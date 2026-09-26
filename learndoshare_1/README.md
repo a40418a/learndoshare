@@ -101,7 +101,7 @@ root에서 커버한다는 원칙은 유지한다. 다만 root가 바꾸는 대�
 #### opt-in 확장 계층 (`override.css`) 조건
 
 - 기본은 꺼져 있다. `milvus.config.json`의 `"overrides": true`로 켠 브랜드에만 로드한다
-- 재정의할 수 있는 `--slds-g-*`는 **별도 허용 목록**으로 제한한다. 모양 관련만 넣는다. 후보는 반경 `--slds-g-radius-border-1..4`·`-pill`·`-circle`, 폰트 굵기 `--slds-g-font-weight-*`이며, 이름은 `@salesforce-ux/design-system` 2.264.1 CSS에서 확인했다. 색(accent 계열)은 org 테마가 원본이므로 재정의하지 않는다
+- 재정의할 수 있는 `--slds-g-*`는 **별도 허용 목록**으로 제한한다. 모양 관련만 넣는다. 후보는 반경 `--slds-g-radius-border-1..4`·`-pill`·`-circle`, 폰트 굵기 `--slds-g-font-weight-*`이며, 이름과 값은 SLDS 2 패키지 `@salesforce-ux/design-system-2` 2.264.2 Cosmos CSS에서 확인했다 (`radius-border-1..4` = 0.25 / 0.5 / 0.75 / 1.25rem, `pill` = 15rem). 색(accent 계열)은 org 테마가 원본이므로 재정의하지 않는다
 - H4 lint는 이 파일에서 차단 대신 **경고**를 내고, 그 외 파일에서의 재정의는 계속 차단한다
 - SLDS 버전 업데이트나 Salesforce 릴리스(연 3회) 때마다 해당 브랜드를 Storybook과 org에서 다시 확인한다
 - Salesforce가 SLDS 2 컴포넌트 hook을 지원하면 이 계층을 그쪽으로 옮긴다
@@ -142,6 +142,8 @@ Storybook에서는 브랜드 root style을 래퍼 요소에 주입하면 된다.
 | styling hook 제약 | `--slds-c-*`는 SLDS 1 전용. `--slds-g-*`는 재정의 금지(읽기 전용). `var()` fallback 필수(린트 규칙) | 확인 |
 | `lightning-*` 로컬 렌더 경로 | npm `lightning-base-components`(Salesforce 배포, MIT, alpha 태그만 존재)에 `badge`, `button` 등이 들어 있다. 조건은 **전역 SLDS CSS**와 **`@lwc/synthetic-shadow`**. 패키지 내부의 `@salesforce/*` 스텁은 **우리 컴포넌트에는 적용되지 않는다** | 확인 (실제 렌더는 미검증) |
 | SFDX 경로 모듈 해석 | `@lwc/module-resolver`의 `dir` 레코드에는 `namespace` 옵션이 없다. `force-app/main/default/lwc/x`를 `c/x`로 쓰려면 컴포넌트마다 alias 레코드(`{ name: "c/x", path: ... }`)를 두거나 `c` 심볼릭 링크 폴더를 쓴다 | 확인 (resolver 실험) |
+| SLDS 2 CSS 패키지 | 최신 SLDS 2는 **별도 패키지 `@salesforce-ux/design-system-2`**(2.264.2)다. `@salesforce-ux/design-system`(2.264.1)은 SLDS 1 빌드라서 버튼 색 등이 `rgb(1,118,211)`로 고정돼 브랜드를 따라가지 않는다. SLDS 2의 `slds2.cosmos.css`는 브랜드 참조 팔레트(`--slds-r-color-brand-*`)를 `:where(html)`에 선언하고 accent hook이 그것을 읽는다. 라이선스는 무료 복제·배포·공개 표시 허용 | 확인 (2026-09-26 Storybook에서 실측) |
+| Storybook 통합 (분기점) | **통과.** SFDX 경로 alias + `lightning-base-components` + synthetic-shadow + SLDS 2 CSS로 `lightning-button`·`lightning-badge`·`lightning-combobox`가 렌더되고, 브랜드 전환이 `lightning-button` 색까지 반영된다. pnpm에서는 `@lwc/engine-dom`·`@lwc/wire-service`를 직접 선언해야 한다. 아이콘은 SVG 템플릿으로 번들되어 스프라이트가 필요 없다 | 확인 (#3) |
 | Storybook | 최신 10.6.0. ESM 전용이고 `addon-essentials`가 없다(core에 통합). 프레임워크는 `@storybook/web-components-vite` | 확인 |
 | 공식 로컬 미리보기 | Spring '26에 **Live Preview**로 이름이 바뀌었다(`sf lightning dev app / site / component`). 단일 컴포넌트 미리보기에서 LDS wire adapter, `@salesforce` scoped module, Apex를 쓸 수 있다(Winter '26~). HMR 지원 | 확인 |
 | 한 org에 테마 여러 개 | 커스텀 테마는 최대 300개, 활성은 1개 (공식 문서). Storybook에 여러 브랜드를 띄우는 것은 Phase 4에서 확인 | 확인 |
@@ -181,7 +183,7 @@ Phase 9  발표 준비 ───────────────────
 - [ ] 스크립트의 `npm run`을 `pnpm`으로 교체 (`package.json`, `.husky/pre-commit`)
 - [ ] `pnpm install` → `pnpm-lock.yaml` 커밋, `package-lock.json`은 `.gitignore`에 추가
 - [ ] **husky 설치 경로 수정:** git 루트가 상위 `learndoshare/`라서 지금은 hook이 설치되지 않는다. `prepare`를 `cd .. && husky learndoshare_1/.husky`로 바꾸고, `pre-commit`은 `cd learndoshare_1 && pnpm exec lint-staged`, `commit-msg`는 [커밋 규칙](../CONTRIBUTING.md) 형식 검사로 둔다
-- [ ] 의존성 추가: `lwc`, `@lwc/rollup-plugin`, `@lwc/synthetic-shadow`, `lightning-base-components`(`-E`로 고정), `@salesforce-ux/design-system`, `rollup`, `@rollup/plugin-node-resolve`, `@rollup/plugin-replace`, `lit`
+- [ ] 의존성 추가: `lwc`, `@lwc/rollup-plugin`, `@lwc/synthetic-shadow`, `lightning-base-components`(`-E`로 고정), `@salesforce-ux/design-system-2`(SLDS 2), `rollup`, `@rollup/plugin-node-resolve`, `@rollup/plugin-replace`, `lit`
 - [ ] `pnpm create storybook@latest --type web_components`로 초기화. docs와 a11y는 별도 애드온이다
 
 - [ ] Claude Code hook H1(pnpm 강제), H2(sf 명령·개인정보 차단), H3(커밋 검사), H6(세션 컨텍스트)를 `.claude/settings.local.json`에서 검증 후 `.claude/settings.json`으로 이동 ([11. Claude Code 자동화](#11-claude-code-자동화--hook--skill))
