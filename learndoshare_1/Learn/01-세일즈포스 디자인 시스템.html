@@ -250,7 +250,7 @@ pnpm exec slds-linter report force-app   <span class="c"># SARIF 보고서</span
 }</code></pre>
   <p>이렇게 하면 브랜드 root가 없는 곳에서는 SLDS 기본 버튼과 똑같이 보이고, 색은 여전히 <code>slds-button_brand</code>가 accent hook을 따라간다.</p>
   <ul>
-    <li><code>--slds-g-radius-border-2</code>(0.25rem), <code>--slds-g-radius-border-pill</code>(15rem), <code>--slds-g-font-weight-7</code>(700)은 <code>@salesforce-ux/design-system</code> 2.264.1 CSS에서 이름과 값을 직접 확인했다. SLDS 버튼 블루프린트의 기본 반경 fallback도 <code>0.25rem</code>이다</li>
+    <li><span class="tag warn">정정</span> 아래 값은 SLDS 1 패키지 기준이다. SLDS 2(<code>@salesforce-ux/design-system-2</code> 2.264.2 Cosmos)에서는 <code>--slds-g-radius-border-1..4</code>가 0.25 / 0.5 / 0.75 / 1.25rem으로 다르다. 우리 org는 SLDS 2이므로 SLDS 2 값을 기준으로 한다. (SLDS 1 기준) <code>--slds-g-radius-border-2</code>(0.25rem), <code>--slds-g-radius-border-pill</code>(15rem), <code>--slds-g-font-weight-7</code>(700)은 <code>@salesforce-ux/design-system</code> 2.264.1 CSS에서 이름과 값을 직접 확인했다. SLDS 버튼 블루프린트의 기본 반경 fallback도 <code>0.25rem</code>이다</li>
     <li>반경 hook은 <code>radius-border-1..4</code>, <code>pill</code>, <code>circle</code>이 있다</li>
   </ul>
   <div class="callout project"><strong>결정 (2026-09-26)</strong>공식 권고는 아니지만 고객사별 니즈가 다양하므로 <code>milvusButton</code>을 파일럿으로 구현한다. 그래도 고객사가 <code>lightning-button</code> 자체를 바꾸길 원하면 4번(opt-in <code>override.css</code>)을 쓴다. 이때 색(accent 계열)은 재정의하지 않는다. 색은 org 테마가 원본이다. Salesforce가 SLDS 2 component hook을 지원하면 4번을 그쪽으로 옮긴다.</div>

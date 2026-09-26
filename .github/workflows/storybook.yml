@@ -1,0 +1,67 @@
+name: Storybook
+
+# main에 반영되면 learndoshare_1 Storybook을 빌드해 GitHub Pages에 배포한다.
+# PR에서는 빌드·lint·테스트만 확인하고 배포하지 않는다.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "learndoshare_1/**"
+      - ".github/workflows/storybook.yml"
+  pull_request:
+    paths:
+      - "learndoshare_1/**"
+      - ".github/workflows/storybook.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: storybook-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: learndoshare_1
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # pnpm 버전은 learndoshare_1/package.json의 packageManager를 따른다
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: learndoshare_1/package.json
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: learndoshare_1/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm test:unit
+      - run: pnpm build-storybook
+
+      - uses: actions/upload-pages-artifact@v5
+        if: github.event_name != 'pull_request'
+        with:
+          path: learndoshare_1/storybook-static
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

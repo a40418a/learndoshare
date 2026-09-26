@@ -29,12 +29,16 @@
 ② 테마 가져오기           pnpm sync:theme → 브랜드 색 → Storybook 메인 컬러 시스템
                                        → 브랜드 로고 → Storybook 로고
         ↓
-③ 브랜드 root style 조정   Claude에 브랜드 요구를 자연어로 입력
-                          ("버튼은 완전히 둥글게, 본문 폰트는 Pretendard")
-                          → brands/<브랜드>/root.css 수정 (허용된 hook만)
+③ 브랜드 root style 조정   Claude에 브랜드 요구를 입력 (#5)
+                          자연어 / 토큰 파일(JSON·CSS 변수) / Figma Variables
+                          / 브랜드 가이드(PDF·이미지) / 고객사 웹사이트 URL
+                          → brands/<브랜드>/root.css 생성 (허용된 변수만)
+                          → Storybook 전체(밀버스 컴포넌트, lightning-* 색, 화면 테마)가 그 브랜드로 바뀜
         ↓
-④ 전용 Storybook 생성     필요한 컴포넌트를 선택
-                          → 선택한 컴포넌트 + 브랜드 root style로 프로젝트 전용 Storybook 생성
+④ 전용 Storybook 생성     Storybook에서 쓸 컴포넌트를 켜고 끔 (#6)
+                          → milvus.config.json 저장 (같은 기능은 컴포넌트 하나만)
+                          → 켜진 컴포넌트 + 브랜드 root style로 프로젝트 전용 Storybook 생성
+                          → Claude Code는 켜진 컴포넌트만 조합해 구현 (hook이 강제)
 ```
 
 | 단계 | 누가 | 결과물 | 자동화 수단 |
@@ -80,6 +84,9 @@
 
 ### 2.2 그래서 브랜드별 버튼은 이렇게 커버한다
 
+**확정 (2026-09-26): 기능 하나에 컴포넌트 하나, root에 따라 자동 전환.** 프로젝트 코드는 항상 `<c-milvus-button>` 하나만 쓴다. 브랜드 root에 버튼 custom 값(신호 변수 `--milvus-button-custom`)이 없으면 내부에서 `lightning-button`을 그대로 렌더하고, 있으면 블루프린트 + `--milvus-button-*`로 렌더한다. Storybook에도 "Button" 항목 하나만 두고 현재 브랜드의 모드(SLDS 기본 / 밀버스 커스텀)를 표시한다. 다른 SLDS 기반 컴포넌트도 같은 방식을 따른다.
+
+
 root에서 커버한다는 원칙은 유지한다. 다만 root가 바꾸는 대상은 **밀버스 변수(`--milvus-*`)**이고, 그 변수를 읽는 것은 밀버스 컴포넌트다.
 
 | 순서 | 방법 | 적용 범위 | 비고 |
@@ -94,7 +101,7 @@ root에서 커버한다는 원칙은 유지한다. 다만 root가 바꾸는 대�
 #### opt-in 확장 계층 (`override.css`) 조건
 
 - 기본은 꺼져 있다. `milvus.config.json`의 `"overrides": true`로 켠 브랜드에만 로드한다
-- 재정의할 수 있는 `--slds-g-*`는 **별도 허용 목록**으로 제한한다. 모양 관련만 넣는다. 후보는 반경 `--slds-g-radius-border-1..4`·`-pill`·`-circle`, 폰트 굵기 `--slds-g-font-weight-*`이며, 이름은 `@salesforce-ux/design-system` 2.264.1 CSS에서 확인했다. 색(accent 계열)은 org 테마가 원본이므로 재정의하지 않는다
+- 재정의할 수 있는 `--slds-g-*`는 **별도 허용 목록**으로 제한한다. 모양 관련만 넣는다. 후보는 반경 `--slds-g-radius-border-1..4`·`-pill`·`-circle`, 폰트 굵기 `--slds-g-font-weight-*`이며, 이름과 값은 SLDS 2 패키지 `@salesforce-ux/design-system-2` 2.264.2 Cosmos CSS에서 확인했다 (`radius-border-1..4` = 0.25 / 0.5 / 0.75 / 1.25rem, `pill` = 15rem). 색(accent 계열)은 org 테마가 원본이므로 재정의하지 않는다
 - H4 lint는 이 파일에서 차단 대신 **경고**를 내고, 그 외 파일에서의 재정의는 계속 차단한다
 - SLDS 버전 업데이트나 Salesforce 릴리스(연 3회) 때마다 해당 브랜드를 Storybook과 org에서 다시 확인한다
 - Salesforce가 SLDS 2 컴포넌트 hook을 지원하면 이 계층을 그쪽으로 옮긴다
@@ -130,11 +137,13 @@ Storybook에서는 브랜드 root style을 래퍼 요소에 주입하면 된다.
 | 테마 레코드 | org `learndoshare_1`에 커스텀 테마 `Milvus_DesignSystem` 1개 (SLDS_v2, 다크 모드 꺼짐) | 확인 |
 | 색상 저장 위치 | `LightningExperienceTheme`에는 색 필드가 없다. `DefaultBrandingSetId` → `BrandingSet` → **`BrandingSetProperty`**(`PropertyName`/`PropertyValue`) | 확인 |
 | 읽히는 값 | 색은 `BRAND_COLOR` = `#0176D3`, `HEADER_BACKGROUND_COLOR` = `#FFFFFF` 두 개뿐이다. 자동 생성 팔레트는 API로 읽을 수 없다. 로고는 `BRAND_IMAGE`에 org 내부 경로(`/file-asset/...`)로 들어 있다 | 확인 |
-| 로고 파일 다운로드 | `/file-asset/...` 경로를 sf CLI 인증으로 받을 수 있는지 | 미확인 |
+| 로고 파일 다운로드 | `BRAND_IMAGE`의 `/file-asset/<이름>` 경로는 Bearer 토큰으로 요청하면 로그인 HTML이 온다(받을 수 없음). 대신 `ContentAsset`(DeveloperName = 경로의 `<이름>`) → `ContentDocumentId` → 최신 `ContentVersion` → REST `/sobjects/ContentVersion/<Id>/VersionData`로 원본 파일을 받을 수 있다 (2026-09-26 실측: 600×120 JPG) | 확인 |
 | SLDS 2 | Winter '26부터 전 에디션 GA. 새 org는 기본, 기존 org는 Themes and Branding에서 선택. 모바일 앱·빌더·Experience Cloud에는 적용되지 않는다 | 확인 |
 | styling hook 제약 | `--slds-c-*`는 SLDS 1 전용. `--slds-g-*`는 재정의 금지(읽기 전용). `var()` fallback 필수(린트 규칙) | 확인 |
 | `lightning-*` 로컬 렌더 경로 | npm `lightning-base-components`(Salesforce 배포, MIT, alpha 태그만 존재)에 `badge`, `button` 등이 들어 있다. 조건은 **전역 SLDS CSS**와 **`@lwc/synthetic-shadow`**. 패키지 내부의 `@salesforce/*` 스텁은 **우리 컴포넌트에는 적용되지 않는다** | 확인 (실제 렌더는 미검증) |
 | SFDX 경로 모듈 해석 | `@lwc/module-resolver`의 `dir` 레코드에는 `namespace` 옵션이 없다. `force-app/main/default/lwc/x`를 `c/x`로 쓰려면 컴포넌트마다 alias 레코드(`{ name: "c/x", path: ... }`)를 두거나 `c` 심볼릭 링크 폴더를 쓴다 | 확인 (resolver 실험) |
+| SLDS 2 CSS 패키지 | 최신 SLDS 2는 **별도 패키지 `@salesforce-ux/design-system-2`**(2.264.2)다. `@salesforce-ux/design-system`(2.264.1)은 SLDS 1 빌드라서 버튼 색 등이 `rgb(1,118,211)`로 고정돼 브랜드를 따라가지 않는다. SLDS 2의 `slds2.cosmos.css`는 브랜드 참조 팔레트(`--slds-r-color-brand-*`)를 `:where(html)`에 선언하고 accent hook이 그것을 읽는다. 라이선스는 무료 복제·배포·공개 표시 허용 | 확인 (2026-09-26 Storybook에서 실측) |
+| Storybook 통합 (분기점) | **통과.** SFDX 경로 alias + `lightning-base-components` + synthetic-shadow + SLDS 2 CSS로 `lightning-button`·`lightning-badge`·`lightning-combobox`가 렌더되고, 브랜드 전환이 `lightning-button` 색까지 반영된다. pnpm에서는 `@lwc/engine-dom`·`@lwc/wire-service`를 직접 선언해야 한다. 아이콘은 SVG 템플릿으로 번들되어 스프라이트가 필요 없다 | 확인 (#3) |
 | Storybook | 최신 10.6.0. ESM 전용이고 `addon-essentials`가 없다(core에 통합). 프레임워크는 `@storybook/web-components-vite` | 확인 |
 | 공식 로컬 미리보기 | Spring '26에 **Live Preview**로 이름이 바뀌었다(`sf lightning dev app / site / component`). 단일 컴포넌트 미리보기에서 LDS wire adapter, `@salesforce` scoped module, Apex를 쓸 수 있다(Winter '26~). HMR 지원 | 확인 |
 | 한 org에 테마 여러 개 | 커스텀 테마는 최대 300개, 활성은 1개 (공식 문서). Storybook에 여러 브랜드를 띄우는 것은 Phase 4에서 확인 | 확인 |
@@ -174,7 +183,7 @@ Phase 9  발표 준비 ───────────────────
 - [ ] 스크립트의 `npm run`을 `pnpm`으로 교체 (`package.json`, `.husky/pre-commit`)
 - [ ] `pnpm install` → `pnpm-lock.yaml` 커밋, `package-lock.json`은 `.gitignore`에 추가
 - [ ] **husky 설치 경로 수정:** git 루트가 상위 `learndoshare/`라서 지금은 hook이 설치되지 않는다. `prepare`를 `cd .. && husky learndoshare_1/.husky`로 바꾸고, `pre-commit`은 `cd learndoshare_1 && pnpm exec lint-staged`, `commit-msg`는 [커밋 규칙](../CONTRIBUTING.md) 형식 검사로 둔다
-- [ ] 의존성 추가: `lwc`, `@lwc/rollup-plugin`, `@lwc/synthetic-shadow`, `lightning-base-components`(`-E`로 고정), `@salesforce-ux/design-system`, `rollup`, `@rollup/plugin-node-resolve`, `@rollup/plugin-replace`, `lit`
+- [ ] 의존성 추가: `lwc`, `@lwc/rollup-plugin`, `@lwc/synthetic-shadow`, `lightning-base-components`(`-E`로 고정), `@salesforce-ux/design-system-2`(SLDS 2), `rollup`, `@rollup/plugin-node-resolve`, `@rollup/plugin-replace`, `lit`
 - [ ] `pnpm create storybook@latest --type web_components`로 초기화. docs와 a11y는 별도 애드온이다
 
 - [ ] Claude Code hook H1(pnpm 강제), H2(sf 명령·개인정보 차단), H3(커밋 검사), H6(세션 컨텍스트)를 `.claude/settings.local.json`에서 검증 후 `.claude/settings.json`으로 이동 ([11. Claude Code 자동화](#11-claude-code-자동화--hook--skill))
@@ -223,17 +232,39 @@ pnpm sync:theme
       BrandingSetProperty:      BrandingSetId, PropertyName, PropertyValue
   → BrandingSetId로 테마와 속성 연결
   → BRAND_COLOR → accent 계열 hook 값 생성         → brands/<테마>/theme.json
-  → BRAND_IMAGE → 로고 파일 다운로드                → brands/<테마>/logo.*
+  → BRAND_IMAGE → ContentAsset → ContentVersion 파일 → brands/<테마>/logo.<확장자>
   → Storybook: 툴바 브랜드 목록, 사이드바 로고(manager 테마), 컬러 시스템 문서 페이지에 반영
 ```
 
 - [ ] `scripts/sync-theme.mjs` 작성 (테마 레코드를 **전부 순회**)
-- [ ] 로고 다운로드 방법 확인 (`/file-asset/...`를 sf 인증으로 받을 수 있는지, **미확인**)
+- [ ] 로고 다운로드 구현 ([로고 받는 방법](#로고-받는-방법-확인됨)대로)
 - [ ] 컬러 시스템 문서 페이지: 브랜드 색과 파생 색 견본을 보여 주는 스토리
 - [ ] Setup에서 두 번째 테마를 만들고 `pnpm sync:theme` 한 번으로 추가되는지 확인
 - [ ] 산출물에 토큰이나 인증 정보가 섞이지 않는지 점검
 
 **한계 (발표에서 밝힐 것):** API로는 원본 색 하나만 읽힌다. 파생 색은 우리가 계산하므로 org 팔레트와 미세하게 다를 수 있다.
+
+#### 로고 받는 방법 (확인됨)
+
+`BRAND_IMAGE` 값은 `/file-asset/X20250411104726_milvus_logo_1?v=1` 같은 org 내부 경로다. 이 경로는 브라우저 세션용이라 CLI 토큰으로는 받을 수 없다. 아래 순서로 받는다.
+
+| 단계 | 호출 | 얻는 것 |
+| --- | --- | --- |
+| 1 | Tooling `BrandingSetProperty` (`PropertyName = 'BRAND_IMAGE'`) | `/file-asset/<이름>?v=1` → `<이름>` 추출 |
+| 2 | SOQL `SELECT ContentDocumentId FROM ContentAsset WHERE DeveloperName = '<이름>'` | 문서 Id |
+| 3 | SOQL `SELECT Id, FileExtension FROM ContentVersion WHERE ContentDocumentId = '<문서 Id>' AND IsLatest = true` | 버전 Id, 확장자 |
+| 4 | REST `GET /services/data/v67.0/sobjects/ContentVersion/<버전 Id>/VersionData` (`Authorization: Bearer`) | 파일 원본 → `brands/<테마>/logo.<확장자>` |
+
+**script · skill · hook에 넣는 방식**
+
+- **script (`scripts/sync-theme.mjs`):** 1~4단계를 모두 script 안에서 처리한다. 토큰은 `sf org display --json` 결과를 **메모리에서만** 쓰고, 출력하거나 파일로 남기지 않는다. 받지 못하면 경고를 출력하고 종료 코드 0으로 끝낸다 (색 동기화는 막지 않는다)
+- **skill (`milvus-init` ②단계):** Claude는 로고를 직접 받지 않고 `pnpm sync:theme`만 실행한다. 결과로 `logo.*`가 생겼는지 확인하고, 없으면 "Setup > Themes and Branding에서 로고를 올렸는지" 확인하도록 사용자에게 안내한다
+- **hook**
+  - H2(`guard-sf`): `sf org display`는 토큰을 출력하므로 **Bash로 직접 실행하는 것을 차단**한다. script 안에서 호출하는 것만 허용된다(hook은 Claude의 도구 호출만 검사하므로 script 내부 호출은 영향받지 않는다)
+  - H3(`guard-commit`): 커밋 diff에 `00D…!` 형태의 액세스 토큰 패턴이 있으면 차단한다
+  - H5(`guard-generated`): `logo.*`는 script만 만든다. 직접 편집하거나 다른 이미지로 교체하는 것을 막는다
+- **로고는 커밋한다** (2026-09-26 결정). Pages 배포본에 로고가 들어가야 하기 때문이다. 공개 저장소이므로 로고 외의 org 파일은 받지 않는다
+
 
 ### Phase 5 — 파일럿 컴포넌트
 
@@ -293,7 +324,7 @@ pnpm sync:theme
 
 ## 5. 10/23(금) 발표 준비 계획
 
-> 관련 이슈: [a40418a/learndoshare#1](https://github.com/a40418a/learndoshare/issues/1)
+> 관련 이슈: [a40418a/learndoshare#1](https://github.com/a40418a/learndoshare/issues/1) (계획, 완료) · 구현: [#3](https://github.com/a40418a/learndoshare/issues/3) Storybook 기반·배포 → [#4](https://github.com/a40418a/learndoshare/issues/4) `milvusButton`·root style → [#5](https://github.com/a40418a/learndoshare/issues/5) 브랜드 입력 skill → [#6](https://github.com/a40418a/learndoshare/issues/6) 컴포넌트 활성화 선택
 > 남은 기간: 9/28(월)부터 약 4주, 실제 작업일 18일 (10/9 한글날 제외)
 
 ### 5.1 주차별 일정
@@ -415,7 +446,7 @@ pnpm sync:theme
 | synthetic/native shadow 차이로 Storybook과 org 화면이 다르다 | 문서를 신뢰할 수 없다 | synthetic-shadow를 로드하고 org 화면과 나란히 비교한다 |
 | Claude가 규칙 밖의 스타일을 만든다 | 브랜드 간 구조가 갈라진다 | 수정 파일 1개, 허용 목록, 린트, PR 리뷰 |
 | API로 원본 색 하나만 읽힌다 | Storybook 파생 색이 org와 다를 수 있다 | 시뮬레이션임을 밝히고 핵심 색은 org 화면으로 교차 확인한다 |
-| 로고 파일을 CLI로 받지 못한다 | ②단계 자동화가 불완전하다 | 컷 라인 2: 로고는 수동 배치 |
+| 로고를 받는 경로(ContentAsset → ContentVersion)가 org 설정이나 권한에 따라 막힌다 | ②단계 자동화가 불완전하다 | 받지 못하면 경고만 내고 색은 계속 동기화한다. 로고는 수동 배치 (컷 라인 2) |
 | HMR이 없다 | "빠른 확인" 목표 일부 미달 | `rollup -w` 병렬 실행. 개발 중 확인은 `sf lightning dev`와 역할을 나눈다 |
 | `lightning-base-components`가 alpha 태그로 배포된다 | 버전 변동 위험 | `-E`로 고정하고 업그레이드는 명시적으로만 한다 |
 
@@ -476,7 +507,7 @@ learndoshare_1/                     # 밀버스 디자인 시스템 (공용)
 | # | 이벤트 · matcher | script | 막는 것 | 판정 | 도입 시점 |
 | --- | --- | --- | --- | --- | --- |
 | H1 | PreToolUse · `Bash` | `guard-pm.mjs` | `npm` · `npx` · `yarn` 명령 | exit 2 + 대응하는 pnpm 명령을 stderr로 안내 → Claude가 스스로 고쳐 다시 실행 | Phase 1 |
-| H2 | PreToolUse · `Bash\|mcp__salesforce-dx__.*` | `guard-sf.mjs` | 1층: `sf project deploy`, `sf data create/update/delete`, `sf apex run` 등 되돌릴 수 없는 명령 (조회·retrieve·describe·`lightning dev`는 통과). 2층: 통과한 조회에 개인정보 필드(`Phone`, `Email`, `MailingStreet` 등)나 `FIELDS(ALL)`가 있으면 차단 | 명령을 `&&` `;` `\|`로 쪼개 조각마다 검사. Bash와 MCP 두 경로를 같은 script가 판정 | Phase 1 |
+| H2 | PreToolUse · `Bash\|mcp__salesforce-dx__.*` | `guard-sf.mjs` | 1층: `sf project deploy`, `sf data create/update/delete`, `sf apex run` 등 되돌릴 수 없는 명령 (조회·retrieve·describe·`lightning dev`는 통과). 2층: 통과한 조회에 개인정보 필드(`Phone`, `Email`, `MailingStreet` 등)나 `FIELDS(ALL)`가 있으면 차단. 3층: 토큰을 출력하는 `sf org display`와 `sf org auth` 계열은 Bash 직접 실행 차단 | 명령을 `&&` `;` `\|`로 쪼개 조각마다 검사. Bash와 MCP 두 경로를 같은 script가 판정 | Phase 1 |
 | H3 | PreToolUse · `Bash` (`git commit`) | `guard-commit.mjs` | 스테이징된 `.sfdx/` · `.sf/` · `.env` · `package-lock.json`, 시크릿 패턴(`sk-`, `AKIA`, `ghp_`, `-----BEGIN PRIVATE KEY-----`), 커밋 메시지 형식(`[태그] 요약 (#N)`) 위반 | 정규식만 (0.1초). 감지한 값은 앞 6자만 출력 | Phase 1 |
 | H4 | PostToolUse · `Edit\|Write` | `lint-style.mjs` | 컴포넌트 CSS: hex 색, `--slds-c-*`, `--slds-g-*` 재정의, fallback 없는 `var(--slds-*)`. `brands/*/root.css`: 허용 목록 밖의 변수, `--slds-*` 정의. `brands/*/override.css`: 별도 허용 목록 밖의 재정의는 차단, 목록 안은 경고 | exit 2 + 고치는 법을 stderr로 → 자가 수정 루프 | Phase 3 |
 | H5 | PreToolUse · `Edit\|Write` | `guard-generated.mjs` | `brands/*/theme.json`, `logo.*` 직접 편집 (org에서 `pnpm sync:theme`으로만 생성) | exit 2 + "`pnpm sync:theme`을 실행하라" 안내 | Phase 4 |
