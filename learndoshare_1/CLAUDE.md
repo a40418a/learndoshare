@@ -95,6 +95,7 @@ UI 변경은 Storybook에서 해당 브랜드로 직접 확인한다. 가능하�
 - **pnpm만 쓴다.** `npm`, `npx`, `yarn`은 쓰지 않는다. 문서 예제에 `npx`가 나오면 `pnpm exec`(설치됨)나 `pnpm dlx`(미설치)로 바꾼다
 - **sf CLI:** 조회(`data query`, `sobject describe`, `project retrieve`, `lightning dev`)는 자유롭게 한다. 배포, 삭제, 데이터 변경, `apex run`은 실행 전에 대상 org와 명령을 보여 주고 승인을 받는다
 - 개인정보 필드(`Phone`, `Email`, 주소)나 `FIELDS(ALL)`는 조회하지 않는다
+- `sf org display`처럼 **액세스 토큰을 출력하는 명령은 직접 실행하지 않는다.** 토큰이 필요한 작업(로고 다운로드 등)은 script 안에서 처리하고 토큰을 출력하지 않는다
 - `.sfdx/`, `.sf/`, `.env`, `package-lock.json`은 커밋하지 않는다
 - 공개 저장소(`a40418a/learndoshare`)다. 이슈·PR·커밋에 org ID와 인증 정보를 쓰지 않는다
 - `.vscode/settings.json`은 사용자의 개인 설정이다. 요청 없이 커밋하지 않는다
