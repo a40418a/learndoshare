@@ -46,3 +46,15 @@ $RECYCLE.BIN/
 **/__pycache__/
 **/.venv/
 **/venv/
+
+# LWC / Storybook build output
+dist/
+storybook-static/
+*storybook.log
+
+# pnpm only
+package-lock.json
+yarn.lock
+
+# 개인 개발 서버 설정 (로컬 경로 포함)
+.claude/launch.json

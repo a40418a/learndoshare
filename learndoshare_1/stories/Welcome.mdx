@@ -1,0 +1,37 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="시작하기" />
+
+<img
+  src="static/brands/Milvus_DesignSystem/logo.jpg"
+  alt="MILVUS"
+  width="240"
+/>
+
+# 밀버스 디자인 시스템
+
+밀버스 프로젝트가 함께 쓰는 **Salesforce LWC 컴포넌트 카탈로그**다. 최신 **SLDS 2**(`@salesforce-ux/design-system-2` 2.264.2, Cosmos 테마)를 기반으로 한다.
+
+**원칙: SLDS가 제공하는 것을 최대한 쓰고, 없는 것만 더한다.**
+
+## 구성
+
+- **Foundations** · 컬러(global styling hook, 브랜드 팔레트), 타이포그래피
+- **컴포넌트 / SLDS 기반** · Salesforce가 제공하는 기능. 실제 `lightning-*` 컴포넌트를 렌더한다
+- **컴포넌트 / 밀버스 추가** · Salesforce가 제공하지 않는 기능. 의미색 뱃지, 검색 다중 선택
+
+**기능 하나에 컴포넌트 하나.** 같은 기능을 여러 컴포넌트로 만들지 않는다. 예를 들어 다중 선택은 MultiSelect 하나만 쓴다.
+
+## 보는 법
+
+- **브랜드 전환:** 상단 툴바의 🖌 브랜드 메뉴. `org` 표시는 org Themes and Branding에서 `pnpm sync:theme`으로 가져온 브랜드, `샘플`은 전환 확인용이다
+- **코드:** 각 스토리 아래 **Show code**에 LWC 사용 코드가 나온다. controls를 바꾸면 코드도 바뀐다
+- **소스:** 밀버스 추가 컴포넌트는 문서 페이지에 실제 소스(html/js)가 그대로 나온다. 저장소의 `force-app/main/default/lwc/`와 같은 파일이다
+
+## 알아 둘 것
+
+- Storybook에는 org가 없다. 브랜드 전환은 **시뮬레이션**이며, 실제 org에서는 관리자가 Setup에서 바꾼다
+- `lightning-*`는 Salesforce가 npm으로 배포하는 `lightning-base-components`로 렌더한다. 플랫폼과 같은 synthetic shadow 모드를 쓴다
+- 데이터(`@wire`, Apex)가 붙은 확인은 Salesforce Live Preview(`sf lightning dev component`)를 쓴다
+
+저장소: [a40418a/learndoshare](https://github.com/a40418a/learndoshare) · 계획: `learndoshare_1/README.md`
