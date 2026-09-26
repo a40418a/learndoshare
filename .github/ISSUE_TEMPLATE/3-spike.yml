@@ -1,0 +1,42 @@
+name: 검증 실험 (Spike)
+description: 되는지 안 되는지 확인한다. 실패해도 결과를 남긴다
+title: "[Spike] "
+labels: ["spike"]
+body:
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: 검증할 가설
+      placeholder: "예: lightning-badge가 Storybook에서 SLDS 스타일이 적용된 채 렌더된다"
+    validations:
+      required: true
+  - type: textarea
+    id: method
+    attributes:
+      label: 방법
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: success
+    attributes:
+      label: 성공 기준
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: input
+    id: deadline
+    attributes:
+      label: 판단 기한
+      placeholder: "예: 10/2(금)"
+    validations:
+      required: true
+  - type: textarea
+    id: fallback
+    attributes:
+      label: 실패 시 대안
+  - type: markdown
+    attributes:
+      value: "닫기 전에 성공/실패와 근거(스크린샷, 에러 메시지)를 댓글로 남깁니다."

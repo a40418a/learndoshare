@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>테마와 브랜딩 동기화</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<nav class="topnav"><div class="topnav-inner">
+  <a href="../README.md">README</a>
+  <a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html">01 SLDS</a>
+  <a href="02-LWC%20%EA%B8%B0%EC%B4%88.html">02 LWC</a>
+  <a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html">03 Storybook</a>
+  <a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html">04 통합</a>
+  <a class="active" href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>
+  <a href="06-%EB%A1%9C%EC%BB%AC%20%EA%B0%9C%EB%B0%9C%20%EB%8F%84%EA%B5%AC%20%EB%B9%84%EA%B5%90.html">06 도구 비교</a>
+  <a href="07-pnpm.html">07 pnpm</a>
+  <a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html">08 Claude Code</a>
+</div></nav>
+
+<div class="layout">
+<aside class="toc">
+  <strong>목차</strong>
+  <ol>
+    <li><a href="#why">왜 알아야 하나</a></li>
+    <li><a href="#what">Themes and Branding이 다루는 것</a></li>
+    <li><a href="#model">데이터 구조</a></li>
+    <li><a href="#result">우리 org 조회 결과</a></li>
+    <li><a href="#query">조회 방법</a></li>
+    <li><a href="#sync">sync 스크립트 설계</a></li>
+    <li><a href="#limits">한계와 주의</a></li>
+    <li><a href="#quiz">스스로 점검</a></li>
+  </ol>
+</aside>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">LEARN 05 · Phase 4 준비</div>
+  <h1>테마와 브랜딩 동기화</h1>
+  <p class="lead">org의 Themes and Branding 설정이 어디에 어떻게 저장되는지 이해하고, 그것을 Storybook 브랜드로 가져오는 스크립트를 설계한다.</p>
+  <div class="meta"><span>예상 1시간</span><span>선행: 01 SLDS</span><span>2026-09-26 org 조회로 확인</span></div>
+</header>
+
+<section id="why">
+  <h2>왜 알아야 하나</h2>
+  <p>밀버스의 색상 원칙은 <b>"색은 org에서 온다"</b>이다. 관리자가 Setup에서 브랜드 색을 바꾸면 커스텀 컴포넌트도 코드 배포 없이 따라가야 한다.</p>
+  <p>그런데 Storybook은 로컬에서 돌아가므로 <b>org가 없다</b>. org의 색을 Storybook에서 보려면 누군가 가져와야 한다. 이 문서는 그 "가져오기"의 재료다.</p>
+  <div class="flow">
+    <div class="step"><b>org (실제)</b>관리자가 Setup에서 테마 색 지정</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>pnpm sync:theme</b>sf CLI로 테마 조회 후 JSON 생성</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>Storybook (시뮬레이션)</b>툴바에서 브랜드를 골라 미리 보기</div>
+  </div>
+  <div class="callout warn"><strong>시뮬레이션이라는 점을 잊지 말 것</strong>Storybook에서 브랜드를 바꿔도 org는 바뀌지 않는다. Storybook은 미리 보는 곳이고, 실제 적용은 관리자가 Setup에서 한다.</div>
+</section>
+
+<section id="what">
+  <h2>Themes and Branding이 다루는 것</h2>
+  <div class="table-wrap"><table>
+    <tr><th>항목</th><th>Setup에서 관리?</th><th>밀버스에서 관리하는 곳</th></tr>
+    <tr><td>브랜드 색</td><td><span class="tag ok">예</span></td><td>Themes and Branding (관리자, 배포 불필요)</td></tr>
+    <tr><td>헤더 배경색</td><td><span class="tag ok">예</span></td><td>Themes and Branding</td></tr>
+    <tr><td>로고, 배너 이미지</td><td><span class="tag ok">예</span></td><td>Themes and Branding</td></tr>
+    <tr><td>폰트, 타이포 계층</td><td><span class="tag bad">아니오</span></td><td>사내 CSS 변수 파일 1개 (개발자, 배포 필요)</td></tr>
+    <tr><td>간격, 반경</td><td><span class="tag bad">아니오</span></td><td>SLDS 기본값 그대로 (건드리지 않음)</td></tr>
+  </table></div>
+  <p>org에는 커스텀 테마를 여러 개 만들 수 있지만, <b>동시에 활성화되는 테마는 하나</b>다. Lightning Blue 같은 내장 테마는 레코드로 조회되지 않고, 직접 만든 커스텀 테마만 조회된다.</p>
+  <div class="callout project"><strong>미확인 항목</strong>"한 org에 테마 레코드를 여러 개 만들어 두고 스크립트가 전부 읽으면 Storybook에 브랜드 여러 개가 뜬다"는 아직 확인하지 못했다. Phase 4에서 두 번째 테마를 만들어 확인한다.</div>
+</section>
+
+<section id="model">
+  <h2>데이터 구조</h2>
+  <p>처음에는 테마 레코드에 색상 필드가 있을 것이라고 생각했지만 <b>그렇지 않다</b>. 색은 테마가 가리키는 <b>브랜딩 집합(BrandingSet)</b>의 속성으로 저장된다.</p>
+  <div class="flow">
+    <div class="step"><b>LightningExperienceTheme</b>테마 1개. 이름, SLDS 버전, 다크 모드 여부</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>BrandingSet</b><code>DefaultBrandingSetId</code>로 연결. 이름은 <code>LEXTHEMING</code> + 테마 이름</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>BrandingSetProperty</b>여러 행. <code>PropertyName</code> / <code>PropertyValue</code> 쌍</div>
+  </div>
+
+  <h3>LightningExperienceTheme 주요 필드 (Tooling API)</h3>
+  <div class="table-wrap"><table>
+    <tr><th>필드</th><th>타입</th><th>의미</th></tr>
+    <tr><td><code>DeveloperName</code></td><td>string</td><td>API 이름. 예: <code>Milvus_DesignSystem</code></td></tr>
+    <tr><td><code>MasterLabel</code></td><td>string</td><td>화면에 보이는 이름</td></tr>
+    <tr><td><code>DefaultBrandingSetId</code></td><td>reference</td><td><b>색이 들어 있는 BrandingSet의 Id</b></td></tr>
+    <tr><td><code>DesignSystemVersion</code></td><td>picklist</td><td><code>SLDS_v2</code> 등</td></tr>
+    <tr><td><code>IsDarkModeEnabled</code></td><td>boolean</td><td>다크 모드 사용 여부</td></tr>
+    <tr><td><code>Metadata</code></td><td>complexvalue</td><td>메타데이터 전체 (JSON). 아래 주의 참고</td></tr>
+  </table></div>
+  <p>색상 이름이 들어간 필드는 하나도 없다. 이것이 "필드명을 추측하지 말고 describe로 확인하라"는 규칙이 필요했던 이유다.</p>
+
+  <h3>BrandingSetProperty 필드</h3>
+  <div class="table-wrap"><table>
+    <tr><th>필드</th><th>타입</th><th>의미</th></tr>
+    <tr><td><code>BrandingSetId</code></td><td>reference</td><td>소속 BrandingSet</td></tr>
+    <tr><td><code>PropertyName</code></td><td>string</td><td><code>BRAND_COLOR</code>, <code>HEADER_BACKGROUND_COLOR</code>, <code>BRAND_IMAGE</code> …</td></tr>
+    <tr><td><code>PropertyValue</code></td><td>textarea</td><td>값. 색은 <code>#RRGGBB</code>, 이미지는 경로, 없으면 문자열 <code>null</code></td></tr>
+  </table></div>
+</section>
+
+<section id="result">
+  <h2>우리 org 조회 결과</h2>
+  <p>org <code>learndoshare_1</code>의 테마 <code>Milvus_DesignSystem</code> (SLDS_v2, 다크 모드 꺼짐)이 가리키는 BrandingSet <code>LEXTHEMINGMilvus_DesignSystem</code>의 속성이다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>PropertyName</th><th>PropertyValue</th><th>Storybook에서 쓰나</th></tr>
+    <tr><td><code>BRAND_COLOR</code></td><td><code>#0176D3</code></td><td><span class="tag ok">핵심</span> accent 계열의 기준색</td></tr>
+    <tr><td><code>HEADER_BACKGROUND_COLOR</code></td><td><code>#FFFFFF</code></td><td><span class="tag info">선택</span> 헤더를 흉내 낼 때만</td></tr>
+    <tr><td><code>BRAND_IMAGE</code></td><td>로고 파일 경로</td><td>사용 안 함</td></tr>
+    <tr><td><code>OVERRIDE_LOADING_PAGE</code></td><td><code>true</code></td><td>사용 안 함</td></tr>
+    <tr><td><code>BRAND_IMAGE_DARK_MODE</code>, <code>GROUP_IMAGE</code>, <code>GROUPS_BANNER_IMAGE</code>, <code>PROFILE_BANNER_IMAGE</code>, <code>USER_IMAGE</code></td><td><code>null</code></td><td>사용 안 함</td></tr>
+  </table></div>
+  <div class="callout key"><strong>가장 중요한 발견</strong>읽히는 색은 <b>두 개뿐</b>이다. Setup 화면에서 브랜드 색 하나를 넣으면 Salesforce가 밝기가 다른 파생 색(팔레트)을 자동으로 만들지만, <b>파생 색은 API에 저장되지 않는다</b>. Storybook에서는 원본 색 하나로 파생 색을 우리가 직접 계산해야 하고, 그래서 org와 미세하게 다를 수 있다.</div>
+</section>
+
+<section id="query">
+  <h2>조회 방법</h2>
+  <h3>1. 필드 목록 확인 (describe)</h3>
+<pre><code>sf sobject describe --sobject LightningExperienceTheme --use-tooling-api -o learndoshare_1 --json \
+  | jq -r '.result.fields[] | "\(.name)\t\(.type)"'</code></pre>
+
+  <h3>2. 테마와 연결된 BrandingSet 찾기</h3>
+<pre><code>sf data query --use-tooling-api -o learndoshare_1 \
+  -q "SELECT Id, DeveloperName, MasterLabel, DefaultBrandingSetId FROM LightningExperienceTheme"</code></pre>
+
+  <h3>3. 모든 BrandingSet의 속성을 한 번에 조회</h3>
+<pre><code>sf data query --use-tooling-api -o learndoshare_1 --json \
+  -q "SELECT BrandingSetId, BrandingSet.DeveloperName, PropertyName, PropertyValue
+      FROM BrandingSetProperty ORDER BY BrandingSetId, PropertyName"</code></pre>
+  <p>관계 필드 <code>BrandingSet.DeveloperName</code>으로 부모 이름을 같이 가져올 수 있다. <code>BrandingSetProperty</code>는 일반 API(<code>--use-tooling-api</code> 없이)로도 조회된다.</p>
+
+  <div class="callout warn"><strong><code>Metadata</code> 필드 조회 시 주의</strong>Tooling API에서 <code>Metadata</code>(complexvalue) 필드는 결과가 <b>한 건</b>일 때만 조회된다. 그래서 <code>WHERE Id = '...'</code>처럼 한 건으로 좁혀야 한다. 전체를 순회할 때는 <code>Metadata</code> 대신 일반 필드를 쓴다.</div>
+
+  <h3>참고: 메타데이터로 받아 보기</h3>
+<pre><code>sf project retrieve start -m LightningExperienceTheme:Milvus_DesignSystem -o learndoshare_1</code></pre>
+  <p>파일로 받으면 구조를 읽기 쉽다. 다만 받은 파일을 저장소에 커밋할지는 <b>미정</b>이다 (README "결정이 필요한 것"). 스크립트는 파일 없이 조회 결과만 쓰므로 retrieve가 필요 없다. <span class="tag warn">미확인</span> BrandingSet 메타데이터까지 함께 받아지는지는 아직 시험하지 않았다.</p>
+</section>
+
+<section id="sync">
+  <h2>sync 스크립트 설계</h2>
+  <h3>요구사항</h3>
+  <ul>
+    <li>명령 하나: <code>pnpm sync:theme</code></li>
+    <li>테마 레코드를 <b>전부 순회</b>한다. 테마를 하나 더 만들면 스크립트를 고치지 않아도 브랜드가 추가된다</li>
+    <li>결과는 <code>brands/&lt;DeveloperName&gt;/theme.json</code> (로고는 같은 폴더의 <code>logo.*</code>)</li>
+    <li>JSON에는 색과 이름만 담는다. org 인증 토큰은 절대 넣지 않는다</li>
+  </ul>
+
+  <h3>처리 흐름</h3>
+  <div class="flow">
+    <div class="step"><b>1. 테마 조회</b>DeveloperName, MasterLabel, DefaultBrandingSetId</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>2. 속성 조회</b>BrandingSetProperty 전체</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>3. 묶기</b>BrandingSetId로 테마와 연결</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>4. 매핑</b>BRAND_COLOR를 accent hook 계열로 변환</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>5. 저장</b>테마마다 JSON 1개</div>
+  </div>
+
+  <h3>뼈대 코드</h3>
+<pre data-file="scripts/sync-theme.mjs"><code>import { execFileSync } from 'node:child_process';
+import { mkdirSync, writeFileSync } from 'node:fs';
+
+const org = process.env.SF_ORG ?? 'learndoshare_1';
+
+<span class="c">// sf CLI 실행 결과(JSON)에서 레코드만 꺼낸다</span>
+function query(soql) {
+  const out = execFileSync('sf', ['data', 'query', '--use-tooling-api', '-o', org, '--json', '-q', soql], { encoding: 'utf8' });
+  return JSON.parse(out).result.records;
+}
+
+const themes = query('SELECT DeveloperName, MasterLabel, DefaultBrandingSetId FROM LightningExperienceTheme');
+const props = query('SELECT BrandingSetId, PropertyName, PropertyValue FROM BrandingSetProperty');
+
+<span class="c">// BrandingSetId → { BRAND_COLOR: '#0176D3', ... }</span>
+const bySet = {};
+for (const p of props) {
+  (bySet[p.BrandingSetId] ??= {})[p.PropertyName] = p.PropertyValue;
+}
+
+for (const t of themes) {
+  const dir = `brands/${t.DeveloperName}`;
+  mkdirSync(dir, { recursive: true });
+  const values = bySet[t.DefaultBrandingSetId] ?? {};
+  const theme = {
+    name: t.DeveloperName,
+    label: t.MasterLabel,
+    brandColor: values.BRAND_COLOR,
+    headerBackground: values.HEADER_BACKGROUND_COLOR,
+    hooks: toAccentHooks(values.BRAND_COLOR), <span class="c">// 01 SLDS 문서의 accent hook 목록 참고</span>
+  };
+  writeFileSync(`${dir}/theme.json`, JSON.stringify(theme, null, 2));
+}</code></pre>
+  <p><code>execSync</code>에 문자열을 이어 붙이는 대신 <code>execFileSync</code>로 인자를 배열로 넘겼다. 셸을 거치지 않으므로 따옴표나 공백 때문에 깨지지 않는다.</p>
+
+  <h3>산출물 예시</h3>
+<pre data-file="brands/Milvus_DesignSystem/theme.json"><code>{
+  "name": "Milvus_DesignSystem",
+  "label": "Milvus_DesignSystem",
+  "brandColor": "#0176D3",
+  "headerBackground": "#FFFFFF",
+  "hooks": {
+    "--slds-g-color-accent-1": "#0176D3",
+    "...": "파생 색 (직접 계산)"
+  }
+}</code></pre>
+  <p>Storybook의 decorator가 이 폴더를 읽어 툴바 항목을 만들고, 선택된 테마의 <code>hooks</code>를 래퍼 요소의 CSS 변수로 주입한다. 자세한 방법은 <a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html#globals">03 스토리북 · decorator와 globals</a>에 있다.</p>
+</section>
+
+<section id="limits">
+  <h2>한계와 주의</h2>
+  <div class="table-wrap"><table>
+    <tr><th>한계</th><th>영향</th><th>대응</th></tr>
+    <tr><td>원본 색만 읽힌다</td><td>파생 색이 org와 미세하게 다를 수 있다</td><td>발표에서 시뮬레이션임을 밝힌다. 핵심 화면은 org 캡처와 비교한다</td></tr>
+    <tr><td>폰트는 동기화되지 않는다</td><td>"전부 자동"이 아니다</td><td>타이포는 CSS 변수 파일로 관리한다고 명확히 말한다</td></tr>
+    <tr><td>앱 단위 브랜딩(App Branding)은 다른 곳에 저장된다</td><td>브랜드가 앱 단위라면 이 스크립트로 못 읽는다</td><td>브랜드 단위(org / 앱)가 정해지면 확장한다 <span class="tag warn">미정</span></td></tr>
+    <tr><td>sf 인증이 필요하다</td><td>CI에서는 별도 인증이 필요하다</td><td>로컬에서만 실행하고 결과 JSON을 커밋하는 방식으로 시작한다</td></tr>
+  </table></div>
+</section>
+
+<section id="quiz" class="quiz">
+  <h2>스스로 점검</h2>
+  <details><summary>Q1. 브랜드 색은 어느 객체의 어느 필드에 들어 있나?</summary>
+    <p><code>BrandingSetProperty</code>의 <code>PropertyName = 'BRAND_COLOR'</code>인 행의 <code>PropertyValue</code>. 테마(<code>LightningExperienceTheme</code>)에는 색 필드가 없고 <code>DefaultBrandingSetId</code>로 연결된다.</p></details>
+  <details><summary>Q2. Setup에서 자동 생성된 팔레트를 API로 가져올 수 있나?</summary>
+    <p>없다. 원본 색(<code>BRAND_COLOR</code>)만 저장된다. 파생 색은 Storybook 쪽에서 계산하므로 org와 다를 수 있다.</p></details>
+  <details><summary>Q3. 테마를 하나 더 만들었을 때 스크립트를 고쳐야 하나?</summary>
+    <p>고치지 않는다. 스크립트가 테마 레코드를 전부 순회하므로 <code>pnpm sync:theme</code>을 다시 실행하면 JSON이 하나 더 생긴다.</p></details>
+  <details><summary>Q4. 왜 <code>Metadata</code> 필드로 전체 테마를 한 번에 읽지 않나?</summary>
+    <p>Tooling API의 complexvalue 필드(<code>Metadata</code>)는 결과가 한 건일 때만 조회되기 때문이다. 게다가 색은 <code>Metadata</code>에도 없다 (<code>defaultBrandingSet</code> 이름만 있다).</p></details>
+  <details><summary>Q5. "Storybook에서 브랜드를 바꾸면 org도 바뀌나요?"라는 질문에 어떻게 답하나?</summary>
+    <p>"아니요. Storybook은 org 설정을 가져와 미리 보는 시뮬레이션입니다. 실제 적용은 관리자가 Setup의 Themes and Branding에서 합니다."</p></details>
+</section>
+
+<footer class="doc-foot">
+  <span>밀버스 디자인 시스템 · Learn 05</span>
+  <span>2026-09-26 기준. org 조회 결과는 <code>learndoshare_1</code>에서 직접 확인함</span>
+</footer>
+</main>
+</div>
+</body>
+</html>

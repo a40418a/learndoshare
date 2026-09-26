@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>스토리북</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<nav class="topnav"><div class="topnav-inner">
+  <a href="../README.md">README</a>
+  <a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html">01 SLDS</a>
+  <a href="02-LWC%20%EA%B8%B0%EC%B4%88.html">02 LWC</a>
+  <a class="active" href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html">03 Storybook</a>
+  <a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html">04 통합</a>
+  <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>
+  <a href="06-%EB%A1%9C%EC%BB%AC%20%EA%B0%9C%EB%B0%9C%20%EB%8F%84%EA%B5%AC%20%EB%B9%84%EA%B5%90.html">06 도구 비교</a>
+  <a href="07-pnpm.html">07 pnpm</a>
+  <a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html">08 Claude Code</a>
+</div></nav>
+
+<div class="layout">
+<aside class="toc">
+  <strong>목차</strong>
+  <ol>
+    <li><a href="#why">왜 알아야 하나</a></li>
+    <li><a href="#versions">버전별 차이 (9 / 10)</a></li>
+    <li><a href="#install">설치와 초기화</a></li>
+    <li><a href="#csf">스토리 작성 (CSF3 + lit)</a></li>
+    <li><a href="#globals">decorator와 globals</a></li>
+    <li><a href="#features">기본 기능과 애드온</a></li>
+    <li><a href="#assets">전역 CSS, 정적 파일, 로고</a></li>
+    <li><a href="#build">빌드와 공유</a></li>
+    <li><a href="#project">우리 프로젝트 적용</a></li>
+    <li><a href="#quiz">스스로 점검</a></li>
+    <li><a href="#refs">참고</a></li>
+  </ol>
+</aside>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">LEARN 03 · Phase 1·3 준비</div>
+  <h1>스토리북</h1>
+  <p class="lead">밀버스 컴포넌트를 org 없이 보여 주는 카탈로그가 Storybook이다. 웹 컴포넌트용 설정, 스토리 작성법, 브랜드를 바꿔 보는 툴바까지 우리 프로젝트에 필요한 만큼만 정리한다.</p>
+  <div class="meta"><span>예상 1.5시간</span><span>선행: 02 LWC · 07 pnpm</span><span>2026-09-26 기준 storybook 최신 10.6.0</span></div>
+</header>
+
+<section id="why">
+  <h2>왜 알아야 하나</h2>
+  <p>LWC 컴포넌트는 원래 org 안에서만 보인다. 디자이너, 기획자, 다른 프로젝트 개발자가 "버튼이 어떻게 생겼나"를 보려고 매번 org에 들어갈 수는 없다. Storybook은 컴포넌트를 <b>상태별(스토리)</b>로 늘어놓은 정적 사이트를 만들어 준다.</p>
+  <div class="flow">
+    <div class="step"><b>LWC 소스</b><code>force-app/.../lwc/</code></div>
+    <div class="arrow">→</div>
+    <div class="step"><b>Rollup 사전 컴파일</b><code>dist/</code>에 JS 생성</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>custom element 등록</b><code>CustomElementConstructor</code>로 태그 등록</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>Storybook</b>lit <code>html</code>로 태그를 렌더링</div>
+  </div>
+  <p>Storybook 입장에서 우리 컴포넌트는 <b>그냥 웹 컴포넌트(custom element)</b>다. 그래서 프레임워크는 <code>@storybook/web-components-vite</code>를 쓰고, 스토리는 lit 템플릿으로 쓴다. LWC를 Storybook 안에서 직접 컴파일하지 않는 이유와 등록 방법은 <a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html">04 통합</a>에서 다룬다.</p>
+</section>
+
+<section id="versions">
+  <h2>버전별 차이 (9 / 10)</h2>
+  <p>2026-09-26 기준 <code>storybook</code> latest는 <b>10.6.0</b>이다 (next 태그 11.0.0-alpha.1, 9 계열 마지막 9.1.20). 인터넷 자료는 7~8 기준이 많아서 그대로 따라 하면 설치되지 않는 패키지가 나온다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>항목</th><th>8 이하 자료</th><th>9</th><th>10 (현재)</th></tr>
+    <tr><td>필수 애드온 묶음</td><td><code>@storybook/addon-essentials</code></td><td><b>삭제</b>. viewport, controls, interactions, actions가 코어로 들어감</td><td>9와 같음</td></tr>
+    <tr><td>문서(autodocs, MDX)</td><td>essentials에 포함</td><td><code>@storybook/addon-docs</code>를 따로 설치</td><td>9와 같음</td></tr>
+    <tr><td>테스트 유틸</td><td><code>@storybook/test</code></td><td><code>storybook/test</code> (패키지 통합)</td><td>9와 같음</td></tr>
+    <tr><td>actions</td><td><code>@storybook/addon-actions</code></td><td><code>storybook/actions</code></td><td>9와 같음</td></tr>
+    <tr><td>타입 import</td><td>렌더러 패키지</td><td>프레임워크 패키지 <code>@storybook/web-components-vite</code></td><td>9와 같음</td></tr>
+    <tr><td>모듈 형식</td><td>CJS 허용</td><td>CJS 허용</td><td><b>ESM 전용</b>. <code>main.js</code>와 preset은 유효한 ESM이어야 한다</td></tr>
+    <tr><td>최소 요구</td><td>—</td><td>Node 20+, pnpm v9+</td><td>Node 20.19+ / 22.12+ 이상 (자료마다 표기가 다르다)</td></tr>
+  </table></div>
+  <p>10에서 새로 생긴 것: 로컬 애드온 경로를 <code>import.meta.resolve</code>로 완전히 해석, 모듈 자동 모킹 <code>sb.mock</code>, CSF Factories(preview 단계), Vitest 4 지원. 10은 2025-10-28에 나왔다.</p>
+  <div class="callout warn"><strong>자료를 볼 때 확인할 것</strong><code>addon-essentials</code>, <code>@storybook/test</code>, <code>@storybook/addon-actions</code>가 보이면 8 이하 자료다. 패키지 이름을 위 표대로 바꿔 읽는다.</div>
+</section>
+
+<section id="install">
+  <h2>설치와 초기화</h2>
+  <p>공식 문서는 <code>npm create storybook@latest</code> / <code>npx storybook@latest init</code>으로 안내한다. 우리는 pnpm 형태로 바꿔 실행한다 (<a href="07-pnpm.html#commands">07 pnpm 대응표</a>).</p>
+<pre><code><span class="c"># 생성기 방식</span>
+pnpm create storybook@latest
+
+<span class="c"># 또는 설치 없이 CLI 일회성 실행</span>
+pnpm dlx storybook@latest init --type web_components --builder vite \
+  --package-manager pnpm --features docs test a11y --yes --no-dev</code></pre>
+  <div class="table-wrap"><table>
+    <tr><th>플래그</th><th>의미</th></tr>
+    <tr><td><code>--type web_components</code></td><td>프로젝트 유형 자동 감지를 건너뛰고 웹 컴포넌트로 지정</td></tr>
+    <tr><td><code>--builder vite</code></td><td>Vite 빌더 사용. <code>@storybook/web-components-vite</code>는 <b>Vite ≥ 5</b>가 필요하다</td></tr>
+    <tr><td><code>--package-manager pnpm</code></td><td>의존성 설치를 pnpm으로</td></tr>
+    <tr><td><code>--features docs test a11y</code></td><td>문서, 테스트, 접근성 기능을 함께 구성</td></tr>
+    <tr><td><code>--yes</code></td><td>질문에 기본값으로 답함</td></tr>
+    <tr><td><code>--no-dev</code></td><td>설치 후 개발 서버를 자동으로 띄우지 않음</td></tr>
+  </table></div>
+<pre data-file=".storybook/main.js"><code><span class="c">/** @type { import('@storybook/web-components-vite').StorybookConfig } */</span>
+const config = {
+  framework: '@storybook/web-components-vite',
+  stories: ['../stories/**/*.stories.js'],
+  addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
+  staticDirs: ['../public'],
+};
+export default config;   <span class="c">// 10은 ESM 전용: module.exports 쓰지 않는다</span></code></pre>
+  <p class="c"><code>stories</code> 경로와 <code>addons</code> 목록은 예시다. 초기화가 만든 파일을 기준으로 필요한 부분만 고친다.</p>
+  <div class="callout warn"><strong>pnpm hoisting 설정은 미리 넣지 않는다</strong>현재 Storybook 공식 문서에는 pnpm용 hoisting 권장 설정이 없다. 9~10에서 패키지가 통합되면서 문제가 크게 줄었다. "Cannot find module"이 실제로 났을 때만 <a href="07-pnpm.html#hoist">07 pnpm · hoisting 문제 해결</a> 순서대로 <code>publicHoistPattern</code>을 좁게 추가한다. 설치 중 esbuild 빌드 승인 요청이 나오면 <code>pnpm approve-builds</code>.</div>
+</section>
+
+<section id="csf">
+  <h2>스토리 작성 (CSF3 + lit)</h2>
+  <h3>가장 작은 스토리</h3>
+  <p>웹 컴포넌트 렌더러에서는 <code>component</code>에 <b>태그 이름 문자열</b>을 넣는다. <code>render</code>가 없으면 Storybook이 태그를 만들고 args를 넘겨 준다.</p>
+<pre data-file="stories/Button.stories.js (공식 예제)"><code>const meta = { component: 'demo-button' };
+export default meta;
+
+export const Primary = {
+  args: { primary: true, label: 'Button' },
+};</code></pre>
+
+  <h3>조금 더 갖춘 형태</h3>
+<pre data-file="stories/Button.stories.js"><code>import { html } from 'lit';
+
+export default {
+  title: 'Example/Button',
+  component: 'demo-button',
+  tags: ['autodocs'],              <span class="c">// addon-docs가 있으면 문서 페이지 자동 생성</span>
+  args: { label: 'Button', primary: false },
+  argTypes: {
+    label: { control: 'text' },
+    primary: { control: 'boolean' },
+  },
+  render: (args) =&gt; html`&lt;demo-button .label=${args.label} ?primary=${args.primary}&gt;&lt;/demo-button&gt;`,
+};
+
+export const Primary = { args: { primary: true } };
+export const Secondary = {};</code></pre>
+
+  <h3>lit 바인딩 네 가지</h3>
+  <div class="table-wrap"><table>
+    <tr><th>문법</th><th>무엇을 설정하나</th><th>예</th></tr>
+    <tr><td><code>x=${v}</code></td><td>HTML <b>attribute</b> (항상 문자열)</td><td><code>variant=${args.variant}</code></td></tr>
+    <tr><td><code>.x=${v}</code></td><td>JS <b>property</b> (객체, 배열, 숫자 그대로)</td><td><code>.options=${args.options}</code></td></tr>
+    <tr><td><code>?x=${v}</code></td><td>boolean attribute (true면 붙이고 false면 제거)</td><td><code>?disabled=${args.disabled}</code></td></tr>
+    <tr><td><code>@x=${fn}</code></td><td>이벤트 리스너</td><td><code>@click=${args.onClick}</code></td></tr>
+  </table></div>
+  <div class="callout key"><strong>LWC의 <code>@api</code> 속성은 property 바인딩(<code>.x=</code>)으로</strong><code>@api</code>로 공개한 값은 JS property로 넘기는 것이 가장 확실하다. 배열이나 객체는 attribute로 넘기면 문자열이 되어 버린다. 이름도 JS 이름 그대로 쓴다 (<code>.iconName=</code>).</div>
+  <p><span class="tag warn">미확인</span> <code>CustomElementConstructor</code>로 등록한 LWC 요소가 HTML attribute(<code>icon-name="..."</code>)를 받아 <code>@api</code> property로 반영하는지, boolean attribute를 어떻게 해석하는지는 아직 시험하지 않았다. 확인 전까지는 property 바인딩만 쓴다.</p>
+</section>
+
+<section id="globals">
+  <h2>decorator와 globals</h2>
+  <p><b>globals</b>는 모든 스토리가 공유하는 값(테마, 언어 등)이고, <b>decorator</b>는 스토리를 감싸는 함수다. 툴바에서 global을 바꾸면 decorator가 그 값을 읽어 스토리를 다시 감싼다. 브랜드 전환은 이 구조로 만든다.</p>
+<pre data-file=".storybook/preview.js (공식 패턴)"><code>import { html } from 'lit';
+
+export default {
+  globalTypes: {
+    theme: {
+      description: 'Global theme for components',
+      toolbar: {
+        title: 'Theme',
+        icon: 'circlehollow',
+        items: ['light', 'dark'],
+        dynamicTitle: true,          <span class="c">// 툴바에 선택된 값을 표시</span>
+      },
+    },
+  },
+  initialGlobals: { theme: 'light' },
+  decorators: [
+    (story, context) =&gt; html`&lt;div data-theme=${context.globals.theme}&gt;${story()}&lt;/div&gt;`,
+  ],
+};</code></pre>
+  <div class="callout warn"><strong>옛 자료의 <code>globals</code>, <code>defaultValue</code></strong>preview의 <code>globals</code>는 8.2에서 deprecated, 9.0에서 삭제되고 <code>initialGlobals</code>로 바뀌었다. 초기값도 더 이상 <code>globalTypes.defaultValue</code>에서 오지 않는다. <code>globalTypes</code>와 <code>initialGlobals</code>는 <code>.storybook/preview.*</code>에만 쓴다.</div>
+
+  <h3>브랜드 decorator <span class="tag info">예시</span></h3>
+  <p>브랜드 폴더를 읽어 툴바 항목을 <b>자동으로</b> 만든다. Vite의 <code>import.meta.glob</code>은 파일 패턴에 맞는 모듈을 한 번에 가져오는 Vite 표준 기능이고, CSS에 <code>?inline</code>을 붙이면 페이지에 자동 주입하지 않고 CSS 문자열만 받는다.</p>
+<pre data-file=".storybook/preview.js (예시)"><code>import { html } from 'lit';
+
+<span class="c">// { '../brands/milvus/theme.json': { name, label, brandColor, headerBackground, hooks }, ... }</span>
+const themes = import.meta.glob('../brands/*/theme.json', { eager: true, import: 'default' });
+<span class="c">// { '../brands/milvus/root.css': ':root { --milvus-... }', ... }</span>
+const rootCss = import.meta.glob('../brands/*/root.css', { query: '?inline', import: 'default', eager: true });
+
+const brands = {};
+for (const [path, theme] of Object.entries(themes)) {
+  const dir = path.split('/')[2];                    <span class="c">// 'milvus'</span>
+  brands[dir] = { theme, css: rootCss[`../brands/${dir}/root.css`] ?? '' };
+}
+const first = Object.keys(brands)[0];
+
+export default {
+  globalTypes: {
+    brand: {
+      description: '브랜드 (org 테마 시뮬레이션)',
+      toolbar: {
+        title: 'Brand',
+        icon: 'paintbrush',
+        items: Object.entries(brands).map(([value, b]) =&gt; ({ value, title: b.theme.label })),
+        dynamicTitle: true,
+      },
+    },
+  },
+  initialGlobals: { brand: first },
+  decorators: [
+    (story, context) =&gt; {
+      const b = brands[context.globals.brand] ?? brands[first];
+      <span class="c">// L1: org 색 → 래퍼의 인라인 CSS 변수</span>
+      const style = Object.entries(b.theme.hooks).map(([k, v]) =&gt; `${k}: ${v}`).join('; ');
+      <span class="c">// L3: 선택된 브랜드의 root.css만 넣는다</span>
+      return html`&lt;style&gt;${b.css}&lt;/style&gt;&lt;div class="milvus-brand" style=${style}&gt;${story()}&lt;/div&gt;`;
+    },
+  ],
+};</code></pre>
+  <ul>
+    <li>CSS 변수는 상속되고 shadow DOM 경계도 넘어가므로, 래퍼에 넣은 값이 안쪽 컴포넌트까지 닿는다</li>
+    <li><code>root.css</code>가 <code>:root</code>에 변수를 선언하면 래퍼가 아니라 문서 전체에 적용된다. 그래서 <b>한 번에 선택된 브랜드 하나만</b> 넣는다</li>
+    <li>JSON <code>import: 'default'</code>, glob의 <code>query: '?inline'</code> 조합은 Vite 문서의 규칙(glob의 <code>query</code> 옵션, CSS <code>?inline</code>)을 합친 것이다. <span class="tag warn">미확인</span> 우리 저장소에서 실제로 돌려 보지는 않았다</li>
+    <li><code>paintbrush</code> 아이콘 이름은 예시다. <span class="tag warn">미확인</span> 공식 예제는 <code>circlehollow</code>를 쓴다</li>
+  </ul>
+  <div class="callout warn"><strong>시뮬레이션이다</strong>툴바로 브랜드를 바꿔도 org는 바뀌지 않는다. 또 org가 자동으로 만드는 파생 색은 API로 읽히지 않으므로 <code>hooks</code>의 파생 색은 org와 미세하게 다를 수 있다 (<a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>).</div>
+</section>
+
+<section id="features">
+  <h2>기본 기능과 애드온</h2>
+  <h3>설정 없이 쓰는 코어 기능</h3>
+  <div class="cards">
+    <div class="card"><h4>Controls</h4><p>args를 패널에서 바꿔 본다. <code>argTypes</code>로 컨트롤 종류 지정.</p></div>
+    <div class="card"><h4>Actions</h4><p>이벤트 핸들러 호출을 기록한다.</p></div>
+    <div class="card"><h4>Viewport</h4><p>모바일, 태블릿 폭으로 미리 보기.</p></div>
+    <div class="card"><h4>Backgrounds</h4><p>캔버스 배경색 전환.</p></div>
+    <div class="card"><h4>Toolbars &amp; globals</h4><p>위의 브랜드 툴바가 여기에 해당.</p></div>
+    <div class="card"><h4>Measure &amp; outline, Highlight</h4><p>간격 측정, 요소 외곽선, 강조 표시.</p></div>
+  </div>
+  <h3>따로 설치하는 애드온</h3>
+  <div class="table-wrap"><table>
+    <tr><th>애드온</th><th>용도</th><th>비고</th></tr>
+    <tr><td><code>@storybook/addon-docs</code></td><td>autodocs, MDX 문서</td><td>9부터 별도 설치</td></tr>
+    <tr><td><code>@storybook/addon-a11y</code></td><td>접근성 자동 검사</td><td>SLDS 접근성 원칙 확인용</td></tr>
+    <tr><td><code>@storybook/addon-vitest</code></td><td>스토리를 Vitest 테스트로 실행</td><td>Vite 기반 프레임워크, Vitest ≥ 3, Playwright 브라우저 모드. <span class="tag warn">미확인</span> 공식 지원 목록에 web-components-vite가 명시돼 있지 않다</td></tr>
+  </table></div>
+<pre><code><span class="c"># 공식 문서의 npx storybook add ... 를 pnpm으로</span>
+pnpm exec storybook add @storybook/addon-a11y</code></pre>
+
+  <h3>인터랙션 테스트</h3>
+  <p>스토리에 <code>play</code> 함수를 붙이면 렌더링 후 사용자 동작을 흉내 내고 결과를 검사한다. 도구는 <code>storybook/test</code>에서 가져온다.</p>
+<pre data-file="stories/Button.stories.js (예시)"><code>import { html } from 'lit';
+import { expect, fn, userEvent } from 'storybook/test';
+
+export const Clicked = {
+  args: { label: 'Save', onClick: fn() },
+  render: (args) =&gt; html`&lt;demo-button .label=${args.label} @click=${args.onClick}&gt;&lt;/demo-button&gt;`,
+  play: async ({ canvasElement, args }) =&gt; {
+    await userEvent.click(canvasElement.querySelector('demo-button'));
+    await expect(args.onClick).toHaveBeenCalled();
+  },
+};</code></pre>
+  <p><span class="tag warn">미확인</span> 컴포넌트 <b>내부</b>(shadow DOM 안쪽) 요소를 찾아 클릭하는 방법은 LWC 요소에서 아직 시험하지 않았다. 위 예시는 호스트 요소를 클릭한다.</p>
+  <p>화면 캡처 비교(시각 회귀 테스트)는 Storybook 팀의 Chromatic 서비스로 한다. 도입 여부는 미정이다.</p>
+</section>
+
+<section id="assets">
+  <h2>전역 CSS, 정적 파일, 로고</h2>
+  <div class="table-wrap"><table>
+    <tr><th>방법</th><th>무엇에 쓰나</th></tr>
+    <tr><td><code>preview.js</code>에서 CSS import</td><td>모든 스토리에 전역 적용 (예: SLDS 기본 스타일)</td></tr>
+    <tr><td><code>.storybook/preview-head.html</code></td><td>미리보기 iframe의 <code>&lt;head&gt;</code>에 태그 삽입 (폰트 <code>&lt;link&gt;</code> 등)</td></tr>
+    <tr><td><code>.storybook/preview-body.html</code></td><td>미리보기 iframe의 <code>&lt;body&gt;</code>에 태그 삽입</td></tr>
+    <tr><td><code>staticDirs</code></td><td>폴더를 그대로 서빙. <code>['../public']</code> 또는 <code>[{ from: '../brands/milvus', to: '/brand' }]</code></td></tr>
+  </table></div>
+
+  <h3>사이드바 로고 (L2)</h3>
+  <p>Storybook 화면 왼쪽 위 로고와 제목은 manager 쪽 테마로 바꾼다. 공식 문서 Theming 페이지 기준 import 경로는 <code>storybook/manager-api</code>와 <code>storybook/theming</code>이다.</p>
+<pre data-file=".storybook/manager.js (예시)"><code>import { addons } from 'storybook/manager-api';
+import { create } from 'storybook/theming';
+
+addons.setConfig({
+  theme: create({
+    base: 'light',                    <span class="c">// 필수. 나머지는 선택</span>
+    brandTitle: '밀버스 디자인 시스템',
+    brandImage: './brand/logo.png',   <span class="c">// staticDirs { from: '../brands/milvus', to: '/brand' } 기준 예시</span>
+  }),
+});</code></pre>
+  <p>manager(사이드바)는 툴바의 브랜드 선택과 따로 돈다. 프로젝트별 Storybook은 브랜드가 하나로 정해지므로 생성할 때 그 브랜드의 <code>logo.png</code>를 연결하면 된다. <span class="tag warn">미확인</span> <code>brandImage</code>의 상대 경로가 배포 위치에 따라 어떻게 해석되는지는 빌드해서 확인해야 한다.</p>
+</section>
+
+<section id="build">
+  <h2>빌드와 공유</h2>
+<pre><code>pnpm exec storybook dev -p 6006      <span class="c"># 개발 서버 (보통 package.json의 "storybook" 스크립트로 등록)</span>
+pnpm exec storybook build            <span class="c"># → storybook-static/</span>
+pnpm exec storybook build -o out/sb  <span class="c"># 출력 폴더 변경</span></code></pre>
+  <p><code>storybook-static</code>은 서버 없이 열리는 <b>정적 사이트</b>다. 아무 정적 호스팅에 올리면 개발 환경이 없는 사람도 링크 하나로 카탈로그를 본다.</p>
+  <h3>참고할 만한 결과물</h3>
+  <p>Salesforce SDS 컴포넌트를 Storybook으로 빌드한 사이트가 있다: <a href="https://sds-site-docs-1fea39e7763a.herokuapp.com">sds-site-docs-1fea39e7763a.herokuapp.com</a>. <code>Components/…</code> 아래 약 719개 스토리, SLDS 2 blueprint 변형, "LBC Examples"가 있다. SLDS 카탈로그를 Storybook으로 만들면 어떤 모습이 되는지 보기에 좋다.</p>
+  <div class="callout warn"><strong>공식 문서 사이트가 아니다</strong>위 사이트는 Salesforce 공식 문서가 아니다. SLDS 2 공식 문서는 <a href="https://www.lightningdesignsystem.com">lightningdesignsystem.com</a>이다. 규칙이나 토큰 값의 근거로는 공식 문서만 인용한다.</div>
+</section>
+
+<section id="project">
+  <h2>우리 프로젝트 적용</h2>
+  <div class="callout project"><strong>Storybook이 맡는 역할</strong>
+    <p>Storybook은 새 프로젝트 워크플로의 <b>② ~ ④ 결과를 눈으로 확인하는 곳</b>이다.</p>
+    <ol>
+      <li>관리자가 org Setup에서 테마를 설정한다</li>
+      <li><code>pnpm sync:theme</code>이 색(L1 <code>theme.json</code>)과 로고(L2 <code>logo.png</code>)를 <code>brands/&lt;브랜드&gt;/</code>로 가져온다 → preview의 브랜드 decorator와 manager 로고에 반영</li>
+      <li>사용자가 원하는 느낌을 말하면 Claude가 <code>brands/&lt;브랜드&gt;/root.css</code>의 허용된 <code>--milvus-*</code> 변수만 고친다 (L3) → 같은 decorator로 바로 확인</li>
+      <li>사용자가 컴포넌트를 고르면 <code>scripts/create-project.mjs --brand X --components badge,button --out &lt;경로&gt;</code>가 그 브랜드·컴포넌트만 담은 Storybook을 만든다</li>
+    </ol>
+  </div>
+  <div class="table-wrap"><table>
+    <tr><th>층</th><th>파일</th><th>Storybook에서 반영되는 곳</th></tr>
+    <tr><td>L1 org 색</td><td><code>brands/&lt;브랜드&gt;/theme.json</code></td><td>decorator가 <code>hooks</code>를 래퍼 인라인 CSS 변수로</td></tr>
+    <tr><td>L2 로고</td><td><code>brands/&lt;브랜드&gt;/logo.png</code></td><td><code>manager.js</code>의 <code>brandImage</code></td></tr>
+    <tr><td>L3 사내 변수</td><td><code>brands/&lt;브랜드&gt;/root.css</code></td><td>decorator가 <code>&lt;style&gt;</code>로 삽입. <code>--milvus-*</code>만 선언, <code>--slds-g-*</code>는 읽기만</td></tr>
+  </table></div>
+  <ul>
+    <li>스토리의 <code>component</code>는 <code>CustomElementConstructor</code>로 등록한 태그 이름이다. 태그 이름 규칙은 04 통합에서 정한다</li>
+    <li><code>@api</code> 값은 property 바인딩(<code>.x=</code>)으로 넘긴다</li>
+    <li>새 스토리를 만들 때 <code>tags: ['autodocs']</code>를 붙여 문서 페이지를 같이 만든다</li>
+    <li>브랜드 decorator와 로고 설정은 <b>계획</b>이다. 현재 저장소에는 <code>.storybook/</code>, <code>brands/</code>, <code>scripts/create-project.mjs</code>가 아직 없다</li>
+  </ul>
+</section>
+
+<section id="quiz" class="quiz">
+  <h2>스스로 점검</h2>
+  <details><summary>Q1. 블로그 예제가 <code>@storybook/addon-essentials</code>를 설치하라고 한다. 어떻게 하나?</summary>
+    <p>설치하지 않는다. 9부터 삭제됐고 controls, actions, viewport 등은 코어에 들어 있다. 문서 기능이 필요하면 <code>@storybook/addon-docs</code>만 따로 추가한다.</p></details>
+  <details><summary>Q2. 웹 컴포넌트 스토리의 <code>component</code>에는 무엇을 넣나?</summary>
+    <p>태그 이름 문자열이다. 예: <code>component: 'demo-button'</code>.</p></details>
+  <details><summary>Q3. 배열 <code>options</code>를 LWC 컴포넌트에 넘길 때 <code>options=${args.options}</code>와 <code>.options=${args.options}</code> 중 무엇을 쓰나? 왜?</summary>
+    <p><code>.options=</code>. 앞의 것은 attribute라 문자열로 바뀌고, <code>.</code>을 붙여야 JS property로 배열이 그대로 전달된다.</p></details>
+  <details><summary>Q4. 툴바 초기값을 <code>globalTypes.brand.defaultValue</code>에 넣었는데 적용되지 않는다. 왜?</summary>
+    <p>9.0부터 초기값은 preview의 <code>initialGlobals</code>에서 온다. <code>initialGlobals: { brand: 'milvus' }</code>처럼 쓴다.</p></details>
+  <details><summary>Q5. 기획자에게 Storybook을 보여 주려면?</summary>
+    <p><code>pnpm exec storybook build</code>로 <code>storybook-static</code>을 만들어 정적 호스팅에 올리고 링크를 공유한다. 개발 서버나 org가 필요 없다.</p></details>
+</section>
+
+<section id="refs">
+  <h2>참고</h2>
+  <ul class="refs">
+    <li><a href="https://storybook.js.org/docs/get-started/frameworks/web-components-vite">Storybook — Web components with Vite</a></li>
+    <li><a href="https://storybook.js.org/docs/writing-stories?renderer=web-components">Writing stories (web components)</a> · <a href="https://storybook.js.org/docs/writing-stories/args?renderer=web-components">Args</a></li>
+    <li><a href="https://storybook.js.org/docs/essentials/toolbars-and-globals?renderer=web-components">Toolbars &amp; globals</a> · <a href="https://storybook.js.org/docs/writing-stories/decorators?renderer=web-components">Decorators</a></li>
+    <li><a href="https://storybook.js.org/docs/configure/user-interface/theming">Theming (manager.js, brandImage)</a></li>
+    <li><a href="https://storybook.js.org/docs/writing-tests/interaction-testing?renderer=web-components">Interaction tests</a> · <a href="https://storybook.js.org/docs/writing-tests/integrations/vitest-addon">Vitest addon</a></li>
+    <li><a href="https://storybook.js.org/docs/releases/migration-guide">Migration guide (9 → 10)</a> · <a href="https://storybook.js.org/docs/api/cli-options">CLI options</a></li>
+    <li><a href="https://vite.dev/guide/features#glob-import">Vite — Glob import</a> · <a href="https://vite.dev/guide/features#disabling-css-injection-into-the-page">Vite — CSS <code>?inline</code></a></li>
+    <li><a href="https://lit.dev/docs/templates/expressions/">Lit — Expressions (attribute / property / boolean / event)</a></li>
+    <li><a href="https://sds-site-docs-1fea39e7763a.herokuapp.com">SDS Storybook 빌드 (비공식 참고용)</a> · <a href="https://www.lightningdesignsystem.com">SLDS 공식 문서</a></li>
+  </ul>
+</section>
+
+<footer class="doc-foot">
+  <span>밀버스 디자인 시스템 · Learn 03</span>
+  <span>2026-09-26 기준. 버전 정보는 <code>pnpm view</code>와 storybook.js.org 공식 문서로 확인함</span>
+</footer>
+</main>
+</div>
+</body>
+</html>
