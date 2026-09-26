@@ -1,0 +1,46 @@
+name: 버그
+description: 동작이 기대와 다르다
+title: "[Fix] "
+labels: ["bug"]
+body:
+  - type: textarea
+    id: symptom
+    attributes:
+      label: 현상
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 재현 방법
+      value: |
+        1.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 동작
+    validations:
+      required: true
+  - type: dropdown
+    id: env
+    attributes:
+      label: 발생 환경
+      multiple: true
+      options:
+        - Storybook
+        - org (Lightning Experience)
+        - Live Preview (sf lightning dev)
+        - Jest
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 완료 기준
+      value: |
+        - [ ]
+  - type: markdown
+    attributes:
+      value: "공개 저장소입니다. org ID, 사용자 정보, 인증 정보는 적지 마세요."

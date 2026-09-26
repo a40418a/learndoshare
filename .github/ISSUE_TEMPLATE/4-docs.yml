@@ -1,0 +1,38 @@
+name: 문서 / 학습 자료
+description: README, 계획서, 학습 자료를 작성하거나 고친다
+title: "[Docs] "
+labels: ["documentation"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 종류
+      options:
+        - README / 계획서
+        - 학습 자료 (Learn/)
+        - 발표 자료
+        - 런북 (CLAUDE.md, skill)
+    validations:
+      required: true
+  - type: textarea
+    id: purpose
+    attributes:
+      label: 목적
+    validations:
+      required: true
+  - type: textarea
+    id: content
+    attributes:
+      label: 작성할 내용
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 완료 기준
+      value: |
+        - [ ]
+    validations:
+      required: true
