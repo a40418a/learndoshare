@@ -1,0 +1,114 @@
+<template>
+  <div class="slds-form-element">
+    <label class="slds-form-element__label" for="input">
+      <abbr lwc:if={required} class="slds-required" title="필수">*</abbr>{label}
+    </label>
+    <div class="slds-form-element__control">
+      <div class="slds-combobox_container">
+        <div class={comboboxClass}>
+          <div
+            class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+            role="none"
+          >
+            <input
+              id="input"
+              type="text"
+              class="slds-input slds-combobox__input"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-haspopup="listbox"
+              aria-controls="listbox"
+              aria-expanded={ariaExpanded}
+              aria-activedescendant={activeDescendant}
+              aria-required={ariaRequired}
+              autocomplete="off"
+              placeholder={placeholder}
+              disabled={disabled}
+              value={searchTerm}
+              oninput={handleInput}
+              onkeydown={handleKeyDown}
+              onfocus={handleFocus}
+              onblur={handleBlur}
+            />
+            <span
+              class="slds-icon_container slds-input__icon slds-input__icon_right"
+            >
+              <lightning-icon
+                icon-name="utility:search"
+                size="x-small"
+              ></lightning-icon>
+            </span>
+          </div>
+          <div
+            id="listbox"
+            class="slds-dropdown slds-dropdown_length-5 slds-dropdown_fluid"
+            role="listbox"
+            aria-label={label}
+            aria-multiselectable="true"
+          >
+            <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+              <template for:each={visibleOptions} for:item="option">
+                <li
+                  key={option.value}
+                  role="presentation"
+                  class="slds-listbox__item"
+                >
+                  <div
+                    id={option.id}
+                    role="option"
+                    aria-selected={option.ariaSelected}
+                    class={option.className}
+                    data-value={option.value}
+                    onmousedown={handleOptionMouseDown}
+                  >
+                    <span class="slds-media__figure slds-listbox__option-icon">
+                      <lightning-icon
+                        lwc:if={option.selected}
+                        icon-name="utility:check"
+                        size="x-small"
+                      ></lightning-icon>
+                    </span>
+                    <span class="slds-media__body">
+                      <span class="slds-truncate" title={option.label}
+                        >{option.label}</span
+                      >
+                    </span>
+                  </div>
+                </li>
+              </template>
+              <li
+                lwc:if={noResults}
+                role="presentation"
+                class="slds-listbox__item"
+              >
+                <div
+                  class="slds-listbox__option slds-listbox__option_plain"
+                  role="option"
+                  aria-disabled="true"
+                >
+                  {noResultsText}
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div lwc:if={hasSelection} class="slds-listbox_selection-group">
+        <ul
+          class="slds-listbox slds-listbox_horizontal"
+          aria-label={selectionLabel}
+        >
+          <template for:each={selectedOptions} for:item="option">
+            <li key={option.value} class="slds-listbox-item">
+              <lightning-pill
+                label={option.label}
+                name={option.value}
+                onremove={handleRemove}
+              ></lightning-pill>
+            </li>
+          </template>
+        </ul>
+      </div>
+    </div>
+  </div>
+</template>
