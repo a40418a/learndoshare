@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LWC 기초</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<nav class="topnav"><div class="topnav-inner">
+  <a href="../README.md">README</a>
+  <a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html">01 SLDS</a>
+  <a class="active" href="02-LWC%20%EA%B8%B0%EC%B4%88.html">02 LWC</a>
+  <a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html">03 Storybook</a>
+  <a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html">04 통합</a>
+  <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>
+  <a href="06-%EB%A1%9C%EC%BB%AC%20%EA%B0%9C%EB%B0%9C%20%EB%8F%84%EA%B5%AC%20%EB%B9%84%EA%B5%90.html">06 도구 비교</a>
+  <a href="07-pnpm.html">07 pnpm</a>
+  <a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html">08 Claude Code</a>
+</div></nav>
+
+<div class="layout">
+<aside class="toc">
+  <strong>목차</strong>
+  <ol>
+    <li><a href="#why">왜 알아야 하나</a></li>
+    <li><a href="#bundle">컴포넌트 번들과 이름 규칙</a></li>
+    <li><a href="#class">LightningElement와 데코레이터</a></li>
+    <li><a href="#lifecycle">라이프사이클 훅</a></li>
+    <li><a href="#template">템플릿 지시어</a></li>
+    <li><a href="#events">이벤트로 부모와 대화하기</a></li>
+    <li><a href="#shadow">Shadow DOM 모드</a></li>
+    <li><a href="#css">CSS 변수와 shadow 경계</a></li>
+    <li><a href="#modules">모듈 시스템</a></li>
+    <li><a href="#split">표현 / 컨테이너 분리</a></li>
+    <li><a href="#test">Jest 테스트</a></li>
+    <li><a href="#project">우리 프로젝트 적용</a></li>
+    <li><a href="#quiz">스스로 점검</a></li>
+    <li><a href="#refs">참고</a></li>
+  </ol>
+</aside>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">LEARN 02 · Phase 2·5 준비</div>
+  <h1>LWC 기초</h1>
+  <p class="lead">Lightning Web Components(LWC)의 번들 구조, 데코레이터, 템플릿, 이벤트, Shadow DOM을 정리한다. 특히 "Storybook에서 org 없이 렌더되는 컴포넌트"를 만들기 위해 알아야 할 부분에 집중한다.</p>
+  <div class="meta"><span>예상 2시간</span><span>선행: 01 SLDS</span><span>2026-09-26 기준 lwc 9.4.3</span></div>
+</header>
+
+<section id="why">
+  <h2>왜 알아야 하나</h2>
+  <p>밀버스 디자인 시스템의 컴포넌트는 전부 LWC다. Storybook에서 보여 주든, org에 배포하든 코드는 하나다. 그런데 org 안에서는 당연하게 동작하던 것들(<code>@wire</code>, <code>@salesforce/*</code> import, synthetic shadow)이 <b>org 밖에서는 없다</b>.</p>
+  <p>어떤 기능이 LWC 엔진 자체의 것이고 어떤 기능이 Salesforce 플랫폼이 제공하는 것인지 구분할 수 있어야, Storybook(04 통합)과 Jest 테스트에서 무엇을 대체(stub)해야 하는지 판단할 수 있다.</p>
+  <div class="cards">
+    <div class="card"><h4>엔진 (어디서나 동작)</h4><p><code>LightningElement</code>, <code>@api</code>, <code>@track</code>, 템플릿 지시어, 라이프사이클 훅, <code>CustomEvent</code></p></div>
+    <div class="card"><h4>플랫폼 (org 안에서만)</h4><p><code>@salesforce/apex</code>, <code>@salesforce/label</code> 등 scoped 모듈, <code>lightning/uiRecordApi</code> 같은 데이터 어댑터</p></div>
+    <div class="card"><h4>그 사이</h4><p><code>lightning-*</code> 기본 컴포넌트. org에는 있고, 밖에서는 npm 패키지나 stub으로 채운다</p></div>
+  </div>
+</section>
+
+<section id="bundle">
+  <h2>컴포넌트 번들과 이름 규칙</h2>
+  <p>컴포넌트 하나는 폴더 하나다. 폴더와 그 안의 파일은 <b>대소문자까지 같은 이름</b>이어야 한다. SFDX 프로젝트에서는 <code>force-app/main/default/lwc/</code> 바로 아래에 두며, 컴포넌트 폴더 안에 다른 컴포넌트를 중첩할 수 없다.</p>
+<pre data-file="force-app/main/default/lwc/"><code>milvusBadge/
+├── milvusBadge.js          <span class="c">← 클래스 (필수)</span>
+├── milvusBadge.html        <span class="c">← 템플릿</span>
+├── milvusBadge.css         <span class="c">← 컴포넌트 스타일 (shadow 안에만 적용)</span>
+├── milvusBadge.js-meta.xml <span class="c">← 메타데이터 (노출 여부, 대상 등)</span>
+└── __tests__/
+    └── milvusBadge.test.js</code></pre>
+  <h3>폴더 이름 → 태그 이름</h3>
+  <p>HTML 표준은 커스텀 요소 이름에 하이픈을 요구하지만, 플랫폼은 폴더 이름에 하이픈을 허용하지 않는다. 그래서 <b>camelCase 폴더 이름이 kebab-case 태그로 바뀌고, 앞에 네임스페이스가 붙는다</b>. 기본 네임스페이스는 <code>c</code>다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>폴더</th><th>import 경로</th><th>마크업 태그</th></tr>
+    <tr><td><code>milvusBadge</code></td><td><code>c/milvusBadge</code></td><td><code>&lt;c-milvus-badge&gt;</code></td></tr>
+    <tr><td><code>milvusRecordBadge</code></td><td><code>c/milvusRecordBadge</code></td><td><code>&lt;c-milvus-record-badge&gt;</code></td></tr>
+  </table></div>
+  <p>속성도 같은 규칙이다. JS의 <code>itemName</code>은 마크업에서 <code>item-name</code>으로 쓴다.</p>
+  <div class="callout warn"><strong>이름 규칙</strong>소문자로 시작, 영숫자와 밑줄만, 하이픈 금지, 밑줄로 끝나거나 연속 밑줄 금지. 네임스페이스 안에서 유일해야 한다.</div>
+</section>
+
+<section id="class">
+  <h2>LightningElement와 데코레이터</h2>
+  <p>모든 컴포넌트 클래스는 <code>lwc</code> 모듈의 <code>LightningElement</code>를 상속한다. 필드에는 데코레이터를 <b>하나만</b> 붙일 수 있다.</p>
+<pre data-file="milvusBadge/milvusBadge.js"><code>import { LightningElement, api } from 'lwc';
+
+export default class MilvusBadge extends LightningElement {
+  @api label = '';          <span class="c">// 공개 속성: 부모가 값을 넣는다</span>
+  @api variant = 'neutral'; <span class="c">// 'neutral' | 'success' | 'warning' ...</span>
+
+  get badgeClass() {        <span class="c">// getter도 템플릿에서 쓰면 반응형</span>
+    return `badge badge_${this.variant}`;
+  }
+}</code></pre>
+
+  <h3>@api — 공개 속성</h3>
+  <ul>
+    <li>컴포넌트의 공개 API다. 템플릿에서 쓰이는 <code>@api</code> 값이 바뀌면 다시 렌더된다</li>
+    <li>데이터는 <b>부모 → 자식 한 방향</b>으로 흐른다. 컴포넌트는 초기화할 때만 자기 <code>@api</code> 필드를 설정하고, 그 뒤로는 소유자(부모)만 값을 바꾼다. 전달받은 값은 읽기 전용으로 다룬다</li>
+    <li>객체나 배열을 넘기면 자식 쪽에서는 <b>읽기 전용 프록시</b>다. 내부를 바꾸려 하면 <code>Invalid mutation</code> 오류가 난다. 바꿔야 하면 얕은 복사본을 만들거나, 이벤트로 부모에게 요청한다</li>
+    <li>공식 문서는 객체보다 <b>원시값(문자열, 숫자, 불리언) 속성을 권장</b>한다. 데이터 모양이 속성 이름으로 드러나고, 모양이 바뀌어도 소비자가 덜 깨진다</li>
+  </ul>
+
+  <h3>@track — 대부분 필요 없다</h3>
+  <p>현재 LWC에서 <b>필드는 기본으로 반응형</b>이다. 다만 비교는 얕다(<code>===</code>). 그래서 동작이 이렇게 갈린다.</p>
+<pre><code>this.count = 43;                          <span class="c">// 감지됨</span>
+this.obj.name = 'Bob';                    <span class="c">// 감지 안 됨 (필드 자체는 그대로)</span>
+this.obj = { ...this.obj, name: 'Bob' };  <span class="c">// 감지됨 (새 객체 대입)</span>
+this.arr.push('c');                       <span class="c">// 감지 안 됨</span></code></pre>
+  <p><code>@track</code>은 <b>평범한 객체(<code>{}</code>)나 배열(<code>[]</code>)의 내부 변경까지 추적하고 싶을 때만</b> 쓴다. <code>Date</code>, <code>Set</code>, <code>Map</code>, 클래스 인스턴스의 내부 변경은 <code>@track</code>을 붙여도 추적되지 않는다. 밀버스에서는 "새 객체를 대입한다"를 기본 습관으로 삼고 <code>@track</code>은 쓰지 않는 것을 목표로 한다.</p>
+
+  <h3>@wire — 반응형 데이터</h3>
+  <p><code>@wire</code>는 데이터 어댑터를 필드나 함수에 연결한다. 설정 객체의 값 앞에 <code>$</code>를 붙이면 그 속성이 바뀔 때마다 다시 조회한다.</p>
+<pre data-file="milvusRecordBadge/milvusRecordBadge.js (일부)"><code>import { LightningElement, api, wire } from 'lwc';
+import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
+import STATUS_FIELD from '@salesforce/schema/Case.Status';
+
+export default class MilvusRecordBadge extends LightningElement {
+  @api recordId;
+
+  @wire(getRecord, { recordId: '$recordId', fields: [STATUS_FIELD] })
+  record; <span class="c">// { data, error } 형태로 채워진다</span>
+}</code></pre>
+  <div class="callout key"><strong>핵심</strong><code>@wire</code>, <code>lightning/uiRecordApi</code>, <code>@salesforce/schema</code>는 모두 <b>플랫폼</b>이 제공한다. org 밖(Storybook)에서는 없다. 그래서 <code>@wire</code>를 쓰는 컴포넌트는 표현 컴포넌트가 될 수 없다 (<a href="#split">표현 / 컨테이너 분리</a>).</div>
+</section>
+
+<section id="lifecycle">
+  <h2>라이프사이클 훅</h2>
+  <p>프레임워크가 컴포넌트를 만들고, DOM에 넣고, 렌더하고, 제거한다. 각 단계에서 호출되는 메서드가 훅이다.</p>
+  <div class="flow">
+    <div class="step"><b>constructor()</b>인스턴스 생성. 반드시 <code>super()</code>를 먼저 호출한다</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>connectedCallback()</b>DOM에 삽입됨. 초기화, 구독 시작</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>renderedCallback()</b>렌더 완료. 다시 렌더될 때마다 또 호출된다</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>disconnectedCallback()</b>DOM에서 제거됨. 구독, 타이머 정리</div>
+  </div>
+  <div class="table-wrap"><table>
+    <tr><th>훅</th><th>주로 하는 일</th><th>주의</th></tr>
+    <tr><td><code>constructor()</code></td><td>필드 기본값</td><td>이 시점에는 자식 요소도, 부모가 넣은 <code>@api</code> 값도 아직 없다</td></tr>
+    <tr><td><code>connectedCallback()</code></td><td>초기 데이터 준비, 이벤트 리스너 등록</td><td>요소가 옮겨지면 여러 번 호출될 수 있다</td></tr>
+    <tr><td><code>renderedCallback()</code></td><td>렌더된 DOM을 봐야 하는 작업</td><td>여기서 반응형 필드를 바꾸면 다시 렌더 → 무한 루프 위험. 한 번만 실행할 작업은 플래그로 막는다</td></tr>
+    <tr><td><code>disconnectedCallback()</code></td><td>정리</td><td>connected에서 만든 것은 여기서 해제한다</td></tr>
+    <tr><td><code>errorCallback(error, stack)</code></td><td>하위 컴포넌트에서 난 오류 처리 (error boundary)</td><td>자기 자신의 오류가 아니라 자손의 오류를 잡는다</td></tr>
+  </table></div>
+  <p>공식 문서 목차에는 <code>render()</code>(템플릿을 조건에 따라 바꿔 끼우는 메서드)도 이 장에 함께 있다. 표현 컴포넌트에서는 거의 쓸 일이 없다.</p>
+</section>
+
+<section id="template">
+  <h2>템플릿 지시어</h2>
+  <p>템플릿은 루트 <code>&lt;template&gt;</code> 하나로 감싼다. 루트에는 지시어를 붙이지 않고, 안쪽의 중첩된 <code>&lt;template&gt;</code>이나 일반 태그에 붙인다.</p>
+
+  <h3>조건부 렌더링: lwc:if / lwc:elseif / lwc:else</h3>
+<pre data-file="milvusBadge/milvusBadge.html"><code>&lt;template&gt;
+  &lt;template lwc:if={label}&gt;
+    &lt;span class={badgeClass}&gt;{label}&lt;/span&gt;
+  &lt;/template&gt;
+  &lt;template lwc:elseif={placeholder}&gt;
+    &lt;span class="badge badge_empty"&gt;{placeholder}&lt;/span&gt;
+  &lt;/template&gt;
+  &lt;template lwc:else&gt;&lt;/template&gt;
+&lt;/template&gt;</code></pre>
+  <div class="callout warn"><strong>옛 문법은 쓰지 않는다</strong><code>if:true</code> / <code>if:false</code>는 공식 문서에서 더 이상 권장하지 않는다. 인터넷 예제에서 보이면 <code>lwc:if</code>로 바꾼다.</div>
+
+  <h3>목록: for:each와 key, iterator</h3>
+<pre><code>&lt;template for:each={items} for:item="item"&gt;
+  &lt;li key={item.id}&gt;{item.label}&lt;/li&gt;
+&lt;/template&gt;
+
+&lt;template iterator:it={items}&gt;
+  &lt;li key={it.value.id} class={it.value.cls}&gt;
+    {it.value.label}
+    &lt;template lwc:if={it.last}&gt; (마지막)&lt;/template&gt;
+  &lt;/li&gt;
+&lt;/template&gt;</code></pre>
+  <ul>
+    <li>어느 쪽이든 반복되는 첫 요소에 <code>key</code>가 <b>필수</b>다. 문자열이나 숫자여야 하고, 인덱스를 key로 쓰면 안 된다</li>
+    <li><code>iterator</code>는 <code>value</code>, <code>index</code>, <code>first</code>, <code>last</code>를 제공한다. 이름(<code>it</code>)은 소문자여야 한다</li>
+  </ul>
+
+  <h3>이벤트 핸들러</h3>
+<pre><code>&lt;button onclick={handleClick}&gt;{label}&lt;/button&gt;
+&lt;c-milvus-badge onselect={handleSelect}&gt;&lt;/c-milvus-badge&gt;</code></pre>
+  <p>핸들러는 <code>on</code> + 이벤트 이름으로 쓰고, 값은 클래스의 메서드를 가리킨다. 템플릿에 함수 호출식(<code>handleClick()</code>)이나 인자를 쓰지 않는다. 필요한 값은 <code>data-*</code> 속성에 넣고 <code>event.currentTarget.dataset</code>으로 읽는다.</p>
+</section>
+
+<section id="events">
+  <h2>이벤트로 부모와 대화하기</h2>
+  <p>LWC의 원칙은 <b>"속성은 아래로, 이벤트는 위로(props down, events up)"</b>다. 자식이 부모 데이터를 바꾸고 싶으면 직접 바꾸지 않고 이벤트를 보낸다.</p>
+<pre data-file="milvusBadge/milvusBadge.js (일부)"><code>handleClick() {
+  this.dispatchEvent(new CustomEvent('select', {
+    detail: { value: this.label }, <span class="c">// 원시값 또는 새로 만든 객체만</span>
+  }));
+}</code></pre>
+<pre data-file="부모 템플릿"><code>&lt;c-milvus-badge label="진행 중" onselect={handleSelect}&gt;&lt;/c-milvus-badge&gt;</code></pre>
+  <div class="table-wrap"><table>
+    <tr><th>옵션</th><th>기본값</th><th>의미</th></tr>
+    <tr><td><code>bubbles</code></td><td><code>false</code></td><td>DOM 위쪽으로 전파되는지</td></tr>
+    <tr><td><code>composed</code></td><td><code>false</code></td><td>shadow 경계를 넘어가는지</td></tr>
+  </table></div>
+  <ul>
+    <li>이벤트 이름은 DOM 표준처럼 소문자로 짓고, <code>on</code>으로 시작하지 않는다 (<code>ononselect</code>가 되어 버린다)</li>
+    <li><code>detail</code>에 객체를 그대로 넣으면 받는 쪽이 원본을 바꿀 수 있다. 원시값만 넣거나 새 객체로 복사해서 넣는다</li>
+    <li>버블링하는 이벤트는 경로 위의 모든 소비자에게 API가 된다. <b>가장 제한적인 설정(기본값 둘 다 false)</b>부터 시작한다</li>
+    <li>LWC는 버블링 단계만 쓴다. capture 단계는 지원하지 않는다</li>
+  </ul>
+</section>
+
+<section id="shadow">
+  <h2>Shadow DOM 모드</h2>
+  <p>각 컴포넌트의 내부 DOM은 shadow tree로 감싸여 바깥과 분리된다. 그런데 "shadow DOM"에는 구현이 여러 가지다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>모드</th><th>선언</th><th>상태</th><th>특징</th></tr>
+    <tr><td>synthetic shadow</td><td>(플랫폼 기본)</td><td><span class="tag info">LEX · Experience Cloud 기본</span></td><td>브라우저의 native shadow를 흉내 내는 폴리필. CSS는 스코프 토큰(예: <code>lwc-12abc-host</code> 속성)으로 격리한다</td></tr>
+    <tr><td>native shadow (mixed shadow)</td><td><code>static shadowSupportMode = 'native'</code></td><td><span class="tag warn">Beta</span></td><td>브라우저 표준 shadow DOM. <code>any</code> 값은 deprecated, <code>reset</code> 값이 있다. native 하위 트리 안에 synthetic 자식을 둘 수 없다</td></tr>
+    <tr><td>light DOM</td><td><code>static renderMode = 'light'</code></td><td><span class="tag ok">GA</span></td><td>shadow 없이 렌더. 바깥 CSS가 그대로 들어오고, 컴포넌트 CSS도 밖으로 샌다</td></tr>
+  </table></div>
+  <p>공식 문서(Light DOM 페이지) 기준으로 <b>Lightning Experience와 Experience Cloud는 여전히 synthetic shadow를 쓴다</b>. 즉 우리가 배포한 컴포넌트는 org 안에서 synthetic shadow로 렌더된다.</p>
+
+  <h3>스타일 격리가 어떻게 다른가</h3>
+  <ul>
+    <li><b>synthetic</b>: 컴포넌트 CSS에 스코프 속성을 붙여 격리한다. 실제로는 한 문서 안에 있으므로 전역 스타일시트(예: SLDS CSS)가 컴포넌트 안까지 적용될 수 있다. SLDS 클래스를 컴포넌트 안에서 쓸 수 있는 이유다</li>
+    <li><b>native</b>: 브라우저가 진짜로 경계를 만든다. 문서 전역 스타일시트는 안으로 들어가지 않는다. 그래서 같은 코드라도 SLDS 클래스가 안 먹는 결과가 나올 수 있다</li>
+  </ul>
+  <div class="callout key"><strong>Storybook도 synthetic으로 맞춘다</strong>Storybook은 브라우저 위에서 LWC를 돌리므로, 아무것도 안 하면 native shadow로 렌더된다. org와 같은 모습을 보려면 <code>@lwc/synthetic-shadow</code>를 <b>가장 먼저</b> import해서 플랫폼과 같은 모드로 맞춰야 한다. <code>lightning-base-components</code> 패키지 README도 synthetic shadow를 필수 조건으로 적고 있다. 자세한 구성은 <a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html">04 통합</a>에서 다룬다.</div>
+</section>
+
+<section id="css">
+  <h2>CSS 변수와 shadow 경계</h2>
+  <p>shadow DOM에서 부모의 CSS <b>선택자</b>는 자식 안으로 들어가지 못한다. 부모는 자식을 "요소 하나"로만 꾸밀 수 있다. 반면 공식 문서에 따르면 <b>CSS 사용자 정의 속성(custom properties)은 shadow 경계를 통과한다</b>. 상속되는 속성이기 때문이다.</p>
+<pre data-file="부모 또는 브랜드 루트 CSS"><code><span class="c">/* 1) 선택자로 자식 내부를 건드리기: 동작하지 않는다 */</span>
+c-milvus-badge span { color: red; }
+
+<span class="c">/* 2) 자식 요소 자체를 꾸미기: 동작한다 (요소 하나로서) */</span>
+c-milvus-badge { display: inline-block; margin: 4px; }
+
+<span class="c">/* 3) 조상에 변수 선언: 자식 내부까지 상속된다 */</span>
+.milvus-brand {
+  --milvus-badge-bg: #0b5cab;
+  --milvus-badge-text: #ffffff;
+}</code></pre>
+<pre data-file="milvusBadge/milvusBadge.css"><code>.badge {
+  <span class="c">/* 브랜드 변수를 읽고, 없으면 SLDS global hook으로 대체 */</span>
+  background: var(--milvus-badge-bg, var(--slds-g-color-accent-1));
+  color: var(--milvus-badge-text, #fff);
+  border-radius: var(--slds-g-radius-border-2);
+}</code></pre>
+  <p class="c">위 <code>--slds-g-*</code> 이름은 예시다. 실제 hook 이름은 01 SLDS 문서의 목록으로 확인한다.</p>
+  <div class="callout ok"><strong>그래서 브랜드 변수가 동작한다</strong><code>--milvus-*</code>를 루트나 브랜드 범위 요소에 한 번 선언하면, 그 아래 모든 컴포넌트가 shadow 안에서 같은 값을 읽는다. 컴포넌트마다 값을 넘길 필요가 없다.</div>
+</section>
+
+<section id="modules">
+  <h2>모듈 시스템</h2>
+  <p>LWC의 import 경로는 <code>네임스페이스/이름</code> 형식이다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>import</th><th>제공하는 곳</th><th>org 밖에서</th></tr>
+    <tr><td><code>import { LightningElement } from 'lwc'</code></td><td>LWC 엔진 (npm <code>lwc</code>)</td><td><span class="tag ok">있음</span></td></tr>
+    <tr><td><code>import MilvusBadge from 'c/milvusBadge'</code></td><td>우리 코드</td><td><span class="tag ok">있음</span> (번들러가 경로를 알아야 함)</td></tr>
+    <tr><td><code>lightning/*</code> (예: <code>lightning/navigation</code>, <code>lightning/uiRecordApi</code>)</td><td>플랫폼</td><td><span class="tag warn">일부</span> npm <code>lightning-base-components</code>에 일부만 있음</td></tr>
+    <tr><td><code>@salesforce/apex/*</code></td><td>플랫폼 (Apex 메서드)</td><td><span class="tag bad">없음</span> stub 필요</td></tr>
+    <tr><td><code>@salesforce/label/*</code></td><td>플랫폼 (Custom Label)</td><td><span class="tag bad">없음</span> stub 필요</td></tr>
+    <tr><td><code>@salesforce/schema/*</code></td><td>플랫폼 (객체·필드 참조)</td><td><span class="tag bad">없음</span> stub 필요</td></tr>
+    <tr><td><code>@salesforce/user/*</code></td><td>플랫폼 (현재 사용자)</td><td><span class="tag bad">없음</span> stub 필요</td></tr>
+    <tr><td><code>@salesforce/i18n/*</code></td><td>플랫폼 (로캘 정보)</td><td><span class="tag bad">없음</span> stub 필요</td></tr>
+  </table></div>
+  <p>scoped 모듈(<code>@salesforce/*</code>)은 org가 배포 시점에 값을 채워 주는 가상의 모듈이다. npm에 실제 패키지가 없으므로 Storybook에서는 번들러 설정으로, Jest에서는 테스트 도구가 대체해 준다.</p>
+</section>
+
+<section id="split">
+  <h2>표현 / 컨테이너 분리</h2>
+  <div class="cards">
+    <div class="card"><h4>표현 컴포넌트 (presentational)</h4><p><code>@api</code>로 받고, 이벤트로 알린다. <code>@wire</code>, Apex, LDS를 쓰지 않는다. Storybook에서 그대로 렌더된다.</p></div>
+    <div class="card"><h4>컨테이너 컴포넌트 (container)</h4><p>데이터를 가져와 표현 컴포넌트에 넘긴다. <code>@wire</code>, Apex 호출은 여기에만 둔다. Storybook 대상이 아니다.</p></div>
+  </div>
+<pre data-file="milvusBadge/milvusBadge.js (표현)"><code>import { LightningElement, api } from 'lwc';
+
+export default class MilvusBadge extends LightningElement {
+  @api label = '';
+  @api variant = 'neutral';
+
+  get badgeClass() {
+    return `badge badge_${this.variant}`;
+  }
+
+  handleClick() {
+    this.dispatchEvent(new CustomEvent('select', { detail: { value: this.label } }));
+  }
+}</code></pre>
+<pre data-file="milvusRecordBadge/milvusRecordBadge.js (컨테이너)"><code>import { LightningElement, api, wire } from 'lwc';
+import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
+import STATUS_FIELD from '@salesforce/schema/Case.Status';
+
+const VARIANT_BY_STATUS = { New: 'neutral', Working: 'warning', Closed: 'success' };
+
+export default class MilvusRecordBadge extends LightningElement {
+  @api recordId;
+
+  @wire(getRecord, { recordId: '$recordId', fields: [STATUS_FIELD] })
+  record;
+
+  get status() {
+    return this.record?.data ? getFieldValue(this.record.data, STATUS_FIELD) : '';
+  }
+
+  get variant() {
+    return VARIANT_BY_STATUS[this.status] ?? 'neutral';
+  }
+}</code></pre>
+<pre data-file="milvusRecordBadge/milvusRecordBadge.html (컨테이너)"><code>&lt;template&gt;
+  &lt;c-milvus-badge label={status} variant={variant}&gt;&lt;/c-milvus-badge&gt;
+&lt;/template&gt;</code></pre>
+  <div class="callout key"><strong>판단 기준 한 줄</strong>"Storybook에서 org 없이 렌더되지 않으면 표현 컴포넌트가 아니다." 표현 컴포넌트에 <code>@wire</code>나 <code>@salesforce/apex</code> import가 들어오면 리뷰에서 막는다.</div>
+</section>
+
+<section id="test">
+  <h2>Jest 테스트</h2>
+  <p>프로젝트의 <code>package.json</code>에는 <code>"test:unit": "sfdx-lwc-jest"</code>가 이미 있다. <code>pnpm test:unit</code>으로 실행한다 (<code>pnpm test:unit:watch</code>, <code>pnpm test:unit:coverage</code>도 있다).</p>
+  <div class="table-wrap"><table>
+    <tr><th>문제</th><th><code>@salesforce/sfdx-lwc-jest</code> (최신 7.9.0)가 해 주는 것</th></tr>
+    <tr><td><code>lightning-*</code> 기본 컴포넌트가 없다</td><td><code>lightning</code> 네임스페이스 <b>전체 컴포넌트의 stub</b>을 포함하고 자동으로 쓴다. 바꾸고 싶으면 Jest 설정의 <code>moduleNameMapper</code>로 덮어쓴다</td></tr>
+    <tr><td><code>@salesforce/*</code> import가 없다</td><td><code>@lwc/jest-transformer</code>가 이 import를 테스트용 값으로 바꿔 준다</td></tr>
+    <tr><td>Apex 호출</td><td><code>@salesforce/apex/Class.method</code> import는 기본으로 <code>jest.fn()</code>이 된다</td></tr>
+    <tr><td><code>@wire</code> 데이터</td><td><code>@salesforce/wire-service-jest-util</code>의 API로 테스트에서 값을 흘려 넣는다. sfdx-lwc-jest README에 따르면 이 API가 패키지를 통해 노출되므로 별도 의존성을 추가하지 않아도 된다</td></tr>
+  </table></div>
+<pre data-file="milvusBadge/__tests__/milvusBadge.test.js"><code>import { createElement } from 'lwc';
+import MilvusBadge from 'c/milvusBadge';
+
+describe('c-milvus-badge', () =&gt; {
+  afterEach(() =&gt; {
+    while (document.body.firstChild) document.body.removeChild(document.body.firstChild);
+  });
+
+  it('label을 렌더하고 클릭하면 select 이벤트를 보낸다', () =&gt; {
+    const el = createElement('c-milvus-badge', { is: MilvusBadge });
+    el.label = '진행 중';
+    const handler = jest.fn();
+    el.addEventListener('select', handler);
+    document.body.appendChild(el);
+
+    const span = el.shadowRoot.querySelector('span');
+    expect(span.textContent).toBe('진행 중');
+    span.click();
+    expect(handler).toHaveBeenCalled();
+  });
+});</code></pre>
+  <p class="c">위 테스트는 템플릿에 <code>onclick={handleClick}</code>이 <code>span</code>에 걸려 있다고 가정한 예시다.</p>
+  <p>표현 컴포넌트는 stub이 거의 필요 없어서 테스트가 짧다. 이것도 분리의 이점이다.</p>
+</section>
+
+<section id="project">
+  <h2>우리 프로젝트 적용</h2>
+  <div class="callout project"><strong>밀버스 규칙 정리</strong>
+    <ul>
+      <li>컴포넌트는 <code>force-app/main/default/lwc/</code>에 두고, 이름은 <code>milvus</code> 접두어 + camelCase. 태그는 <code>&lt;c-milvus-*&gt;</code>가 된다</li>
+      <li>디자인 시스템 컴포넌트는 <b>표현 컴포넌트</b>로 만든다. <code>@api</code> 입력, <code>CustomEvent</code> 출력만. <code>@wire</code>, Apex, LDS는 컨테이너에만</li>
+      <li>공개 속성은 가능하면 원시값. 객체를 받으면 절대 내부를 바꾸지 않는다</li>
+      <li>색과 브랜드 값은 <code>--milvus-*</code> 변수로 읽는다. 변수는 루트나 브랜드 범위에서 선언하고 상속으로 컴포넌트 안에 들어온다</li>
+      <li>SLDS global hook(<code>--slds-g-*</code>)은 <b>읽기만</b> 한다. 컴포넌트에서 재정의하지 않는다</li>
+      <li>Storybook은 LWC를 Rollup으로 미리 컴파일해서 렌더한다. 플랫폼과 같은 모습을 위해 synthetic shadow를 켠다 (04 통합)</li>
+      <li>단위 테스트는 <code>pnpm test:unit</code></li>
+    </ul>
+  </div>
+  <div class="callout warn"><strong>버전 정보</strong>2026-09-26 기준 npm <code>lwc</code> latest는 9.4.3이다. dist-tag로 <code>summer26</code> 9.1.5, <code>winter27</code> 9.3.10이 있다. 로컬 도구(Storybook용 Rollup 빌드)의 <code>lwc</code> 버전과 org 릴리스 버전이 다르면 미세한 동작 차이가 있을 수 있다. 어느 태그에 맞출지는 04 통합 단계에서 정한다.</div>
+</section>
+
+<section id="quiz" class="quiz">
+  <h2>스스로 점검</h2>
+  <details><summary>Q1. 폴더 <code>milvusStatusPill</code>의 마크업 태그와 import 경로는?</summary>
+    <p>태그는 <code>&lt;c-milvus-status-pill&gt;</code>, import는 <code>c/milvusStatusPill</code>. camelCase가 kebab-case로 바뀌고 네임스페이스 <code>c</code>가 붙는다.</p></details>
+  <details><summary>Q2. <code>this.items.push(x)</code> 후 화면이 안 바뀐다. <code>@track</code>을 붙이는 것 말고 권장하는 방법은?</summary>
+    <p>새 배열을 대입한다: <code>this.items = [...this.items, x]</code>. 필드는 기본으로 반응형이지만 <code>===</code>로 얕게 비교하므로 새 값을 대입해야 감지된다.</p></details>
+  <details><summary>Q3. 자식이 <code>@api</code>로 받은 객체의 속성을 바꾸려 한다. 무슨 일이 일어나고, 어떻게 해야 하나?</summary>
+    <p>읽기 전용 프록시라 <code>Invalid mutation</code> 오류가 난다. 부모에게 <code>CustomEvent</code>를 보내 부모가 값을 바꾸게 하거나, 자기 필드에 복사본을 만들어 쓴다.</p></details>
+  <details><summary>Q4. 부모 CSS의 <code>c-milvus-badge span { ... }</code>은 왜 안 먹고, <code>--milvus-badge-bg</code>는 왜 먹나?</summary>
+    <p>선택자는 shadow 경계를 넘지 못한다. CSS 사용자 정의 속성은 상속되므로 shadow 경계를 통과해 컴포넌트 안에서 <code>var()</code>로 읽힌다.</p></details>
+  <details><summary>Q5. Storybook에서 SLDS 클래스가 컴포넌트 안에 적용되지 않는다. 가장 먼저 의심할 것은?</summary>
+    <p>synthetic shadow가 켜져 있지 않아 native shadow로 렌더되고 있을 가능성. org(LEX)는 synthetic shadow를 쓰므로 <code>@lwc/synthetic-shadow</code>를 가장 먼저 import해서 맞춘다.</p></details>
+</section>
+
+<section id="refs">
+  <h2>참고</h2>
+  <ul class="refs">
+    <li><a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-folder.html">LWC Guide — Component Folder</a> (번들, 이름 규칙)</li>
+    <li><a href="https://developer.salesforce.com/docs/platform/lwc/guide/reactivity-public.html">Public Properties</a> · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-data-flow.html">Data Flow</a> · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/reactivity-fields.html">Reactivity for Fields, Objects, and Arrays</a></li>
+    <li><a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-lifecycle-hooks.html">Lifecycle Hooks</a></li>
+    <li><a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-conditional.html">Render DOM Elements Conditionally</a> · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-lists.html">Render Lists</a></li>
+    <li><a href="https://developer.salesforce.com/docs/platform/lwc/guide/events-create-dispatch.html">Create and Dispatch Events</a> · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/events-propagation.html">Configure Event Propagation</a></li>
+    <li><a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css.html">CSS Stylesheets</a> (CSS 사용자 정의 속성이 shadow 경계를 통과)</li>
+    <li><a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-light-dom.html">Light DOM</a> · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-mixed-shadow.html">Mixed Shadow Mode (Beta)</a></li>
+    <li><a href="https://github.com/salesforce/sfdx-lwc-jest">salesforce/sfdx-lwc-jest README</a> · <a href="https://github.com/salesforce/wire-service-jest-util">salesforce/wire-service-jest-util README</a></li>
+    <li><a href="https://github.com/salesforce/lwc">salesforce/lwc</a> · <a href="https://lwc.dev">lwc.dev</a></li>
+  </ul>
+</section>
+
+<footer class="doc-foot">
+  <span>밀버스 디자인 시스템 · Learn 02</span>
+  <span>2026-09-26 기준. 내용은 LWC Developer Guide와 패키지 README로 확인함</span>
+</footer>
+</main>
+</div>
+</body>
+</html>

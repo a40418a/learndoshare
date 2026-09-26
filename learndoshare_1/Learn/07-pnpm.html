@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pnpm 핵심 정리</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<nav class="topnav"><div class="topnav-inner">
+  <a href="../README.md">README</a>
+  <a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html">01 SLDS</a>
+  <a href="02-LWC%20%EA%B8%B0%EC%B4%88.html">02 LWC</a>
+  <a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html">03 Storybook</a>
+  <a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html">04 통합</a>
+  <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>
+  <a href="06-%EB%A1%9C%EC%BB%AC%20%EA%B0%9C%EB%B0%9C%20%EB%8F%84%EA%B5%AC%20%EB%B9%84%EA%B5%90.html">06 도구 비교</a>
+  <a class="active" href="07-pnpm.html">07 pnpm</a>
+  <a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html">08 Claude Code</a>
+</div></nav>
+
+<div class="layout">
+<aside class="toc">
+  <strong>목차</strong>
+  <ol>
+    <li><a href="#why">왜 pnpm인가</a></li>
+    <li><a href="#layout">node_modules 구조</a></li>
+    <li><a href="#versions">버전별 차이 (10 / 11+)</a></li>
+    <li><a href="#commands">명령어 대응표</a></li>
+    <li><a href="#builds">빌드 스크립트 승인</a></li>
+    <li><a href="#hoist">hoisting 문제 해결</a></li>
+    <li><a href="#pin">버전 고정과 lockfile</a></li>
+    <li><a href="#husky">husky와 pnpm</a></li>
+    <li><a href="#workspace">workspace (나중에)</a></li>
+    <li><a href="#quiz">스스로 점검</a></li>
+  </ol>
+</aside>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">LEARN 07 · Phase 1 준비</div>
+  <h1>pnpm 핵심 정리</h1>
+  <p class="lead">밀버스는 pnpm만 쓴다. npm에 익숙한 사람이 pnpm에서 걸리는 지점, 특히 Storybook을 설치할 때 문제가 되는 부분을 중심으로 정리한다.</p>
+  <div class="meta"><span>예상 1시간</span><span>2026-09-26 기준 pnpm 최신 12.6.0</span><span>로컬 설치 10.13.1 · Node 24.4.1</span></div>
+</header>
+
+<section id="why">
+  <h2>왜 pnpm인가</h2>
+  <div class="cards">
+    <div class="card"><h4>디스크 절약</h4><p>패키지를 전역 저장소(content-addressable store)에 한 번만 저장하고, 프로젝트에는 하드 링크로 연결한다.</p></div>
+    <div class="card"><h4>엄격함</h4><p><code>package.json</code>에 선언하지 않은 패키지는 import할 수 없다. "우연히 되던 코드"가 사라진다.</p></div>
+    <div class="card"><h4>보안 기본값</h4><p>10부터 의존성의 설치 스크립트(<code>postinstall</code>)를 기본으로 실행하지 않는다.</p></div>
+  </div>
+  <div class="callout project"><strong>규칙</strong><code>npm</code>, <code>yarn</code>, <code>npx</code> 명령은 쓰지 않는다. 블로그나 공식 문서 예제에 <code>npx</code>가 나오면 아래 대응표로 바꿔 실행한다.</div>
+</section>
+
+<section id="layout">
+  <h2>node_modules 구조</h2>
+  <p>npm은 모든 의존성을 <code>node_modules</code> 최상단에 평평하게 펼친다(hoisting). pnpm은 <b>직접 선언한 패키지만</b> 최상단에 심볼릭 링크로 두고, 실제 파일은 <code>node_modules/.pnpm/</code> 아래에 둔다.</p>
+<pre><code>node_modules/
+├── storybook -&gt; .pnpm/storybook@10.6.0/node_modules/storybook   <span class="c">← 내가 선언한 것만 보인다</span>
+├── lwc -&gt; .pnpm/lwc@9.4.3/node_modules/lwc
+└── .pnpm/
+    ├── storybook@10.6.0/node_modules/...
+    ├── node_modules/        <span class="c">← 숨겨진 hoist 영역 (hoistPattern: ['*'])</span>
+    └── ...</code></pre>
+  <div class="table-wrap"><table>
+    <tr><th>설정</th><th>기본값</th><th>의미</th></tr>
+    <tr><td><code>nodeLinker</code></td><td><code>isolated</code></td><td>위와 같은 심볼릭 링크 구조</td></tr>
+    <tr><td><code>hoistPattern</code></td><td><code>['*']</code></td><td>숨겨진 영역(<code>.pnpm/node_modules</code>)으로 끌어올림. 내 코드에서는 안 보인다</td></tr>
+    <tr><td><code>publicHoistPattern</code></td><td><code>[]</code></td><td>최상단 <code>node_modules</code>로 끌어올릴 패턴. 도구가 hoisting을 전제할 때 쓴다</td></tr>
+    <tr><td><code>shamefullyHoist</code></td><td><code>false</code></td><td><code>true</code>면 npm처럼 전부 펼침 (<code>publicHoistPattern: ['*']</code>와 같음)</td></tr>
+  </table></div>
+  <p>pnpm 10부터는 eslint와 prettier도 기본으로 최상단에 올리지 않는다.</p>
+</section>
+
+<section id="versions">
+  <h2>버전별 차이 (10 / 11+)</h2>
+  <p>인터넷 자료 대부분은 pnpm 8~10 기준이다. <b>11부터 설정 위치와 빌드 승인 방식이 바뀌었으므로</b> 자료를 볼 때 버전을 꼭 확인한다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>항목</th><th>pnpm 10</th><th>pnpm 11 이상 (최신 12.x)</th></tr>
+    <tr><td>설정 파일</td><td><code>.npmrc</code>, <code>pnpm-workspace.yaml</code> 둘 다 읽음</td><td><code>.npmrc</code>는 <b>인증·레지스트리만</b>. 나머지는 <code>pnpm-workspace.yaml</code>(camelCase)</td></tr>
+    <tr><td>의존성 빌드 스크립트</td><td>기본 미실행. 승인 목록 <code>onlyBuiltDependencies</code></td><td>기본 미실행. 승인 목록 <code>allowBuilds</code> (<code>onlyBuiltDependencies</code> 삭제)</td></tr>
+    <tr><td>미승인 빌드가 있으면</td><td>경고만 (<code>strictDepBuilds: false</code>)</td><td><b>설치 실패</b> (<code>strictDepBuilds: true</code>)</td></tr>
+    <tr><td>새로 나온 버전 설치</td><td>제한 없음</td><td><code>minimumReleaseAge</code> 기본 1일. 24시간 안에 나온 버전은 설치를 막는다</td></tr>
+    <tr><td>Node 요구</td><td>18+</td><td><b>22+</b></td></tr>
+    <tr><td>환경 변수</td><td><code>npm_config_*</code></td><td><code>pnpm_config_*</code></td></tr>
+  </table></div>
+  <div class="callout project"><strong>결정 필요</strong>로컬에는 10.13.1이 설치돼 있다. Node는 24.4.1이라 11 이상의 요구(22+)도 충족한다. 팀 표준 버전을 정해 <code>package.json</code>에 고정해야 한다 (README Phase 1). 새로 시작하는 프로젝트라 최신 메이저로 맞추는 쪽이 이후 문서와 차이가 적다.</div>
+</section>
+
+<section id="commands">
+  <h2>명령어 대응표</h2>
+  <div class="table-wrap"><table>
+    <tr><th>하고 싶은 일</th><th>npm (쓰지 않음)</th><th>pnpm</th></tr>
+    <tr><td>의존성 설치</td><td><code>npm install</code></td><td><code>pnpm install</code></td></tr>
+    <tr><td>개발 의존성 추가</td><td><code>npm i -D rollup</code></td><td><code>pnpm add -D rollup</code></td></tr>
+    <tr><td>정확한 버전으로 추가</td><td><code>npm i -E pkg</code></td><td><code>pnpm add -E pkg</code></td></tr>
+    <tr><td>스크립트 실행</td><td><code>npm run storybook</code></td><td><code>pnpm storybook</code> (또는 <code>pnpm run storybook</code>)</td></tr>
+    <tr><td>설치된 CLI 실행</td><td><code>npx rollup -c</code></td><td><code>pnpm exec rollup -c</code></td></tr>
+    <tr><td>설치 없이 일회성 실행</td><td><code>npx create-x</code></td><td><code>pnpm dlx create-x</code></td></tr>
+    <tr><td>프로젝트 생성기</td><td><code>npm create storybook@latest</code></td><td><code>pnpm create storybook@latest</code></td></tr>
+    <tr><td>패키지 정보 조회</td><td><code>npm view lwc version</code></td><td><code>pnpm view lwc version</code></td></tr>
+  </table></div>
+  <p><code>pnpm exec</code>는 <b>프로젝트에 설치된</b> 실행 파일(<code>node_modules/.bin</code>)을 쓴다. <code>pnpm dlx</code>는 패키지를 임시로 받아 실행한다. 헷갈리면 "설치했으면 exec, 안 했으면 dlx"로 기억한다.</p>
+</section>
+
+<section id="builds">
+  <h2>빌드 스크립트 승인</h2>
+  <p>pnpm 10부터 <b>의존성</b>의 <code>postinstall</code> 같은 설치 스크립트는 기본으로 실행되지 않는다. 악성 패키지가 설치만으로 코드를 실행하는 공격을 막기 위해서다.</p>
+  <ul>
+    <li>Storybook/Vite를 설치하면 <code>esbuild</code> 같은 패키지가 "빌드 스크립트 무시됨" 목록에 뜰 수 있다</li>
+    <li><code>pnpm approve-builds</code>를 실행해 필요한 것만 승인한다</li>
+    <li><b>내 프로젝트 자신의</b> <code>prepare</code>/<code>postinstall</code>(예: husky)은 계속 실행된다 (pnpm 10.13.1에서 실험으로 확인)</li>
+  </ul>
+<pre data-file="pnpm-workspace.yaml (pnpm 11 이상)"><code>allowBuilds:
+  esbuild: true</code></pre>
+<pre data-file="package.json (pnpm 10)"><code>"pnpm": {
+  "onlyBuiltDependencies": ["esbuild"]
+}</code></pre>
+  <div class="callout warn"><strong>pnpm 11 이상에서는 설치가 멈춘다</strong>미승인 빌드가 있으면 경고가 아니라 오류로 설치가 중단된다. 당황하지 말고 <code>pnpm approve-builds</code>로 승인하고 다시 설치한다.</div>
+</section>
+
+<section id="hoist">
+  <h2>hoisting 문제 해결</h2>
+  <p>일부 도구는 npm처럼 모든 패키지가 최상단에 있다고 가정하고 만들어졌다. pnpm에서는 이런 도구가 "모듈을 찾을 수 없음" 오류를 낸다. Storybook 6~7 시절에 자주 보고됐다. 9~10은 패키지가 <code>storybook</code> 하나로 통합돼 크게 줄었지만, 애드온에서 여전히 생길 수 있다.</p>
+  <h3>해결 순서 (좁은 것부터)</h3>
+  <ol>
+    <li>오류 메시지에 나온 패키지를 직접 <code>pnpm add -D</code>로 선언한다 (가장 정석)</li>
+    <li>안 되면 해당 패턴만 최상단으로 올린다
+<pre data-file="pnpm 10: .npmrc"><code>public-hoist-pattern[]=*storybook*</code></pre>
+<pre data-file="pnpm 11 이상: pnpm-workspace.yaml"><code>publicHoistPattern:
+  - "*storybook*"</code></pre></li>
+    <li>최후 수단: <code>shamefullyHoist: true</code>. pnpm의 엄격함을 포기하는 것이라 쓰지 않는 것을 목표로 한다</li>
+  </ol>
+  <div class="callout key"><strong>원칙</strong>설정은 <b>실제로 깨졌을 때만</b> 추가한다. 미리 넣어 두면 무엇 때문에 넣었는지 아무도 모르게 된다.</div>
+</section>
+
+<section id="pin">
+  <h2>버전 고정과 lockfile</h2>
+  <ul>
+    <li><code>pnpm-lock.yaml</code>은 <b>반드시 커밋</b>한다. 모두 같은 버전을 설치하게 된다</li>
+    <li><code>package-lock.json</code>, <code>yarn.lock</code>은 <code>.gitignore</code>에 넣는다. 섞여 있으면 누군가 npm을 썼다는 신호다</li>
+    <li>pnpm 버전 고정: 최신 문서는 <code>packageManager</code> 필드를 "legacy"로 부르고 <code>devEngines.packageManager</code>를 권장한다 (범위 지정 가능)</li>
+  </ul>
+<pre data-file="package.json"><code>{
+  "devEngines": {
+    "packageManager": { "name": "pnpm", "version": "^12.0.0", "onFail": "error" }
+  },
+  "engines": { "node": "&gt;=22" }
+}</code></pre>
+  <p class="c">예시의 버전은 결정 전 자리표시자다. 팀이 정한 버전으로 바꾼다.</p>
+  <div class="callout warn"><strong>alpha 패키지는 정확한 버전으로</strong><code>lightning-base-components</code>는 latest 태그가 <code>1.28.19-alpha</code>다. <code>pnpm add -D -E lightning-base-components</code>처럼 <code>-E</code>로 정확히 고정하고, 올릴 때는 명시적으로 올린다.</div>
+</section>
+
+<section id="husky">
+  <h2>husky와 pnpm</h2>
+  <p>husky hook 파일 안에서도 npm/npx를 쓰지 않는다.</p>
+<pre data-file=".husky/pre-commit"><code>cd learndoshare_1 &amp;&amp; pnpm exec lint-staged</code></pre>
+  <div class="callout project"><strong>현재 hook이 동작하지 않는 이유</strong>git 루트는 상위 폴더 <code>learndoshare/</code>인데 <code>package.json</code>은 <code>learndoshare_1/</code>에 있다. <code>prepare: "husky"</code>는 현재 폴더에서 <code>.git</code>을 찾으므로 실패하고, <code>|| true</code> 때문에 조용히 넘어간다. <code>prepare</code>를 <code>cd .. &amp;&amp; husky learndoshare_1/.husky</code>로 바꿔야 한다. Phase 1에서 처리한다.</div>
+</section>
+
+<section id="workspace">
+  <h2>workspace (나중에)</h2>
+  <p>지금은 단일 패키지로 시작한다. 두 번째 프로젝트가 붙어서 토큰, 컴포넌트, Storybook을 나눌 때 workspace로 전환한다.</p>
+<pre data-file="pnpm-workspace.yaml"><code>packages:
+  - packages/*</code></pre>
+  <p>workspace 안의 패키지끼리는 <code>"@milvus/tokens": "workspace:*"</code>처럼 참조한다. 배포할 때는 실제 버전 번호로 바뀐다.</p>
+</section>
+
+<section id="quiz" class="quiz">
+  <h2>스스로 점검</h2>
+  <details><summary>Q1. 블로그에 <code>npx storybook add @storybook/addon-a11y</code>라고 나온다. 어떻게 실행하나?</summary>
+    <p>Storybook이 이미 설치돼 있으므로 <code>pnpm exec storybook add @storybook/addon-a11y</code>.</p></details>
+  <details><summary>Q2. Storybook 설치 후 "Ignored build scripts: esbuild"가 떴다. 무엇을 해야 하나?</summary>
+    <p><code>pnpm approve-builds</code>로 esbuild를 승인한다. pnpm 11 이상이면 승인 전까지 설치가 실패한다.</p></details>
+  <details><summary>Q3. "Cannot find module"이 나서 <code>shamefullyHoist</code>를 켜려고 한다. 그 전에 할 일은?</summary>
+    <p>1) 그 패키지를 직접 <code>pnpm add -D</code>로 선언, 2) 안 되면 <code>publicHoistPattern</code>으로 좁게 올리기. <code>shamefullyHoist</code>는 최후 수단이다.</p></details>
+  <details><summary>Q4. pnpm 12에서 <code>.npmrc</code>에 <code>public-hoist-pattern</code>을 넣었는데 효과가 없다. 왜?</summary>
+    <p>11부터 <code>.npmrc</code>는 인증·레지스트리 설정만 읽는다. <code>pnpm-workspace.yaml</code>에 <code>publicHoistPattern</code>으로 넣어야 한다.</p></details>
+  <details><summary>Q5. husky의 <code>prepare</code>는 의존성 빌드 스크립트 차단에 걸리나?</summary>
+    <p>걸리지 않는다. 차단 대상은 의존성의 스크립트이고, 루트 프로젝트 자신의 <code>prepare</code>는 실행된다.</p></details>
+</section>
+
+<section id="refs">
+  <h2>참고</h2>
+  <ul class="refs">
+    <li><a href="https://pnpm.io/settings/node-modules">pnpm settings — node-modules</a></li>
+    <li><a href="https://pnpm.io/blog/releases/11.0">pnpm 11.0 release</a> · <a href="https://github.com/pnpm/pnpm/releases/tag/v10.0.0">pnpm 10.0.0 release</a></li>
+    <li><a href="https://pnpm.io/cli/approve-builds">pnpm approve-builds</a> · <a href="https://pnpm.io/cli/dlx">pnpm dlx / exec</a></li>
+    <li><a href="https://pnpm.io/package_json">package.json — devEngines</a> · <a href="https://pnpm.io/workspaces">workspaces</a></li>
+  </ul>
+</section>
+
+<footer class="doc-foot">
+  <span>밀버스 디자인 시스템 · Learn 07</span>
+  <span>2026-09-26 기준. 버전 정보는 <code>pnpm view</code>와 공식 문서로 확인함</span>
+</footer>
+</main>
+</div>
+</body>
+</html>
