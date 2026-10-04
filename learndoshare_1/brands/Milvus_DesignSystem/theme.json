@@ -5,5 +5,24 @@
   "designSystemVersion": "SLDS_v2",
   "brandColor": "#0176D3",
   "headerBackgroundColor": "#FFFFFF",
-  "logo": "logo.jpg"
+  "logo": "logo.jpg",
+  "palette": {
+    "5": "#001127",
+    "10": "#001c3a",
+    "15": "#01264a",
+    "20": "#01315d",
+    "30": "#034883",
+    "35": "#005398",
+    "40": "#015fac",
+    "45": "#0b6cbf",
+    "50": "#0176d3",
+    "55": "#2186e4",
+    "60": "#3393f3",
+    "65": "#46a1ff",
+    "70": "#67affd",
+    "80": "#9ccafe",
+    "85": "#b6d8fe",
+    "90": "#cee5fe",
+    "95": "#e7f2ff"
+  }
 }

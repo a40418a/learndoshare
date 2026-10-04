@@ -5,7 +5,7 @@
   "description": "밀버스 디자인 시스템 (SFDX + LWC + Storybook)",
   "scripts": {
     "lint": "eslint \"force-app/**/lwc/**/*.js\"",
-    "test": "pnpm test:unit",
+    "test": "pnpm test:unit && pnpm test:palette",
     "test:unit": "sfdx-lwc-jest",
     "test:unit:watch": "sfdx-lwc-jest --watch",
     "test:unit:debug": "sfdx-lwc-jest --debug",
@@ -18,7 +18,8 @@
     "prettier": "prettier --write \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "prepare": "husky || true",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "test:palette": "node scripts/palette.mjs"
   },
   "devDependencies": {
     "@lwc/engine-dom": "9.4.3",

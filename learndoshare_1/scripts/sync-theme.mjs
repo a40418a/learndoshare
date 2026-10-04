@@ -1,16 +1,18 @@
 #!/usr/bin/env node
 /**
  * org의 Themes and Branding을 읽어 brands/<테마>/ 를 만든다.
- *   theme.json  브랜드 색 (L1)
+ *   theme.json  브랜드 색 + 브랜드 팔레트 17단계 (L1)
  *   logo.<ext>  브랜드 로고 (L2)
  *
- * 사용: pnpm sync:theme            (기본 org 별칭: learndoshare_1)
- *       SF_ORG=<별칭> pnpm sync:theme
+ * 사용: pnpm sync:theme                       org의 커스텀 테마 전부
+ *       pnpm sync:theme <브랜드명> [...]        지정한 테마만 (DeveloperName 또는 MasterLabel)
+ *       SF_ORG=<별칭> pnpm sync:theme          다른 org (기본: learndoshare_1)
  *
  * 액세스 토큰은 메모리에서만 쓰고 출력하거나 파일로 남기지 않는다.
  */
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { brandPalette } from "./palette.mjs";
 
 const org = process.env.SF_ORG ?? "learndoshare_1";
 const API = "v67.0";
@@ -60,10 +62,24 @@ async function downloadLogo(brandImage, dir, auth) {
   return file;
 }
 
-const themes = query(
+const allThemes = query(
   "SELECT DeveloperName, MasterLabel, DefaultBrandingSetId, DesignSystemVersion FROM LightningExperienceTheme",
   true
 );
+const wanted = process.argv.slice(2);
+const themes = wanted.length
+  ? allThemes.filter(
+      (t) => wanted.includes(t.DeveloperName) || wanted.includes(t.MasterLabel)
+    )
+  : allThemes;
+if (wanted.length && themes.length !== wanted.length) {
+  const found = themes.flatMap((t) => [t.DeveloperName, t.MasterLabel]);
+  console.error(
+    `org(${org})에서 찾지 못한 테마: ${wanted.filter((w) => !found.includes(w)).join(", ")}\n` +
+      `사용할 수 있는 테마: ${allThemes.map((t) => t.DeveloperName).join(", ") || "없음"}`
+  );
+  process.exit(1);
+}
 if (!themes.length) {
   console.error(
     `org(${org})에 커스텀 테마가 없습니다. Setup > Themes and Branding에서 테마를 만든 뒤 다시 실행하세요.`
@@ -104,7 +120,9 @@ for (const theme of themes) {
     designSystemVersion: theme.DesignSystemVersion,
     brandColor: values.BRAND_COLOR ?? null,
     headerBackgroundColor: values.HEADER_BACKGROUND_COLOR ?? null,
-    logo
+    logo,
+    // org는 팔레트를 저장하지 않고 실행 시점에 계산한다. 같은 규칙으로 계산해 둔다 (scripts/palette.mjs)
+    palette: values.BRAND_COLOR ? brandPalette(values.BRAND_COLOR) : null
   };
   writeFileSync(`${dir}/theme.json`, `${JSON.stringify(json, null, 2)}\n`);
   console.log(

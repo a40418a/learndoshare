@@ -88,7 +88,7 @@ export default {
         component: `컴포넌트는 색을 직접 쓰지 않고 SLDS 2 **global styling hook**(\`--slds-g-color-*\`)만 읽는다. 브랜드 계열(accent)은 org **Themes and Branding**의 브랜드 색을 따른다.
 
 - 상단 툴바에서 브랜드를 바꾸면 이 페이지의 값이 바뀐다
-- **Storybook의 브랜드 전환은 시뮬레이션이다.** org는 브랜드 색 하나로 팔레트를 만들고, 여기서는 그 팔레트를 \`color-mix\`로 근사한다. 실제 org 화면과 미세하게 다를 수 있다
+- **Storybook의 브랜드 전환은 시뮬레이션이다.** org는 브랜드 색 하나로 팔레트를 실행 시점에 만든다. 여기서는 같은 규칙(단계 = 명도 L\*, 색상각 유지)으로 \`pnpm sync:theme\`이 계산해 둔 값을 쓴다. 실제 org 화면과 미세하게 다를 수 있다
 - 컴포넌트 CSS에서는 \`var(--slds-g-color-accent-1, <fallback>)\`처럼 **fallback을 함께** 쓴다`
       }
     }
