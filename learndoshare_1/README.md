@@ -142,6 +142,7 @@ Storybook에서는 브랜드 root style을 래퍼 요소에 주입하면 된다.
 | styling hook 제약 | `--slds-c-*`는 SLDS 1 전용. `--slds-g-*`는 재정의 금지(읽기 전용). `var()` fallback 필수(린트 규칙) | 확인 |
 | `lightning-*` 로컬 렌더 경로 | npm `lightning-base-components`(Salesforce 배포, MIT, alpha 태그만 존재)에 `badge`, `button` 등이 들어 있다. 조건은 **전역 SLDS CSS**와 **`@lwc/synthetic-shadow`**. 패키지 내부의 `@salesforce/*` 스텁은 **우리 컴포넌트에는 적용되지 않는다** | 확인 (실제 렌더는 미검증) |
 | SFDX 경로 모듈 해석 | `@lwc/module-resolver`의 `dir` 레코드에는 `namespace` 옵션이 없다. `force-app/main/default/lwc/x`를 `c/x`로 쓰려면 컴포넌트마다 alias 레코드(`{ name: "c/x", path: ... }`)를 두거나 `c` 심볼릭 링크 폴더를 쓴다 | 확인 (resolver 실험) |
+| 브랜드 팔레트 생성 규칙 | Setup 새 테마 화면에서 44색을 넣고 견본 7칸(`COLOR_95`~`COLOR_10`)을 DOM에서 실측해 역산했다(`scripts/palette.measured.json`). **CIELAB 명도 고정**(96·91·49·39·29·19·8, 브랜드 밝기와 무관) + **색상각 유지** + **상대 채도**. 원본 브랜드 색은 그대로 들어가지 않는다(`#0176D3` → 50단계 `#2976ca`, `#FFD600` → `#8a7300`). 50단계 L* 49는 흰 글자 대비 4.5:1(공식: accent는 WCAG 기준으로 자동 생성). 구현 `scripts/palette.mjs`: 실측 대비 평균 ΔE 0.07 / 최대 0.64, 학습에 쓰지 않은 20색 평균 0.13. 채도 혼합 계수와 Setup에 안 보이는 10단계는 추정 | 확인 (2026-10-05) |
 | SLDS 2 CSS 패키지 | 최신 SLDS 2는 **별도 패키지 `@salesforce-ux/design-system-2`**(2.264.2)다. `@salesforce-ux/design-system`(2.264.1)은 SLDS 1 빌드라서 버튼 색 등이 `rgb(1,118,211)`로 고정돼 브랜드를 따라가지 않는다. SLDS 2의 `slds2.cosmos.css`는 브랜드 참조 팔레트(`--slds-r-color-brand-*`)를 `:where(html)`에 선언하고 accent hook이 그것을 읽는다. 라이선스는 무료 복제·배포·공개 표시 허용 | 확인 (2026-09-26 Storybook에서 실측) |
 | Storybook 통합 (분기점) | **통과.** SFDX 경로 alias + `lightning-base-components` + synthetic-shadow + SLDS 2 CSS로 `lightning-button`·`lightning-badge`·`lightning-combobox`가 렌더되고, 브랜드 전환이 `lightning-button` 색까지 반영된다. pnpm에서는 `@lwc/engine-dom`·`@lwc/wire-service`를 직접 선언해야 한다. 아이콘은 SVG 템플릿으로 번들되어 스프라이트가 필요 없다 | 확인 (#3) |
 | Storybook | 최신 10.6.0. ESM 전용이고 `addon-essentials`가 없다(core에 통합). 프레임워크는 `@storybook/web-components-vite` | 확인 |
@@ -242,7 +243,7 @@ pnpm sync:theme
 - [ ] Setup에서 두 번째 테마를 만들고 `pnpm sync:theme` 한 번으로 추가되는지 확인
 - [ ] 산출물에 토큰이나 인증 정보가 섞이지 않는지 점검
 
-**한계 (발표에서 밝힐 것):** API로는 원본 색 하나만 읽힌다. 파생 색은 우리가 계산하므로 org 팔레트와 미세하게 다를 수 있다.
+**한계 (발표에서 밝힐 것):** API로는 원본 색 하나만 읽힌다. 파생 색은 Setup 화면을 실측해 역산한 규칙으로 계산한다. 화면에 보이는 7단계는 실측과 눈으로 구분되지 않는 수준(평균 ΔE 0.07)으로 맞지만, 정확한 식은 비공개라 나머지 10단계는 추정값이다.
 
 #### 로고 받는 방법 (확인됨)
 
