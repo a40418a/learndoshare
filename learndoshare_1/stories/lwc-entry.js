@@ -3,12 +3,6 @@ import "@lwc/synthetic-shadow";
 
 export { createElement } from "lwc";
 
-// SLDS 기반 (Salesforce 제공)
-export { default as LightningBadge } from "lightning/badge";
-export { default as LightningButton } from "lightning/button";
-export { default as LightningCombobox } from "lightning/combobox";
-export { default as LightningDualListbox } from "lightning/dualListbox";
-
-// 밀버스 추가
+// 밀버스 추가. Salesforce 기본 컴포넌트는 공식 예제 카탈로그(catalog.js)에서 렌더한다
 export { default as MilvusBadge } from "c/milvusBadge";
 export { default as MilvusMultiSelect } from "c/milvusMultiSelect";
