@@ -165,7 +165,7 @@
   <p>컴포넌트마다 따로 빌드하면 각 결과물에 LWC 엔진이 하나씩 들어간다. 엔진이 페이지에 여러 벌 있으면 컴포넌트끼리 서로를 모르는 상태가 될 수 있다. 입력을 여러 개 준 한 번의 Rollup 빌드는 공통 코드를 공유 청크로 뽑아내므로 엔진이 하나만 로드된다. <span class="tag warn">미확인</span> 엔진 중복 시 실제 증상은 아직 재현하지 않았다.</p>
   <h3>개발 루프</h3>
   <p><code>rollup -w</code>(감시 모드)와 <code>storybook dev</code>를 <b>병렬</b>로 실행한다. 컴포넌트를 저장하면 Rollup이 dist를 다시 쓰고, Vite가 dist 변경을 감지해 새로 고친다. 진짜 HMR(상태 유지 교체)이 아니라 <b>다시 빌드 후 새로 고침</b>이다.</p>
-  <div class="callout project"><strong>SLDS 버전</strong>전역 CSS는 <code>@salesforce-ux/design-system</code> 2.264.1의 <code>assets/styles/salesforce-lightning-design-system.min.css</code>를 쓴다. 이 경로는 패키지에 실제로 있다 (CDN으로 확인). org의 SLDS 버전과 맞는지는 01 SLDS 문서 기준으로 확인한다.</div>
+  <div class="callout project"><strong>SLDS 버전 (정정, #3에서 실측)</strong>최신 SLDS 2는 별도 패키지 <code>@salesforce-ux/design-system-2</code>의 <code>dist/css/bundled/slds2.cosmos.css</code>다. 아래의 <code>@salesforce-ux/design-system</code>은 SLDS 1 빌드라 브랜드 색이 버튼에 반영되지 않았다. 원래 문장: 전역 CSS는 <code>@salesforce-ux/design-system</code> 2.264.1의 <code>assets/styles/salesforce-lightning-design-system.min.css</code>를 쓴다. 이 경로는 패키지에 실제로 있다 (CDN으로 확인). org의 SLDS 버전과 맞는지는 01 SLDS 문서 기준으로 확인한다.</div>
 </section>
 
 <section id="code">
@@ -230,7 +230,7 @@ export default {
 <pre data-file=".storybook/preview.js"><code><span class="c">// 반드시 첫 줄: 플랫폼(LEX)과 같은 synthetic shadow</span>
 import '@lwc/synthetic-shadow';
 <span class="c">// lightning-base-components README: SLDS는 앱 전역에 정의해야 한다</span>
-import '@salesforce-ux/design-system/assets/styles/salesforce-lightning-design-system.min.css';
+import '@salesforce-ux/design-system-2/dist/css/bundled/slds2.cosmos.css';
 import { withBrand } from './brand-decorator.js';
 
 export default {

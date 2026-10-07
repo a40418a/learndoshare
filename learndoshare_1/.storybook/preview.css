@@ -1,0 +1,40 @@
+/* Storybook 문서 화면용 보조 스타일. 컴포넌트 스타일이 아니다 */
+.sb-swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--slds-g-spacing-3, 0.75rem);
+}
+.sb-swatch {
+  border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  overflow: hidden;
+  font-size: 0.75rem;
+}
+.sb-swatch__chip {
+  height: 56px;
+}
+.sb-swatch__meta {
+  padding: var(--slds-g-spacing-2, 0.5rem);
+  line-height: 1.4;
+  word-break: break-all;
+}
+.sb-stack > * + * {
+  margin-top: var(--slds-g-spacing-4, 1rem);
+}
+.sb-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--slds-g-spacing-2, 0.5rem);
+  align-items: center;
+}
+.sb-code {
+  margin: 0;
+  padding: var(--slds-g-spacing-3, 0.75rem);
+  overflow-x: auto;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
+  border: 1px solid var(--slds-g-color-border-1, #c9c9c9);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+}

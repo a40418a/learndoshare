@@ -1,0 +1,28 @@
+{
+  "name": "Milvus_DesignSystem",
+  "label": "Milvus_DesignSystem",
+  "source": "org",
+  "designSystemVersion": "SLDS_v2",
+  "brandColor": "#0176D3",
+  "headerBackgroundColor": "#FFFFFF",
+  "logo": "logo.jpg",
+  "palette": {
+    "5": "#01040b",
+    "10": "#05182f",
+    "15": "#092443",
+    "20": "#0d2f55",
+    "30": "#16457a",
+    "35": "#1b518d",
+    "40": "#1f5da1",
+    "45": "#2469b6",
+    "50": "#2976ca",
+    "55": "#3385e2",
+    "60": "#4794f5",
+    "65": "#679ef4",
+    "70": "#8cb1f7",
+    "80": "#b5c9f9",
+    "85": "#c9d7fa",
+    "90": "#dde5fc",
+    "95": "#f0f3fd"
+  }
+}

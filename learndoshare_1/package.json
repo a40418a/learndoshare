@@ -1,34 +1,55 @@
 {
-  "name": "salesforce-app",
+  "name": "milvus-design-system",
   "private": true,
   "version": "1.0.0",
-  "description": "Salesforce App",
+  "description": "밀버스 디자인 시스템 (SFDX + LWC + Storybook)",
   "scripts": {
-    "lint": "eslint **/{aura,lwc}/**/*.js",
-    "test": "npm run test:unit",
+    "lint": "eslint \"force-app/**/lwc/**/*.js\"",
+    "test": "pnpm test:unit && pnpm test:palette",
     "test:unit": "sfdx-lwc-jest",
     "test:unit:watch": "sfdx-lwc-jest --watch",
     "test:unit:debug": "sfdx-lwc-jest --debug",
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
+    "build:lwc": "rollup -c rollup.lwc.config.mjs",
+    "dev:lwc": "rollup -c rollup.lwc.config.mjs -w",
+    "storybook": "pnpm build:lwc && storybook dev -p 6006",
+    "build-storybook": "pnpm build:lwc && storybook build -o storybook-static",
+    "sync:theme": "node scripts/sync-theme.mjs",
     "prettier": "prettier --write \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "prepare": "husky || true",
-    "precommit": "lint-staged"
+    "precommit": "lint-staged",
+    "test:palette": "node scripts/palette.mjs"
   },
   "devDependencies": {
+    "@lwc/engine-dom": "9.4.3",
     "@lwc/eslint-plugin-lwc": "^3.1.0",
+    "@lwc/rollup-plugin": "9.4.3",
+    "@lwc/synthetic-shadow": "9.4.3",
+    "@lwc/wire-service": "9.4.3",
     "@prettier/plugin-xml": "^3.4.1",
+    "@rollup/plugin-node-resolve": "16.0.3",
+    "@rollup/plugin-replace": "6.0.3",
+    "@salesforce-ux/design-system-2": "2.264.2",
     "@salesforce/eslint-config-lwc": "^4.0.0",
     "@salesforce/eslint-plugin-aura": "^3.0.0",
     "@salesforce/eslint-plugin-lightning": "^2.0.0",
     "@salesforce/sfdx-lwc-jest": "^7.0.2",
+    "@storybook/addon-a11y": "10.6.0",
+    "@storybook/addon-docs": "10.6.0",
+    "@storybook/web-components-vite": "10.6.0",
     "eslint": "^9.29.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jest": "^28.14.0",
     "husky": "^9.1.7",
+    "lightning-base-components": "1.28.19-alpha",
     "lint-staged": "^16.1.2",
+    "lwc": "9.4.3",
     "prettier": "^3.5.3",
-    "prettier-plugin-apex": "^2.2.6"
+    "prettier-plugin-apex": "^2.2.6",
+    "rollup": "4.63.5",
+    "storybook": "10.6.0",
+    "vite": "^7.3.6"
   },
   "lint-staged": {
     "**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}": [
@@ -38,7 +59,16 @@
       "eslint"
     ],
     "**/lwc/**": [
-        "sfdx-lwc-jest -- --bail --findRelatedTests --passWithNoTests"
+      "sfdx-lwc-jest -- --bail --findRelatedTests --passWithNoTests"
+    ]
+  },
+  "packageManager": "pnpm@10.13.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
     ]
   }
 }

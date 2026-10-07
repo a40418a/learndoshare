@@ -1,0 +1,28 @@
+{
+  "name": "Sample_Forest",
+  "label": "샘플 브랜드 (org 아님)",
+  "source": "sample",
+  "designSystemVersion": "SLDS_v2",
+  "brandColor": "#2E7D5B",
+  "headerBackgroundColor": null,
+  "logo": null,
+  "palette": {
+    "5": "#040404",
+    "10": "#0c1a14",
+    "15": "#13281e",
+    "20": "#1a3327",
+    "30": "#274c3a",
+    "35": "#2e5845",
+    "40": "#36654f",
+    "45": "#3e725a",
+    "50": "#448064",
+    "55": "#519072",
+    "60": "#5aa180",
+    "65": "#60ad89",
+    "70": "#6ec19a",
+    "80": "#7edcb0",
+    "85": "#84ebbb",
+    "90": "#b9f2d5",
+    "95": "#e3f9ed"
+  }
+}
