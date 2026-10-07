@@ -69,11 +69,10 @@
 | 위치 | 해도 되는 것 | 하면 안 되는 것 |
 | --- | --- | --- |
 | 컴포넌트 CSS | `var(--slds-g-*, fallback)`, `var(--milvus-*, fallback)` 읽기 | hex 색, 브랜드 값, `--slds-c-*`, `--slds-g-*` 재정의, `.slds-*` 클래스 덮어쓰기 |
-| `brands/<브랜드>/root.css` | 허용 목록 안의 `--milvus-*` 정의 | `--slds-*` 정의, 색(accent) 덮어쓰기 |
-| `brands/<브랜드>/override.css` | 별도 허용 목록 안의 모양 관련 `--slds-g-*` 재정의 (반경, 폰트 굵기) | 색 재정의. **사용자 확인 없이 켜기** |
+| `brands/<브랜드>/util.css` | `:root`의 `--slds-g-*` global hook (반경, 글꼴, 간격 등). 이 파일 하나로 모든 컴포넌트가 바뀐다 | 클래스 규칙, `--slds-c-*`·`--sds-c-*`·`--slds-s-*` (native shadow 안에 닿지 않음), 브랜드 색(accent) 재정의 |
 | `brands/<브랜드>/theme.json`, `logo.*` | 없음 (`pnpm sync:theme`만 생성) | 직접 편집 |
 
-- 브랜드 요구가 들어오면 org 테마 → `lightning-button` 기존 옵션 → `--milvus-*` + `milvusButton` → `override.css`(확인 후) 순으로 제안한다
+- 브랜드 요구가 들어오면 org 테마(색·로고) → `util.css`의 global hook(모양·글꼴, 영향 지도 참고) → 특정 컴포넌트만 바꿔야 하면 밀버스 컴포넌트 순으로 제안한다
 - 커스텀 변수 접두사는 `--milvus-`만 쓴다
 
 ## 4. 검증 명령

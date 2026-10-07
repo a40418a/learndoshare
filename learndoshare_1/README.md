@@ -61,6 +61,16 @@
 
 ## 2. 스타일 계층 — root style
 
+> **최신 결정 (2026-10-07, #11): 브랜드 스타일은 `brands/<브랜드>/util.css` 파일 하나로 관리한다.** 이 파일만 고치면 `lightning-*`를 포함한 모든 컴포넌트가 바뀐다.
+>
+> - **실측:** Salesforce 기본 컴포넌트는 브라우저 native shadow DOM으로 그려지는 것이 많다(npm 패키지에 156개 지정). 그래서 `.slds-button` 같은 클래스 규칙이나 컴포넌트 hook(`--slds-c-*` · `--sds-c-*` · `--slds-s-*`)은 컴포넌트 안까지 닿지 않는다. **상속되는 global hook(`--slds-g-*`)만 닿는다.**
+> - 그래서 util.css는 `:root`의 global hook만 정의한다. hook마다 영향을 주는 컴포넌트 묶음이 다르므로 묶음별 조절은 된다(예: 버튼 `radius-border-pill`, 입력창 `radius-border-2`, 카드 `radius-border-4`). 영향 지도는 Storybook "Foundations / 브랜드 스타일 (util.css)"에 SLDS CSS에서 자동으로 나온다.
+> - 특정 컴포넌트 하나만 바꾸는 것은 기본 컴포넌트로는 불가능하다. 필요하면 밀버스 컴포넌트로 만든다(예: `milvusButton`, PR #8).
+> - 브랜드 색은 util.css에서 바꾸지 않는다(org가 원본). `pnpm test`(`scripts/check-brands.mjs`)가 규칙을 검사한다.
+> - 공식 권고(global hook 재정의 금지) 밖이라는 것을 알고 택한 방식이다. org에서는 정적 리소스 + `loadStyle`로 문서에 넣고, 같은 화면의 표준 UI에도 적용된다.
+>
+> 아래 2.1~2.4는 이 결정 이전의 설계(root.css, override.css, milvusButton)이며 기록으로 남긴다.
+
 브랜드에 따라 바뀌는 모든 것은 아래 계층 중 한 곳에만 있다. **컴포넌트 CSS에는 브랜드 값이 없다.**
 
 | 계층 | 내용 | 출처 | 변경 주체 | 위치 |
