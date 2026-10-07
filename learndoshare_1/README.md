@@ -66,11 +66,11 @@
 > - **실측:** npm 패키지는 기본 컴포넌트 156개를 native shadow로 지정한다(`package.json`의 `lwc.nativeShadowEnabledComponents`. `lightning-button`·`-input`·`-combobox`·`-card`·`-badge` 등). 이 컴포넌트 안에는 `.slds-button` 같은 클래스 규칙이나 컴포넌트 hook(`--slds-c-*` · `--sds-c-*` · `--slds-s-*`)이 닿지 않는다. **상속되는 global hook(`--slds-g-*`)만 닿는다.** 나머지 기본 컴포넌트와 밀버스 컴포넌트는 synthetic이라 전역 SLDS 클래스가 적용된다.
 >   - 정정 (#14): #11 측정 때 Storybook은 빌드 순서 버그 때문에 **모든** LWC를 native로 그렸다(밀버스 컴포넌트 포함). 지금은 위 목록만 native로, 나머지는 synthetic으로 그린다(`rollup.lwc.config.mjs`). 목록 중 `combobox`·`input`(날짜/시간) 등은 `attachInternals`를 써서 synthetic에서는 오류가 나므로 org도 이 목록대로 native로 그린다고 본다. org 화면에서 직접 확인하는 것은 **미확인**이다.
 > - 그래서 util.css는 `:root`의 global hook만 정의한다. hook마다 영향을 주는 컴포넌트 묶음이 다르므로 묶음별 조절은 된다(예: 버튼 `radius-border-pill`, 입력창 `radius-border-2`, 카드 `radius-border-4`). 영향 지도는 Storybook "Foundations / 브랜드 스타일 (util.css)"에 SLDS CSS에서 자동으로 나온다.
-> - 특정 컴포넌트 하나만 바꾸는 것은 기본 컴포넌트로는 불가능하다. 필요하면 밀버스 컴포넌트로 만든다(예: `milvusButton`, PR #8).
+> - 특정 컴포넌트 하나만 바꾸는 것은 기본 컴포넌트로는 불가능하다. 필요하면 밀버스 컴포넌트로 만들고, 그 컴포넌트가 읽는 `--milvus-*` 변수를 util.css에 넣는다. 예: `milvusButton`(#4)은 util.css에 `--milvus-button-custom: on`이 있으면 SLDS 버튼 블루프린트에 `--milvus-button-*`를 적용하고, 없으면 `lightning-button`을 그대로 그린다. `--milvus-*`는 컴포넌트가 실제로 읽는 이름만 쓸 수 있다(`pnpm test`가 검사).
 > - 브랜드 색은 util.css에서 바꾸지 않는다(org가 원본). `pnpm test`(`scripts/check-brands.mjs`)가 규칙을 검사한다.
 > - 공식 권고(global hook 재정의 금지) 밖이라는 것을 알고 택한 방식이다. org에서는 정적 리소스 + `loadStyle`로 문서에 넣고, 같은 화면의 표준 UI에도 적용된다.
 >
-> 아래 2.1~2.4는 이 결정 이전의 설계(root.css, override.css, milvusButton)이며 기록으로 남긴다.
+> 아래 2.1~2.4는 이 결정 이전의 설계(root.css, override.css)이며 기록으로 남긴다. root.css는 util.css로 합쳤고 override.css는 만들지 않는다.
 
 브랜드에 따라 바뀌는 모든 것은 아래 계층 중 한 곳에만 있다. **컴포넌트 CSS에는 브랜드 값이 없다.**
 

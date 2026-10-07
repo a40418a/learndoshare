@@ -1,0 +1,30 @@
+<template>
+  <template lwc:if={custom}>
+    <button class={buttonClass} type={type} title={title} disabled={disabled}>
+      <span
+        lwc:if={iconLeft}
+        class="slds-current-color slds-button__icon slds-button__icon_left"
+      >
+        <lightning-icon icon-name={iconName} size="xx-small"></lightning-icon>
+      </span>
+      {label}
+      <span
+        lwc:if={iconRight}
+        class="slds-current-color slds-button__icon slds-button__icon_right"
+      >
+        <lightning-icon icon-name={iconName} size="xx-small"></lightning-icon>
+      </span>
+    </button>
+  </template>
+  <template lwc:else>
+    <lightning-button
+      label={label}
+      variant={safeVariant}
+      icon-name={iconName}
+      icon-position={iconPosition}
+      disabled={disabled}
+      type={type}
+      title={title}
+    ></lightning-button>
+  </template>
+</template>

@@ -32,7 +32,7 @@
 | 2 | 저장소에 이미 있는가? (`milvus*` 컴포넌트, `scripts/`, `brands/`) | 재사용한다 |
 | 3 | org 설정으로 되는가? (Themes and Branding의 색·로고) | 코드를 쓰지 않는다 |
 | 4 | SLDS가 제공하는가? (`lightning-*` base component → SLDS 블루프린트 클래스) | 그대로 쓴다 |
-| 5 | 브랜드 root style로 되는가? (`brands/<브랜드>/root.css`의 `--milvus-*`) | 변수만 추가한다 |
+| 5 | 브랜드 `util.css`로 되는가? (`brands/<브랜드>/util.css`의 `--slds-g-*`, 밀버스 컴포넌트의 `--milvus-*`) | 변수만 추가한다 |
 | 6 | 이미 설치된 의존성이나 Node/브라우저 기본 기능으로 되는가? | 그것을 쓴다 |
 | 7 | 그래도 안 되면 | 동작하는 최소 구현을 만든다 |
 
@@ -42,8 +42,8 @@
 
 아래는 README에서 이미 결정한 것이다. Ponytail이 "필요 없다"고 판단해도 **빼지 않는다.**
 
-- `milvusButton`: SLDS 2에는 `lightning-button` 모양을 브랜드별로 바꿀 공식 경로가 없다. 고객사별 니즈 때문에 구현한다
-- opt-in `override.css`: `lightning-button` 자체를 바꿔야 하는 고객사용 확장 계층이다
+- `milvusButton`: util.css의 global hook은 같은 hook을 쓰는 컴포넌트를 모두 바꾼다. 버튼만 다르게 하려는 고객사 니즈 때문에 구현한다
+- `util.css`의 global hook 재정의: 공식 권고 밖인 것을 알고 택했다 (README 2장)
 - `pnpm sync:theme`, `create-project.mjs`, hook H1~H8, `milvus.config.json`
 - 표현/컨테이너 분리: 표현 컴포넌트에는 `@wire`, Apex, LDS를 넣지 않는다. 한 파일로 합치는 편이 짧더라도 합치지 않는다
 
@@ -69,7 +69,7 @@
 | 위치 | 해도 되는 것 | 하면 안 되는 것 |
 | --- | --- | --- |
 | 컴포넌트 CSS | `var(--slds-g-*, fallback)`, `var(--milvus-*, fallback)` 읽기 | hex 색, 브랜드 값, `--slds-c-*`, `--slds-g-*` 재정의, `.slds-*` 클래스 덮어쓰기 |
-| `brands/<브랜드>/util.css` | `:root`의 `--slds-g-*` global hook (반경, 글꼴, 간격 등). 이 파일 하나로 모든 컴포넌트가 바뀐다 | 클래스 규칙, `--slds-c-*`·`--sds-c-*`·`--slds-s-*` (native shadow로 그려지는 기본 컴포넌트 안에 닿지 않음), 브랜드 색(accent) 재정의 |
+| `brands/<브랜드>/util.css` | `:root`의 `--slds-g-*` global hook (반경, 글꼴, 간격 등). 이 파일 하나로 모든 컴포넌트가 바뀐다. 밀버스 컴포넌트가 읽는 `--milvus-*` | 클래스 규칙, `--slds-c-*`·`--sds-c-*`·`--slds-s-*` (native shadow로 그려지는 기본 컴포넌트 안에 닿지 않음), 브랜드 색(accent) 재정의 |
 | `brands/<브랜드>/theme.json`, `logo.*` | 없음 (`pnpm sync:theme`만 생성) | 직접 편집 |
 
 - 브랜드 요구가 들어오면 org 테마(색·로고) → `util.css`의 global hook(모양·글꼴, 영향 지도 참고) → 특정 컴포넌트만 바꿔야 하면 밀버스 컴포넌트 순으로 제안한다

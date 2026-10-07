@@ -1,0 +1,19 @@
+/* 브랜드 값(--milvus-button-*)이 없으면 SLDS 2 버튼 기본값으로 떨어진다 */
+.milvus-button {
+  border-radius: var(
+    --milvus-button-radius,
+    var(--slds-g-radius-border-pill, 15rem)
+  );
+  font-weight: var(
+    --milvus-button-font-weight,
+    var(--slds-g-font-weight-6, 600)
+  );
+  padding-inline: var(
+    --milvus-button-padding-inline,
+    var(--slds-g-spacing-4, 1rem)
+  );
+}
+
+.milvus-button_base {
+  padding-inline: 0;
+}
