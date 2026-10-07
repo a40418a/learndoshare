@@ -1,10 +1,10 @@
 /*
  * Sample_Forest 브랜드 util.css — 이 파일 하나로 모든 컴포넌트(lightning-* 포함)의 모양을 바꾼다.
  *
- * 쓸 수 있는 것은 :root의 SLDS 2 global hook(--slds-g-*)과 밀버스 컴포넌트가 읽는 --milvus-* 변수뿐이다.
- * 지금 org는 기본 컴포넌트를 synthetic shadow로 그려서 .slds-button 같은 클래스 규칙이나 컴포넌트 hook
- * (--slds-c-*, --sds-c-*, --slds-s-*)도 닿는다. 하지만 npm 패키지가 156개를 native shadow 지원으로 지정해 두어,
- * native로 바뀌면 상속되는 global hook만 닿는다. 그래서 global hook만 쓴다. 어떤 hook이 어떤 컴포넌트에 영향을 주는지는
+ * 쓸 수 있는 것은 :root의 SLDS 2 global hook(--slds-g-*, 전체 모양), 컴포넌트 hook(--slds-s-*, 특정 컴포넌트 묶음),
+ * 밀버스 컴포넌트가 읽는 --milvus-* 변수뿐이다. 클래스 규칙은 쓰지 않는다.
+ * 컴포넌트 hook은 지금 org가 기본 컴포넌트를 synthetic shadow로 그려서 닿는다. npm 패키지가 156개를 native shadow
+ * 지원으로 지정해 두어, native로 바뀌면 global hook만 닿고 컴포넌트 hook은 효과가 사라진다. 어떤 hook이 어떤 컴포넌트에 영향을 주는지는
  * Storybook "Foundations / 브랜드 스타일 (util.css)" 페이지에 자동으로 나온다.
  *
  * 브랜드 색(accent 계열)은 org 테마가 원본이라 여기서 바꾸지 않는다 (pnpm test가 막는다).

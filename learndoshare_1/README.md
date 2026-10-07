@@ -66,8 +66,8 @@
 > - **실측 (org, 2026-10-07):** Lightning Experience는 기본 컴포넌트(`lightning-button`·`-input`·`-combobox` 등)를 synthetic shadow로 그린다. 그래서 지금은 global hook, 컴포넌트 hook(`--slds-s-*` 등), `.slds-*` 클래스 규칙이 모두 닿는다. Storybook도 org와 같게 전부 synthetic으로 그린다.
 >   - 다만 npm 패키지는 기본 컴포넌트 156개를 native shadow 지원으로 지정해 두었다(`package.json`의 `lwc.nativeShadowEnabledComponents`). Salesforce가 이 컴포넌트들을 native로 바꾸면 컴포넌트 hook과 클래스 규칙은 닿지 않고 **상속되는 global hook(`--slds-g-*`)만 닿는다**(전환 시점은 미확인).
 >   - 경과: #11은 빌드 버그 때문에 모든 LWC가 native로 그려진 Storybook에서 측정했다. #14는 패키지 목록대로 혼합 모드로 그렸다. org 실측(#16)으로 둘 다 바로잡았다.
-> - 그래서 util.css는 native로 바뀌어도 계속 닿는 `:root`의 global hook만 정의한다. hook마다 영향을 주는 컴포넌트 묶음이 다르므로 묶음별 조절은 된다(예: 버튼 `radius-border-pill`, 입력창 `radius-border-2`, 카드 `radius-border-4`). 영향 지도는 Storybook "Foundations / 브랜드 스타일 (util.css)"에 SLDS CSS에서 자동으로 나온다.
-> - 특정 컴포넌트 하나만 바꾸는 것은 기본 컴포넌트로는 불가능하다. 필요하면 밀버스 컴포넌트로 만들고, 그 컴포넌트가 읽는 `--milvus-*` 변수를 util.css에 넣는다. 예: `milvusButton`(#4)은 util.css에 `--milvus-button-custom: on`이 있으면 SLDS 버튼 블루프린트에 `--milvus-button-*`를 적용하고, 없으면 `lightning-button`을 그대로 그린다. `--milvus-*`는 컴포넌트가 실제로 읽는 이름만 쓸 수 있다(`pnpm test`가 검사).
+> - **util.css에는 global hook과 컴포넌트 hook을 쓴다(#18).** global hook(`--slds-g-*`)은 같은 hook을 쓰는 컴포넌트 묶음을 함께 바꾸고(예: 버튼 `radius-border-pill`, 입력창 `radius-border-2`, 카드 `radius-border-4`), 컴포넌트 hook(`--slds-s-*`)은 그 컴포넌트만 바꾼다(예: `--slds-s-button-radius-border`). 컴포넌트 hook은 native 전환 때 효과가 사라질 수 있다는 것을 알고 허용했다(2026-10-07 결정). 색 컴포넌트 hook은 브랜드 색에 이어진 것이 많아 막는다. 영향 지도는 Storybook "Foundations / 브랜드 스타일 (util.css)"에 SLDS CSS에서 자동으로 나온다.
+> - native 전환에도 유지해야 하거나 hook이 없는 모양은 밀버스 컴포넌트로 만들고, 그 컴포넌트가 읽는 `--milvus-*` 변수를 util.css에 넣는다. 예: `milvusButton`(#4)은 util.css에 `--milvus-button-custom: on`이 있으면 SLDS 버튼 블루프린트에 `--milvus-button-*`를 적용하고, 없으면 `lightning-button`을 그대로 그린다. `--slds-s-*`와 `--milvus-*`는 실제로 읽는 곳이 있는 이름만 쓸 수 있다(`pnpm test`가 검사).
 > - 브랜드 색은 util.css에서 바꾸지 않는다(org가 원본). `pnpm test`(`scripts/check-brands.mjs`)가 규칙을 검사한다.
 > - 공식 권고(global hook 재정의 금지) 밖이라는 것을 알고 택한 방식이다. org에서는 정적 리소스 + `loadStyle`로 문서에 넣고, 같은 화면의 표준 UI에도 적용된다.
 >
