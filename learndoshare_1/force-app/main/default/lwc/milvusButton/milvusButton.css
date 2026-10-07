@@ -1,0 +1,17 @@
+/* 브랜드 값(--milvus-button-*)이 없으면 SLDS 2 버튼 기본값으로 떨어진다 */
+.milvus-button {
+  border-radius: var(
+    --milvus-button-radius,
+    var(--slds-g-radius-border-pill, 15rem)
+  );
+  /* lightning-button은 굵기 hook이 정의되지 않아 상속값을 쓴다. 같게 보이도록 상속으로 떨어진다 */
+  font-weight: var(--milvus-button-font-weight, inherit);
+  padding-inline: var(
+    --milvus-button-padding-inline,
+    var(--slds-g-spacing-4, 1rem)
+  );
+}
+
+.milvus-button_base {
+  padding-inline: 0;
+}
