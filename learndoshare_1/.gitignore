@@ -58,3 +58,6 @@ yarn.lock
 
 # 개인 개발 서버 설정 (로컬 경로 포함)
 .claude/launch.json
+
+# 자동 생성 (scripts/generate-slds-catalog.mjs)
+stories/slds-catalog/
