@@ -17,11 +17,10 @@ import { Meta } from "@storybook/addon-docs/blocks";
 ## 구성
 
 - **Foundations** · 컬러(global styling hook, 브랜드 팔레트), 타이포그래피
-- **컴포넌트 / SLDS 기반** · Salesforce가 제공하는 기능. 실제 `lightning-*` 컴포넌트를 렌더한다
+- **컴포넌트 / 기본** · Salesforce가 제공하는 컴포넌트(`lightning-*`) **73개 전부**와 공식 예제 249개. npm `lightning-base-components`의 예제를 그대로 렌더한다
 - **컴포넌트 / 밀버스 추가** · Salesforce가 제공하지 않는 기능. 의미색 뱃지, 검색 다중 선택
-- **SLDS 전체 컴포넌트** · Salesforce 기본 컴포넌트(`lightning-*`) 73개의 **공식 예제 249개**. npm `lightning-base-components`에 들어 있는 예제를 그대로 렌더한다. 화면에 쓸 표준은 위 "컴포넌트" 섹션이고, 이 섹션은 무엇이 있는지 찾아보는 레퍼런스다
 
-  공식 예제가 없어 빠진 것: `LightningAlert`·`LightningConfirm`·`LightningPrompt`, `LightningModal`, toast. npm 패키지에 아예 없는 것(org 데이터 필요): `lightning-record-form`·`record-edit-form`·`input-field`·`record-picker`·`file-upload`·`map`·`input-rich-text`. 이것들은 Live Preview(`sf lightning dev component`)로 확인한다
+  기본 섹션에서 빠진 것: 공식 예제가 없는 `LightningAlert`·`LightningConfirm`·`LightningPrompt`, `LightningModal`, toast. npm 패키지에 없는 것(org 데이터 필요): `lightning-record-form`·`record-edit-form`·`input-field`·`record-picker`·`file-upload`·`map`·`input-rich-text`. 이것들은 Live Preview(`sf lightning dev component`)로 확인한다
 
 **기능 하나에 컴포넌트 하나.** 같은 기능을 여러 컴포넌트로 만들지 않는다. 예를 들어 다중 선택은 MultiSelect 하나만 쓴다.
 

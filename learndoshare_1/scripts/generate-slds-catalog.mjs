@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * lightning-base-components에 들어 있는 Salesforce 공식 예제(src/lightning/<컴포넌트>/__examples__)를
- * Storybook "SLDS 전체 컴포넌트" 섹션으로 만든다. 예제를 직접 쓰지 않고 공식 예제를 그대로 컴파일한다.
+ * Storybook "컴포넌트/기본" 섹션으로 만든다. 예제를 직접 쓰지 않고 공식 예제를 그대로 컴파일한다.
  *
  * 만드는 것 (stories/slds-catalog/, 커밋하지 않음):
  *   examples.json      Rollup alias 목록 (rollup.lwc.config.mjs가 읽는다)
@@ -134,7 +134,7 @@ for (const [comp, list] of Object.entries(byComp)) {
     ...list.map((e, i) => `import html${i} from "../../${e.html}?raw";`),
     ``,
     `export default {`,
-    `  title: "SLDS 전체 컴포넌트/${title(comp)}",`,
+    `  title: "컴포넌트/기본/${title(comp)}",`,
     `  parameters: {`,
     `    controls: { disable: true },`,
     `    docs: {`,
