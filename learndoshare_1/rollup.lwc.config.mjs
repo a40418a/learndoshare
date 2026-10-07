@@ -27,34 +27,20 @@ const catalog = JSON.parse(
   readFileSync("stories/slds-catalog/examples.json", "utf8")
 );
 
-// org와 같은 혼합 shadow 모드: 패키지가 지정한 기본 컴포넌트(lwc.nativeShadowEnabledComponents)만 native shadow로,
-// 나머지와 밀버스 컴포넌트는 synthetic으로 그린다. combobox 등은 attachInternals를 써서 synthetic에서 동작하지 않는다.
-// 패키지 소스에는 이 설정이 없어서(플랫폼이 붙인다) 빌드 때 default export 클래스에 shadowSupportMode = "native"를 붙인다
-const NATIVE = new Set(
-  JSON.parse(
-    readFileSync("node_modules/lightning-base-components/package.json", "utf8")
-  ).lwc.nativeShadowEnabledComponents
-);
-const kebab = (s) => s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
-const nativeShadow = {
-  name: "milvus-native-shadow",
-  transform(code, id) {
-    const [, name] =
-      id.match(/lightning-base-components\/src\/lightning\/([^/]+)\/\1\.js$/) ??
-      [];
-    if (!name || !NATIVE.has(`lightning-${kebab(name)}`)) return null;
-    // export default class X ... 또는 export default X; (formattedRichText처럼 클래스를 골라 내보내는 경우)
-    const [, cls] =
-      code.match(/export default class (\w+)/) ??
-      code.match(/export default (\w+);/) ??
-      [];
-    // datatableKeyboardMixins처럼 목록에 있지만 컴포넌트가 아닌 모듈은 건너뛴다
-    if (!cls) return null;
-    return {
-      code: `${code}\n${cls}.shadowSupportMode = "native";\n`,
-      map: null
-    };
-  }
+// org는 기본 컴포넌트를 synthetic shadow로 그린다(2026-10-07 실측). Storybook도 전부 synthetic으로 그린다.
+// npm 패키지는 기능 게이트(@salesforce/gate/*)를 모두 열어 둔다(external/gateStub.js). 그중 combobox의
+// ElementInternals 게이트가 열려 있으면 attachInternals()를 불러 synthetic에서 오류가 난다. org에서는 같은 컴포넌트가
+// synthetic으로 동작하므로 닫혀 있다고 보고, 이 게이트만 닫는다
+const CLOSED_GATES = new Set([
+  "@salesforce/gate/bc.260.enableComboboxElementInternals"
+]);
+const closedGates = {
+  name: "milvus-closed-gates",
+  resolveId: (id) => (CLOSED_GATES.has(id) ? "\0milvus-closed-gate" : null),
+  load: (id) =>
+    id === "\0milvus-closed-gate"
+      ? "export default { isOpen: () => false };"
+      : null
 };
 
 export default {
@@ -80,7 +66,7 @@ export default {
     warn(warning);
   },
   plugins: [
-    nativeShadow,
+    closedGates,
     replace({
       preventAssignment: true,
       values: { "process.env.NODE_ENV": JSON.stringify("development") }
