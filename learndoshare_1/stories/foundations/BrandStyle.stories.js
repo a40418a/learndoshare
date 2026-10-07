@@ -8,7 +8,7 @@ export default {
       description: {
         component: `브랜드마다 **\`brands/<브랜드>/util.css\` 파일 하나**로 모든 컴포넌트(\`lightning-*\` 포함)의 모양을 바꾼다. 상단 툴바에서 브랜드를 바꾸면 \`컴포넌트/기본\` 전체가 그 브랜드의 util.css로 그려진다.
 
-- **쓸 수 있는 것은 \`:root\`의 SLDS 2 global hook(\`--slds-g-*\`)뿐이다.** Salesforce 기본 컴포넌트는 브라우저 native shadow DOM으로 그려지는 것이 많아서, \`.slds-button\` 같은 클래스 규칙이나 컴포넌트 hook(\`--slds-c-*\`·\`--sds-c-*\`·\`--slds-s-*\`)은 안으로 들어가지 못한다. 상속되는 global hook만 닿는다 (2026-10-07 실측)
+- **쓸 수 있는 것은 \`:root\`의 SLDS 2 global hook(\`--slds-g-*\`)뿐이다.** \`lightning-button\`·\`-input\` 같은 Salesforce 기본 컴포넌트 다수(패키지가 지정한 156개)는 native shadow DOM으로 그려져서, \`.slds-button\` 같은 클래스 규칙이나 컴포넌트 hook(\`--slds-c-*\`·\`--sds-c-*\`·\`--slds-s-*\`)은 안으로 들어가지 못한다. 상속되는 global hook만 닿는다 (Storybook 실측, org 화면은 미확인)
 - 그래도 global hook마다 영향을 주는 컴포넌트 묶음이 달라서 묶음별 조절은 된다. 아래 **영향 지도**를 보고 고른다. 예: 버튼 반경은 \`--slds-g-radius-border-pill\`, 입력창은 \`-2\`, 카드는 \`-4\`
 - 특정 컴포넌트 하나만 따로 바꾸는 것은 기본 컴포넌트로는 안 된다. 그런 요구는 밀버스 컴포넌트로 만든다
 - **브랜드 색은 바꾸지 않는다.** 색은 org Themes and Branding이 원본이고 \`pnpm sync:theme\`이 가져온다. \`pnpm test\`가 util.css 규칙을 검사한다

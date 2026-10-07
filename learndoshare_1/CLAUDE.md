@@ -69,7 +69,7 @@
 | 위치 | 해도 되는 것 | 하면 안 되는 것 |
 | --- | --- | --- |
 | 컴포넌트 CSS | `var(--slds-g-*, fallback)`, `var(--milvus-*, fallback)` 읽기 | hex 색, 브랜드 값, `--slds-c-*`, `--slds-g-*` 재정의, `.slds-*` 클래스 덮어쓰기 |
-| `brands/<브랜드>/util.css` | `:root`의 `--slds-g-*` global hook (반경, 글꼴, 간격 등). 이 파일 하나로 모든 컴포넌트가 바뀐다 | 클래스 규칙, `--slds-c-*`·`--sds-c-*`·`--slds-s-*` (native shadow 안에 닿지 않음), 브랜드 색(accent) 재정의 |
+| `brands/<브랜드>/util.css` | `:root`의 `--slds-g-*` global hook (반경, 글꼴, 간격 등). 이 파일 하나로 모든 컴포넌트가 바뀐다 | 클래스 규칙, `--slds-c-*`·`--sds-c-*`·`--slds-s-*` (native shadow로 그려지는 기본 컴포넌트 안에 닿지 않음), 브랜드 색(accent) 재정의 |
 | `brands/<브랜드>/theme.json`, `logo.*` | 없음 (`pnpm sync:theme`만 생성) | 직접 편집 |
 
 - 브랜드 요구가 들어오면 org 테마(색·로고) → `util.css`의 global hook(모양·글꼴, 영향 지도 참고) → 특정 컴포넌트만 바꿔야 하면 밀버스 컴포넌트 순으로 제안한다
