@@ -4,10 +4,8 @@
     --milvus-button-radius,
     var(--slds-g-radius-border-pill, 15rem)
   );
-  font-weight: var(
-    --milvus-button-font-weight,
-    var(--slds-g-font-weight-6, 600)
-  );
+  /* lightning-button은 굵기 hook이 정의되지 않아 상속값을 쓴다. 같게 보이도록 상속으로 떨어진다 */
+  font-weight: var(--milvus-button-font-weight, inherit);
   padding-inline: var(
     --milvus-button-padding-inline,
     var(--slds-g-spacing-4, 1rem)
