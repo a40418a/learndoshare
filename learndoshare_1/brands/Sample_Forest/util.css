@@ -1,0 +1,19 @@
+/*
+ * Sample_Forest 브랜드 util.css — 이 파일 하나로 모든 컴포넌트(lightning-* 포함)의 모양을 바꾼다.
+ *
+ * 쓸 수 있는 것은 :root의 SLDS 2 global hook(--slds-g-*)뿐이다.
+ * Salesforce 기본 컴포넌트는 브라우저 native shadow DOM으로 그려지는 것이 많아서
+ * .slds-button 같은 클래스 규칙이나 컴포넌트 hook(--slds-c-*, --sds-c-*, --slds-s-*)은 안으로 들어가지 못한다.
+ * 상속되는 global hook만 닿는다. 어떤 hook이 어떤 컴포넌트에 영향을 주는지는
+ * Storybook "Foundations / 브랜드 스타일 (util.css)" 페이지에 자동으로 나온다.
+ *
+ * 브랜드 색(accent 계열)은 org 테마가 원본이라 여기서 바꾸지 않는다 (pnpm test가 막는다).
+ */
+:root {
+  /* 버튼·뱃지 등 알약형 → 각진 모서리 */
+  --slds-g-radius-border-pill: var(--slds-g-radius-border-1);
+  /* 입력창 (기본 0.5rem) → 조금 덜 둥글게 */
+  --slds-g-radius-border-2: 0.25rem;
+  /* 카드·컨테이너 (기본 1.25rem) → 덜 둥글게 */
+  --slds-g-radius-border-4: 0.5rem;
+}
