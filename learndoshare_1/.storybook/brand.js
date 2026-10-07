@@ -9,6 +9,17 @@ export const brands = Object.fromEntries(
   themes.map((theme) => [theme.name, theme])
 );
 
+// 브랜드 스타일 파일 하나(brands/<브랜드>/util.css). 모든 컴포넌트(lightning-* 포함)의 모양을 바꾼다
+export const utilCss = Object.fromEntries(
+  Object.entries(
+    import.meta.glob("../brands/*/util.css", {
+      query: "?inline",
+      import: "default",
+      eager: true
+    })
+  ).map(([path, css]) => [path.split("/").at(-2), css])
+);
+
 // accent hook은 :root에서 계산되므로 팔레트도 :root에 둬야 반영된다 (org도 문서 루트에 테마를 적용한다)
 export function applyBrand(name) {
   const root = document.documentElement;
@@ -21,4 +32,14 @@ export function applyBrand(name) {
     root.style.setProperty(`--slds-r-color-brand-${step}`, color);
   }
   root.dataset.milvusBrand = name;
+
+  // org의 loadStyle과 같은 위치(문서 루트)에 넣는다. SLDS 2 CSS는 @layer 안에 있어서 이 규칙이 우선한다
+  const style =
+    document.getElementById("milvus-brand-util") ??
+    document.head.appendChild(
+      Object.assign(document.createElement("style"), {
+        id: "milvus-brand-util"
+      })
+    );
+  style.textContent = utilCss[name] ?? "";
 }
