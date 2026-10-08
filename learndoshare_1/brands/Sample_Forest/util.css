@@ -10,7 +10,7 @@
  * 브랜드 색(accent 계열)은 org 테마가 원본이라 여기서 바꾸지 않는다 (pnpm test가 막는다).
  */
 :root {
-  /* 버튼·뱃지 등 알약형 → 각진 모서리 */
+  /* 알약형(버튼, 토글, 필, 경로, 원형 진행 표시줄) → 각진 모서리. 뱃지는 radius-border-1을 쓴다 */
   --slds-g-radius-border-pill: var(--slds-g-radius-border-1);
   /* 입력창 (기본 0.5rem) → 조금 덜 둥글게 */
   --slds-g-radius-border-2: 0.25rem;
