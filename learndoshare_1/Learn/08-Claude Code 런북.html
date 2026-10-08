@@ -61,7 +61,7 @@
   </div>
   <p>이 네 단계를 Claude가 순서대로, 금지 사항을 지키며 수행하게 만드는 문서 묶음을 이 문서에서는 <b>런북</b>이라고 부른다. 위 흐름은 패키지·CLI 설계의 <span class="tag info">계획</span>이고 아직 구현 전이다(<a href="../docs/specs/2026-10-08-milvus-package-design.md">설계</a> 0장).</p>
   <div class="callout key"><strong>기본 우선 (2026-10-09 갱신)</strong>기본 상태는 Salesforce 기본 모양에 브랜드 색·로고만 바꾼 것이다. 색·로고는 공식 기능인 <code>BrandingSet</code> 메타데이터로 배포한다. <code>init</code> 직후 util.css(<code>milvusBrand.css</code>)는 비어 있고, 브랜드 요청이 있을 때만 모양을 바꾼다(설계 1장, 10/9 결정). 이전의 4단계 흐름은 <a href="#runbook">런북 설계</a>의 "이전 설계"에 있다.</div>
-  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/skills">Claude Code — Skills</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (BrandingSet 배포, loadStyle 범위)</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/skills">Claude Code — Skills</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (BrandingSet 배포, loadStyle 범위)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (0장 흐름, 1장 기본 우선)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="concepts">
@@ -251,22 +251,25 @@ exit 0</code></pre>
 }</code></pre>
   <p class="c">실제 목록은 더 길다. 전체는 설계 7.2에 있다.</p>
 
-  <h3>바뀐 hook 계획</h3>
-  <p>README 11장의 hook 계획 가운데 일부는 패키지 설계에서 permissions로 바뀌었다(설계 문서 맨 앞 "이 문서가 대체하는 것" 표). 구현 첫 PR에서 CLAUDE.md 2장과 README 11장을 이 표에 맞게 고친다.</p>
+  <h3>바뀐 hook 계획 (2026-10-09 갱신)</h3>
+  <p>패키지 설계는 README 11장의 hook 계획 일부를 permissions로 바꾸었다(설계 문서 맨 앞 "이 문서가 대체하는 것" 표, 7.2). 이 hook들은 아직 구현되지 않았다. 저장소에 <code>.claude/</code> 설정이 없고, README 4장 Phase 1의 hook 항목도 끝나지 않았다. 구현 첫 PR에서 CLAUDE.md 2장과 README 11장을 이 표에 맞게 고친다.</p>
   <div class="table-wrap"><table>
-    <tr><th>이전 계획 (README 11장)</th><th>지금 계획</th></tr>
-    <tr><td>H2: PreToolUse hook으로 sf 데이터 변경·<code>apex run</code> 차단</td><td><code>permissions.ask</code>. 실행 전에 묻는다</td></tr>
-    <tr><td>H7: PreToolUse hook으로 밀버스 관리 파일 직접 수정 차단</td><td><code>permissions.deny</code>의 <code>Edit(...)</code> 규칙. 다른 경로로 바뀐 것은 <code>check</code>의 sha256 비교가 잡는다</td></tr>
-    <tr><td>H8: SessionStart hook으로 세션 시작 안내</td><td>두지 않는다. <code>CLAUDE.md</code>가 불러오는 <code>milvus-design.md</code>가 같은 안내를 한다</td></tr>
-    <tr><td>H4: 편집마다 스타일 린트</td><td>hook 하나: <code>pnpm milvus check --style</code> (정규식 수준, 0.2초 안)</td></tr>
+    <tr><th>막으려던 것 (이전 hook)</th><th>패키지 설계</th></tr>
+    <tr><td>되돌릴 수 없는 sf 명령: 배포, 데이터 변경, <code>apex run</code> (H2 1층)</td><td><code>permissions.ask</code>. 실행 전에 묻는다. 7.2 목록은 <code>milvus deploy</code>의 실행 형태 4가지, <code>sf project deploy</code>, <code>sf data delete</code>·<code>update</code>·<code>upsert</code>, <code>sf apex run</code>이다</td></tr>
+    <tr><td>조회 안의 개인정보 필드(<code>Phone</code>, <code>Email</code>, 주소)와 <code>FIELDS(ALL)</code> (H2 2층)</td><td><span class="tag warn">설계에 없음</span> 7.2에 대응 규칙이 없어 패키지는 막지 않는다. 이 저장소에서는 CLAUDE.md 5장의 지시로만 남아 있다(강제력 없음)</td></tr>
+    <tr><td>토큰을 출력하는 <code>sf org display</code>·<code>sf org auth</code> 계열의 직접 실행 (H2 3층)</td><td><span class="tag warn">설계에 없음</span> 7.2에 대응 규칙이 없어 패키지는 막지 않는다. 이 저장소에서는 CLAUDE.md 5장의 지시로만 남아 있다(강제력 없음)</td></tr>
+    <tr><td>밀버스 관리 파일 직접 수정 (H7)</td><td><code>permissions.deny</code>의 <code>Edit(...)</code> 규칙. 다른 경로로 바뀐 것은 <code>check</code>의 sha256 비교가 잡는다</td></tr>
+    <tr><td>세션 시작 안내 (H8)</td><td>두지 않는다. <code>CLAUDE.md</code>가 불러오는 <code>milvus-design.md</code>가 같은 안내를 한다</td></tr>
+    <tr><td>편집마다 스타일 린트 (H4)</td><td>hook 하나: <code>pnpm milvus check --style</code> (정규식 수준, 0.2초 안)</td></tr>
   </table></div>
+  <aside class="legacy"><strong>이전 설계 (2026-10-09 갱신)</strong>README 11장은 위 항목을 모두 hook으로 막을 계획이었다. H2(<code>guard-sf.mjs</code>, PreToolUse, Bash와 sf MCP 도구)는 세 층으로 막는다. 1층은 <code>sf project deploy</code>, <code>sf data create/update/delete</code>, <code>sf apex run</code> 같은 되돌릴 수 없는 명령, 2층은 조회 안의 개인정보 필드와 <code>FIELDS(ALL)</code>, 3층은 <code>sf org display</code>·<code>sf org auth</code> 계열의 직접 실행이다. H7(PreToolUse)은 밀버스 관리 파일 수정 차단, H8(SessionStart)은 세션 시작 안내, H4(PostToolUse <code>lint-style.mjs</code>)는 편집마다 스타일 린트였다.</aside>
   <ul>
     <li><span class="tag warn">미확인</span> <code>Edit(...)</code> deny 규칙이 밀버스 관리 파일을 의도대로 막는지는 10/13에 확인한다(설계 14장)</li>
     <li>설계 14장의 "<code>Bash(pnpm milvus deploy *)</code>가 인자 없는 명령에도 걸리는가"는 공식 문서상 걸린다(위 permissions 절). 실제 동작 확인은 10/13이다</li>
   </ul>
 
   <aside class="legacy"><strong>이전 설계 (2026-10-09 갱신)</strong>이 절은 원래 다른 런북을 설명했다. 흐름은 ① org 테마 → ② <code>pnpm sync:theme</code> → ③ Claude가 <code>brands/&lt;브랜드&gt;/root.css</code>의 허용 변수(<code>brands/ALLOWLIST.md</code>)만 수정 → ④ <code>node scripts/create-project.mjs</code>로 프로젝트 Storybook 생성이었다. skill은 <code>milvus-init</code> 하나, <code>lightning-button</code> 자체의 모양은 opt-in <code>override.css</code>로 바꾸는 안이었다. 지금은 <code>root.css</code>·<code>override.css</code>가 <code>milvusBrand.css</code>(util.css) 하나로, <code>create-project.mjs</code>가 <code>pnpm milvus init</code>으로, <code>milvus-init</code>이 <code>milvus-brand</code>로 바뀌었다. <code>pnpm sync:theme</code>은 디자인 시스템 저장소의 데모 브랜드에만 남고, 프로젝트에서는 <code>init --from-org</code>가 같은 일을 한다.</aside>
-  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project (@import, 외부 import 승인)</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/permissions">Claude Code — Configure permissions</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/hooks-guide">Claude Code — Automate actions with hooks</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (BrandingSet·util.css 배포)</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project (@import, 외부 import 승인)</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/permissions">Claude Code — Configure permissions</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/hooks-guide">Claude Code — Automate actions with hooks</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (BrandingSet·util.css 배포)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (맨 앞 대체 표, 3장, 7.2, 14장)</a> (확인 2026-10-09) · <a href="../README.md">README 11장 (hook H2·H4·H7·H8), 4장 Phase 1</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="deploy">
@@ -281,12 +284,12 @@ exit 0</code></pre>
     <tr><td>결정</td><td><span class="tag info">범위 밖</span> (설계 0장)</td><td><span class="tag ok">채택</span> 구현 전 (설계 3장·7장)</td></tr>
   </table></div>
   <div class="callout bad"><strong>저장소가 공개(PUBLIC)다</strong><code>a40418a/learndoshare</code>는 공개 저장소다. 런북, skill, hook 스크립트에 org ID, 사용자명, 인증 정보, 인스턴스 URL을 넣지 않는다. GitHub Packages 토큰도 파일에 쓰지 않고 환경 변수로 둔다.</div>
-  <p class="sources">출처: <a href="https://code.claude.com/docs/en/plugins/install">Install and manage plugins (자동 업데이트 기본값)</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugin-marketplaces">Create a marketplace</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/skills">Claude Code — Skills (plugin skill 이름)</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://code.claude.com/docs/en/plugins/install">Install and manage plugins (자동 업데이트 기본값)</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugin-marketplaces">Create a marketplace</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/skills">Claude Code — Skills (plugin skill 이름)</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (0장 범위 밖, 3장·7장)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="ponytail">
   <h2>Ponytail</h2>
-  <p><a href="https://github.com/DietrichGebert/ponytail">DietrichGebert/ponytail</a>은 AI 에이전트에게 "게으른 시니어 개발자" 규칙을 넣어 <b>과잉 구현을 줄이는</b> 플러그인이다. MIT 라이선스다. 2026-10-08에 <a href="https://github.com/DietrichGebert/ponytail/releases/tag/v5.0.0">v5.0.0</a>이 나오면서 README와 명령 설명이 바뀌었다. 아래 내용은 2026-10-09의 README와 <a href="https://github.com/DietrichGebert/ponytail/blob/main/INSTALL.md">INSTALL.md</a> 기준이다(2026-10-09 갱신). 설치한 버전은 셸에서 <code>claude plugin list</code>로 확인한다.</p>
+  <p><a href="https://github.com/DietrichGebert/ponytail">DietrichGebert/ponytail</a>은 AI 에이전트에게 "게으른 시니어 개발자" 규칙을 넣어 <b>과잉 구현을 줄이는</b> 플러그인이다. MIT 라이선스다. 2026-10-08에 <a href="https://github.com/DietrichGebert/ponytail/releases/tag/v5.0.0">v5.0.0</a>이 나오면서 규칙, review, audit가 새로 쓰였고, 같은 날 <a href="https://github.com/DietrichGebert/ponytail/releases/tag/v5.1.0">v5.1.0</a>에서 지름길 주석 표시가 바뀌었다(아래 <code>/ponytail-debt</code>). 아래 내용은 2026-10-09의 README와 <a href="https://github.com/DietrichGebert/ponytail/blob/main/INSTALL.md">INSTALL.md</a> 기준이다(2026-10-09 갱신). 설치한 버전은 셸에서 <code>claude plugin list</code>로 확인한다.</p>
   <h3>코드를 쓰기 전의 사다리</h3>
   <p>처음으로 "예"가 나오는 칸에서 멈춘다.</p>
   <div class="table-wrap"><table>
@@ -320,7 +323,7 @@ exit 0</code></pre>
     <tr><td><code>/ponytail lite|full|ultra|off</code></td><td>강도 변경 또는 끄기. 인자가 없으면 꺼져 있을 때 기본 단계로 켜고, 켜져 있으면 현재 단계를 알려 준다. 기본 <code>full</code></td></tr>
     <tr><td><code>/ponytail-review</code></td><td>현재 diff를 검토한다. 버그, 보안, 실제 부하, 테스트 없는 위험 코드, 느린 경로, 줄일 것을 본다 (v5에서 바뀜. 이전에는 줄일 것만 봤다)</td></tr>
     <tr><td><code>/ponytail-audit</code></td><td>같은 검사를 저장소 전체에 하고 중요한 것부터 순서를 매긴다</td></tr>
-    <tr><td><code>/ponytail-debt</code></td><td>미뤄 둔 <code>ponytail:</code> 주석을 목록으로 모은다</td></tr>
+    <tr><td><code>/ponytail-debt</code></td><td>일부러 미뤄 둔 지름길 주석을 목록으로 모은다. v5.1.0부터 Ponytail이 쓰는 표시는 <code>shortcut:</code>이고, 예전 <code>ponytail:</code> 주석도 계속 찾는다. 다른 단어는 <code>/ponytail-debt &lt;단어&gt;</code>로 모은다. 밀버스 CLAUDE.md는 <code>ponytail:</code> 주석을 쓴다 (2026-10-09 갱신)</td></tr>
     <tr><td><code>/ponytail-gain</code></td><td>벤치마크 기반 효과 표시</td></tr>
     <tr><td><code>/ponytail-help</code></td><td>명령 요약</td></tr>
   </table></div>
@@ -337,7 +340,7 @@ exit 0</code></pre>
   <div class="callout warn"><strong>제작자 자체 측정이다</strong>README의 agentic 벤치마크(Claude Code, Opus 5.5, 과제 39개, 과제마다 5회)는 skill이 없을 때와 비교해 코드 약 53%, 시간 약 41%, 비용 약 26%, 출력 토큰 약 45% 감소를 보고한다. <a href="https://github.com/DietrichGebert/ponytail/blob/main/benchmarks/results/2026-10-07-agentic.md">결과 문서</a>는 한계도 적고 있다. 모델 하나와 호스트 하나만 쟀고, 에이전트가 코드를 실행하지 못했으며, 과제 39개 중 21개는 정답 검사가 없어 크기만 잰다. 우리 과제에서도 같은 효과가 날지는 <span class="tag warn">미확인</span>이다.</div>
 
   <h3>밀버스 원칙과 겹치는 지점</h3>
-  <p>사다리 4번 "플랫폼 기본 기능"이 밀버스의 <b>"Salesforce 기본 먼저"</b> 원칙과 같다.</p>
+  <p>사다리 4번 "플랫폼 기본 기능"은 밀버스 원칙 <b>"SLDS가 제공하는 것을 최대한 쓴다"</b>(README 1.3)와 같은 방향이다(2026-10-09 갱신).</p>
   <div class="table-wrap"><table>
     <tr><th>요청</th><th>먼저 확인할 것 (4번 칸)</th><th>그다음</th></tr>
     <tr><td>다중 선택이 필요하다</td><td><code>lightning-dual-listbox</code>, <code>lightning-select</code>의 <code>multiple</code></td><td>그래도 안 되면 <code>milvusMultiSelect</code></td></tr>
@@ -345,7 +348,7 @@ exit 0</code></pre>
     <tr><td>브랜드 색을 바꾸고 싶다</td><td><code>BrandingSet</code>(색·로고, 공식 기능)</td><td>컴포넌트 코드는 건드리지 않는다</td></tr>
   </table></div>
   <div class="callout bad"><strong>"코드가 적다"가 목표가 아니다</strong>Ponytail이 줄인 코드는 테스트(<code>sfdx-lwc-jest</code>, Storybook 인터랙션 테스트, a11y 검사)로 확인한다. 입력 검증, 오류 처리, 접근성 속성이 빠졌다면 되돌린다. PR 전에 <code>/ponytail-review</code>로 검토하고, 사람 리뷰로 빠진 것을 확인한다.</div>
-  <p class="sources">출처: <a href="https://code.claude.com/docs/en/plugins/install">Install and manage plugins</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/skills">Claude Code — Skills (plugin skill 이름)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-dual-listbox.html">Lightning Component Reference — lightning-dual-listbox</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-select.html">Lightning Component Reference — lightning-select</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (native 전환과 밀버스 컴포넌트)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (BrandingSet)</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://github.com/DietrichGebert/ponytail">DietrichGebert/ponytail README (사다리, 설치, 명령, MIT, 벤치마크 요약)</a> (확인 2026-10-09) · <a href="https://github.com/DietrichGebert/ponytail/blob/main/INSTALL.md">Ponytail INSTALL.md (node PATH, 기본 단계, PONYTAIL_SUBAGENT_MATCHER, 제거)</a> (확인 2026-10-09) · <a href="https://github.com/DietrichGebert/ponytail/releases/tag/v5.0.0">Ponytail v5.0.0 릴리스</a> (확인 2026-10-09) · <a href="https://github.com/DietrichGebert/ponytail/releases/tag/v5.1.0">Ponytail v5.1.0 릴리스 (shortcut: 표시)</a> (확인 2026-10-09) · <a href="https://github.com/DietrichGebert/ponytail/blob/main/benchmarks/results/2026-10-07-agentic.md">Ponytail agentic 벤치마크 결과 (방법, 한계)</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins/install">Install and manage plugins (설치 패널·범위, /plugin uninstall, claude plugin list)</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/skills">Claude Code — Skills (plugin skill 이름)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-dual-listbox.html">Lightning Component Reference — lightning-dual-listbox</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-select.html">Lightning Component Reference — lightning-select</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (native 전환과 밀버스 컴포넌트)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (BrandingSet)</a> (확인 2026-10-09) · <a href="../README.md">README 1.3 원칙</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="project">
@@ -362,7 +365,7 @@ exit 0</code></pre>
     </ol>
   </div>
   <p>일정의 근거는 <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계</a> 12장이다. plugin marketplace 배포는 범위 밖이다(설계 0장).</p>
-  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project (/context)</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins/install">Install and manage plugins (설치 범위)</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project (/context)</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins/install">Install and manage plugins (설치 범위)</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (12장 일정, 0장 범위 밖)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="quiz" class="quiz">
@@ -377,9 +380,9 @@ exit 0</code></pre>
     <p>README는 두 명령을 별도의 프롬프트로 보내라고 안내한다. <code>/plugin marketplace add DietrichGebert/ponytail</code>을 먼저 보내고, 다음 프롬프트로 <code>/plugin install ponytail@ponytail</code>을 보낸다.</p></details>
   <details><summary>Q5. 사용자가 "다중 선택 컴포넌트 만들어 줘"라고 했다. Ponytail 사다리와 밀버스 원칙으로 첫 행동은?</summary>
     <p>새로 만들기 전에 4번 칸(플랫폼 기본 기능)을 확인한다. <code>lightning-dual-listbox</code>나 <code>lightning-select</code>의 <code>multiple</code>로 되는지 보고, 안 될 때만 <code>milvusMultiSelect</code>를 만든다. 만들더라도 접근성과 입력 검증은 줄이지 않는다.</p></details>
-  <details><summary>Q6. README 11장의 H7(관리 파일 수정 차단 hook)과 H2(sf 데이터 변경 차단 hook)는 지금 계획에서 무엇으로 바뀌었나?</summary>
-    <p>H7은 <code>permissions.deny</code>의 <code>Edit(...)</code> 규칙, H2는 <code>permissions.ask</code>로 바뀌었다. <code>Edit</code> 규칙은 파일을 고치는 모든 내장 도구에 적용되고, Bash의 ask 규칙은 auto 모드에서도 묻는다. H8(세션 시작 안내)은 두지 않는다.</p></details>
-  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/hooks-guide">Claude Code — Automate actions with hooks</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/permissions">Claude Code — Configure permissions</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins/install">Install and manage plugins</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-dual-listbox.html">Lightning Component Reference — lightning-dual-listbox</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-select.html">Lightning Component Reference — lightning-select</a> (확인 2026-10-09)</p>
+  <details><summary>Q6. README 11장의 H7(관리 파일 수정 차단 hook)과 H2(sf 명령 차단 hook, 3층)는 패키지 설계에서 무엇으로 바뀌었나?</summary>
+    <p>H7은 <code>permissions.deny</code>의 <code>Edit(...)</code> 규칙으로 바뀌었다. H2는 1층(되돌릴 수 없는 sf 명령)만 <code>permissions.ask</code>로 바뀌었다. 2층(개인정보 필드·<code>FIELDS(ALL)</code>)과 3층(<code>sf org display</code> 같은 토큰 출력)은 설계 7.2에 대응 규칙이 없어 패키지가 막지 않는다. <code>Edit</code> 규칙은 파일을 고치는 모든 내장 도구에 적용되고, Bash의 ask 규칙은 auto 모드에서도 묻는다. H8(세션 시작 안내)은 두지 않는다. (2026-10-09 갱신)</p></details>
+  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/hooks-guide">Claude Code — Automate actions with hooks</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/permissions">Claude Code — Configure permissions</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins/install">Install and manage plugins</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-dual-listbox.html">Lightning Component Reference — lightning-dual-listbox</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-select.html">Lightning Component Reference — lightning-select</a> (확인 2026-10-09) · <a href="https://github.com/DietrichGebert/ponytail">DietrichGebert/ponytail README (Q4 설치, Q5 사다리)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (Q6: 맨 앞 대체 표, 7.2)</a> (확인 2026-10-09) · <a href="../README.md">README 11장 (Q6: H2 세 층)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="refs">
@@ -390,10 +393,10 @@ exit 0</code></pre>
     <li><a href="https://code.claude.com/docs/en/plugins">Plugins overview</a> · <a href="https://code.claude.com/docs/en/plugins/install">Install and manage plugins</a> · <a href="https://code.claude.com/docs/en/plugins/create">Create a plugin</a></li>
     <li><a href="https://code.claude.com/docs/en/plugin-marketplaces">Create a marketplace</a> · <a href="https://code.claude.com/docs/en/plugins/manifest-reference">Plugin manifest reference</a></li>
     <li><a href="https://code.claude.com/docs/en/hooks-guide">Automate actions with hooks</a> · <a href="https://code.claude.com/docs/en/hooks">Hooks reference</a> · <a href="https://code.claude.com/docs/en/permissions">Configure permissions</a></li>
-    <li><a href="https://github.com/DietrichGebert/ponytail">DietrichGebert/ponytail (README)</a> · <a href="https://github.com/DietrichGebert/ponytail/blob/main/INSTALL.md">INSTALL.md</a> · <a href="https://github.com/DietrichGebert/ponytail/releases/tag/v5.0.0">v5.0.0 release</a> · <a href="https://github.com/DietrichGebert/ponytail/blob/main/benchmarks/results/2026-10-07-agentic.md">agentic benchmark writeup</a></li>
+    <li><a href="https://github.com/DietrichGebert/ponytail">DietrichGebert/ponytail (README)</a> · <a href="https://github.com/DietrichGebert/ponytail/blob/main/INSTALL.md">INSTALL.md</a> · <a href="https://github.com/DietrichGebert/ponytail/releases/tag/v5.0.0">v5.0.0 release</a> · <a href="https://github.com/DietrichGebert/ponytail/releases/tag/v5.1.0">v5.1.0 release</a> · <a href="https://github.com/DietrichGebert/ponytail/blob/main/benchmarks/results/2026-10-07-agentic.md">agentic benchmark writeup</a></li>
     <li><a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Packages — npm registry</a></li>
   </ul>
-  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — Memory</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/skills">Skills</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/commands">Commands</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins">Plugins overview</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins/create">Create a plugin</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/hooks">Hooks reference</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/permissions">Configure permissions</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — Memory</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/skills">Skills</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/commands">Commands</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins">Plugins overview</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins/create">Create a plugin</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/hooks">Hooks reference</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/permissions">Configure permissions</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09) · <a href="https://github.com/DietrichGebert/ponytail">DietrichGebert/ponytail</a> (확인 2026-10-09)</p>
 </section>
 
 <footer class="doc-foot">

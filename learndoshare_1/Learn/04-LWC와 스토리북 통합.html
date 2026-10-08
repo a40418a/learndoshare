@@ -57,7 +57,7 @@
   </div>
   <p>번들러가 다르므로 "Storybook에 LWC 플러그인 하나 꽂으면 끝"이 아니다. 둘을 이을 다리가 필요하다. 이 문서의 선택은 <b>"LWC는 Rollup으로 미리 빌드하고, Storybook은 그 결과물(<code>dist/lwc/</code>)만 읽는다"</b>이다.</p>
   <div class="callout ok"><strong>분기점 통과 (2026-10-09 갱신)</strong>공개 PoC는 가장 단순한 경우(<code>&lt;h1&gt;</code>, <code>&lt;p&gt;</code>)만 보여 줬다. 우리는 SFDX 폴더, <code>lightning-*</code> 컴포넌트, SLDS 2 스타일, 브랜드 전환까지 #3에서 확인했다 (<a href="../README.md">README</a> 3장 "Storybook 통합"). 아래 빌드 구조와 코드는 계획이 아니라 지금 저장소의 실제 구성이다.</div>
-  <p class="sources">출처: <a href="https://lwc.dev/guide/es_modules">lwc.dev — ES Modules (모듈 해석, 빌드 때 컴파일)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/rollup-plugin">@lwc/rollup-plugin README</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/get-started/frameworks/web-components-vite">Storybook — Web components with Vite</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://lwc.dev/guide/es_modules">lwc.dev — ES Modules (모듈 해석, 빌드 때 컴파일)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/rollup-plugin">@lwc/rollup-plugin README</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/get-started/frameworks/web-components-vite">Storybook — Web components with Vite</a> (확인 2026-10-09) · <a href="../README.md">README 3장 "Storybook 통합 (분기점)" (#3 통과)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="poc">
@@ -121,7 +121,7 @@
 <pre data-file="alias 레코드 예"><code>{ "name": "c/milvusBadge", "path": "force-app/main/default/lwc/milvusBadge/milvusBadge.js" }</code></pre>
   <p>컴포넌트가 늘 때마다 손으로 추가할 수는 없으므로, <code>rollup.lwc.config.mjs</code>가 <code>lwc</code> 폴더를 읽어 alias 목록을 <b>자동 생성</b>한다 (<a href="#code">저장소 코드</a>).</p>
   <div class="callout warn"><strong>인터넷 예제 주의</strong><span class="tag warn">미확인</span> 일부 설정 예제에 <code>{ dir, namespace: 'c' }</code> 형태가 보인다. 그 예제가 어떤 해석기를 쓰는지는 확인하지 않았다. 일반 <code>@lwc/module-resolver</code> 9.4.3에서는 위 표처럼 동작하지 않는다.</div>
-  <p class="sources">출처: <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/module-resolver">@lwc/module-resolver README (dir 레코드, NO_LWC_MODULE_FOUND)</a> (확인 2026-10-09) · <a href="https://lwc.dev/guide/es_modules">lwc.dev — ES Modules</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/module-resolver">@lwc/module-resolver README (dir 레코드, NO_LWC_MODULE_FOUND)</a> (확인 2026-10-09) · <a href="https://lwc.dev/guide/es_modules">lwc.dev — ES Modules</a> (확인 2026-10-09) · <a href="../README.md">README 3장 "SFDX 경로 모듈 해석" (2026-09-26 실험)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="lbc">
@@ -186,7 +186,7 @@ const element = createElement('lightning-hello', { is: LightningHello });</code>
   <h3>개발 루프</h3>
   <p><code>pnpm dev:lwc</code>(<code>rollup -w</code>, 감시 모드)와 <code>pnpm exec storybook dev -p 6006</code>을 <b>터미널 두 개</b>에서 띄운다. 컴포넌트를 저장하면 Rollup이 dist를 다시 쓰고, Storybook(Vite)이 바뀐 파일을 다시 읽는다. 상태를 유지하는 HMR이 아니라 <b>다시 빌드 후 새로 고침</b>이다. <span class="tag warn">미확인</span> 저장 후 반영까지 걸리는 시간은 측정 기록이 없다.</p>
   <div class="callout project"><strong>SLDS 2 CSS (2026-10-09 갱신)</strong>전역 CSS는 <code>@salesforce-ux/design-system-2</code> 2.264.2의 <code>dist/css/bundled/slds2.cosmos.css</code>다. preview.js에서 import한다. <code>@salesforce-ux/design-system</code>(2.264.1)은 SLDS 1 빌드라서 브랜드 색이 버튼에 반영되지 않았다 (#3 실측).</div>
-  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM (LEX·Experience Cloud는 synthetic)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-light-dom.html">LWC Developer Guide — Light DOM</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/blob/master/packages/%40lwc/engine-core/src/framework/base-lightning-element.ts">LWC 엔진 소스 (attachInternals 오류)</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/attachInternals">MDN — attachInternals()</a> (확인 2026-10-09) · <a href="https://rollupjs.org/configuration-options/">Rollup — Configuration options (input, manualChunks)</a> (확인 2026-10-09) · <a href="https://rollupjs.org/command-line-interface/">Rollup — CLI (-w)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">@salesforce-ux/design-system-2 (npm)</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM (LEX·Experience Cloud는 synthetic)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-light-dom.html">LWC Developer Guide — Light DOM</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/blob/master/packages/%40lwc/engine-core/src/framework/base-lightning-element.ts">LWC 엔진 소스 (attachInternals 오류)</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/attachInternals">MDN — attachInternals()</a> (확인 2026-10-09) · <a href="https://rollupjs.org/configuration-options/">Rollup — Configuration options (input, manualChunks)</a> (확인 2026-10-09) · <a href="https://rollupjs.org/command-line-interface/">Rollup — CLI (-w)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">@salesforce-ux/design-system-2 (npm)</a> (확인 2026-10-09) · <a href="../README.md">README 3장 "LWC shadow 모드", "SLDS 2 CSS 패키지" (2026-10-07 org 실측, #3 실측)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="code">
@@ -307,7 +307,7 @@ export const 기본 = {};</code></pre>
   <h2>위험 요소</h2>
   <div class="table-wrap"><table>
     <tr><th>위험</th><th>영향</th><th>대응</th></tr>
-    <tr><td>synthetic vs native shadow 차이</td><td>Salesforce가 기본 컴포넌트를 native로 바꾸면 컴포넌트 hook과 클래스 규칙이 그 컴포넌트 안에 닿지 않을 수 있다. 상속되는 global hook은 닿는다</td><td>지금은 org와 같게 전부 synthetic(PR #17). 전환 감지와 native 빌드는 설계 9.2의 계획(발표 뒤)</td></tr>
+    <tr><td>synthetic vs native shadow 차이</td><td>2026-10-09 갱신: Salesforce가 기본 컴포넌트를 native로 바꾸면 문서의 SLDS CSS(<code>.slds-*</code>)와 클래스 규칙이 컴포넌트 안에 닿지 않는다. hook은 g·s 구분 없이 shadow 경계를 넘어 상속되지만, 기본 컴포넌트의 native CSS가 직접 읽는 이름에만 효과가 있다 (추정, 실측 필요). 그래서 global hook을 포함해 hook으로 바꿀 수 있는 컴포넌트 비율도 떨어진다. 소스 분석으로는 모양 73% → 32%(LBC에만 있는 s hook까지 쓰면 54%), 포커스 링 모양 69% → 8%, 아이콘 71% → 29%다</td><td>지금은 org와 같게 전부 synthetic(PR #17). 전환 감지(<code>loadBrand</code>의 경고)는 설계 9.2의 계획이고, native 빌드는 발표 뒤로 미뤘다</td></tr>
     <tr><td>기능 게이트</td><td>npm 패키지는 게이트를 모두 열어 둔다. org와 다른 코드 경로를 탈 수 있다</td><td>synthetic에서 오류가 나는 combobox ElementInternals 게이트만 닫는다. <span class="tag warn">미확인</span> 다른 게이트가 org와 같은 상태인지는 확인하지 않았다</td></tr>
     <tr><td>루트 요소 slot 한계</td><td>slot을 받는 컴포넌트가 스토리에서 비어 보인다</td><td>스토리 전용 래퍼 LWC로 감싼다 (lwc#2029)</td></tr>
     <tr><td><code>@salesforce/*</code> stub</td><td>우리 컴포넌트의 label, i18n 등 import가 빌드 실패</td><td>alias 레코드로 stub 파일 연결. 표현 컴포넌트는 가능한 한 쓰지 않는다. 해석 못 한 import는 <code>onwarn</code>이 빌드를 실패시킨다</td></tr>
@@ -316,7 +316,7 @@ export const 기본 = {};</code></pre>
     <tr><td>HMR 없음</td><td>저장 후 반영까지 Rollup 재빌드 시간이 든다</td><td>감시 모드(<code>pnpm dev:lwc</code>) 병렬 실행</td></tr>
     <tr><td>Storybook 10은 ESM 전용</td><td>CommonJS 설정 파일(<code>require</code>)이 동작하지 않는다</td><td>Rollup 설정(<code>.mjs</code>)과 <code>.storybook/*</code>를 모두 ESM으로 쓴다</td></tr>
   </table></div>
-  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="https://www.w3.org/TR/css-scoping-1/">W3C — CSS Scoping (shadow 트리 상속)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/issues/2029">salesforce/lwc#2029</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/releases/migration-guide">Storybook — Migration guide (ESM 전용)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (native 전환 대비)</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="https://www.w3.org/TR/css-scoping-1/">W3C — CSS Scoping (shadow 트리 상속)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/issues/2029">salesforce/lwc#2029</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/releases/migration-guide">Storybook — Migration guide (ESM 전용)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (0장 3·5번: native 전환 시 도달 비율, g·s 상속)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 9.2 (native 전환 감지·대비), 12장 (native 빌드는 발표 뒤)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="branch">
@@ -338,7 +338,7 @@ export const 기본 = {};</code></pre>
     <div class="step"><b>3. org 문서 앱</b>org 안에 컴포넌트 문서 앱을 만드는 방식으로 전환</div>
   </div>
   <div class="callout key"><strong>오류 분류가 먼저</strong>"안 된다"로 뭉뚱그리면 다음 선택을 할 수 없다. 모듈을 못 찾는 오류(pnpm·resolver), 템플릿·CSS 컴파일 오류(LWC 컴파일러), 렌더는 되지만 모습이 다른 경우(shadow·SLDS)는 원인도 대응도 다르다.</div>
-  <p class="sources">출처: <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm, 포함 컴포넌트)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">@salesforce-ux/design-system-2 (npm)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/get-started/frameworks/web-components-vite">Storybook — Web components with Vite</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm, 포함 컴포넌트)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">@salesforce-ux/design-system-2 (npm)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/get-started/frameworks/web-components-vite">Storybook — Web components with Vite</a> (확인 2026-10-09) · <a href="../README.md">README 3장 "Storybook 통합 (분기점)", "SLDS 전체 컴포넌트 카탈로그"</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="project">
@@ -348,7 +348,8 @@ export const 기본 = {};</code></pre>
       <li>표현 컴포넌트 3개(<code>milvusBadge</code>, <code>milvusButton</code>, <code>milvusMultiSelect</code>)가 <code>force-app/main/default/lwc/</code>에 있고, <code>stories/lwc-entry.js</code>가 export한다</li>
       <li>Salesforce 기본 컴포넌트는 <code>lightning-base-components</code>의 공식 예제(<code>__examples__</code>)를 그대로 컴파일한 카탈로그로 보여 준다 (<code>scripts/generate-slds-catalog.mjs</code>)</li>
       <li>컨테이너(<code>@wire</code>, Apex, LDS를 쓰는 컴포넌트)는 빌드 입력에 넣지 않는다. <code>lightning/uiRecordApi</code>가 패키지에 없으므로 빌드되지 않는 것이 정상이다. 지금 저장소에는 컨테이너 컴포넌트가 없다</li>
-      <li>브랜드 모양은 <code>brands/&lt;브랜드&gt;/util.css</code>의 <code>:root</code>에 <code>--slds-g-*</code>, 색이 아닌 <code>--slds-s-*</code>, <code>--milvus-*</code>만 쓴다 (#11, PR #19). 클래스 규칙, <code>--slds-c-*</code>, 브랜드 색(accent) 재정의는 금지다. 기본은 util.css 없이 Salesforce 기본 모양이다 (기본 우선, 2026-10-09 결정)</li>
+      <li><b>지금 규칙</b>(#11, #18, PR #19): 브랜드 모양은 <code>brands/&lt;브랜드&gt;/util.css</code>의 <code>:root</code>에 <code>--slds-g-*</code>, 색이 아닌 <code>--slds-s-*</code>, <code>--milvus-*</code>만 쓴다. 클래스 규칙, <code>--slds-c-*</code>, 브랜드 색(accent) 재정의는 금지다. 기본은 util.css 없이 Salesforce 기본 모양이다 (기본 우선, 2026-10-09 결정)</li>
+      <li><span class="tag info">계획</span> (Task 7, 설계 5.2, 2026-10-09 갱신): 전 컴포넌트 분석에 따라 허용 범위를 넓힌다. 중립 색 <code>--slds-g-color-*</code>(<code>light-dark()</code> 값), 조건부 포커스 그림자, SLDS 2·기본 컴포넌트 CSS가 실제로 읽는 비색 s hook, 색 s hook 6개 화이트리스트(hover·선택 바탕 등), 상속 속성 <code>letter-spacing</code>이다. 대신 글꼴(<code>--slds-g-font-family*</code>)은 막는다. 검사 스크립트, CLAUDE.md, 설계 5.2가 지금 서로 달라서 이때 하나로 맞춘다. 아직 구현 전이다</li>
     </ul>
   </div>
   <p class="c">2026-10-09 갱신: 이전 문장 "SLDS global hook(<code>--slds-g-*</code>)은 읽기만 한다. 브랜드 전환은 <code>--milvus-*</code>로만 한다"는 #11·#18 결정으로 바뀌었다. 자세한 규칙은 <a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html#globals">03 Storybook</a>과 <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>에 있다.</p>
@@ -360,7 +361,7 @@ export const 기본 = {};</code></pre>
     <li>native 전환 대비용 두 번째 빌드(native)는 발표 뒤로 미룬다</li>
   </ul>
   <p>근거는 <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서</a> 4.2·9.2·13장이다. 아직 구현 전이다.</p>
-  <p class="sources">출처: <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (loadStyle, .ts LWC 배포)</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="../README.md">README 2장 (지금 util.css 규칙, #11·#18)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (기본 우선), 4.2·9.2·13장, 5.2 (util.css 확장 규칙, 계획)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (2.1 규칙 세 곳 불일치)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (loadStyle, .ts LWC 배포)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="quiz" class="quiz">
@@ -377,7 +378,7 @@ export const 기본 = {};</code></pre>
     <p>org(LEX)가 기본 컴포넌트를 synthetic으로 그리기 때문이다 (공식 문서, 2026-10-07 실측). Storybook은 org와 같은 모습을 보여 줘야 하므로 그 목록을 쓰지 않는다.</p></details>
   <details><summary>Q6. 기능 게이트를 전부 닫지 않고 combobox 게이트 하나만 닫는 이유는?</summary>
     <p>그 게이트가 열려 있으면 <code>attachInternals()</code>를 불러 synthetic shadow에서 엔진 오류가 나기 때문이다. 다른 게이트는 오류가 없어서 패키지 stub대로 둔다. org에서 각 게이트가 열려 있는지는 확인하지 않았다.</p></details>
-  <p class="sources">출처: <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/rollup-plugin">@lwc/rollup-plugin README</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/module-resolver">@lwc/module-resolver README</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/issues/2029">salesforce/lwc#2029</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/blob/master/packages/%40lwc/engine-core/src/framework/base-lightning-element.ts">LWC 엔진 소스 (attachInternals)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/rollup-plugin">@lwc/rollup-plugin README</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/module-resolver">@lwc/module-resolver README</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/issues/2029">salesforce/lwc#2029</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/blob/master/packages/%40lwc/engine-core/src/framework/base-lightning-element.ts">LWC 엔진 소스 (attachInternals)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="../README.md">README 3장 "LWC shadow 모드" (2026-10-07 실측)</a> (확인 2026-10-09)</p>
 </section>
 
 <footer class="doc-foot">
