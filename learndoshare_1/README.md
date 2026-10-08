@@ -438,7 +438,8 @@ pnpm sync:theme
 
 | 순서 | 자료 | 핵심 내용 | 선행 Phase | 예상 시간 |
 | --- | --- | --- | --- | --- |
-| 1 | [세일즈포스 디자인 시스템](<Learn/01-세일즈포스 디자인 시스템.html>) | SLDS 1과 2, styling hook(global / component / 레거시 토큰), 블루프린트와 base component, 브랜드별 버튼을 root에서 바꾸는 법 | 전체 | 1.5시간 |
+| 0 | [디자인 시스템과 Salesforce](<Learn/00-디자인 시스템과 Salesforce.html>) | 디자인 시스템 개념, SLDS 1과 2, styling hook(r → g → s → c), 브랜드(BrandingSet), shadow DOM과 스타일 범위, LEX와 Visualforce, 전 컴포넌트 분석, 밀버스의 층과 명령, 용어집 | 전체 | 2시간 |
+| 1 | [세일즈포스 디자인 시스템](<Learn/01-세일즈포스 디자인 시스템.html>) | SLDS 1과 2, styling hook(global / component / 레거시 토큰), 블루프린트와 base component, 브랜드 모양과 milvusButton | 전체 | 1.5시간 |
 | 2 | [LWC 기초](<Learn/02-LWC 기초.html>) | 컴포넌트 구조, `@api`/`@wire`, shadow DOM(synthetic / native / light), CSS 변수 상속, 표현/컨테이너 분리 | 2, 5 | 2시간 |
 | 3 | [스토리북](<Learn/03-스토리북.html>) | CSF3, args·controls, decorator·globals(툴바), 로고·manager 테마, autodocs, 정적 빌드 | 1, 3 | 1.5시간 |
 | 4 | [LWC와 스토리북 통합](<Learn/04-LWC와 스토리북 통합.html>) | Rollup과 Vite가 왜 충돌하는가, digitalflask 방식 해부, 미해결 과제와 해결 경로 | 2 | 2시간 |
@@ -447,7 +448,7 @@ pnpm sync:theme
 | 7 | [pnpm](<Learn/07-pnpm.html>) | strict node_modules, 버전별 차이(10 / 11+), 빌드 스크립트 승인, hoisting, husky | 1 | 1시간 |
 | 8 | [Claude Code 런북](<Learn/08-Claude Code 런북.html>) | `CLAUDE.md`, skill, 프로젝트 시작 워크플로를 Claude Code가 수행하게 만드는 법 | 6 | 1시간 |
 
-**추천 순서:** 1 → 7 → 2 → 3 → 4 → 5 → 8 → 6. 1(SLDS)과 7(pnpm)을 먼저 읽으면 Phase 1을 바로 시작할 수 있다.
+**추천 순서:** 0 → 1 → 7 → 2 → 3 → 4 → 5 → 8 → 6. 0(개념)으로 전체 그림을 잡고, 1(SLDS)과 7(pnpm)을 읽으면 Phase 1을 바로 시작할 수 있다.
 
 ---
 

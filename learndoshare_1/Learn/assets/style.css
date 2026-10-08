@@ -126,6 +126,13 @@ tr:last-child td { border-bottom: none; }
 .callout.project { border-left: 4px solid var(--accent); }
 .callout.project > strong:first-child::before { content: "우리 프로젝트에서 · "; color: var(--muted); font-weight: 500; }
 
+/* 이전 설계: 폐기·대체된 설명 (scripts/check-learn.ts가 root.css·override.css는 이 안에만 허용) */
+aside.legacy { margin: 14px 0; padding: 12px 16px; border: 1px dashed var(--muted); border-radius: var(--radius); background: var(--surface-2); color: var(--muted); }
+aside.legacy > strong:first-child { display: block; margin-bottom: 2px; color: var(--text); }
+
+/* 출처: 모든 section 끝 */
+p.sources { margin-top: 18px; font-size: 13px; line-height: 1.6; color: var(--muted); overflow-wrap: anywhere; }
+
 /* 상태 태그 */
 .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 0 8px; border-radius: 999px; line-height: 1.7; vertical-align: 1px; }
 .tag.ok { background: var(--ok-soft); color: var(--ok); }

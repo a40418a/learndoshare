@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>디자인 시스템과 Salesforce</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<nav class="topnav"><div class="topnav-inner">
+  <a href="../README.md">README</a>
+  <a class="active" href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html">00 개념</a>
+  <a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html">01 SLDS</a>
+  <a href="02-LWC%20%EA%B8%B0%EC%B4%88.html">02 LWC</a>
+  <a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html">03 Storybook</a>
+  <a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html">04 통합</a>
+  <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>
+  <a href="06-%EB%A1%9C%EC%BB%AC%20%EA%B0%9C%EB%B0%9C%20%EB%8F%84%EA%B5%AC%20%EB%B9%84%EA%B5%90.html">06 도구 비교</a>
+  <a href="07-pnpm.html">07 pnpm</a>
+  <a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html">08 Claude Code</a>
+</div></nav>
+
+<div class="layout">
+<aside class="toc">
+  <strong>목차</strong>
+  <ol>
+    <li><a href="#concept">1. 디자인 시스템이란</a></li>
+    <li><a href="#slds">2. SLDS</a></li>
+    <li><a href="#hooks">3. 토큰과 styling hook</a></li>
+    <li><a href="#brand">4. 브랜드는 어디서 오는가</a></li>
+    <li><a href="#shadow">5. shadow DOM과 스타일 범위</a></li>
+    <li><a href="#vf">6. LEX와 Visualforce</a></li>
+    <li><a href="#audit">7. 전 컴포넌트 분석</a></li>
+    <li><a href="#layers">8. 밀버스의 층과 명령</a></li>
+    <li><a href="#glossary">9. 용어집</a></li>
+  </ol>
+</aside>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">LEARN 00 · 개념</div>
+  <h1>디자인 시스템과 Salesforce</h1>
+  <p class="lead">디자인 시스템이 무엇으로 이루어지는지, Salesforce가 그것을 SLDS와 styling hook으로 어떻게 구현했는지, 밀버스가 그 위에 무엇을 얹는지 정리한다. 각 절은 개념 → Salesforce에서는 → 밀버스에서는 → 직접 확인하기 순서다.</p>
+  <div class="meta"><span>예상 1시간</span><span>선행 없음</span><span>2026-10-09 공식 문서 · 패키지 · 실측 기록으로 확인</span><span>SLDS 사이트 표기 Fall '26 v3.4.1</span></div>
+</header>
+
+<div class="callout key"><strong>표시 규칙</strong><span class="tag warn">미확인</span>은 공식 문서나 실측으로 확인하지 못한 것이다. <span class="tag info">계획</span>은 설계만 있고 아직 구현하지 않은 것이다(10/16까지 구현 예정). 표시가 없는 밀버스 항목은 지금 저장소에 있다. 밀버스의 결정은 <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 문서</a>와 <a href="../README.md">README</a> 3장이 원본이다.</div>
+
+<section id="concept">
+  <h2>1. 디자인 시스템이란</h2>
+  <h3>개념</h3>
+  <p>디자인 시스템은 여러 화면과 제품이 같은 모양과 동작을 갖게 하는 공유 자산이다. SLDS 사이트는 디자인 시스템의 기반을 "재사용할 코드, 통일된 시각 언어, 접근성 기준, 원칙"의 조합이라고 설명한다. 이 문서는 다섯 가지로 나눠 본다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>구성</th><th>무엇인가</th><th>근거</th></tr>
+    <tr><td>디자인 토큰</td><td>색, 간격, 글자 크기, 반경, 그림자 같은 디자인 값에 이름을 붙인 것. 하드코딩한 값 대신 이름으로 참조한다</td><td>SLDS Styling API, SLDS 1 Design Tokens. 도구 사이에서 토큰을 주고받는 표준 형식은 W3C Design Tokens Community Group이 만든다(2025.10이 첫 안정판)</td></tr>
+    <tr><td>컴포넌트</td><td>특정 기능이나 동작을 맡는 UI의 독립된 요소. 버튼, 입력창, 카드 등</td><td>SLDS Components</td></tr>
+    <tr><td>패턴</td><td>여러 컴포넌트를 조합해 같은 문제를 같은 방식으로 푸는 방법. 이 문서에서 쓰는 정의다</td><td>SLDS 2 사이트는 에이전트 화면용 "Agentic Patterns"를 따로 둔다</td></tr>
+    <tr><td>원칙</td><td>결정이 갈릴 때 기준이 되는 가치</td><td>SLDS 2의 원칙 5개: Clarity, Innovation, Scalability, Empowerment, Inspiration</td></tr>
+    <tr><td>운영</td><td>누가 무엇을 바꾸는가. 값의 주인, 바꾸는 절차, 알리는 방법</td><td>SLDS의 역할 구분(관리자, 디자이너, 개발자)과 "hook 값은 SLDS가 정한다"는 규칙</td></tr>
+  </table></div>
+  <h3>Salesforce에서는</h3>
+  <ul>
+    <li><b>토큰</b>은 CSS 사용자 정의 속성인 <b>styling hook</b>으로 구현된다. 공식 설명은 "SLDS는 디자인 토큰을 CSS custom property, 곧 styling hook에 대응시킨다"이다 (3절)</li>
+    <li><b>컴포넌트</b>는 두 종류다. 동작까지 들어 있는 기본 컴포넌트(<code>lightning-*</code>)와, HTML·CSS만 있는 블루프린트(<code>slds-*</code> 클래스)다 (2절)</li>
+    <li><b>운영</b>: global styling hook의 값은 SLDS가 정하고, Salesforce가 언제든 바꿀 수 있으며 릴리스 노트로 알린다. 브랜드 색과 로고는 관리자가 Themes and Branding에서 정한다. 개발자는 hook을 읽기만 한다</li>
+    <li>SLDS 2 전환 안내는 일을 관리자(전환 주도, 샌드박스, 사용자 공지), 디자이너(시각 일관성 검증), 개발자(SLDS Linter, 코드 수정, 테스트)로 나눈다</li>
+  </ul>
+  <h3>밀버스에서는</h3>
+  <p>밀버스는 SLDS를 대체하지 않는다. README 1.3의 첫 원칙이 "SLDS가 제공하는 것을 최대한 쓴다"이다. 그래서 밀버스의 운영은 "누가 무엇을 바꾸는가"를 Salesforce의 구분 위에 한 칸 더 얹는 일이다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>무엇을</th><th>누가</th><th>어디서</th></tr>
+    <tr><td>hook의 기본값, 기본 컴포넌트</td><td>Salesforce</td><td>SLDS 2 CSS, <code>lightning-*</code> (우리가 고치지 않는다)</td></tr>
+    <tr><td>브랜드 색, 로고</td><td>관리자 또는 배포</td><td>org 테마의 <code>BrandingSet</code> (4절)</td></tr>
+    <tr><td>모양(반경, 간격 등)</td><td>브랜드 요청이 있을 때만 개발자</td><td>util.css (8절)</td></tr>
+    <tr><td>SLDS에 없는 컴포넌트</td><td>디자인 시스템 오너</td><td><code>force-app/main/default/lwc/milvus*</code></td></tr>
+  </table></div>
+  <h3>직접 확인하기</h3>
+  <ul>
+    <li>SLDS 사이트의 Visual Language 페이지에서 원칙 5개를 읽는다</li>
+    <li>Global Styling Hooks 페이지 첫머리에서 "SLDS determines the values of global styling hooks" 문장을 찾는다. 운영의 주인이 누구인지 알려 주는 문장이다</li>
+  </ul>
+  <p class="sources">출처: <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/67a7b2-visual-language">SLDS 2 — Visual Language</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/7708aa-styling-api">SLDS 2 — Styling API</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/777f5a-global-styling-hooks">SLDS 2 — Global Styling Hooks</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/755aff-components">SLDS 2 — Components</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/8184ad-transition-to-slds-2">SLDS 2 — Transition to SLDS 2</a> (확인 2026-10-09) · <a href="https://v1.lightningdesignsystem.com/design-tokens/">SLDS 1 — Design Tokens</a> (확인 2026-10-09) · <a href="https://www.w3.org/community/design-tokens/">W3C Design Tokens Community Group</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="slds">
+  <h2>2. SLDS</h2>
+  <h3>개념</h3>
+  <p>디자인 시스템도 버전이 바뀐다. 구조(마크업과 레이아웃)와 시각 디자인(색, 반경 등)을 분리해 두면, 테마만 바꿔 모양을 바꿀 수 있다. 또 컴포넌트를 "동작까지 든 완성품"과 "모양만 정한 틀"로 나눠 제공하면, 쓰는 쪽이 상황에 맞게 고를 수 있다.</p>
+  <h3>Salesforce에서는</h3>
+  <p>SLDS(Salesforce Lightning Design System)는 두 버전이 있다. SLDS 2는 Spring '25에 소개됐고, 원래 SLDS는 SLDS 1이라 부른다. SLDS 2는 구조와 시각 디자인을 styling hook으로 분리하는 새 CSS 프레임워크 위에 만들어졌다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>항목</th><th>SLDS 1</th><th>SLDS 2</th></tr>
+    <tr><td>사이트</td><td>v1.lightningdesignsystem.com</td><td>lightningdesignsystem.com</td></tr>
+    <tr><td>기본 테마</td><td>Lightning Blue</td><td>Salesforce Cosmos. SLDS 1의 모양을 유지하는 SLDS 2용 Lightning Blue 테마도 있다</td></tr>
+    <tr><td>블루프린트</td><td>v1 사이트에 있음</td><td>SLDS 1과 같은 블루프린트를 쓴다. 새 사이트에 다시 싣지 않았다</td></tr>
+    <tr><td>디자인 토큰(<code>--lwc-*</code>)</td><td>지원</td><td><span class="tag bad">지원 안 함</span> global styling hook으로 바꾼다</td></tr>
+    <tr><td>global styling hook(<code>--slds-g-*</code>)</td><td>시스템 색·팔레트 hook</td><td>SLDS 1의 것 + 의미 기반(semantic) 색 hook</td></tr>
+    <tr><td>컴포넌트 hook(<code>--slds-c-*</code>)</td><td>지원</td><td>LWC 개발자 가이드: 아직 지원하지 않음. SLDS 사이트: Developer Preview(운영에 쓰지 말 것)</td></tr>
+  </table></div>
+  <ul>
+    <li><b>켜는 방법</b>: org가 Winter '25 이상이어야 한다. Setup의 Themes and Branding에서 Salesforce Cosmos나 커스텀 SLDS 2 테마를 활성화한다. 활성화하면 org 전체 사용자에게 적용된다</li>
+    <li><b>적용되지 않는 곳</b>: SLDS 2 전환 안내는 Lightning Out(베타)과 Salesforce Classic을 "SLDS 2에서 지원하지 않음"으로 적는다</li>
+  </ul>
+  <div class="table-wrap"><table>
+    <tr><th>컴포넌트 종류</th><th>무엇인가</th><th>언제 쓰나</th></tr>
+    <tr><td>기본 컴포넌트 (<code>lightning-*</code>)</td><td>Salesforce가 제공하는 완성품. 접근성이 들어 있고 자동으로 갱신된다. 속성과 styling hook으로 모양을 조정한다</td><td>항상 먼저</td></tr>
+    <tr><td>블루프린트 (<code>slds-*</code> 클래스)</td><td>프레임워크와 무관한 HTML·CSS 틀. 동작과 로직이 없다</td><td>맞는 기본 컴포넌트가 없을 때만. 동작은 직접 만든다</td></tr>
+  </table></div>
+  <h3>밀버스에서는</h3>
+  <ul>
+    <li>우리 org는 SLDS 2 커스텀 테마를 쓴다(README 3장: <code>SLDS_v2</code>, 다크 모드 꺼짐)</li>
+    <li>판단 사다리(CLAUDE.md 2장)의 4단계가 이 표다. <code>lightning-*</code>이 있으면 쓰고, 없으면 블루프린트로 만든다</li>
+    <li>Storybook은 org 없이 그리기 위해 npm 패키지 두 개를 쓴다. SLDS 2 CSS(<code>@salesforce-ux/design-system-2</code> 2.264.2의 <code>slds2.cosmos.css</code>)와 기본 컴포넌트 원본(<code>lightning-base-components</code> 1.28.19-alpha)이다</li>
+    <li>블루프린트로 만든 밀버스 컴포넌트(예: <code>milvusButton</code>)는 <code>lightning-*</code>이 해 주던 접근성과 동작을 직접 맞춘다</li>
+  </ul>
+  <h3>직접 확인하기</h3>
+  <ul>
+    <li>Setup → Themes and Branding에서 활성 테마 이름 옆에 "SLDS 2" 표시가 있는지 본다</li>
+    <li>로컬에서 <code>ls node_modules/@salesforce-ux/design-system-2/dist/css/bundled/</code>를 실행하면 <code>slds2.cosmos.css</code>와 <code>slds2.lightning-blue.css</code>가 나온다. SLDS 2 안에 테마가 둘인 것을 눈으로 확인한다</li>
+  </ul>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC Developer Guide — Compare SLDS Versions</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/7708aa-styling-api">SLDS 2 — Styling API</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/755aff-components">SLDS 2 — Components</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/8184ad-transition-to-slds-2">SLDS 2 — Transition to SLDS 2</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/771012-admins">SLDS 2 — Admins</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.brand_your_org_in_lightning_experience.htm&amp;type=5">Salesforce Help — Personalize Your Org with Themes and Branding</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm — @salesforce-ux/design-system-2</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">npm — lightning-base-components</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="hooks">
+  <h2>3. 토큰의 Salesforce 이름: styling hook</h2>
+  <h3>개념</h3>
+  <p>토큰은 층으로 흐른다. 값 → 의미 있는 이름 → 특정 컴포넌트의 이름 → 실제 CSS 속성 순서다. 위층 값을 한 번 바꾸면 그것을 참조하는 모든 컴포넌트가 바뀌고, 아래층 이름을 바꾸면 그 컴포넌트만 바뀐다. 웹에서는 이 이름을 CSS 사용자 정의 속성(<code>--이름</code>)으로 만들고 <code>var()</code>로 읽는다.</p>
+  <h3>Salesforce에서는</h3>
+  <p>SLDS 사이트의 공식 흐름은 "디자인 토큰 값 → global styling hook → 컴포넌트 수준 styling hook → 컴포넌트 구현"이다. 예: <code>#066AFE</code> → <code>--slds-g-color-accent-container-1</code> → <code>--slds-c-button-color-background</code> → <code>background-color</code>.</p>
+  <p>설치된 SLDS 2 CSS를 열어 보면 공식 문서에 없는 두 접두사가 더 있다. 그래서 실제 체인은 네 단계다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>접두사</th><th>무엇인가</th><th>근거</th></tr>
+    <tr><td><code>--slds-r-*</code></td><td>원래 값(팔레트). <code>@layer defaults</code>의 <code>:where(html)</code>에 85개: brand, error, info, success, warning 계열이 17단계씩</td><td>패키지 CSS. 공식 문서에는 설명이 없다. "r"이 무엇의 약자인지 <span class="tag warn">미확인</span></td></tr>
+    <tr><td><code>--slds-g-*</code></td><td>global hook. 이름 규칙 <code>--slds-g-{분류}-{속성}-{변형}</code>. 색, 그림자, 테두리·반경, 글자, 간격, 크기</td><td>공식 문서. 패키지 CSS의 두 번째 <code>@layer defaults</code>에 524개</td></tr>
+    <tr><td><code>--slds-s-*</code></td><td>컴포넌트별 기본값. <code>@layer shared</code>의 <code>:where(html)</code>에 107개. 대부분 g hook을 가리킨다</td><td>패키지 CSS. 공식 문서에는 설명이 없다. "s"가 무엇의 약자인지 <span class="tag warn">미확인</span></td></tr>
+    <tr><td><code>--slds-c-*</code></td><td>컴포넌트 수준 hook. 사용자가 덮어쓰라고 열어 둔 자리</td><td>공식 문서. SLDS 2에서는 Developer Preview / 미지원(2절)</td></tr>
+  </table></div>
+<pre data-file="@salesforce-ux/design-system-2 2.264.2 · dist/css/bundled/slds2.cosmos.css (발췌, 순서를 바꿔 모음)"><code><span class="c">/* r: 원래 값 (@layer defaults) */</span>
+--slds-r-color-brand-50: #066afe;
+<span class="c">/* g: 의미 있는 이름 (@layer defaults) */</span>
+--slds-g-color-accent-container-1: var(--slds-r-color-brand-50);
+--slds-g-radius-border-pill: 15rem;
+<span class="c">/* s: 컴포넌트별 기본값 (@layer shared) */</span>
+--slds-s-button-radius-border: var(--slds-g-radius-border-pill);
+<span class="c">/* 구현: c가 있으면 c, 없으면 s, 그것도 없으면 g */</span>
+.slds-button {
+  border-radius: var(
+    --slds-c-button-radius-border,
+    var(--slds-s-button-radius-border, var(--slds-g-radius-border-2))
+  );
+}</code></pre>
+  <p>즉 버튼 모서리는 c hook이 없으면 <code>--slds-s-button-radius-border</code>를 읽고, 그 값이 <code>--slds-g-radius-border-pill</code>(15rem)이라 알약 모양이 된다.</p>
+  <div class="callout bad"><strong>공식 규칙: global hook은 읽기만 한다</strong>Global Styling Hooks 페이지의 규칙은 "참조한다, 값을 다시 할당하지 않는다, SLDS 1에서도 그려지도록 fallback을 둔다" 세 가지다. Color Modes 페이지도 "<code>--slds-g-*</code>를 재정의하지 마라. UI가 깨질 수 있다"고 적는다. 반면 관리자의 Themes and Branding은 "특정 hook 값을 브랜드에 맞게 덮어쓰는 방식"으로 동작한다고 Styling API 페이지가 설명한다. hook 값을 바꾸는 공식 경로는 org 테마다.</div>
+  <ul>
+    <li>SLDS 1의 디자인 토큰(<code>--lwc-*</code>)은 SLDS 2에서 동작하지 않는다. LWC 개발자 가이드는 global hook으로 바꾸라고 안내한다</li>
+    <li>권장 쓰는 법: <code>var(--slds-g-color-surface-container-1, var(--lwc-colorBackgroundAlt))</code>처럼 SLDS 2 hook을 앞에, 옛 값을 fallback으로 둔다(SLDS 2 전환 안내의 예)</li>
+  </ul>
+  <h3>밀버스에서는</h3>
+  <ul>
+    <li><b>컴포넌트 CSS</b>는 hook을 읽기만 하고 fallback을 반드시 둔다 (CLAUDE.md 3장)</li>
+    <li><b>util.css</b>는 공식 권고 밖이라는 것을 알고 택한 예외다. 지금 규칙(PR #19 이후, <code>pnpm test</code>의 <code>scripts/check-brands.mjs</code>가 검사): <code>:root</code> 블록 하나에 <code>--slds-g-*</code>(브랜드 색 계열 제외), 이름에 color가 없고 SLDS 2 CSS가 정의하는 <code>--slds-s-*</code>, 밀버스 컴포넌트가 읽는 <code>--milvus-*</code>만 쓴다. 클래스 규칙, <code>--slds-c-*</code>, <code>--sds-c-*</code>, 브랜드 색(accent·brand) 재정의는 금지다</li>
+    <li><span class="tag info">계획</span> 전 컴포넌트 분석(7절)에 따라 규칙을 다시 맞춘다(설계 5.2): 중립 색은 <code>light-dark()</code>로, 포커스 링 그림자는 색을 브랜드 hook으로만, 색 s hook은 6개만, 상속 속성은 <code>letter-spacing</code>만, 글꼴 hook은 금지. 10/12에 검사 스크립트·CLAUDE.md·설계 5.2를 하나로 맞춘다</li>
+    <li><b>기본 우선</b>(2026-10-09 결정): 기본 상태에서는 util.css가 비어 있다. 브랜드 요청이 있을 때만 쓴다 (8절)</li>
+  </ul>
+  <h3>직접 확인하기</h3>
+<pre><code><span class="c"># 위 발췌가 실제로 있는지 (2.264.2 기준)</span>
+grep -n -F -- "--slds-s-button-radius-border" node_modules/@salesforce-ux/design-system-2/dist/css/bundled/slds2.cosmos.css
+
+<span class="c"># hook 하나가 몇 곳에서 읽히는지 (분석 스크립트)</span>
+cd docs/research/2026-10-08
+node hk.cjs --slds-s-button-radius-border</code></pre>
+  <p>지금 저장소의 Storybook(<code>pnpm storybook</code>)에는 "Foundations / 브랜드 스타일 (util.css)" 페이지가 있어, 어떤 hook이 어떤 컴포넌트에 영향을 주는지 SLDS CSS에서 자동으로 뽑아 보여 준다(README 2장).</p>
+  <p class="sources">출처: <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/7708aa-styling-api">SLDS 2 — Styling API</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/777f5a-global-styling-hooks">SLDS 2 — Global Styling Hooks</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2 — Color Modes</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/8184ad-transition-to-slds-2">SLDS 2 — Transition to SLDS 2</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC Developer Guide — SLDS Styling Hooks</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-design-tokens.html">LWC Developer Guide — SLDS Design Tokens</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm — @salesforce-ux/design-system-2</a> (설치된 2.264.2의 CSS를 grep으로 확인 2026-10-09) · <a href="../docs/research/2026-10-08/README.md">연구 자료 안내 (hk.cjs)</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="brand">
+  <h2>4. 브랜드는 어디서 오는가</h2>
+  <h3>개념</h3>
+  <p>브랜드 값은 원본을 한 곳에 두고 나머지를 계산하게 해야 어긋나지 않는다. 특히 색은 "입력한 색" 하나에서 여러 단계의 팔레트를 만들고, 글자와 배경의 대비 기준(WCAG 4.5:1)을 넘는 단계를 골라 쓴다.</p>
+  <h3>Salesforce에서는</h3>
+  <ul>
+    <li><b>Themes and Branding</b>(Setup): 테마는 화면의 모양을 정하는 시각 스타일 묶음이다. 기본 테마를 고르거나 커스텀 테마를 만든다. SLDS 2 테마를 활성화하면 org에 SLDS 2가 켜진다</li>
+    <li>관리자는 브랜드 이미지를 올리고 브랜드 색을 고른다. SLDS 2는 WCAG 대비를 만족하는 보조 accent 색을 자동으로 고른다</li>
+  </ul>
+  <div class="table-wrap"><table>
+    <tr><th>메타데이터</th><th>무엇을 담나</th></tr>
+    <tr><td><code>LightningExperienceTheme</code></td><td>테마 자체. <code>defaultBrandingSet</code>(필수), <code>designSystemVersion</code>(<code>SLDS_v1</code> / <code>SLDS_v2</code>, API 64.0~, 기본 <code>SLDS_v1</code>), <code>isDarkModeEnabled</code>(API 65.0~). 활성화는 <code>LightningExperienceSettings</code>의 활성 테마 필드로 한다</td></tr>
+    <tr><td><code>BrandingSet</code></td><td>브랜딩 속성의 이름·값 배열(<code>brandingSetProperty</code>). 공식 매니페스트 예의 이름은 <code>LEXTHEMING</code> + 테마 이름이다</td></tr>
+  </table></div>
+  <div class="table-wrap"><table>
+    <tr><th><code>BrandingSet</code> 속성</th><th>뜻</th><th>적용</th></tr>
+    <tr><td><code>BRAND_COLOR</code></td><td>브랜드 색. 이 값을 주면 WCAG 2.0을 만족하는 팔레트가 자동으로 만들어지고, 브랜드 색이 대비를 못 넘는 곳에는 대신 접근성 색이 쓰인다</td><td>SLDS 1·2</td></tr>
+    <tr><td><code>BRAND_IMAGE</code></td><td>로고. org 안의 자산 파일 경로. 600×120px, 5MB 미만 권장</td><td>SLDS 1·2</td></tr>
+    <tr><td><code>ACCENT_COLOR_1~3</code>, <code>CONTAINER_ACCENT_COLOR_1~3</code></td><td>accent 색과 브랜드 버튼 같은 컨테이너 배경을 직접 지정</td><td>SLDS 2만, API 64.0~</td></tr>
+    <tr><td><code>ACCENT_CONTAINER_CONTENT_COLOR_1~3</code></td><td>accent 컨테이너 안의 글자·아이콘 색</td><td>SLDS 2만, API 65.0~</td></tr>
+    <tr><td><code>HEADER_BACKGROUND_COLOR</code>, <code>PAGE_BACKGROUND_COLOR</code>, <code>OVERRIDE_A11Y_COLOR</code></td><td>헤더·페이지 배경, 접근성 색 덮어쓰기</td><td>SLDS 1만</td></tr>
+  </table></div>
+  <p>SLDS 2 CSS 안에서는 팔레트가 <code>--slds-r-color-brand-5</code>~<code>95</code>(17단계)이고, 브랜드 버튼 배경 <code>--slds-g-color-accent-container-1</code>은 50단계를, <code>--slds-g-color-accent-2</code>는 라이트 모드에서 40단계를 읽는다(패키지 CSS 확인). org는 활성 테마의 팔레트로 이 값을 채운다.</p>
+  <h3>밀버스에서는</h3>
+  <ul>
+    <li><b>색과 로고의 원본은 <code>BrandingSet</code> 하나다.</b> util.css에서 accent·brand 계열을 바꾸지 않는다(설계 5.1, 5.2)</li>
+    <li><b>org 실측(2026-10-08):</b> <code>BrandingSet</code>과 <code>LightningExperienceTheme</code>은 배포로 만들어진다. 활성 테마 이름 한 필드만 담은 설정을 배포하면 그 필드만 바뀐다. 테마를 지우면 그 테마의 <code>BrandingSet</code>도 지워진다</li>
+    <li><b>팔레트 규칙(실측으로 역산, 2026-10-05):</b> 단계마다 CIELAB 명도 L*가 고정이고(95→96, 90→91, 50→49, 40→39, 30→29, 20→19, 10→8), 색상각은 유지한다. 그래서 원본 브랜드 색은 그대로 들어가지 않는다. 예: <code>#0176D3</code> → 50단계 <code>#2976ca</code> (README 3장, <code>scripts/palette.mjs</code>)</li>
+    <li>org에서 <code>BRAND_COLOR</code> <code>#2E7D32</code>를 활성화했더니 LEX accent가 <code>#468244</code>였고, 우리 규칙의 50단계와 같았다</li>
+    <li>50단계는 L* 49라서 흰 글자 대비가 모든 색에서 4.62~4.68:1이다. 그래서 브랜드 색을 막지 않고, 입력한 색·실제 버튼 색(50)·링크 색(40)을 함께 보여 준다(설계 5.4)</li>
+    <li>밀버스는 지금 <code>BRAND_COLOR</code>와 <code>BRAND_IMAGE</code>만 다룬다(설계 5.1). SLDS 2 전용 <code>ACCENT_COLOR_*</code> 속성을 쓸지는 설계에 없다 <span class="tag warn">미정</span></li>
+    <li><span class="tag info">계획</span> <code>pnpm milvus init --brand &lt;이름&gt;</code>은 Salesforce 기본색 <code>#0176D3</code>으로 <code>BrandingSet</code>과 테마 파일을 만든다(설계 4.1)</li>
+  </ul>
+  <h3>직접 확인하기</h3>
+  <ul>
+    <li>Setup → Themes and Branding에서 활성 테마를 열어 브랜드 색과 로고를 본다</li>
+    <li>org 조회(읽기만): <code>sf data query --target-org &lt;별칭&gt; --query "SELECT PropertyName, PropertyValue FROM BrandingSetProperty"</code>. 우리 org에서 읽히는 색은 <code>BRAND_COLOR</code>, <code>HEADER_BACKGROUND_COLOR</code> 두 개였다(README 3장). 데이터 구조는 <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>에 있다</li>
+    <li>DevTools 콘솔에서 <code>getComputedStyle(document.documentElement).getPropertyValue('--slds-g-color-accent-container-1')</code>로 지금 브랜드 버튼 색을 읽는다. Storybook에서는 npm SLDS 2 CSS가 <code>html</code>에 정의하므로 읽힌다. org 런타임이 같은 위치에 정의하는지는 <span class="tag warn">미확인</span></li>
+  </ul>
+  <p class="sources">출처: <a href="https://help.salesforce.com/s/articleView?id=xcloud.brand_your_org_in_lightning_experience.htm&amp;type=5">Salesforce Help — Personalize Your Org with Themes and Branding</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/771012-admins">SLDS 2 — Admins</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_brandingset.htm">Metadata API — BrandingSet</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_lightningexperiencetheme.htm">Metadata API — LightningExperienceTheme</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm — @salesforce-ux/design-system-2</a> (설치된 2.264.2의 CSS를 grep으로 확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (테마 배포·활성화, accent 측정)</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="shadow">
+  <h2>5. shadow DOM과 스타일이 닿는 범위</h2>
+  <h3>개념</h3>
+  <p>shadow DOM은 웹 컴포넌트의 내부 DOM을 감싸 바깥의 HTML, CSS, JavaScript가 건드리지 못하게 하는 표준이다. 페이지의 CSS 규칙(예: <code>.slds-button { … }</code>)은 shadow 트리 안으로 들어가지 않는다. 그러나 <b>상속</b>은 경계를 넘는다. shadow 트리의 맨 위 요소는 호스트 요소에서 상속받고, <code>--</code>로 만든 사용자 정의 속성은 기본적으로 상속된다. 그래서 styling hook(사용자 정의 속성)은 닿고, 클래스 규칙은 닿지 않는다.</p>
+  <h3>Salesforce에서는</h3>
+  <ul>
+    <li>LWC는 Lightning Experience와 Experience Cloud에서 <b>synthetic shadow</b>(폴리필)를 쓴다. Lightning Out처럼 그 밖에서 쓰면 native shadow로 그린다</li>
+    <li>synthetic shadow에서는 앱이 전역 스타일시트로 DOM 전체를 꾸민다. native shadow에서는 그렇게 할 수 없고, 컴포넌트 스타일을 번들에 넣어야 한다</li>
+    <li>Salesforce는 mixed shadow mode(베타)를 거쳐 native shadow로 옮겨 가겠다고 적었다. 컴포넌트는 <code>static shadowSupportMode = "native"</code>로 native를 택한다</li>
+    <li>npm <code>lightning-base-components</code> 1.28.19-alpha는 <code>package.json</code>의 <code>lwc.nativeShadowEnabledComponents</code>에 156개를 native 지원으로 지정해 두었다(설치본 확인). org에 언제 적용될지는 <span class="tag warn">미확인</span></li>
+  </ul>
+  <div class="table-wrap"><table>
+    <tr><th>문서 수준 CSS가 넣은 것</th><th>synthetic (지금 org)</th><th>native (전환 뒤)</th></tr>
+    <tr><td><code>:root</code>의 <code>--slds-g-*</code></td><td>닿음</td><td>상속으로 닿음. 그 hook을 읽는 곳이 컴포넌트 CSS에 남아 있을 때만 효과</td></tr>
+    <tr><td><code>:root</code>의 <code>--slds-s-*</code></td><td>닿음 (실측)</td><td>기본 컴포넌트의 native CSS가 직접 읽는 이름에만 닿을 가능성이 높다 <span class="tag warn">추정</span></td></tr>
+    <tr><td><code>.slds-*</code> 클래스 규칙</td><td>닿음</td><td>닿지 않음</td></tr>
+  </table></div>
+  <h3>밀버스에서는</h3>
+  <ul>
+    <li><b>org 실측(2026-10-07, #16):</b> LEX는 기본 컴포넌트를 synthetic으로 그린다. 홈, 계정 목록, 새 계정 화면에서 쟀고 native는 내부 primitive 3개뿐이었다. Storybook도 org와 같게 전부 synthetic으로 그린다(README 3장)</li>
+    <li><b>org 실측(2026-10-08):</b> LEX에서 <code>loadStyle</code>로 넣은 CSS는 문서 head에 들어가, 프로브 컴포넌트뿐 아니라 같은 페이지의 표준 헤더 버튼과 <code>document.body</code>에 붙는 <code>LightningAlert</code> 모달까지 바꿨다. 컴포넌트 hook <code>--slds-s-input-radius-border</code>도 닿았다</li>
+    <li><b>native 전환 위험:</b> 전환되면 클래스 규칙(<code>milvusBridge.css</code>)은 사라지고 hook으로 바꿀 수 있는 비율도 떨어진다(7절의 "native" 열). 소스 분석상 "native에서는 <code>--slds-s-*</code>가 닿지 않는다"는 지나친 서술이고, 기본 컴포넌트의 native CSS가 직접 읽는 s 이름에는 닿을 가능성이 높다 <span class="tag warn">추정, 실측 필요</span></li>
+    <li><span class="tag info">계획</span> 감지: 기본 컴포넌트는 synthetic이 아닐 때 호스트에 <code>data-render-mode="shadow"</code>를 붙인다(LBC 소스). <code>loadBrand</code>가 이것을 보고 개발 콘솔에 경고한다(설계 9.2)</li>
+  </ul>
+  <h3>직접 확인하기</h3>
+  <ul>
+    <li>LEX 화면에서 DevTools Elements 패널을 연다. native 컴포넌트는 <code>#shadow-root</code> 아래에 보이고, synthetic 컴포넌트는 그렇지 않다(LWC 개발자 가이드의 설명)</li>
+    <li><code>lightning-button</code> 호스트 요소에 <code>data-render-mode</code> 속성이 있는지 본다</li>
+    <li>자기 컴포넌트에서는 <code>this.template.synthetic</code>이 synthetic이면 <code>true</code>, native면 <code>undefined</code>다</li>
+  </ul>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-mixed-shadow.html">LWC Developer Guide — Mixed Shadow Mode (Beta)</a> (확인 2026-10-09) · <a href="https://www.w3.org/TR/css-scoping-1/">W3C — CSS Scoping Module Level 1, 3.3.2 Inheritance</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties">MDN — Using CSS custom properties</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">npm — lightning-base-components</a> (설치본 package.json 확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (loadStyle 도달 범위)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (0장 전제 수정, 2.8 감지)</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="vf">
+  <h2>6. LEX와 Visualforce</h2>
+  <h3>개념</h3>
+  <p>같은 디자인 시스템이라도 페이지 기술마다 스타일을 싣는 방법이 다르다. 그래서 "같은 CSS가 어디에 들어가는가"와 "그 페이지가 어느 버전의 SLDS를 쓰는가"를 따로 확인해야 한다.</p>
+  <h3>Salesforce에서는</h3>
+  <div class="table-wrap"><table>
+    <tr><th></th><th>LEX (LWC)</th><th>Visualforce (VF)</th></tr>
+    <tr><td>내 CSS 싣기</td><td>CSS를 정적 리소스로 올리고 <code>lightning/platformResourceLoader</code>의 <code>loadStyle(this, url)</code>로 불러온다. 프로미스를 돌려준다</td><td><code>&lt;apex:stylesheet value="{!$Resource.이름}"/&gt;</code>. 생성된 페이지의 head에 <code>&lt;link&gt;</code>를 넣는다</td></tr>
+    <tr><td>SLDS 싣기</td><td>플랫폼이 넣는다</td><td><code>&lt;apex:slds/&gt;</code>. SLDS를 정적 리소스로 올리지 말고 이것을 쓰라고 안내한다. 내용은 <code>slds-scope</code> 클래스 안에서 SLDS 스타일을 받는다</td></tr>
+  </table></div>
+  <div class="callout key"><strong><code>&lt;apex:slds/&gt;</code>도 SLDS 2가 될 수 있다 (공식 문서, 2026-10-09 확인)</strong>
+    <ul>
+      <li>Setup → User Interface의 Visualforce Settings에 "Use SLDS 2 for pages that include &lt;apex:slds&gt; when an SLDS 2 theme is active" 설정이 있다. 이것을 켜고 SLDS 2 테마가 활성이면 <code>&lt;apex:slds&gt;</code>를 쓴 VF 페이지가 SLDS 2 스타일시트를 쓴다</li>
+      <li><code>&lt;apex:slds&gt;</code>의 <code>lightningStyleMode</code> 속성(API 65.0~): 기본값 <code>Auto</code>는 org 테마 설정을 보고 SLDS 버전을 정한다. <code>SLDS1</code>로 두면 SLDS 1을 고정한다</li>
+      <li>SLDS 2 전환 안내도 VF 페이지에 대해 같은 설정을 켜라고 적는다</li>
+    </ul>
+  </div>
+  <h3>밀버스에서는</h3>
+  <ul>
+    <li><b>org 실측(2026-10-08):</b> VF의 <code>&lt;apex:slds/&gt;</code>는 SLDS 1로 그려졌다. 테마 색은 따라왔지만 util.css는 효과가 없었다. SLDS 2 CSS를 넣으면 util.css가 작동했고, 팔레트(브랜드 색 단계)는 직접 넣어야 했다</li>
+    <li>프로브 VF 페이지는 API 67.0이었고 <code>&lt;apex:slds/&gt;</code>에 속성이 없었다(문서상 기본값 <code>Auto</code>). 그때 위 User Interface 설정이 켜져 있었는지는 기록이 없다 <span class="tag warn">미확인</span>. 그래서 "<code>&lt;apex:slds/&gt;</code>는 SLDS 1이다"는 "설정 상태를 모른 채 잰 결과"로 읽는다. 설정이 꺼져 있었다면 문서와 맞는다 <span class="tag warn">추정</span> (2026-10-09 갱신)</li>
+    <li><b>기본 우선:</b> VF가 LEX와 다르게 보이는 원인은 SLDS 버전이지 util.css가 아니다. 모양을 바꾸지 않는 기본 상태에서도 VF를 LEX와 맞추는 것이 먼저다</li>
+    <li><span class="tag info">계획</span> 설계는 VF 페이지에 <code>&lt;c:milvusHead/&gt;</code> 한 줄을 넣고, <code>milvusHead</code>가 <code>milvusVf</code>(SLDS 2 CSS + 팔레트), <code>milvusBridge</code>, <code>milvusBrand</code>를 <code>&lt;apex:stylesheet&gt;</code>로 차례로 넣게 한다(설계 5.5). 공식 설정만으로 SLDS 2와 브랜드 팔레트가 함께 들어오는지는 <span class="tag warn">미확인</span>이다</li>
+    <li><b>LEX의 한계:</b> util.css와 브리지는 밀버스 컴포넌트가 <code>loadStyle</code>을 부른 페이지에만 들어간다. 표준 레코드 페이지만 있는 화면에는 org 테마 색만 적용된다. 유틸리티 바의 백그라운드 로드로 모든 페이지에 거는 방법은 <span class="tag warn">미확인</span></li>
+  </ul>
+  <h3>직접 확인하기</h3>
+  <ul>
+    <li>Setup → User Interface → Visualforce Settings에서 위 설정의 체크 상태를 본다(읽기만. 바꾸는 것은 org 설정 변경이라 승인 후)</li>
+    <li>VF 페이지에서 DevTools Network 탭으로 어떤 SLDS 스타일시트가 내려오는지 본다</li>
+    <li>npm SLDS 2 CSS는 <code>:root</code>에 <code>--slds-is-v2-enabled: true</code>를 정의한다(설치본 확인). VF 콘솔에서 <code>getComputedStyle(document.documentElement).getPropertyValue('--slds-is-v2-enabled')</code>를 읽어 볼 수 있다. org가 내려주는 SLDS 2 스타일시트에도 이 값이 있는지는 <span class="tag warn">미확인</span></li>
+  </ul>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/js-third-party-library.html">LWC Developer Guide — Use Third-Party JavaScript Libraries (loadStyle)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-slds.html">Visualforce Developer Guide — apex:slds</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-stylesheet.html">Visualforce Developer Guide — apex:stylesheet</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_settings.htm&amp;type=5">Salesforce Help — User Interface Settings (Visualforce Settings)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/8184ad-transition-to-slds-2">SLDS 2 — Transition to SLDS 2 (Visualforce Pages)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (VF, loadStyle)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (2.9 모든 화면)</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="audit">
+  <h2>7. 전 컴포넌트 분석</h2>
+  <h3>개념</h3>
+  <p>hook이 있다는 것과 hook으로 바꿀 수 있다는 것은 다르다. 컴포넌트 CSS가 그 hook을 <code>var()</code>로 읽어야 바뀐다. 값을 직접 쓴 선언(하드코딩)은 어떤 hook으로도 바뀌지 않는다. 그래서 "브랜드가 모든 컴포넌트에 반영되는가"는 선언을 하나씩 세어 봐야 답할 수 있다.</p>
+  <h3>Salesforce에서는</h3>
+  <p>2026-10-08에 설치된 SLDS 2 CSS(2.264.2)와 <code>lightning-base-components</code>(1.28.19-alpha)의 선언 <b>17,398개</b>를 항목 × 값 종류로 분류했다. 아래 비율은 그 항목의 선언이 있는 컴포넌트 가운데 <b>모든 선언이 hook으로 정해지는</b> 컴포넌트의 비율이다. 항목마다 분모가 달라 같은 항목 안에서만 비교한다. "지금"은 org가 쓰는 경로(synthetic, SLDS 2 CSS), "native"는 전환 뒤 경로(기본 컴포넌트의 <code>*.slds.css</code>)다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>항목</th><th>지금</th><th>native</th><th>큰 빈틈</th></tr>
+    <tr><td>색 (중립 바탕·글자·테두리·비활성·반전)</td><td>88% (131/149)</td><td>79% (79/100)</td><td>개체 아이콘 배경 (CSS 973곳 + JS 966곳)</td></tr>
+    <tr><td>모양 (반경, 테두리 두께)</td><td>73% (72/99)</td><td>32% (25/78)</td><td>입력창 두께 1px, Path 양 끝, native 배지·토글 15rem</td></tr>
+    <tr><td>간격·밀도·크기</td><td>45% (85/188). 선언 기준은 SLDS 2 76%, LBC 88%</td><td>—</td><td>컨트롤 높이 1.875rem, 모달 너비, 표 머리글 2rem</td></tr>
+    <tr><td>글자 (크기, 굵기, 줄 간격, 자간, 대소문자)</td><td>90% (223/248)</td><td>59% (68/116)</td><td>자간과 대소문자는 hook이 0개</td></tr>
+    <tr><td>그림자·깊이</td><td>77% (27/35)</td><td>62% (29/47)</td><td>native 드롭다운·팝오버·툴팁 그림자, z-index, 투명도</td></tr>
+    <tr><td><b>움직임</b></td><td><b>0% (0/91)</b></td><td>0%</td><td>시간·곡선 hook을 읽는 컴포넌트가 없다</td></tr>
+    <tr><td>포커스 링 모양</td><td>69% (35/51)</td><td>8% (5/59)</td><td>커서, 링크 밑줄, native 3px 글로우</td></tr>
+    <tr><td>아이콘</td><td>71% (39/55)</td><td>29% (16/55)</td><td>개체 아이콘 색, 컨트롤 안 아이콘 크기 0.875rem</td></tr>
+  </table></div>
+  <h4>hook이 없는 것</h4>
+  <ul>
+    <li><b>움직임:</b> <code>--slds-g-duration-*</code> 8개는 정의만 있고 읽는 곳이 0이다. 곡선(easing) hook은 아예 없다. transition·animation 리터럴이 SLDS 2 217, LBC 161이고 <code>@keyframes</code>는 32개, 26개다. 선언 분류표에서 움직임 하드코딩은 SLDS 2 308/344, LBC 253/270이다</li>
+    <li>자간, 대소문자, 커서, z-index도 hook이 0개다</li>
+    <li>개체 아이콘 배경색은 SLDS 2 CSS 973곳과 LBC JS 966곳에 값이 박혀 있다</li>
+  </ul>
+  <h4>"Salesforce 고정" 목록 (2026-10-08 사용자 합의)</h4>
+  <div class="table-wrap"><table>
+    <tr><th>언제</th><th>고정 항목</th></tr>
+    <tr><td>두 모드 모두</td><td>아이콘 SVG 모양과 개체 아이콘 글리프의 흰색, z-index 층, 0·1이 아닌 투명도, 토스트 표시 시간(JS 상수 4800·9600ms), 스피너 모양, 색 선택기 색상환, Agentforce 영역, 이미지 위 어둡게 처리, 파괴·성공 버튼의 흰 글자, LEX 전역 헤더(org 테마가 원본)</td></tr>
+    <tr><td>native 전환 뒤</td><td>드롭다운·팝오버·툴팁 그림자, 툴팁 배경과 글자 크기, native <code>lightning-card</code> 그림자, 모달 반경, 배지·토글 15rem, 입력창 두께, 콤보박스 높이, <code>:focus</code> 위주 포커스 표시와 3px 글로우, 버튼 떠오름, 표 머리글·hover 회색, 검색 강조 <code>#ff0</code>, 모든 움직임</td></tr>
+  </table></div>
+  <h3>밀버스에서는</h3>
+  <ul>
+    <li><b>결론 1:</b> hook만으로는 "모든 컴포넌트"를 채울 수 없다</li>
+    <li><b>결론 2:</b> 지금 org(synthetic)에서는 hook과 <code>milvusBridge.css</code> <span class="tag info">계획</span>로 거의 모든 컴포넌트에 닿는다(소스 분석 결과)</li>
+    <li><b>결론 3:</b> native로 바뀌면 브리지는 사라지고 hook 비율도 떨어진다. 그래서 전환을 자동으로 감지하고, 끝까지 바꿀 수 없는 것은 위 고정 목록으로 합의한다</li>
+    <li><b>기본 우선과의 관계:</b> 이 분석은 기본 상태에서 쓰는 것이 아니라, 브랜드 요청이 왔을 때 무엇을 들어줄 수 있는지 판단하는 근거다</li>
+    <li>분석 원본과 스크립트는 <code>docs/research/2026-10-08/</code>에 있다. 쓴 hook 이름 150개가 실제 원본에 있는지 <code>hookcheck.cjs</code>로 확인했다</li>
+  </ul>
+  <h3>직접 확인하기</h3>
+<pre><code><span class="c"># learndoshare_1에서 pnpm install 뒤</span>
+cd docs/research/2026-10-08
+export AUDIT_OUT="$(mktemp -d)"      <span class="c"># 큰 JSON을 저장소 밖에 쓴다</span>
+node extract.cjs                     <span class="c"># 선언 분류표 summary.md를 다시 만든다</span>
+node motion.cjs                      <span class="c"># 움직임 hook 비율</span>
+node hk.cjs --slds-g-duration-quickly   <span class="c"># 정의 수와 읽는 곳 수</span></code></pre>
+  <p>다시 실행한 결과가 원본과 바이트 단위로 같았다는 기록이 연구 자료 안내에 있다.</p>
+  <p class="sources">출처: <a href="../docs/research/2026-10-08/summary.md">선언 분류 요약 (summary.md)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">8개 항목 감사 종합 (synthesis.md 0·1·2.6·2.7장)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/README.md">연구 자료 안내 (다시 만들기)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm — @salesforce-ux/design-system-2</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">npm — lightning-base-components</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="layers">
+  <h2>8. 밀버스의 층과 명령</h2>
+  <h3>개념</h3>
+  <p>브랜드 요구를 들어줄 때는 공식 기능부터 쓰고, 그것으로 안 되는 만큼만 한 층씩 내려간다. 층이 아래로 갈수록 할 수 있는 것은 늘고, Salesforce 업데이트에 깨질 위험도 커진다.</p>
+  <h3>Salesforce에서는</h3>
+  <p>공식 경로는 Themes and Branding(브랜드 색·로고)과, 컴포넌트 CSS에서 hook을 읽는 것이다. 커스텀 CSS는 정적 리소스로 올려 LEX에서는 <code>loadStyle</code>, VF에서는 <code>&lt;apex:stylesheet&gt;</code>로 싣는다(6절). global hook 재정의와 SLDS 클래스 덮어쓰기는 공식 권고 밖이다(3절).</p>
+  <h3>밀버스에서는</h3>
+  <div class="table-wrap"><table>
+    <tr><th>층</th><th>원본</th><th>무엇을 바꾸나</th><th>공식 여부</th><th>상태</th></tr>
+    <tr><td>1. org 테마</td><td><code>BrandingSet</code> (<code>BRAND_COLOR</code>, <code>BRAND_IMAGE</code>)</td><td>브랜드 색, 로고. LEX, Setup, VF에 반영</td><td>공식 기능</td><td>org에 있음. 배포·활성화는 실측함. 자동화(<code>init</code>, <code>deploy</code>)는 <span class="tag info">계획</span></td></tr>
+    <tr><td>2. util.css (<code>milvusBrand.css</code>)</td><td><code>:root</code> 블록 하나</td><td>모양, 피드백 색, 밀버스 변수 값. 브랜드 요청이 있을 때만</td><td>권고 밖(알고 택함)</td><td>저장소의 <code>brands/&lt;브랜드&gt;/util.css</code>로 구현됨. 정적 리소스 이름 <code>milvusBrand</code>와 <code>loadBrand</code> 연결은 <span class="tag info">계획</span></td></tr>
+    <tr><td>3. <code>milvusBridge.css</code></td><td>패키지 제공 클래스 규칙</td><td>hook이 없는 항목(움직임, 컨트롤 높이, 자간 등)만. 값은 <code>--milvus-*</code>를 읽고 기본값은 Salesforce 원래 값</td><td>권고 밖, native에서 사라짐</td><td><span class="tag info">계획</span></td></tr>
+    <tr><td>4. 밀버스 컴포넌트</td><td><code>lwc/milvus*</code></td><td>SLDS에 없는 컴포넌트, hook이 없는 모양, native 전환에도 유지할 모양</td><td>공식 방식(hook 읽기)</td><td><code>milvusBadge</code>, <code>milvusButton</code>, <code>milvusMultiSelect</code> 구현됨(파일럿)</td></tr>
+  </table></div>
+  <div class="callout project"><strong>기본 우선 (2026-10-09 결정)</strong>기본 상태는 Salesforce 기본 모양에 브랜드 색·로고(<code>BrandingSet</code>, 공식 기능)만 바꾼 것이다. <code>init</code> 직후 util.css는 비어 있고, 브랜드 요청이 있을 때만 util.css와 브리지 변수로 모양을 바꾼다. VF는 모양을 바꾸지 않아도 SLDS 2로 LEX와 맞춘다(설계는 <code>milvusVf</code>, 6절의 공식 설정이 대안이 될 수 있는지는 <span class="tag warn">미확인</span>). 요청이 오면 org 테마 → util.css의 global hook(전체 모양) → util.css의 컴포넌트 hook(특정 컴포넌트) → 밀버스 컴포넌트 순으로 제안한다.</div>
+  <div class="callout ok"><strong><code>milvusButton</code>은 폐기가 아니라 역할이 바뀌었다</strong>처음에는 "버튼만 다르게"가 목적이었지만, 지금 그것은 util.css의 컴포넌트 hook(<code>--slds-s-button-*</code>)으로도 된다. 그래서 <code>milvusButton</code>은 hook이 없는 모양과, 기본 컴포넌트가 native로 바뀌어 hook이 닿지 않을 때를 대비하는 역할을 맡는다. util.css에 <code>--milvus-button-custom: on</code>이 없으면 <code>lightning-button</code>을 그대로 그린다(README 2장, CLAUDE.md 2장).</div>
+  <div class="callout key"><strong>자주 묻는 질문: util.css에 Salesforce 디자인이 먹히나? VF는?</strong>
+    <ul>
+      <li>LEX: 먹힌다. <code>loadStyle</code>한 CSS가 문서 head에 들어가 같은 페이지의 표준 UI와 모달까지 바꿨다(5절 실측). 단 밀버스 컴포넌트가 있는 페이지에만 들어간다</li>
+      <li>VF: <code>&lt;apex:slds/&gt;</code>가 SLDS 1로 그려지면 먹히지 않는다. SLDS 2 CSS가 있으면 먹힌다(실측). 원인은 SLDS 버전이다</li>
+      <li>기본 우선에서는 util.css 자체가 필요 없다. 그래도 VF를 LEX와 같은 SLDS 2로 맞추는 일은 남는다</li>
+    </ul>
+  </div>
+  <h4>명령 <span class="tag info">계획</span> (10/16까지 구현 예정)</h4>
+  <div class="table-wrap"><table>
+    <tr><th>명령</th><th>하는 일</th></tr>
+    <tr><td><code>pnpm milvus init --target-org &lt;별칭&gt; (--brand &lt;이름&gt; | --from-org) [--no-vf]</code></td><td>사전 점검 후 프로젝트에 밀버스 파일을 만든다. <code>--brand</code>는 기본색 <code>#0176D3</code>으로 브랜드 파일을, <code>--from-org</code>는 org의 활성 테마를 받아 쓴다. util.css는 빈 <code>:root</code>로 만든다</td></tr>
+    <tr><td><code>pnpm milvus storybook</code></td><td>패키지 안의 설정으로 Storybook을 띄운다. 프로젝트의 <code>BrandingSet</code>에서 팔레트를 계산하고 util.css를 문서에 넣는다. 브랜드 명세 페이지에서 요청을 입력한다</td></tr>
+    <tr><td><code>pnpm milvus deploy [--target-org &lt;별칭&gt;] [--yes]</code></td><td>전체 검사 → 배포 계획 출력. <code>--yes</code>가 없으면 계획만 보여 주고 끝난다(사람이 터미널에서 실행하면 y/N을 묻는다). 승인되면 밀버스 관련 메타데이터만 한 번에 배포하고, 성공했을 때만 활성 테마를 바꾼다. 활성 테마 변경은 org 전체 사용자에게 적용된다</td></tr>
+  </table></div>
+  <p>설계에는 <code>check</code>와 <code>update</code>도 있다(설계 4장). 지금 이 저장소에서 실행할 수 있는 것은 <code>pnpm storybook</code>, <code>pnpm test</code>(util.css 규칙 검사 포함), <code>pnpm sync:theme</code>이다.</p>
+  <h3>직접 확인하기</h3>
+  <ul>
+    <li><code>brands/Sample_Forest/util.css</code>를 연다. <code>:root</code> 하나에 반경 hook과 <code>--milvus-button-*</code>만 있다</li>
+    <li><code>pnpm storybook</code>에서 브랜드를 Sample_Forest로 바꿔 버튼·입력창·카드의 모서리와 <code>milvusButton</code>의 모드가 바뀌는지 본다</li>
+    <li><code>pnpm test</code>가 util.css 규칙(accent 재정의 금지 등)을 검사한다</li>
+  </ul>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_brandingset.htm">Metadata API — BrandingSet</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/js-third-party-library.html">LWC Developer Guide — loadStyle</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-stylesheet.html">Visualforce Developer Guide — apex:stylesheet</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/777f5a-global-styling-hooks">SLDS 2 — Global Styling Hooks</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (테마 배포, loadStyle, VF)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (2.5 브리지)</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="glossary">
+  <h2>9. 용어집</h2>
+  <h3>개념</h3>
+  <p>같은 단어를 같은 뜻으로 써야 팀과 Claude가 같은 것을 가리킨다. Salesforce가 정한 이름은 그대로 쓰고, 밀버스가 만든 이름은 따로 모은다.</p>
+  <h3>Salesforce에서는</h3>
+  <div class="table-wrap"><table>
+    <tr><th>용어</th><th>뜻</th><th>절</th></tr>
+    <tr><td>SLDS 1 / SLDS 2</td><td>Salesforce Lightning Design System의 두 버전. SLDS 2는 Spring '25에 소개</td><td><a href="#slds">2</a></td></tr>
+    <tr><td>Salesforce Cosmos</td><td>SLDS 2의 기본 테마</td><td><a href="#slds">2</a></td></tr>
+    <tr><td>기본 컴포넌트 (<code>lightning-*</code>)</td><td>Salesforce가 제공하는 완성된 LWC. 접근성과 동작이 들어 있다</td><td><a href="#slds">2</a></td></tr>
+    <tr><td>블루프린트</td><td>동작 없는 HTML·CSS 틀. <code>slds-*</code> 클래스</td><td><a href="#slds">2</a></td></tr>
+    <tr><td>디자인 토큰</td><td>디자인 값에 붙인 이름. SLDS 1의 <code>--lwc-*</code>는 SLDS 2에서 지원하지 않는다</td><td><a href="#concept">1</a>, <a href="#hooks">3</a></td></tr>
+    <tr><td>styling hook</td><td>SLDS가 토큰을 CSS 사용자 정의 속성으로 만든 것</td><td><a href="#hooks">3</a></td></tr>
+    <tr><td>global hook (<code>--slds-g-*</code>)</td><td>시스템 전체 값. 읽기만 한다</td><td><a href="#hooks">3</a></td></tr>
+    <tr><td>컴포넌트 수준 hook (<code>--slds-c-*</code>)</td><td>컴포넌트 하나를 바꾸는 자리. SLDS 2에서는 Developer Preview / 미지원</td><td><a href="#hooks">3</a></td></tr>
+    <tr><td><code>--slds-r-*</code>, <code>--slds-s-*</code></td><td>패키지 CSS에만 있는 이름. r은 팔레트 원래 값, s는 컴포넌트별 기본값(공식 설명 없음)</td><td><a href="#hooks">3</a></td></tr>
+    <tr><td>semantic 색 hook</td><td>모양이 아니라 목적을 이름으로 쓴 색 hook. 예: <code>surface-container-1</code>, <code>on-surface-1</code>, <code>accent-1</code></td><td><a href="#hooks">3</a></td></tr>
+    <tr><td>Themes and Branding</td><td>Setup에서 테마(브랜드 색, 로고)를 만들고 활성화하는 곳</td><td><a href="#brand">4</a></td></tr>
+    <tr><td><code>LightningExperienceTheme</code> / <code>BrandingSet</code></td><td>테마와 그 브랜딩 속성을 담는 메타데이터</td><td><a href="#brand">4</a></td></tr>
+    <tr><td>shadow DOM</td><td>컴포넌트 내부 DOM을 감싸는 웹 표준</td><td><a href="#shadow">5</a></td></tr>
+    <tr><td>synthetic / native shadow</td><td>LWC가 LEX에서 쓰는 폴리필 / 브라우저 표준 구현</td><td><a href="#shadow">5</a></td></tr>
+    <tr><td>mixed shadow mode</td><td>synthetic 환경에서 일부 컴포넌트만 native로 그리는 방식(베타)</td><td><a href="#shadow">5</a></td></tr>
+    <tr><td>LEX / VF</td><td>Lightning Experience / Visualforce</td><td><a href="#vf">6</a></td></tr>
+    <tr><td><code>loadStyle</code></td><td>정적 리소스 CSS를 LWC에서 불러오는 함수(<code>lightning/platformResourceLoader</code>)</td><td><a href="#vf">6</a></td></tr>
+    <tr><td><code>&lt;apex:slds/&gt;</code></td><td>VF 페이지에 SLDS를 싣는 태그. 설정에 따라 SLDS 1 또는 2</td><td><a href="#vf">6</a></td></tr>
+  </table></div>
+  <h3>밀버스에서는</h3>
+  <div class="table-wrap"><table>
+    <tr><th>용어</th><th>뜻</th><th>절</th></tr>
+    <tr><td>기본 우선</td><td>기본은 Salesforce 모양 + 브랜드 색·로고. 모양은 요청이 있을 때만 바꾼다(2026-10-09 결정)</td><td><a href="#layers">8</a></td></tr>
+    <tr><td>util.css (<code>milvusBrand.css</code>)</td><td>브랜드 모양을 담는 <code>:root</code> 한 블록. 공식 권고 밖임을 알고 택했다. 지금 저장소에서는 <code>brands/&lt;브랜드&gt;/util.css</code>, 패키지에서는 정적 리소스 <code>milvusBrand.css</code> <span class="tag info">계획</span></td><td><a href="#hooks">3</a>, <a href="#layers">8</a></td></tr>
+    <tr><td><code>milvusBridge.css</code></td><td>hook이 없는 항목만 다루는 패키지 제공 클래스 규칙 <span class="tag info">계획</span></td><td><a href="#layers">8</a></td></tr>
+    <tr><td><code>milvusVf</code>, <code>milvusHead</code></td><td>VF용 SLDS 2 + 팔레트 리소스, 그것을 싣는 VF 컴포넌트 <span class="tag info">계획</span></td><td><a href="#vf">6</a></td></tr>
+    <tr><td><code>--milvus-*</code></td><td>밀버스 컴포넌트와 브리지가 읽는 변수. 사내 변수 접두사는 이것만 쓴다</td><td><a href="#layers">8</a></td></tr>
+    <tr><td>밀버스 컴포넌트</td><td><code>lwc/milvus*</code>. SLDS에 없는 것과 hook이 없는 모양을 맡는다</td><td><a href="#layers">8</a></td></tr>
+    <tr><td>팔레트 50단계</td><td>브랜드 색에서 계산한 단계 중 버튼 배경에 쓰이는 단계. L* 49</td><td><a href="#brand">4</a></td></tr>
+    <tr><td>Salesforce 고정</td><td>어떤 방법으로도 바꿀 수 없어 사용자와 합의한 항목 목록</td><td><a href="#audit">7</a></td></tr>
+    <tr><td>지금 / native (분석에서)</td><td>org가 지금 쓰는 경로(synthetic) / 전환 뒤 경로</td><td><a href="#audit">7</a></td></tr>
+    <tr><td>발행 / 배포</td><td>패키지를 GitHub Packages에 올림 / 메타데이터를 org에 올림</td><td><a href="#layers">8</a></td></tr>
+  </table></div>
+  <h3>직접 확인하기</h3>
+  <ul>
+    <li>SLDS 사이트의 Styling API 페이지에서 global hook과 컴포넌트 수준 hook의 차이 표를 읽는다</li>
+    <li>밀버스 용어의 원래 정의는 설계 문서 첫머리의 용어 설명과 1장 결정 표에서 확인한다</li>
+  </ul>
+  <p class="sources">출처: <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/7708aa-styling-api">SLDS 2 — Styling API</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/777f5a-global-styling-hooks">SLDS 2 — Global Styling Hooks</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC Developer Guide — Compare SLDS Versions</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-mixed-shadow.html">LWC Developer Guide — Mixed Shadow Mode (Beta)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-slds.html">Visualforce Developer Guide — apex:slds</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합</a> (확인 2026-10-09)</p>
+</section>
+
+<footer class="doc-foot">
+  <span>밀버스 디자인 시스템 · Learn 00</span>
+  <span>2026-10-09 기준. 공식 문서, 설치된 패키지(<code>@salesforce-ux/design-system-2</code> 2.264.2, <code>lightning-base-components</code> 1.28.19-alpha), <code>docs/research/2026-10-08/</code>로 확인함</span>
+</footer>
+</main>
+</div>
+</body>
+</html>

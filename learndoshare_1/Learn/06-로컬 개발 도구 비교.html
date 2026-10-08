@@ -9,6 +9,7 @@
 <body>
 <nav class="topnav"><div class="topnav-inner">
   <a href="../README.md">README</a>
+  <a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html">00 개념</a>
   <a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html">01 SLDS</a>
   <a href="02-LWC%20%EA%B8%B0%EC%B4%88.html">02 LWC</a>
   <a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html">03 Storybook</a>
@@ -34,7 +35,6 @@
     <li><a href="#split">역할 분담 권장</a></li>
     <li><a href="#lab">보조 실습 B</a></li>
     <li><a href="#quiz">스스로 점검</a></li>
-    <li><a href="#refs">참고</a></li>
   </ol>
 </aside>
 
@@ -43,96 +43,106 @@
   <div class="eyebrow">LEARN 06 · Phase 7 준비</div>
   <h1>로컬 개발 도구 비교</h1>
   <p class="lead">LWC를 배포하지 않고 확인하는 방법은 여러 가지다. 각 도구가 무엇을 잘하고 무엇을 못하는지 정리하고, 밀버스에서 어떤 도구를 어디에 쓸지 정한다.</p>
-  <div class="meta"><span>예상 1시간</span><span>선행: 03 Storybook, 04 통합</span><span>2026-09-26 공식 문서 · GitHub · npm으로 확인</span></div>
+  <div class="meta"><span>예상 1시간</span><span>선행: 03 Storybook, 04 통합</span><span>2026-09-26 확인 · 2026-10-09 공식 문서로 다시 확인</span></div>
 </header>
 
 <section id="why">
   <h2>왜 알아야 하나</h2>
   <p>밀버스의 주 경로는 <b>Storybook</b>이다 (<a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html">04 통합</a>). 그런데 발표나 리뷰에서 "Salesforce 공식 도구(Live Preview)가 있는데 왜 Storybook을 따로 쓰나?"라는 질문이 반드시 나온다.</p>
   <p>답은 "둘 중 하나"가 아니라 <b>"잘하는 일이 다르다"</b>이다. 이 문서는 그 답의 근거를 모으고, Phase 7 보조 실습에서 직접 비교할 계획을 세운다.</p>
-  <div class="callout warn"><strong>이름부터 헷갈린다</strong>"Local Dev"는 Spring '26에 <b>Live Preview</b>로 이름이 바뀌었다. 또 이와 별개로, 예전 "LWC Local Development Server"는 이미 은퇴했다. 블로그 글이 어느 쪽을 말하는지 먼저 확인한다.</div>
+  <div class="callout warn"><strong>이름부터 헷갈린다 (2026-10-09 갱신)</strong>"Local Dev"는 <b>2026년 4월 13일 주부터 Live Preview</b>로 이름이 바뀌었다(Summer '26 릴리스 노트). LWC 개발자 가이드는 Spring '26에 이름을 바꿨다고 적는다. CLI 명령(<code>sf lightning dev …</code>)은 그대로다. 또 이와 별개로, 예전 "Local Development Server"는 2025년 9월 5일에 은퇴했다. 블로그 글이 어느 쪽을 말하는지 먼저 확인한다.</div>
+  <p class="sources">출처: <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_lwc_live_preview.htm&amp;release=262&amp;type=5">Summer '26 Release Notes: Local Dev is Now Live Preview</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/get-started-test-components.html">LWC Developer Guide: Run a Live Component Preview</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_lwc_local_development_server.htm&amp;release=256&amp;type=5">Summer '25 Release Notes: The Local Development Server Is Being Retired</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="options">
   <h2>후보 네 가지</h2>
   <div class="cards">
     <div class="card"><h4>Live Preview</h4><p>Salesforce 공식. org에 연결해 실제 데이터로 미리 본다. <code>sf lightning dev</code></p></div>
-    <div class="card"><h4>LWC Garden</h4><p>개인이 만든 오픈소스. LWC용 Storybook 비슷한 도구</p></div>
+    <div class="card"><h4>LWC Garden</h4><p>개인이 만든 오픈소스. LWC를 org 없이 로컬에서 만들고 보는 도구</p></div>
     <div class="card"><h4>Storybook</h4><p>밀버스 주 경로. org 없이 카탈로그·변형·브랜드를 보여 준다</p></div>
-    <div class="card"><h4>org 내 문서 앱</h4><p>org 안에 컴포넌트 문서 페이지를 직접 만든다</p></div>
+    <div class="card"><h4>org 내 문서 앱</h4><p>org 안에 Lightning App Builder로 컴포넌트 문서 페이지를 직접 만든다</p></div>
   </div>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/get-started-test-components.html">LWC Developer Guide: Run a Live Component Preview</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@lwc-garden/core">npm: @lwc-garden/core</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/get-started/frameworks/web-components-vite">Storybook: Web components with Vite</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=platform.lightning_app_builder_overview.htm&amp;type=5">Help: Get Help for Lightning App Builder</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="live">
   <h2>Live Preview (구 Local Dev)</h2>
-  <p>Salesforce CLI에 기본 포함된 플러그인 <code>@salesforce/plugin-lightning-dev</code>(2026-09-26 기준 6.2.19)로 동작한다. VS Code 확장도 있다.</p>
+  <p>Salesforce CLI에 함께 들어 있는 플러그인 <code>@salesforce/plugin-lightning-dev</code>(2026-10-09 기준 최신 6.2.19)로 동작한다. CLI가 이 플러그인을 자동으로 설치한다. VS Code 확장(Live Preview VS Code Extension)도 있다.</p>
   <div class="table-wrap"><table>
     <tr><th>명령</th><th>보는 대상</th><th>메모</th></tr>
-    <tr><td><code>sf lightning dev app</code></td><td>Lightning 앱</td><td>데스크톱 또는 <code>-t</code>로 iOS/Android 시뮬레이터</td></tr>
+    <tr><td><code>sf lightning dev app</code></td><td>Lightning 앱</td><td>데스크톱 또는 <code>-t</code>(<code>--device-type</code>)로 iOS 시뮬레이터·Android 에뮬레이터</td></tr>
     <tr><td><code>sf lightning dev site</code></td><td>Experience Cloud LWR 사이트</td><td>사이트를 먼저 게시해야 한다. <code>--ssr</code>는 Spring '26부터 지원 안 함</td></tr>
-    <tr><td><code>sf lightning dev component</code></td><td>컴포넌트 하나를 단독으로</td><td><code>-n</code> 이름, <code>-c</code> 목록에서 선택, <code>-o</code> 대상 org (Winter '26부터 필수)</td></tr>
+    <tr><td><code>sf lightning dev component</code></td><td>컴포넌트 하나를 단독으로</td><td><code>-n</code> 이름, <code>-o</code> 대상 org (Winter '26부터 필수). 이름 없이 실행하면 프로젝트의 컴포넌트 목록에서 고른다. <code>-c</code>(<code>--client-select</code>)는 컴포넌트를 고르지 않고 미리 보기를 연다 (2026-10-09 갱신)</td></tr>
   </table></div>
 <pre><code><span class="c"># 컴포넌트 하나를 org에 연결해 미리 보기</span>
 sf lightning dev component -n milvusBadge -o learndoshare_1
 
-<span class="c"># 목록에서 골라 실행</span>
-sf lightning dev component -c -o learndoshare_1</code></pre>
+<span class="c"># 이름 없이 실행하면 목록에서 골라 실행</span>
+sf lightning dev component -o learndoshare_1</code></pre>
   <h3>준비 조건</h3>
   <ul>
-    <li>처음 실행하면 CLI가 org에서 기능을 켤지 묻는다</li>
-    <li>권한: <b>View Setup</b>, <b>Customize Application</b></li>
+    <li>처음 실행하면 CLI가 org에서 기능을 켤지 묻는다. org 설정이 바뀐다(Metadata API의 <code>enableLightningPreviewPref</code>가 "Local Dev 사용 여부" 필드다)</li>
+    <li>기능을 켜는 사람의 권한: <b>View Setup</b>, <b>Customize Application</b></li>
     <li>프로젝트에 <code>lwc</code> 디렉터리가 있어야 한다</li>
+    <li>운영 org에서도 쓸 수 있지만, 공식 문서는 sandbox와 scratch org에서만 쓰기를 권한다</li>
   </ul>
   <h3>되는 것과 안 되는 것</h3>
   <div class="table-wrap"><table>
     <tr><th>항목</th><th>동작</th></tr>
-    <tr><td>HTML/CSS/JS 수정 (공개 API 변화 없음)</td><td><span class="tag ok">HMR</span> 저장하면 바로 반영</td></tr>
-    <tr><td><code>@wire</code> 변경, 새 <code>@api</code>, 새 scoped import, <code>.js-meta.xml</code> 수정</td><td><span class="tag warn">수동</span> 새로 고침 또는 배포 필요</td></tr>
-    <tr><td>단독 컴포넌트에서 LDS wire adapter, <code>@salesforce</code> scoped 모듈, Apex 컨트롤러</td><td><span class="tag ok">가능</span> Winter '26부터. Apex는 org에서 실행된다</td></tr>
+    <tr><td>HTML/CSS 수정, 공개 API를 바꾸지 않는 JS 수정, 새 컴포넌트 참조</td><td><span class="tag ok">HMR</span> 저장하면 바로 반영</td></tr>
+    <tr><td>새 <code>@api</code>, <code>@wire</code> 관련 변경, 새 <code>@salesforce</code> scoped import, <code>.js-meta.xml</code> 수정</td><td><span class="tag warn">수동</span> 단독 컴포넌트는 브라우저 새로 고침, 앱·사이트는 배포 후 Live Preview 서버 재시작</td></tr>
+    <tr><td>단독 컴포넌트에서 LDS wire adapter, <code>@salesforce</code> scoped 모듈, Apex 컨트롤러</td><td><span class="tag ok">가능</span> Winter '26에 베타로 추가. Apex는 org에서 실행된다</td></tr>
     <tr><td>Aura 컴포넌트, Landing Page</td><td><span class="tag bad">지원 안 함</span></td></tr>
   </table></div>
-  <div class="callout warn"><strong>베타 여부는 불확실</strong><span class="tag warn">미확인</span> Summer '25 릴리스 노트와 Winter '26 개발자 블로그는 "Beta"라고 불렀지만, 현재 가이드 페이지에는 Beta 표시가 없다. GA가 됐다는 공식 발표는 찾지 못했으므로 "베타일 수 있다"고 말한다.</div>
+  <div class="callout key"><strong>베타 여부 (2026-10-09 갱신)</strong>이전에는 "베타일 수 있다"고 적었다. 공식 릴리스 노트로 다시 확인했다. Lightning 앱 미리 보기는 Spring '25에 GA가 됐다. 단일 컴포넌트 미리 보기(Single Component Live Preview)는 2026년 4월 13일 주부터 GA다. Experience 사이트 미리 보기는 Spring '25 기준 베타였고, 지금 상태는 찾지 못했다 <span class="tag warn">미확인</span>. VS Code 확장으로 React 컴포넌트를 미리 보는 것은 베타다.</div>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/get-started-test-components.html">LWC Developer Guide: Run a Live Component Preview</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/salesforce-cli-reference/guide/cli_reference_lightning_dev_component.html">CLI Reference: lightning dev component</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce/plugin-lightning-dev">npm: @salesforce/plugin-lightning-dev</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_lightningexperiencesettings.htm">Metadata API: LightningExperienceSettings</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/blogs/2025/09/winter26-developers">Salesforce Developers Blog: Winter '26 for Developers</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_lwc_local_dev.htm&amp;release=254&amp;type=5">Spring '25 Release Notes: Local Dev for Lightning Apps (GA)</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_lwc_single_component.htm&amp;release=262&amp;type=5">Summer '26 Release Notes: Single Component Live Preview (GA)</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_lwc_live_preview.htm&amp;release=262&amp;type=5">Summer '26 Release Notes: Local Dev is Now Live Preview</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="legacy">
   <h2>은퇴한 Local Development Server</h2>
-  <div class="callout bad"><strong>쓰지 않는다</strong>예전 도구 <code>@salesforce/lwc-dev-server</code>(LWC Local Development Server)는 <b>2025년 9월 5일에 은퇴</b>했다 (Summer '25 릴리스 노트). 저장소는 2023년에 보관(archived) 처리됐고, VS Code 확장 65.18.0(2026년 2월)에서 관련 명령이 제거됐다.</div>
+  <div class="callout bad"><strong>쓰지 않는다</strong>예전 도구 LWC Local Development Server(Salesforce CLI 플러그인 <code>@salesforce/lwc-dev-server</code>, 마지막 버전 2.11.0)는 <b>2025년 9월 5일에 은퇴</b>했다 (Summer '25 릴리스 노트). 관련 GitHub 저장소(<a href="https://github.com/forcedotcom/lwc-dev-server">lwc-dev-server</a>, <a href="https://github.com/forcedotcom/lwc-dev-server-feedback">lwc-dev-server-feedback</a>)는 2024년에 보관(archived) 처리됐다. VS Code 확장 65.18.0(2026-02-18)에서 관련 명령 4개가 제거됐다(<a href="https://github.com/forcedotcom/salesforcedx-vscode/blob/develop/CHANGELOG.md">CHANGELOG</a>). 2026-10-09 갱신: 보관 연도를 2023년에서 2024년으로 고쳤다.</div>
   <p>블로그에 "LWC Local Development Server"나 <code>lwc-dev-server</code>가 나오면 이 도구를 말하는 것이다. 따라 하지 않는다.</p>
+  <p class="c">GitHub 저장소와 CHANGELOG는 Salesforce 조직(<code>forcedotcom</code>)의 자료지만 Learn 출처 허용 도메인 밖이라 본문에만 링크한다.</p>
+  <p class="sources">출처: <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_lwc_local_development_server.htm&amp;release=256&amp;type=5">Summer '25 Release Notes: The Local Development Server Is Being Retired</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce/lwc-dev-server">npm: @salesforce/lwc-dev-server</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="garden">
   <h2>LWC Garden</h2>
-  <p>Luke Secomb이 만든 오픈소스 도구다. LWC 컴포넌트를 org 없이 모아 보는, Storybook과 비슷한 목적을 가진다.</p>
+  <p>Luke Secomb이 만든 오픈소스 도구다(<a href="https://github.com/lukethacoder/lwc-garden">GitHub 저장소</a>, <a href="https://lwc.garden">lwc.garden 문서</a>). LWC 컴포넌트를 org 없이 모아 보는, Storybook과 비슷한 목적을 가진다.</p>
   <div class="table-wrap"><table>
-    <tr><th>항목</th><th>2026-09-26 확인 내용</th></tr>
-    <tr><td>저장소 규모</td><td>star 33, fork 5, 열린 이슈 3</td></tr>
-    <tr><td>활동</td><td>2024-03-25 생성. 마지막 커밋 2026-01-11, 그 전 커밋은 2025-03-01. GitHub 릴리스 없음</td></tr>
-    <tr><td>npm</td><td><code>@lwc-garden/core</code> 1.2.2 (2025-03-01)</td></tr>
-    <tr><td>라이선스</td><td>저장소 라이선스는 <b>GPL-3.0</b>. README 배지는 MIT라고 표시 → 서로 다르다</td></tr>
+    <tr><th>항목</th><th>2026-10-09 확인 내용</th></tr>
+    <tr><td>저장소 규모</td><td>star 33, fork 5, 열린 이슈 3 (GitHub)</td></tr>
+    <tr><td>활동</td><td>npm 첫 배포 2024-03-25. 마지막 커밋 2026-01-11, 그 전 커밋은 2025-03-01 (GitHub). GitHub 릴리스 표시 없음</td></tr>
+    <tr><td>npm</td><td><code>@lwc-garden/core</code> 1.2.2 (2025-03-01). npm에는 라이선스가 "none"으로 표시된다</td></tr>
+    <tr><td>라이선스</td><td>저장소 라이선스와 README 본문은 <b>GPL-3.0</b>. README 배지는 MIT라고 표시 → 서로 다르다</td></tr>
     <tr><td>내세우는 기능</td><td>HMR, Apex·OmniScript·외부 모듈 mock, slot 자리표시, SLDS 기본 포함, argTypes 편집기, 사용자 테마</td></tr>
-    <tr><td>기술 기반</td><td>LWR + Webpack + synthetic shadow</td></tr>
-    <tr><td>SFDX 연결</td><td>lwr 설정에 <code>{ dir: "./force-app/main/default/lwc", namespace: "c" }</code></td></tr>
-    <tr><td><code>lightning-*</code> base 컴포넌트</td><td><span class="tag warn">미확인</span> 지원 여부가 문서에서 분명하지 않다</td></tr>
+    <tr><td>기술 기반</td><td>문서의 설정 예시는 LWR(<code>lwr.config.json</code>)이고 synthetic shadow를 켠다. README는 Webpack을 쓴다고 적는다</td></tr>
+    <tr><td>SFDX 연결</td><td>lwr 설정 예시에 <code>{ dir: "./force-app/main/default/lwc", namespace: "c" }</code></td></tr>
+    <tr><td><code>lightning-*</code> base 컴포넌트</td><td><span class="tag warn">미확인</span> 문서에 지원 여부가 없다. <code>lightning/*</code> import를 해석한다는 소개만 있다</td></tr>
   </table></div>
-  <div class="callout warn"><strong>회사에서 쓰기 전에 볼 것</strong>GPL-3.0은 배포 조건이 까다로운 라이선스다. README 배지(MIT)와 실제 라이선스(GPL-3.0)가 달라 어느 쪽이 맞는지 확인이 필요하다. 유지보수자가 한 명이고 커밋 간격이 길다는 점도 위험이다. 그래서 주 경로로 쓰지 않고 비교 대상으로만 둔다.</div>
+  <div class="callout warn"><strong>회사에서 쓰기 전에 볼 것</strong>GPL-3.0은 배포 조건이 까다로운 라이선스다. README 배지(MIT), npm 표시(none), 저장소 라이선스(GPL-3.0)가 서로 달라 어느 쪽이 맞는지 확인이 필요하다. 유지보수자가 한 명이고 커밋 간격이 길다는 점도 위험이다. 그래서 주 경로로 쓰지 않고 비교 대상으로만 둔다.</div>
+  <p class="c">저장소 수치, 라이선스, 기능은 프로젝트 자체 자료(GitHub, lwc.garden)를 직접 열어 확인했다. 두 도메인은 Learn 출처 허용 목록 밖이라 아래 출처에는 npm 페이지만 단다.</p>
+  <p class="sources">출처: <a href="https://www.npmjs.com/package/@lwc-garden/core">npm: @lwc-garden/core</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="storybook">
   <h2>Storybook</h2>
-  <p>밀버스 주 경로다. digitalflask 방식으로 LWC를 Storybook에서 렌더한다. 구성은 <a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html">04 통합</a>에 있다.</p>
+  <p>밀버스 주 경로다. LWC를 Rollup으로 컴파일하고 Storybook(<code>@storybook/web-components-vite</code>)에서 렌더한다. 구성은 <a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html">04 통합</a>에 있다. (2026-10-09 갱신: 블로그 이름으로 부르던 "digitalflask 방식" 표현을 뺐다)</p>
   <div class="cards">
-    <div class="card"><h4>잘하는 것</h4><p>org 없음, 컴포넌트 카탈로그, 한 화면에 여러 상태 나열, 브랜드 전환 툴바, 정적 빌드로 비개발자에게 공유, 접근성 검사</p></div>
-    <div class="card"><h4>못하는 것</h4><p>실제 데이터 없음(mock 필요), 진짜 HMR 아님(<code>rollup -w</code>로 다시 빌드 후 새로 고침)</p></div>
+    <div class="card"><h4>잘하는 것</h4><p>org 없음, 컴포넌트 카탈로그, 한 화면에 여러 상태 나열, Controls로 props 조작, 브랜드 전환 툴바, 정적 빌드로 비개발자에게 공유, 접근성 검사(a11y 애드온, axe-core)</p></div>
+    <div class="card"><h4>못하는 것</h4><p>실제 데이터 없음(mock 필요), LWC 변경은 <code>rollup -w</code>(<code>pnpm dev:lwc</code>)로 다시 빌드한다. 컴포넌트 단위 HMR이 아니다</p></div>
   </div>
+  <p class="sources">출처: <a href="https://storybook.js.org/docs/get-started/frameworks/web-components-vite">Storybook: Web components with Vite</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/essentials/controls">Storybook: Controls</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/sharing/publish-storybook">Storybook: Publish Storybook</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/writing-tests/accessibility-testing">Storybook: Accessibility tests</a> (확인 2026-10-09) · <a href="https://rollupjs.org/command-line-interface/#w-watch">Rollup: Command Line Interface (-w, --watch)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="inorg">
   <h2>org 내 문서 앱</h2>
-  <p>org 안에 Lightning 앱 페이지를 만들어 컴포넌트를 나열하는 방법이다.</p>
+  <p>org 안에 Lightning App Builder로 앱 페이지를 만들어 컴포넌트를 나열하는 방법이다. 컴포넌트를 App Builder에 올리려면 <code>.js-meta.xml</code>에 대상(<code>lightning__AppPage</code> 등)을 정하고 org에 배포해야 한다.</p>
   <ul>
     <li><b>장점</b>: 통합 위험이 0이다. 실제 환경 그대로 보인다</li>
     <li><b>단점</b>: 확인할 때마다 배포해야 한다. props 조작, 코드 보기 같은 문서 기능을 직접 만들어야 한다</li>
   </ul>
+  <p class="sources">출처: <a href="https://help.salesforce.com/s/articleView?id=platform.lightning_app_builder_overview.htm&amp;type=5">Help: Get Help for Lightning App Builder</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/use-config-for-app-builder.html">LWC Developer Guide: Configure a Component for Lightning App Builder</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="compare">
@@ -149,9 +159,10 @@ sf lightning dev component -c -o learndoshare_1</code></pre>
     <tr><td>브랜드 전환</td><td><span class="tag warn">org 테마 교체</span></td><td><span class="tag ok">툴바</span> (05 참고)</td><td><span class="tag info">사용자 테마</span></td><td><span class="tag warn">org 테마 교체</span></td></tr>
     <tr><td>공유 / 정적 배포</td><td><span class="tag bad">org 계정 필요</span></td><td><span class="tag ok">정적 빌드</span></td><td><span class="tag warn">미확인</span></td><td><span class="tag bad">org 계정 필요</span></td></tr>
     <tr><td>시각 회귀</td><td><span class="tag bad">도구 없음</span></td><td><span class="tag info">생태계 도구 연결 가능</span></td><td><span class="tag warn">미확인</span></td><td><span class="tag bad">도구 없음</span></td></tr>
-    <tr><td>안정성 / 라이선스</td><td><span class="tag ok">공식</span> 베타 여부 불확실</td><td><span class="tag ok">대규모 오픈소스</span> LWC 연동은 우리가 유지</td><td><span class="tag bad">1인 유지, GPL-3.0</span></td><td><span class="tag ok">공식 기능만 사용</span></td></tr>
+    <tr><td>안정성 / 라이선스</td><td><span class="tag ok">공식</span> 앱·단일 컴포넌트 미리 보기 GA</td><td><span class="tag ok">대규모 오픈소스</span> LWC 연동은 우리가 유지</td><td><span class="tag bad">1인 유지, GPL-3.0</span></td><td><span class="tag ok">공식 기능만 사용</span></td></tr>
   </table></div>
-  <p class="c">Storybook의 시각 회귀는 Storybook 생태계의 별도 도구(테스트 러너, 외부 서비스 등)를 붙여야 한다는 뜻이다. 어떤 도구를 쓸지는 정하지 않았다.</p>
+  <p class="c">Storybook의 시각 회귀는 Storybook 생태계의 별도 도구를 붙여야 한다는 뜻이다. 공식 문서는 Chromatic 기반의 Visual Tests 애드온을 안내한다. 어떤 도구를 쓸지는 정하지 않았다.</p>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/get-started-test-components.html">LWC Developer Guide: Run a Live Component Preview</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_lwc_single_component.htm&amp;release=262&amp;type=5">Summer '26 Release Notes: Single Component Live Preview (GA)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/essentials/controls">Storybook: Controls</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/sharing/publish-storybook">Storybook: Publish Storybook</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/writing-tests/visual-testing">Storybook: Visual tests</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@lwc-garden/core">npm: @lwc-garden/core</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="split">
@@ -166,7 +177,8 @@ sf lightning dev component -c -o learndoshare_1</code></pre>
     <div class="arrow">→</div>
     <div class="step"><b>Live Preview</b>실제 데이터로 연결을 확인한다</div>
   </div>
-  <div class="callout project"><strong>분리가 왜 조건인가</strong>표현 컴포넌트 안에 <code>@wire</code>가 섞여 있으면 Storybook에서 그릴 때마다 mock이 필요해지고, 상태 나열이라는 Storybook의 강점이 사라진다. 반대로 분리돼 있으면 표현은 Storybook, 연결은 Live Preview로 깔끔하게 나뉜다.</div>
+  <div class="callout project"><strong>분리가 왜 조건인가</strong>표현 컴포넌트 안에 <code>@wire</code>가 섞여 있으면 Storybook에서 그릴 때마다 mock이 필요해지고, 상태 나열이라는 Storybook의 강점이 사라진다. 반대로 분리돼 있으면 표현은 Storybook, 연결은 Live Preview로 깔끔하게 나뉜다. 이 분리는 밀버스의 결정이다(CLAUDE.md 2장).</div>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/get-started-test-components.html">LWC Developer Guide: Run a Live Component Preview</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/get-started/frameworks/web-components-vite">Storybook: Web components with Vite</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/sharing/publish-storybook">Storybook: Publish Storybook</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="lab">
@@ -185,37 +197,28 @@ sf lightning dev component -c -o learndoshare_1</code></pre>
     <tr><td>Live Preview · B-2</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
     <tr><td>Storybook · B-2</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
   </table></div>
-  <div class="callout warn"><strong>실행 전 확인</strong>Live Preview는 처음 실행할 때 org의 기능을 켜도록 묻는다. 우리 org 설정이 바뀌는 것이므로 팀에 알리고 진행한다. 실행 사용자에게 View Setup, Customize Application 권한이 있어야 한다.</div>
+  <div class="callout warn"><strong>실행 전 확인</strong>Live Preview는 처음 실행할 때 org의 기능을 켜도록 묻는다. 우리 org 설정이 바뀌는 것이므로 팀에 알리고 진행한다. 기능을 켜는 사용자에게 View Setup, Customize Application 권한이 있어야 한다.</div>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/get-started-test-components.html">LWC Developer Guide: Run a Live Component Preview</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/salesforce-cli-reference/guide/cli_reference_lightning_dev_component.html">CLI Reference: lightning dev component</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_lightningexperiencesettings.htm">Metadata API: LightningExperienceSettings</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="quiz" class="quiz">
   <h2>스스로 점검</h2>
   <details><summary>Q1. 블로그에 "LWC Local Development Server로 로컬에서 띄우라"고 나온다. 따라 해도 되나?</summary>
-    <p>안 된다. <code>@salesforce/lwc-dev-server</code>는 2025년 9월 5일에 은퇴했다. 지금은 Live Preview(<code>sf lightning dev</code>)를 쓴다.</p></details>
+    <p>안 된다. Local Development Server(<code>@salesforce/lwc-dev-server</code>)는 2025년 9월 5일에 은퇴했다. 지금은 Live Preview(<code>sf lightning dev</code>)를 쓴다.</p></details>
   <details><summary>Q2. Live Preview에서 컴포넌트에 새 <code>@api</code> 속성을 추가했는데 반영되지 않는다. 왜인가?</summary>
-    <p>공개 API가 바뀌는 수정은 HMR 대상이 아니다. 새 <code>@api</code>, <code>@wire</code> 변경, 새 scoped import, <code>.js-meta.xml</code> 수정은 수동 새로 고침이나 배포가 필요하다.</p></details>
+    <p>공개 API가 바뀌는 수정은 자동 반영 대상이 아니다. 새 <code>@api</code>, <code>@wire</code> 관련 변경, 새 scoped import, <code>.js-meta.xml</code> 수정은 단독 컴포넌트라면 브라우저를 새로 고치고, 앱·사이트라면 배포한 뒤 Live Preview 서버를 다시 시작한다.</p></details>
   <details><summary>Q3. "공식 도구가 있는데 왜 Storybook을 쓰나?"에 어떻게 답하나?</summary>
     <p>"잘하는 일이 다릅니다. Live Preview는 org에 붙여 실제 데이터로 확인할 때, Storybook은 org 없이 모든 상태·브랜드를 나열하고 정적 빌드로 비개발자와 공유할 때 씁니다."</p></details>
   <details><summary>Q4. LWC Garden을 주 경로로 쓰지 않는 이유 두 가지는?</summary>
-    <p>① 라이선스가 GPL-3.0이고 README 배지(MIT)와 달라 회사 사용 전 확인이 필요하다. ② 유지보수자가 한 명이고 커밋 간격이 길며 릴리스가 없다. 그 밖에 <code>lightning-*</code> 지원 여부도 확인되지 않았다.</p></details>
+    <p>① 저장소 라이선스가 GPL-3.0이고 README 배지(MIT)·npm 표시(none)와 달라 회사 사용 전 확인이 필요하다. ② 유지보수자가 한 명이고 커밋 간격이 길며 릴리스가 없다. 그 밖에 <code>lightning-*</code> 지원 여부도 확인되지 않았다.</p></details>
   <details><summary>Q5. 역할 분담이 성립하려면 컴포넌트를 어떻게 설계해야 하나?</summary>
     <p>표현 컴포넌트와 컨테이너 컴포넌트를 분리한다. 표현은 props만 받아 Storybook에서 나열하고, 데이터 조회(<code>@wire</code>, Apex)는 컨테이너가 맡아 Live Preview에서 확인한다.</p></details>
-</section>
-
-<section id="refs">
-  <h2>참고</h2>
-  <ul class="refs">
-    <li><a href="https://developer.salesforce.com/docs/platform/lwc/guide/get-started-test-components.html">LWC Guide — Live Preview (Preview Components)</a></li>
-    <li><a href="https://developer.salesforce.com/blogs/2025/09/winter26-developers">Salesforce Developers Blog — Winter '26 for Developers</a></li>
-    <li><a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_lwc_local_development_server.htm&amp;release=256&amp;type=5">Summer '25 Release Notes — LWC Local Development Server 은퇴</a></li>
-    <li><a href="https://github.com/lukethacoder/lwc-garden">LWC Garden (GitHub)</a> · <a href="https://lwc.garden">lwc.garden 문서</a></li>
-    <li>npm 레지스트리: <code>@salesforce/plugin-lightning-dev</code> 6.2.19, <code>@lwc-garden/core</code> 1.2.2 (<code>pnpm view</code>로 확인)</li>
-  </ul>
+  <p class="sources">출처: <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_lwc_local_development_server.htm&amp;release=256&amp;type=5">Summer '25 Release Notes: The Local Development Server Is Being Retired</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/get-started-test-components.html">LWC Developer Guide: Run a Live Component Preview</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/sharing/publish-storybook">Storybook: Publish Storybook</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@lwc-garden/core">npm: @lwc-garden/core</a> (확인 2026-10-09)</p>
 </section>
 
 <footer class="doc-foot">
   <span>밀버스 디자인 시스템 · Learn 06</span>
-  <span>2026-09-26 기준. 공식 문서, GitHub, <code>pnpm view</code>로 확인함</span>
+  <span>2026-09-26 기준, 2026-10-09 갱신. 공식 문서, 릴리스 노트, npm, GitHub로 확인함</span>
 </footer>
 </main>
 </div>
