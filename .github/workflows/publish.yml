@@ -1,0 +1,43 @@
+name: Publish
+
+# 태그 v*를 push하면 learndoshare_1을 GitHub Packages에 발행한다.
+# 버전은 태그가 아니라 learndoshare_1/package.json의 version을 따른다.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+  packages: write
+
+defaults:
+  run:
+    working-directory: learndoshare_1
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # pnpm 버전은 learndoshare_1/package.json의 packageManager를 따른다
+      - uses: pnpm/action-setup@v6
+        with:
+          package_json_file: learndoshare_1/package.json
+
+      # registry-url과 scope를 주면 setup-node가 NODE_AUTH_TOKEN을 읽는 .npmrc를 만든다
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+          scope: "@a40418a"
+          cache: pnpm
+          cache-dependency-path: learndoshare_1/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+
+      # 태그 checkout은 detached HEAD라 git 검사를 끈다. prepack이 dist/를 빌드한다
+      - run: pnpm publish --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
