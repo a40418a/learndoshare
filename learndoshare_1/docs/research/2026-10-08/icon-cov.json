@@ -1,0 +1,945 @@
+{
+ "slds2:badge": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:button": {
+  "n": 71,
+  "hook": 61,
+  "kw": 6,
+  "lit": 2,
+  "other": 2,
+  "lits": [
+   "width:0.875rem @.slds-button__icon,\n.slds-button__icon_stateful,\n.slds-button__icon--stateful",
+   "height:0.875rem @.slds-button__icon,\n.slds-button__icon_stateful,\n.slds-button__icon--stateful"
+  ]
+ },
+ "slds2:hint-parent": {
+  "n": 7,
+  "hook": 6,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:has-error": {
+  "n": 6,
+  "hook": 5,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:icon": {
+  "n": 14,
+  "hook": 13,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:icon-text-default": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:input": {
+  "n": 2,
+  "hook": 2,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:icon-ellie": {
+  "n": 8,
+  "hook": 3,
+  "kw": 2,
+  "lit": 3,
+  "other": 0,
+  "lits": [
+   "width:calc(14rem / 16) @.slds-icon-ellie",
+   "height:calc(14rem / 16) @.slds-icon-ellie",
+   "width:17.5rem @.slds-icon-ellie svg"
+  ]
+ },
+ "slds2:icon-eq": {
+  "n": 8,
+  "hook": 1,
+  "kw": 0,
+  "lit": 7,
+  "other": 0,
+  "lits": [
+   "width:calc(14rem / 16) @.slds-icon-eq",
+   "height:calc(14rem / 16) @.slds-icon-eq",
+   "height:0.1875rem @.slds-icon-eq.slds-is-animated .slds-icon-eq__bar",
+   "width:calc(4rem / 16) @.slds-icon-eq__bar",
+   "height:0.5625rem @.slds-icon-eq__bar",
+   "height:0.875rem @.slds-icon-eq__bar:nth-of-type(2)",
+   "height:0.75rem @.slds-icon-eq__bar:nth-of-type(3)"
+  ]
+ },
+ "slds2:icon-score": {
+  "n": 6,
+  "hook": 3,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.3125rem @.slds-icon-score",
+   "height:0.3125rem @.slds-icon-score"
+  ]
+ },
+ "slds2:icon-strength": {
+  "n": 8,
+  "hook": 5,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:1.6875rem @.slds-icon-strength",
+   "height:0.4375rem @.slds-icon-strength"
+  ]
+ },
+ "slds2:icon-trend": {
+  "n": 7,
+  "hook": 3,
+  "kw": 2,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:1rem @.slds-icon-trend",
+   "height:1rem @.slds-icon-trend"
+  ]
+ },
+ "slds2:icon-waffle": {
+  "n": 19,
+  "hook": 8,
+  "kw": 3,
+  "lit": 8,
+  "other": 0,
+  "lits": [
+   "width:1.3125rem @.slds-icon-waffle",
+   "height:1.3125rem @.slds-icon-waffle",
+   "width:0.3125rem @.slds-icon-waffle .slds-r1,\n.slds-icon-waffle .slds-r2,\n.slds-icon-waffle .slds-",
+   "height:0.3125rem @.slds-icon-waffle .slds-r1,\n.slds-icon-waffle .slds-r2,\n.slds-icon-waffle .slds-",
+   "width:1.3125rem @.slds-icon-waffle",
+   "height:1.3125rem @.slds-icon-waffle",
+   "width:0.3125rem @.slds-icon-waffle .slds-r1,\n.slds-icon-waffle .slds-r2,\n.slds-icon-waffle .slds-",
+   "height:0.3125rem @.slds-icon-waffle .slds-r1,\n.slds-icon-waffle .slds-r2,\n.slds-icon-waffle .slds-"
+  ]
+ },
+ "slds2:icon-help": {
+  "n": 7,
+  "hook": 3,
+  "kw": 0,
+  "lit": 4,
+  "other": 0,
+  "lits": [
+   "width:1.5rem @.slds-icon-help",
+   "height:1.5rem @.slds-icon-help",
+   "width:1.5rem @.slds-icon-help svg",
+   "height:1.5rem @.slds-icon-help svg"
+  ]
+ },
+ "slds2:icon-typing": {
+  "n": 4,
+  "hook": 1,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "height:0.5rem @.slds-icon-typing__dot",
+   "width:0.5rem @.slds-icon-typing__dot"
+  ]
+ },
+ "slds2:einstein-header": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:chat-avatar": {
+  "n": 1,
+  "hook": 0,
+  "kw": 0,
+  "lit": 1,
+  "other": 0,
+  "lits": [
+   "min-width:2rem @.slds-chat-avatar"
+  ]
+ },
+ "slds2:chat-message": {
+  "n": 3,
+  "hook": 3,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:chat-event": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:input-has-icon": {
+  "n": 7,
+  "hook": 3,
+  "kw": 2,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.875rem @.slds-input-has-icon .slds-input__icon",
+   "height:0.875rem @.slds-input-has-icon .slds-input__icon"
+  ]
+ },
+ "slds2:page-header": {
+  "n": 4,
+  "hook": 3,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:popover": {
+  "n": 9,
+  "hook": 6,
+  "kw": 3,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:dropdown": {
+  "n": 4,
+  "hook": 4,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:picklist": {
+  "n": 5,
+  "hook": 5,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:combobox": {
+  "n": 6,
+  "hook": 5,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:listbox": {
+  "n": 5,
+  "hook": 4,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:has-inline-listbox": {
+  "n": 2,
+  "hook": 2,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:utility-bar": {
+  "n": 1,
+  "hook": 0,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:utility-panel": {
+  "n": 1,
+  "hook": 0,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:global-actions": {
+  "n": 19,
+  "hook": 13,
+  "kw": 0,
+  "lit": 0,
+  "other": 6,
+  "lits": []
+ },
+ "slds2:context-bar": {
+  "n": 11,
+  "hook": 8,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:2rem @.slds-context-bar__icon-action .slds-icon-waffle_container,.slds-context-bar__ic",
+   "height:2rem @.slds-context-bar__icon-action .slds-icon-waffle_container,.slds-context-bar__ic"
+  ]
+ },
+ "slds2:filters": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:post": {
+  "n": 1,
+  "hook": 0,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:app-launcher": {
+  "n": 4,
+  "hook": 4,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:visual-picker": {
+  "n": 15,
+  "hook": 15,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:pill": {
+  "n": 8,
+  "hook": 8,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:progress": {
+  "n": 4,
+  "hook": 1,
+  "kw": 3,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:progress-ring": {
+  "n": 7,
+  "hook": 5,
+  "kw": 2,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:rich-text-editor": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:tile": {
+  "n": 2,
+  "hook": 2,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:sub-tabs": {
+  "n": 5,
+  "hook": 5,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:notify": {
+  "n": 5,
+  "hook": 2,
+  "kw": 3,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:notification": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:trial-header": {
+  "n": 1,
+  "hook": 0,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:avatar": {
+  "n": 24,
+  "hook": 17,
+  "kw": 1,
+  "lit": 0,
+  "other": 6,
+  "lits": []
+ },
+ "slds2:avatar-group": {
+  "n": 26,
+  "hook": 26,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:avatar-grouped": {
+  "n": 10,
+  "hook": 7,
+  "kw": 3,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:image": {
+  "n": 10,
+  "hook": 8,
+  "kw": 1,
+  "lit": 1,
+  "other": 0,
+  "lits": [
+   "background-color:rgb(24, 24, 24, 0.5) @.slds-image .slds-file__figure:hover::before,\n  .slds-image .slds-file__figure:f"
+  ]
+ },
+ "slds2:is-sortable": {
+  "n": 3,
+  "hook": 1,
+  "kw": 0,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.75rem @.slds-is-sortable__icon",
+   "height:0.75rem @.slds-is-sortable__icon"
+  ]
+ },
+ "slds2:table": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:no-cell-focus": {
+  "n": 2,
+  "hook": 2,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:illustration": {
+  "n": 6,
+  "hook": 0,
+  "kw": 2,
+  "lit": 4,
+  "other": 0,
+  "lits": [
+   "max-width:300px @.slds-illustration.slds-illustration_small .slds-illustration__svg,.slds-illustr",
+   "max-height:200px @.slds-illustration.slds-illustration_small .slds-illustration__svg,.slds-illustr",
+   "max-width:600px @.slds-illustration.slds-illustration_large .slds-illustration__svg,.slds-illustr",
+   "max-height:400px @.slds-illustration.slds-illustration_large .slds-illustration__svg,.slds-illustr"
+  ]
+ },
+ "slds2:welcome-mat": {
+  "n": 6,
+  "hook": 6,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:media": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "slds2:theme": {
+  "n": 4,
+  "hook": 4,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:avatar": {
+  "n": 18,
+  "hook": 17,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:badge": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:baseCombobox": {
+  "n": 10,
+  "hook": 7,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon",
+   "height:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon"
+  ]
+ },
+ "lbc:baseComboboxItem": {
+  "n": 3,
+  "hook": 3,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:buttonIcon": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:buttonIconStateful": {
+  "n": 3,
+  "hook": 2,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:buttonMenu": {
+  "n": 5,
+  "hook": 4,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:calendar": {
+  "n": 4,
+  "hook": 3,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:carousel": {
+  "n": 8,
+  "hook": 7,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:colorPickerCustom": {
+  "n": 3,
+  "hook": 0,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon",
+   "height:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon"
+  ]
+ },
+ "lbc:colorPickerPanel": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:datatable": {
+  "n": 19,
+  "hook": 16,
+  "kw": 3,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:datepicker": {
+  "n": 3,
+  "hook": 0,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon",
+   "height:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon"
+  ]
+ },
+ "lbc:datetimepicker": {
+  "n": 3,
+  "hook": 0,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon",
+   "height:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon"
+  ]
+ },
+ "lbc:dualListbox": {
+  "n": 4,
+  "hook": 4,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:dynamicIcon": {
+  "n": 47,
+  "hook": 0,
+  "kw": 8,
+  "lit": 39,
+  "other": 0,
+  "lits": [
+   "width:calc(14rem / 16) @:host([data-render-mode=\"shadow\"]) .slds-icon-ellie",
+   "height:calc(14rem / 16) @:host([data-render-mode=\"shadow\"]) .slds-icon-ellie",
+   "width:17.5rem @:host([data-render-mode=\"shadow\"]) .slds-icon-ellie svg",
+   "color:#0d9dda @:host([data-render-mode=\"shadow\"]) .slds-icon-ellie svg",
+   "fill:white @:host([data-render-mode=\"shadow\"]) .slds-icon-ellie circle:nth-child(2n)",
+   "stroke:white @:host([data-render-mode=\"shadow\"]) .slds-icon-ellie circle:nth-child(2n)",
+   "width:calc(14rem / 16) @:host([data-render-mode=\"shadow\"]) .slds-icon-eq",
+   "height:calc(14rem / 16) @:host([data-render-mode=\"shadow\"]) .slds-icon-eq",
+   "height:0.1875rem @:host([data-render-mode=\"shadow\"]) .slds-icon-eq.slds-is-animated .slds-icon-eq_",
+   "width:calc(4rem / 16) @:host([data-render-mode=\"shadow\"]) .slds-icon-eq__bar",
+   "height:0.5625rem @:host([data-render-mode=\"shadow\"]) .slds-icon-eq__bar",
+   "background:#0176d3 @:host([data-render-mode=\"shadow\"]) .slds-icon-eq__bar",
+   "height:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-icon-eq__bar:nth-of-type(2)",
+   "height:0.75rem @:host([data-render-mode=\"shadow\"]) .slds-icon-eq__bar:nth-of-type(3)",
+   "width:0.3125rem @:host([data-render-mode=\"shadow\"]) .slds-icon-score",
+   "height:0.3125rem @:host([data-render-mode=\"shadow\"]) .slds-icon-score",
+   "fill:#2e844a @:host([data-render-mode=\"shadow\"]) .slds-icon-score__positive",
+   "stroke:#2e844a @:host([data-render-mode=\"shadow\"]) .slds-icon-score__positive",
+   "stroke:#ba0517 @:host([data-render-mode=\"shadow\"]) .slds-icon-score__negative",
+   "width:1.6875rem @:host([data-render-mode=\"shadow\"]) .slds-icon-strength",
+   "height:0.4375rem @:host([data-render-mode=\"shadow\"]) .slds-icon-strength",
+   "stroke:#939393 @:host([data-render-mode=\"shadow\"]) .slds-icon-strength circle",
+   "fill:#2e844a @:host([data-render-mode=\"shadow\"]) .slds-icon-strength[data-slds-strength='1'] c",
+   "stroke:#2e844a @:host([data-render-mode=\"shadow\"]) .slds-icon-strength[data-slds-strength='1'] c",
+   "fill:#fddde3 @:host([data-render-mode=\"shadow\"]) .slds-icon-strength[data-slds-strength='-1'] ",
+   "stroke:#ba0517 @:host([data-render-mode=\"shadow\"]) .slds-icon-strength[data-slds-strength='-1'] ",
+   "width:1rem @:host([data-render-mode=\"shadow\"]) .slds-icon-trend",
+   "height:1rem @:host([data-render-mode=\"shadow\"]) .slds-icon-trend",
+   "color:#ba0517 @:host([data-render-mode=\"shadow\"]) .slds-icon-trend[data-slds-trend='down']",
+   "color:#939393 @:host([data-render-mode=\"shadow\"]) .slds-icon-trend[data-slds-trend='neutral']",
+   "color:#2e844a @:host([data-render-mode=\"shadow\"]) .slds-icon-trend[data-slds-trend='up']",
+   "background-color:#418fde @:host([data-render-mode=\"shadow\"]) .slds-icon-waffle_container:hover .slds-r1,:h",
+   "background-color:#ed8b00 @:host([data-render-mode=\"shadow\"]) .slds-icon-waffle_container:hover .slds-r4,:h",
+   "background-color:#ffb60f @:host([data-render-mode=\"shadow\"]) .slds-icon-waffle_container:hover .slds-r6,:h",
+   "width:1.3125rem @:host([data-render-mode=\"shadow\"]) .slds-icon-waffle",
+   "height:1.3125rem @:host([data-render-mode=\"shadow\"]) .slds-icon-waffle",
+   "width:0.3125rem @:host([data-render-mode=\"shadow\"]) .slds-icon-waffle [class*='slds-r']",
+   "height:0.3125rem @:host([data-render-mode=\"shadow\"]) .slds-icon-waffle [class*='slds-r']",
+   "background-color:#747474 @:host([data-render-mode=\"shadow\"]) .slds-icon-waffle [class*='slds-r']"
+  ]
+ },
+ "lbc:groupedCombobox": {
+  "n": 3,
+  "hook": 0,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon",
+   "height:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon"
+  ]
+ },
+ "lbc:helptext": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:icon": {
+  "n": 12,
+  "hook": 9,
+  "kw": 3,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:inputAddress": {
+  "n": 3,
+  "hook": 0,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon",
+   "height:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon"
+  ]
+ },
+ "lbc:inputLocation": {
+  "n": 3,
+  "hook": 0,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon",
+   "height:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon"
+  ]
+ },
+ "lbc:inputName": {
+  "n": 3,
+  "hook": 0,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon",
+   "height:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon"
+  ]
+ },
+ "lbc:lookupAddress": {
+  "n": 3,
+  "hook": 3,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:pill": {
+  "n": 22,
+  "hook": 21,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:pillContainer": {
+  "n": 7,
+  "hook": 7,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:popup": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:primitiveCellFactory": {
+  "n": 6,
+  "hook": 6,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:primitiveDatatableIeditPanel": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:primitiveDatatableStatusBar": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:primitiveDatatableTooltip": {
+  "n": 2,
+  "hook": 2,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:primitiveDatatableTooltipBubble": {
+  "n": 3,
+  "hook": 3,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:primitiveFigure": {
+  "n": 2,
+  "hook": 0,
+  "kw": 2,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:primitiveHeaderFactory": {
+  "n": 2,
+  "hook": 2,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:primitiveIcon": {
+  "n": 12,
+  "hook": 9,
+  "kw": 3,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:primitiveInputColor": {
+  "n": 3,
+  "hook": 0,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon",
+   "height:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon"
+  ]
+ },
+ "lbc:primitiveInputSimple": {
+  "n": 3,
+  "hook": 0,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon",
+   "height:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon"
+  ]
+ },
+ "lbc:primitiveTreegridCellToggle": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:progressRing": {
+  "n": 6,
+  "hook": 3,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.75rem @:host([data-render-mode=\"shadow\"]) .slds-progress-ring__content .slds-icon",
+   "width:1rem @:host([data-render-mode=\"shadow\"]) .slds-progress-ring_large .slds-icon"
+  ]
+ },
+ "lbc:progressStep": {
+  "n": 3,
+  "hook": 0,
+  "kw": 3,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:prompt": {
+  "n": 3,
+  "hook": 0,
+  "kw": 1,
+  "lit": 2,
+  "other": 0,
+  "lits": [
+   "width:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon",
+   "height:0.875rem @:host([data-render-mode=\"shadow\"]) .slds-input-has-icon .slds-input__icon"
+  ]
+ },
+ "lbc:sldsCommon": {
+  "n": 1,
+  "hook": 0,
+  "kw": 1,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:sldsMediaObject": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:tile": {
+  "n": 2,
+  "hook": 2,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:toast": {
+  "n": 13,
+  "hook": 10,
+  "kw": 3,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:treeItem": {
+  "n": 3,
+  "hook": 1,
+  "kw": 2,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ },
+ "lbc:verticalNavigationItemBadge": {
+  "n": 1,
+  "hook": 1,
+  "kw": 0,
+  "lit": 0,
+  "other": 0,
+  "lits": []
+ }
+}
