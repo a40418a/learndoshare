@@ -63,7 +63,7 @@
 
 > **최신 결정 (2026-10-07, #11): 브랜드 스타일은 `brands/<브랜드>/util.css` 파일 하나로 관리한다.** 이 파일만 고치면 `lightning-*`를 포함한 모든 컴포넌트가 바뀐다.
 >
-> - **실측 (org, 2026-10-07):** Lightning Experience는 기본 컴포넌트(`lightning-button`·`-input`·`-combobox` 등)를 synthetic shadow로 그린다. 그래서 지금은 global hook, 컴포넌트 hook(`--slds-s-*` 등), `.slds-*` 클래스 규칙이 모두 닿는다. Storybook도 org와 같게 전부 synthetic으로 그린다. (2026-10-09 갱신: org에서 직접 잰 것은 hook이고, 클래스 규칙은 synthetic 실측에서 나온 결론이다. 직접 측정은 10/12 org 프로브에 제안했다, [Learn 09](<Learn/09-override와 공식 권고.html>) 2절)
+> - **실측 (org, 2026-10-07):** Lightning Experience는 기본 컴포넌트(`lightning-button`·`-input`·`-combobox` 등)를 synthetic shadow로 그린다. 그래서 지금은 global hook, 컴포넌트 hook(`--slds-s-*` 등), `.slds-*` 클래스 규칙이 모두 닿는다. Storybook도 org와 같게 전부 synthetic으로 그린다. (2026-10-09 갱신: org에서 직접 잰 것은 hook이고, 클래스 규칙은 synthetic 실측에서 나온 결론이다. 클래스 규칙은 10/12 org 프로브에서 측정 예정(설계 14장), [Learn 09](<Learn/09-override와 공식 권고.html>) 2절)
 >   - 다만 npm 패키지는 기본 컴포넌트 156개를 native shadow 지원으로 지정해 두었다(`package.json`의 `lwc.nativeShadowEnabledComponents`). Salesforce가 이 컴포넌트들을 native로 바꾸면 클래스 규칙은 그 컴포넌트 안에 닿지 않는다. custom property는 g·s 구분 없이 shadow 경계를 넘어 상속되지만, native에서는 SLDS 전역 CSS 안의 읽기 지점이 사라지고 **기본 컴포넌트의 native CSS가 읽는 이름에만 효과가 있다**(전환 시점은 미확인).
 >   - **2026-10-09 정정:** 처음에는 "컴포넌트 hook은 닿지 않고 상속되는 global hook(`--slds-g-*`)만 닿는다"고 적었다. 전 컴포넌트 분석([`synthesis.md`](docs/research/2026-10-08/synthesis.md) 0장 5번 전제 수정)과 맞지 않아 고쳤다. native에서 s hook이 실제로 효과가 있는지는 실측이 필요하다(설계 14장).
 >   - 경과: #11은 빌드 버그 때문에 모든 LWC가 native로 그려진 Storybook에서 측정했다. #14는 패키지 목록대로 혼합 모드로 그렸다. org 실측(#16)으로 둘 다 바로잡았다.
@@ -406,7 +406,7 @@ pnpm sync:theme
 | 질문 | 답변 방향 |
 | --- | --- |
 | 토큰(테마)만 하면 되는 거 아닌가? | 브랜드 전환은 토큰과 root style로 풀린다. 컴포넌트를 만드는 이유는 중복 구현과 일관성이다 |
-| 브랜드마다 버튼 디자인이 다르면? | 색은 org 테마로 `lightning-button`까지 바뀐다. 모양은 SLDS 2가 공식 경로를 주지 않는다(`--slds-c-*`는 SLDS 1 전용, global hook은 읽기 전용). 그래서 root의 `--milvus-button-*`를 읽는 `milvusButton`(SLDS 블루프린트 기반)을 구현했다. `lightning-button` 자체까지 바꿔야 하면 opt-in `override.css`를 쓰되, 공식 권고 밖임을 알고 릴리스마다 재확인한다 |
+| 브랜드마다 버튼 디자인이 다르면? | 색은 org 테마로 `lightning-button`까지 바뀐다. 모양은 SLDS 2에 운영에서 쓸 공식 경로가 없다. 컴포넌트 hook(`--slds-c-*`)은 SLDS 2에서 Developer Preview(Winter '27, 운영 금지)이고 global hook은 읽기 전용이다. 그래서 요청이 있을 때만 util.css의 hook → 브리지 변수 → opt-in `milvusOverride.css`(마지막 수단, 공식 권고 밖) 순으로 바꾸고, 릴리스마다 재확인한다. 모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다(기능이 없을 때만 만든다). `milvusButton`은 "새로 만드는 방식"의 비교 예시로 보여 준다(2026-10-09 갱신, [Learn 09](<Learn/09-override와 공식 권고.html>)) |
 | Claude가 만든 스타일을 믿을 수 있나? | 수정 파일은 `root.css` 하나, 허용 목록 밖은 거부, 린트, Storybook 시각 확인, PR 리뷰를 거친다 |
 | Storybook에서 브랜드를 바꾸면 org도 바뀌나? | 아니다. 시뮬레이션이다. 색은 관리자가 Setup에서, root style은 배포로 반영한다 |
 | 공식 도구가 있는데 왜 Storybook까지? | 실습 B 결과. 개발 중 확인은 공식 도구, 카탈로그·브랜드·공유·프로젝트 시작은 Storybook |
@@ -460,7 +460,7 @@ pnpm sync:theme
 | 리스크 | 영향 | 대응 |
 | --- | --- | --- |
 | `lightning-*`이 Storybook에서 렌더되지 않는다 | Storybook 방식 전체 무산 | Phase 2를 먼저 하고, 실패하면 LWC Garden → org 내 문서 앱 |
-| SLDS 2에서 `lightning-button` 모양을 브랜드별로 바꿀 공식 경로가 없다 (확인됨) | 버튼을 root에서 커버하려면 밀버스 컴포넌트가 필요하다 | `milvusButton`(블루프린트 기반) + `--milvus-*` 구현. Salesforce가 SLDS 2 컴포넌트 hook을 지원하면 재검토한다 |
+| SLDS 2에서 `lightning-button` 모양을 브랜드별로 바꿀 운영용 공식 경로가 없다 (확인됨. `--slds-c-*`는 Winter '27 Developer Preview, 운영 금지) | 버튼 모양 요청을 공식 수단만으로는 들어줄 수 없다 | 요청이 있을 때만 util.css의 hook → 브리지 변수 → opt-in `milvusOverride.css`(마지막 수단, 공식 권고 밖) 순으로 쓴다. 모양만 바꾸려고 밀버스 컴포넌트를 만들지 않고, `milvusButton`은 비교 예시로 둔다. 컴포넌트 hook이 GA가 되면 재검토한다(2026-10-09 갱신, [Learn 09](<Learn/09-override와 공식 권고.html>)) |
 | `override.css`(global hook 재정의)가 Salesforce 릴리스 후 깨진다 | 해당 고객사 화면의 버튼 레이아웃이 틀어진다 | opt-in 브랜드에만 적용, 별도 허용 목록, 릴리스(연 3회)마다 Storybook·org 재확인, `milvus.config.json`에 사용 여부 기록 |
 | root style을 org에 반영하는 방식이 정해지지 않았다 | Storybook에서만 되는 스타일이 된다 | Phase 3에서 `loadStyle` / `:host` 선언을 비교하고, 결정 요청 항목으로 올린다 |
 | synthetic/native shadow 차이로 Storybook과 org 화면이 다르다 | 문서를 신뢰할 수 없다 | synthetic-shadow를 로드하고 org 화면과 나란히 비교한다 |

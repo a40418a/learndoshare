@@ -36,14 +36,18 @@
 | B7 | **Salesforce는 HTML, CSS, DOM의 하위 호환을 보장한 적이 없다.** 지원되지 않는 커스터마이즈를 하면 Salesforce UI 개선을 받아들이기 어렵거나 불가능해진다. Summer '24에도 앞으로의 UI 변경을 위해 내부 구현, SLDS 스타일, custom property를 바꾼다고 예고했다 | Salesforce Component Internals Are Protected (KB 001395244), https://help.salesforce.com/s/articleView?id=001395244&type=1 / Confirm Your Components Use Supported Design System Customizations (Summer '24 RN), https://help.salesforce.com/s/articleView?id=release-notes.rn_lc_design_system_updates.htm&release=250&type=5 | B |
 | B8 | **접근성 때문에 관리자 테마 옵션 일부를 뺐다.** 배경색, 배경 이미지, 글로벌 헤더 색은 SLDS 2 테마에서 쓸 수 없다. accent 색은 브랜드 색에서 WCAG 대비에 맞게 자동으로 만들어지며, Salesforce는 이 색을 재정의하지 말 것을 강하게 권한다. "Override accessibility brand color" 체크박스는 SLDS 1 custom 테마에만 있고, 접근성 문제를 일으킬 수 있다고 경고한다 | Considerations for Themes and Branding, https://help.salesforce.com/s/articleView?id=xcloud.lex_themes_and_branding_considerations.htm&type=5 / Manage Custom Configurations for Themes, https://help.salesforce.com/s/articleView?id=xcloud.brand_custom_configurations.htm&type=5 | B |
 | B9 | **global color hook을 쓰면 org의 Themes and Branding 브랜드 색을 따라가고 WCAG 2.1 대비 기준에 맞출 수 있다.** SLDS 2 테마에는 design token이 없고, 그 자리를 global hook이 대신한다 | SLDS Design Tokens, https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-design-tokens.html | B |
-| B10 | **구조와 시각 스타일을 분리해서 커스터마이즈와 테마를 주고, 다크 모드와 에이전트 기능의 길을 연다.** SLDS 2는 SLDS 1과 하위 호환된다고도 쓴다. admin 블로그는 hook이 UI를 정적에서 동적으로 바꿔 다크 모드 같은 실시간 개인화를 가능하게 하고, 하드코딩한 컴포넌트에서는 시각 회귀가 생길 수 있다고 쓴다 | Bring Your Org to Life with SLDS 2 (GA) (Winter '26 RN), https://help.salesforce.com/s/articleView?id=release-notes.rn_slds2_ga.htm&release=258&type=5 / Get Started · LDS 2, https://www.lightningdesignsystem.com/2e1ef8501/p/76969d-get-started / The Admin Guide to Preparing Your Org for Dark Mode With SLDS 2, https://admin.salesforce.com/blog/2025/the-admin-guide-to-preparing-your-org-for-dark-mode | B |
-| B11 | **native shadow DOM에서는 페이지 전역 CSS가 컴포넌트 안으로 들어가지 못한다.** 예외는 상속 속성과 custom property다. 그래서 SLDS를 쓴다면 `slds-*` 클래스 대신 styling hook으로 옮기라고 권한다. base component는 성능과 Web Components 표준을 위해 native shadow로 옮겨 가는 중이며, 그 과정에서 내부 DOM이 바뀐다 | Get Your LWC Components Ready for Native Shadow DOM in Spring '24, https://developer.salesforce.com/blogs/2024/01/get-your-lwc-components-ready-native-shadow-dom / Internal DOM Structure Is Changing for Lightning Base Components (Summer '25 RN), https://help.salesforce.com/s/articleView?id=release-notes.rn_lc_native_shadow_dom.htm&release=256&type=5 | B |
+| B10 | **구조와 시각 스타일을 분리해서 커스터마이즈와 테마를 주고, 다크 모드와 에이전트 기능의 길을 연다.** SLDS 2는 SLDS 1과 하위 호환된다고도 쓴다. Admins 블로그는 hook이 UI를 정적에서 동적으로 바꿔 다크 모드 같은 실시간 개인화를 가능하게 하고, 하드코딩한 컴포넌트에서는 시각 회귀가 생길 수 있다고 쓴다 | Bring Your Org to Life with SLDS 2 (GA) (Winter '26 RN), https://help.salesforce.com/s/articleView?id=release-notes.rn_slds2_ga.htm&release=258&type=5 / Get Started · LDS 2, https://www.lightningdesignsystem.com/2e1ef8501/p/76969d-get-started / (Salesforce 공식 블로그) The Admin Guide to Preparing Your Org for Dark Mode With SLDS 2, https://admin.salesforce.com/blog/2025/the-admin-guide-to-preparing-your-org-for-dark-mode | B |
+| B11 | **native shadow DOM에서는 페이지 전역 CSS가 컴포넌트 안으로 들어가지 못한다.** 예외는 상속 속성과 custom property다. 그래서 SLDS를 쓴다면 `slds-*` 클래스 대신 styling hook으로 옮기라고 권한다. base component는 성능과 Web Components 표준을 위해 native shadow로 옮겨 가는 중이며, 그 과정에서 내부 DOM이 바뀐다 | (Salesforce 공식 블로그) Get Your LWC Components Ready for Native Shadow DOM in Spring '24, https://developer.salesforce.com/blogs/2024/01/get-your-lwc-components-ready-native-shadow-dom / Internal DOM Structure Is Changing for Lightning Base Components (Summer '25 RN), https://help.salesforce.com/s/articleView?id=release-notes.rn_lc_native_shadow_dom.htm&release=256&type=5 | B |
 | B12 | **컴포넌트 hook을 다시 연 이유**: 특정 컴포넌트를 업그레이드에 안전한 방식으로 테마에 맞게 조정하려는 것이다. 이 hook은 Shadow DOM 경계를 넘어 상속되므로 LWC에서도 동작한다. 범주(spacing, radius, color)와 modifier 패턴으로 다시 설계했다 | Customize Components with the SLDS 2 Styling API and Component-Level Hooks (Developer Preview) (Winter '27 RN), https://help.salesforce.com/s/articleView?id=release-notes.rn_slds_c_level_hooks.htm&release=264&type=5 | B |
-| B13 | (Flow 맥락의 설계 관점) 내부 Lightning 화면은 일관성과 생산성에 맞춰져 있어 세밀한 시각 조정이 덜 필요하다. 테마가 일관성, 재사용, 장기 유지보수의 기반이고, override는 테마가 못 메우는 예외에만 쓴다 | Spring '26: Design Screen Flows With Intent Using Styling Overrides, https://admin.salesforce.com/blog/2026/spring-26-design-screen-flows-with-intent-using-styling-overrides | B |
+| B13 | (Flow 맥락의 설계 관점) 내부 Lightning 화면은 일관성과 생산성에 맞춰져 있어 세밀한 시각 조정이 덜 필요하다. 테마가 일관성, 재사용, 장기 유지보수의 기반이고, override는 테마가 못 메우는 예외에만 쓴다 | (Salesforce 공식 블로그) Spring '26: Design Screen Flows With Intent Using Styling Overrides, https://admin.salesforce.com/blog/2026/spring-26-design-screen-flows-with-intent-using-styling-overrides | B |
+| B14 | 고객의 더 깊은 커스터마이즈 요구와 생성형 AI 때문에 시스템을 넓혀야 했다. 컴포넌트를 하나씩 고치는 대신 한 곳에서 값을 바꿔 전체에 반영하는 방식을 장점으로 든다 | (Salesforce 공식 블로그) What is Salesforce Lightning Design System 2 (SLDS 2 Beta)?, https://www.salesforce.com/blog/what-is-slds-2/ | B |
 
-**허용 목록 밖 (salesforce.com 자사 블로그, 참고만 하고 근거로 쓰지 않음)**
-- What is Salesforce Lightning Design System 2 (SLDS 2 Beta)? https://www.salesforce.com/blog/what-is-slds-2/ : 고객의 더 깊은 커스터마이즈 요구와 생성형 AI 때문에 시스템을 넓혀야 했다고 쓴다. 컴포넌트를 하나씩 고치는 대신 한 곳에서 값을 바꿔 전체에 반영하는 방식을 장점으로 든다. [B]
-- What Are Styling Hooks and How Do You Use Them with SLDS? https://www.salesforce.com/blog/what-are-styling-hooks/ : 다크 모드로 전환할 때 "우리가" global hook을 재할당한다고 쓴다. 주어가 Salesforce라면 B1, B2와 같은 구조를 설명하는 문장이다. [B]
+**Salesforce 공식 블로그를 쓰는 기준 (2026-10-09 갱신)**
+- `admin.salesforce.com/blog`, `developer.salesforce.com/blogs`, `www.salesforce.com/blog`는 Salesforce가 직접 쓴 1차 자료지만 문서는 아니다. 세 곳을 같은 기준으로 다룬다.
+- Salesforce가 밝힌 **이유·의도**를 인용할 때, 같은 내용이 문서·릴리스 노트에 없으면 근거로 쓴다(B10의 Admins 블로그, B11의 Developers 블로그, B13, B14). 표의 출처 칸에 "(Salesforce 공식 블로그)"라고 붙였다.
+- 기능 사실(무엇이 지원되는가)은 문서·릴리스 노트를 우선한다. 블로그만 근거인 기능 사실은 문서를 찾아 바꾸거나 **미확인**으로 둔다((d)의 Flow Builder 행).
+- What Are Styling Hooks and How Do You Use Them with SLDS?(https://www.salesforce.com/blog/what-are-styling-hooks/, Salesforce 공식 블로그)는 다크 모드로 바꿀 때 "우리가" global hook을 다시 할당한다고 쓴다. 주어가 누구인지는 밝히지 않는다. 같은 구조는 문서(B1, B2)에 있으므로 근거는 문서로 둔다. [B]
+- 2026-10-09 이전 판은 `www.salesforce.com/blog` 두 글만 근거에서 빼고(참고만) 다른 두 곳의 블로그는 근거로 써서 기준이 달랐다. 위 기준으로 통일했다.
 
 ### 조사자 사이의 모순과 판정 (원문 기준)
 
@@ -51,7 +55,7 @@
 | --- | --- | --- |
 | SLDS 2의 `--slds-c-*` 상태 | B 담당: "아직 미지원, Developer Preview 문구 없음" / A·C 담당: "Developer Preview" | **시점 차이다. 현재 상태는 Developer Preview(프로덕션 금지)다.** Spring '25 RN은 "아직 미지원"이라고 썼다. Winter '27 RN과 SLDS 2 사이트의 Component-Level Styling Hooks 페이지(https://www.lightningdesignsystem.com/2e1ef8501/p/0213f9-component-level-styling-hooks)는 Developer Preview라고 쓰고, 케이스를 열어 신청하라고 안내한다. LWC Guide의 Compare SLDS Versions(https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html)와 SLDS Styling Hooks 페이지는 2026-10-09에도 "현재 미지원"이라는 예전 표기를 유지한다 [B] |
 | global hook 재정의 금지가 `:root`에도 적용되는가 | C 담당: Transition 페이지는 "컴포넌트 CSS 선택자 안"만 다룬다 | **`:root`도 지원 범위 밖이다.** Styling Hook Index(B3)는 범위를 제한하지 않고 "고객 커스터마이즈에서" 재정의를 지원하지 않는다고 쓴다 |
-| developer.salesforce.com에 재정의 금지 문구가 있는가 | B 담당: 없음. 2023 블로그는 `:host { --slds-g-color-border-base-4: red; }` 예시를 보여 준다 | **그 도메인 범위에서는 사실이다.** 2023 블로그(https://developer.salesforce.com/blogs/2023/06/preparing-your-app-for-the-lightning-design-system-color-update)는 SLDS 1 시기에 `--lwc-*` override를 대체하는 맥락의 글이다. 현재 SLDS 2 문서(B1, B3, B4)가 우선한다 [B] |
+| developer.salesforce.com에 재정의 금지 문구가 있는가 | B 담당: 없음. 2023 Developers 블로그(Salesforce 공식 블로그)는 `:host { --slds-g-color-border-base-4: red; }` 예시를 보여 준다 | **그 도메인 범위에서는 사실이다.** 2023 블로그(https://developer.salesforce.com/blogs/2023/06/preparing-your-app-for-the-lightning-design-system-color-update)는 SLDS 1 시기에 `--lwc-*` override를 대체하는 맥락의 글이다. 현재 SLDS 2 문서(B1, B3, B4)가 우선한다 [B] |
 | "global hook을 바꿔라"는 문장 | Styling API 페이지는 global hook으로 앱 전체 테마를 세우라고 쓴다. Winter '27 RN은 c-hook이 참조하는 global hook을 바꿀 수 있다고 쓴다 | **미확인.** 같은 사이트의 금지 문장(B1, B3, B4)과 표현이 충돌한다. 두 문장을 잇는 단서는 Develop 페이지의 "값 할당은 테마 도구 몫"이라는 문장뿐이다. 두 표현을 정리한 공식 문장은 찾지 못했다 |
 | `--slds-s-*`가 private인가 | B 담당: 공식 문서로는 미확인 / A·C 담당: 린터가 private로 분류 | **확인됨.** 공식 린터 README와 rule-messages.yml에 "--_slds-와 --slds-s- 접두사는 Salesforce 내부용"이라고 적혀 있다(github.com/salesforce-ux). 다만 현재 규칙 코드(`no-slds-private-var.ts`)는 `--_slds-`로 시작하는 속성만 검사한다 [G] |
 
@@ -63,7 +67,7 @@
 | --- | --- | --- | --- | --- |
 | 컴포넌트 hook `--slds-c-*` | 2.17.0(Spring '22)부터 GA. 버튼만 바꾸는 식의 조정이 공식 수단이었다. v1 Buttons 페이지는 `--slds-c-button-radius-border` 기본값을 0.25rem으로 적는다 | Spring '25~Summer '25에는 미지원("아직"). Winter '27부터 **Developer Preview**: 프로덕션 금지, 케이스로 신청 | **줄어듦** (GA에서 DP로) | v1 Styling Hooks(https://v1.lightningdesignsystem.com/platforms/lightning/styling-hooks/), v1 Buttons(https://v1.lightningdesignsystem.com/components/buttons/), Spring '25 RN(https://help.salesforce.com/s/articleView?id=release-notes.rn_slds_slds2.htm&release=254&type=5), B12 |
 | global hook `--slds-g-*` 재할당 | SLDS 1 문서도 재할당을 금지했다(B4) | 금지. 값은 SLDS와 테마 도구가 소유한다(B1, B3) | **변화 없음** (원래 공식 수단이 아니었다) | B1, B3, B4 |
-| shared hook `--slds-s-*` | 문서에 없음 | 공식 린터가 private(내부용)로 분류한다. Salesforce가 릴리스에서 매핑을 바꾼다(Winter '27: `--slds-s-table-color`) | 원래 공개 API가 아니었다 | (b) 판정 표, Winter '27 Blueprints Updates(https://help.salesforce.com/s/articleView?id=release-notes.rn_slds_updates.htm&release=264&type=5) |
+| shared hook `--slds-s-*` | v1 Best Practices의 "Update Styling Hooks" 절이 "Shared and component-level styling hooks"가 SLDS 2에서 지원되지 않는다고 적어 이 종류를 언급한다. 이름 목록을 공개한 문서는 찾지 못했다 | 공식 린터가 private(내부용)로 분류한다. Salesforce가 릴리스에서 매핑을 바꾼다(Winter '27: `--slds-s-table-color`) | 원래 공개 API가 아니었다 | v1 Best Practices, (b) 판정 표, Winter '27 Blueprints Updates(https://help.salesforce.com/s/articleView?id=release-notes.rn_slds_updates.htm&release=264&type=5) |
 | `.slds-*` 클래스 override, 직접 CSS override | 지원하지 않았지만 실제로는 동작했다 | 지원하지 않는다. **"SLDS 2에서 무시된다"는 이 행의 근거가 아니다** (2026-10-09 정정). v1 Best Practices의 그 문장은 styling hook 절 안에 있고, 남의 선택자에 다시 할당한 hook 값이 SLDS 2에서 효과가 없다는 뜻이다((h)). 클래스 규칙이 실제로 닿는지는 지원 여부가 아니라 shadow 모드가 정한다 | **지원 범위 밖** (SLDS 1과 같음). native 전환과 내부 변경 때 깨질 위험이 커진다 | v1 Best Practices, B6, B7, B11, (h) |
 | `--lwc-*` design token 설정과 참조 | 동작 | SLDS 2에서는 설정을 지원하지 않고, 다시 할당한 값은 무시된다. 설치된 2.264.2 CSS는 `--lwc-*`를 3곳(브랜드 이미지)에서만 읽는다 [L] | **줄어듦** | v1 Best Practices, B9, (h) |
 | 관리자 테마 색 옵션 | 배경색, 배경 이미지, 글로벌 헤더 색, "Override accessibility brand color" | 모두 SLDS 2 테마에서는 쓸 수 없다(접근성 이유) | **줄어듦** | B8 |
@@ -82,7 +86,7 @@
 | 관리자 | 같은 곳 > Advanced Configuration | accent 색 조정. custom SLDS 2 테마에만 있고, 재정의는 강하게 비권장한다 | GA | Manage Custom Configurations |
 | 관리자 | 같은 곳 > Dark Mode | 사용자가 다크 모드를 켤 수 있게 허용 | Winter '27 GA (2026-09부터) | Dark Mode GA RN |
 | 사용자 | 표시 설정 | color mode(light, dark, system), 표시 밀도 | 관리자가 허용한 뒤 / GA | Admins · LDS 2, Global Styling Hooks · LDS 2 |
-| 관리자 | Flow Builder | 화면과 컴포넌트 단위 override(배경, 글자, 테두리 색, 테두리 두께, 반경). Flow 화면에만 적용된다 | Spring '26 | B13 |
+| 관리자 | Flow Builder | 화면과 컴포넌트 단위 스타일 변경(Style 탭). org나 Experience Cloud 사이트의 테마 스타일을 덮어쓰고, Flow 화면에만 적용된다. 레코드 페이지의 Quick Action으로 실행하는 flow에서는 쓸 수 없다. 바꿀 수 있는 속성(배경, 글자, 테두리 색, 테두리 두께, 반경)은 B13 블로그의 목록이다 | 문서 있음. 도입 릴리스(Spring '26)는 블로그 제목 기준이고 릴리스 노트는 **미확인** | Customize Screen Style and Layout in a Screen Flow(Salesforce Help), https://help.salesforce.com/s/articleView?id=platform.automate_flow_build_customize_component_and_field_layout_in_screen_flows.htm&type=5 [B] / B13 |
 | 개발자 | 마크업 | base component의 속성(`variant`, `type` 등)과 SLDS utility class(정렬, 여백, 타이포그래피) | GA, 1순위 | Style with Lightning Design System(https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds.html), Develop · LDS 2 |
 | 개발자 | 컴포넌트 CSS | `var(--slds-g-*, SLDS 1 fallback)`로 **읽기만**. 밀도 hook 포함 | GA | Style with Lightning Design System, B1 |
 | 개발자 | 컴포넌트 CSS | SLDS 클래스를 덮어쓰지 않고 자기 클래스를 만든다. 자기 namespace의 custom hook을 쓴다(`--slds`, `--sds` 접두사 금지) | GA, 린터 규칙 `no-slds-namespace-for-custom-hooks` | Style with Lightning Design System, rule-messages.yml(https://github.com/salesforce-ux/slds-linter/blob/main/packages/eslint-plugin-slds/src/config/rule-messages.yml) [G] |
@@ -90,7 +94,7 @@
 | 개발자 | 컴포넌트 CSS | `--slds-c-*` 설정 | **Developer Preview**: 프로덕션 금지, 케이스로 신청 | B12 |
 
 **금지 또는 미지원**: `--slds-g-*` 재정의(B1, B3, B4), `--slds-s-*`와 `--_slds-*` 사용(린터), `.slds-*` 클래스와 base component 내부 DOM 타기팅(B6, B7), `--lwc-*` 설정(v1 Best Practices), 하드코딩 값(B5, 강제 아님, 권장 위반).
-**마이그레이션 도구**: SLDS Linter. SLDS 2 기준으로 코드를 분석하며, admin 블로그도 회귀를 찾는 수단으로 안내한다(B10의 admin 블로그).
+**마이그레이션 도구**: SLDS Linter. SLDS 2 기준으로 코드를 분석하며, Admins 블로그(Salesforce 공식 블로그, B10)도 회귀를 찾는 수단으로 안내한다.
 
 ---
 
@@ -142,8 +146,6 @@
 - SLDS Styling Hooks: https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html
 - SLDS Design Tokens: https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-design-tokens.html
 - Style with Lightning Design System: https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds.html
-- Get Your LWC Components Ready for Native Shadow DOM in Spring '24: https://developer.salesforce.com/blogs/2024/01/get-your-lwc-components-ready-native-shadow-dom
-- Preparing your App for the Lightning Design System Color Update (2023): https://developer.salesforce.com/blogs/2023/06/preparing-your-app-for-the-lightning-design-system-color-update
 
 **help.salesforce.com** [B]
 - Customize Components with the SLDS 2 Styling API and Component-Level Hooks (Developer Preview), Winter '27: https://help.salesforce.com/s/articleView?id=release-notes.rn_slds_c_level_hooks.htm&release=264&type=5
@@ -158,10 +160,15 @@
 - Salesforce Component Internals Are Protected (KB 001395244): https://help.salesforce.com/s/articleView?id=001395244&type=1
 - Confirm Your Components Use Supported Design System Customizations, Summer '24: https://help.salesforce.com/s/articleView?id=release-notes.rn_lc_design_system_updates.htm&release=250&type=5
 - Internal DOM Structure Is Changing for Lightning Base Components, Summer '25: https://help.salesforce.com/s/articleView?id=release-notes.rn_lc_native_shadow_dom.htm&release=256&type=5
+- Customize Screen Style and Layout in a Screen Flow: https://help.salesforce.com/s/articleView?id=platform.automate_flow_build_customize_component_and_field_layout_in_screen_flows.htm&type=5
 
-**admin.salesforce.com** [B]
-- The Admin Guide to Preparing Your Org for Dark Mode With SLDS 2: https://admin.salesforce.com/blog/2025/the-admin-guide-to-preparing-your-org-for-dark-mode
-- Spring '26: Design Screen Flows With Intent Using Styling Overrides: https://admin.salesforce.com/blog/2026/spring-26-design-screen-flows-with-intent-using-styling-overrides
+**Salesforce 공식 블로그** [B] (이유·의도에만 쓴다. 기준은 (b) 표 아래)
+- Developers 블로그, Get Your LWC Components Ready for Native Shadow DOM in Spring '24: https://developer.salesforce.com/blogs/2024/01/get-your-lwc-components-ready-native-shadow-dom
+- Developers 블로그, Preparing your App for the Lightning Design System Color Update (2023): https://developer.salesforce.com/blogs/2023/06/preparing-your-app-for-the-lightning-design-system-color-update
+- Admins 블로그, The Admin Guide to Preparing Your Org for Dark Mode With SLDS 2: https://admin.salesforce.com/blog/2025/the-admin-guide-to-preparing-your-org-for-dark-mode
+- Admins 블로그, Spring '26: Design Screen Flows With Intent Using Styling Overrides: https://admin.salesforce.com/blog/2026/spring-26-design-screen-flows-with-intent-using-styling-overrides
+- Salesforce 블로그, What is Salesforce Lightning Design System 2 (SLDS 2 Beta)?: https://www.salesforce.com/blog/what-is-slds-2/
+- Salesforce 블로그, What Are Styling Hooks and How Do You Use Them with SLDS?: https://www.salesforce.com/blog/what-are-styling-hooks/
 
 **github.com/salesforce-ux** [G] (main 브랜치 커밋 3cc020f, 2026-06-02)
 - eslint-plugin-slds README: https://github.com/salesforce-ux/slds-linter/blob/main/packages/eslint-plugin-slds/README.md
@@ -169,17 +176,13 @@
 - no-slds-private-var.ts: https://github.com/salesforce-ux/slds-linter/blob/main/packages/eslint-plugin-slds/src/rules/v9/no-slds-private-var.ts
 - no-slds-namespace-for-custom-hooks.ts: https://github.com/salesforce-ux/slds-linter/blob/main/packages/eslint-plugin-slds/src/rules/v9/no-slds-namespace-for-custom-hooks.ts
 
-**허용 목록 밖, 참고만** [B]
-- https://www.salesforce.com/blog/what-is-slds-2/
-- https://www.salesforce.com/blog/what-are-styling-hooks/
-
 **조사자가 냈지만 다시 열지 않아 뺀 주장**: Lightning Out 2.0의 c-hook 예시, Flow 화면 LWC의 `<stylingHook>`, KB 004633525, `no-unsupported-hooks-slds2`의 c-card 예시, npm 패키지 CSS 집계, v1 New Global Styling Hook Guidance 페이지(같은 내용을 v1 Best Practices로 확인함)
 
 ---
 
 ## (h) 2026-10-09 정정: "SLDS 2에서는 무시된다"가 가리키는 것
 
-(c)표의 옛 행은 "`.slds-*` 클래스 override, 직접 CSS override: 미지원이고, SLDS 2에서는 무시된다"였다. 그런데 2026-10-08 org 프로브는 `loadStyle`로 넣은 CSS가 synthetic org에서 `lightning-*` 안까지 닿았다고 기록한다([org 프로브](2026-10-08/org-probe.md)). 둘이 모순인지 원문을 다시 열어 확인했다.
+(c)표의 옛 행은 "`.slds-*` 클래스 override, 직접 CSS override: 미지원이고, SLDS 2에서는 무시된다"였다. 그런데 2026-10-08 org 프로브는 `loadStyle`로 넣은 `:root`의 hook 두 개가 synthetic org에서 `lightning-*` 안까지 닿았다고 기록한다(클래스 규칙은 재지 않았다, [org 프로브](2026-10-08/org-probe.md)). 둘이 모순인지 원문을 다시 열어 확인했다.
 
 **원문의 위치 (v1 Best Practices, [B] 2026-10-09)**
 
@@ -191,7 +194,7 @@
 **읽는 법**
 
 1. "무시된다"의 주어는 **남의 선택자에 다시 할당한 styling hook 값**이다. `.slds-button { border-radius: 0; }` 같은 클래스 규칙의 속성 값이 아니다.
-2. "지원하지 않는다"(①)는 지원 정책이다. Salesforce가 동작을 보장하지 않는다는 뜻이지, 플랫폼이 그 CSS를 걸러 낸다는 뜻이 아니다. LWC Anti-Patterns 페이지도 SLDS 클래스 덮어쓰기를 "지원하지 않는다"고 쓰고, 이유로 앞으로의 SLDS 변경이 예상하지 못한 결과를 낼 수 있다는 점을 든다(B6).
+2. "지원하지 않는다"(①)는 지원 정책이다. Salesforce가 동작을 보장하지 않는다는 뜻이지, 플랫폼이 그 CSS를 걸러 낸다는 뜻이 아니다(**추정**: 공식 문장이 아니라 우리 해석이다. 걸러 내는지 아닌지를 밝힌 공식 문장은 찾지 못했다). LWC Anti-Patterns 페이지도 SLDS 클래스 덮어쓰기를 "지원하지 않는다"고 쓰고, 이유로 앞으로의 SLDS 변경이 예상하지 못한 결과를 낼 수 있다는 점을 든다(B6).
 3. 다시 할당한 hook 값이 "무시되는" 이유는 공식 문서에 없다. 설치된 패키지에서 확인한 사실은 이렇다 [L]:
    - `@salesforce-ux/design-system-2` 2.264.2의 `slds2.cosmos.css`가 `var(--lwc-*)`로 읽는 곳은 3곳(브랜드 밴드·전역 헤더 이미지)뿐이다. 그래서 `--lwc-*`를 다시 할당해도 SLDS 2 CSS의 거의 모든 규칙은 그 값을 읽지 않는다. 문서의 "무시된다"와 맞는다.
    - 반면 같은 파일은 `--slds-c-*` 이름 199개를 `var()`로 읽는다(예: `.slds-button`의 `border-radius`가 `--slds-c-button-radius-border`를 먼저 읽는다). 그러니 "무시된다"를 모든 hook에 일반화할 수 없다. 읽는 곳이 있는 이름은 지금 효과가 있지만 지원되지 않는다(SLDS 2에서 c-hook은 Developer Preview).
@@ -201,8 +204,8 @@
 **결론**
 
 - 정책과 실제 도달로 나눠 보면 공식 문장과 우리 실측은 모순이 아니다. 공식 문장의 "지원하지 않는다"는 정책이다. 우리 실측은 "지금 org(synthetic)에서는 `:root`에 넣은 hook 값이 컴포넌트 안까지 닿았다"를 말한다.
-- 다만 "무시된다"가 어떤 값을 가리키는지는 공식 설명이 없다(**미확인**). "SLDS 2가 더는 읽지 않는 옛 hook 이름을 말한다"는 위 3의 **추정**이다. `--lwc-*`(3곳에서만 읽음)와는 맞지만, 같은 CSS가 `--slds-c-*` 이름 199개를 지금도 읽는다는 사실과는 맞지 않는다. 발표에서는 이유를 단정하지 않는다(2026-10-09 리뷰 반영).
-- 다만 클래스 규칙의 도달은 직접 재지 않았다. 10/12 org 프로브(Task 9)에서 `milvusBrand` 옆에 클래스 규칙 하나(예: `.slds-button { letter-spacing: 0.2em; }`처럼 기본값과 확실히 다른 값)를 함께 넣어 `lightning-button` 안에 닿는지 잰다.
+- "무시된다"가 어떤 값을 가리키는지는 공식 설명이 없다(**미확인**). "SLDS 2가 더는 읽지 않는 옛 hook 이름을 말한다"는 위 3의 **추정**이다. 이 추정은 `--lwc-*`(3곳에서만 읽음)와는 맞지만, 같은 CSS가 `--slds-c-*` 이름 199개를 지금도 읽는다는 사실과는 맞지 않는다. 그래서 발표에서는 이유를 단정하지 않는다(2026-10-09 리뷰 반영).
+- 클래스 규칙이 org에서 `lightning-*` 안까지 닿는지는 아직 재지 않았다. 10/12 org 프로브에서 측정 예정이다(설계 14장, 계획 Task 9): 프로브 `milvusOverride`에 `.slds-button { border-radius: 0 }` 한 줄을 넣고, 같은 화면의 `lightning-button` 내부 버튼과 표준 헤더 버튼의 `border-radius`를 잰다.
 
 ---
 
@@ -263,12 +266,12 @@ Learn 09 실험 A·C의 근거다. org가 아니라 로컬 브라우저에서 �
   - https://www.lightningdesignsystem.com/2e1ef8501/p/98b493-styling-hook-index
   - https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-antipatterns.html
   - https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html
-  - https://developer.salesforce.com/blogs/2024/06/lightning-ui-enhancements-in-summer-24
+  - https://developer.salesforce.com/blogs/2024/06/lightning-ui-enhancements-in-summer-24 (Salesforce 공식 블로그)
   - https://help.salesforce.com/s/articleView?id=001622574&type=1 (2026-10-09에 SLDS 2 Transition 페이지로 리다이렉트)
   - https://help.salesforce.com/s/articleView?id=001622575&type=1 (2026-10-09에 LWC Anti-Patterns 페이지로 리다이렉트)
   - https://github.com/salesforce-ux/slds-linter/blob/main/packages/eslint-plugin-slds/src/config/rule-messages.yml
-  - https://www.salesforce.com/blog/what-is-slds-2/ (허용 목록 밖, 참고만)
-  - https://www.salesforce.com/blog/what-are-styling-hooks/ (허용 목록 밖, 참고만)
+  - https://www.salesforce.com/blog/what-is-slds-2/ (Salesforce 공식 블로그)
+  - https://www.salesforce.com/blog/what-are-styling-hooks/ (Salesforce 공식 블로그)
 
 ### 조사 기록 B: developer.salesforce.com
 
@@ -291,13 +294,13 @@ Learn 09 실험 A·C의 근거다. org가 아니라 로컬 브라우저에서 �
   - https://developer.salesforce.com/docs/platform/slds-linter/guide/get-started-intro.html
   - https://developer.salesforce.com/docs/platform/slds-linter/guide/get-started-release-notes.html
   - https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html
-  - https://developer.salesforce.com/blogs/2023/06/preparing-your-app-for-the-lightning-design-system-color-update
-  - https://developer.salesforce.com/blogs/2024/01/get-your-lwc-components-ready-native-shadow-dom
-  - https://developer.salesforce.com/blogs/2025/01/spring25-developers
-  - https://developer.salesforce.com/blogs/2025/09/winter26-developers
-  - https://developer.salesforce.com/blogs/2026/01/developers-guide-to-the-spring-26-release
-  - https://developer.salesforce.com/blogs/2026/06/the-salesforce-developers-guide-to-the-summer-26-release
-  - https://developer.salesforce.com/blogs/2026/10/developers-guide-to-the-winter-27-release
+  - https://developer.salesforce.com/blogs/2023/06/preparing-your-app-for-the-lightning-design-system-color-update (Salesforce 공식 블로그)
+  - https://developer.salesforce.com/blogs/2024/01/get-your-lwc-components-ready-native-shadow-dom (Salesforce 공식 블로그)
+  - https://developer.salesforce.com/blogs/2025/01/spring25-developers (Salesforce 공식 블로그)
+  - https://developer.salesforce.com/blogs/2025/09/winter26-developers (Salesforce 공식 블로그)
+  - https://developer.salesforce.com/blogs/2026/01/developers-guide-to-the-spring-26-release (Salesforce 공식 블로그)
+  - https://developer.salesforce.com/blogs/2026/06/the-salesforce-developers-guide-to-the-summer-26-release (Salesforce 공식 블로그)
+  - https://developer.salesforce.com/blogs/2026/10/developers-guide-to-the-winter-27-release (Salesforce 공식 블로그)
   - https://help.salesforce.com/s/articleView?id=release-notes.rn_slds_slds2.htm&release=254&type=5
   - https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_enhancedlex.htm&type=5
   - https://www.lightningdesignsystem.com/2e1ef8501/p/313db3-faqs/b/70dcc7
@@ -334,9 +337,9 @@ Learn 09 실험 A·C의 근거다. org가 아니라 로컬 브라우저에서 �
   - https://help.salesforce.com/s/articleView?id=xcloud.brand_custom_configurations.htm&type=5
   - https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_enhancedlex.htm&type=5
   - https://help.salesforce.com/s/articleView?id=xcloud.lex_themes_and_branding_considerations.htm&type=5
-  - https://admin.salesforce.com/blog/2025/the-admin-guide-to-preparing-your-org-for-dark-mode
-  - https://admin.salesforce.com/blog/2026/jens-top-winter-27-release-features-for-admins
-  - https://admin.salesforce.com/blog/2026/spring-26-design-screen-flows-with-intent-using-styling-overrides
+  - https://admin.salesforce.com/blog/2025/the-admin-guide-to-preparing-your-org-for-dark-mode (Salesforce 공식 블로그)
+  - https://admin.salesforce.com/blog/2026/jens-top-winter-27-release-features-for-admins (Salesforce 공식 블로그)
+  - https://admin.salesforce.com/blog/2026/spring-26-design-screen-flows-with-intent-using-styling-overrides (Salesforce 공식 블로그)
   - https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html#no-slds-private-var
   - https://www.lightningdesignsystem.com/2e1ef8501/p/0213f9-component-level-styling-hooks
   - https://www.lightningdesignsystem.com/2e1ef8501/p/319e5f-styling-hooks
@@ -348,8 +351,10 @@ Learn 09 실험 A·C의 근거다. org가 아니라 로컬 브라우저에서 �
   - https://github.com/salesforce-ux/slds-linter/blob/3cc020f5f908f8f289188f41b5a7feb4491534f1/packages/eslint-plugin-slds/src/rules/v9/no-unsupported-hooks-slds2.ts
   - https://github.com/salesforce-ux/slds-linter/releases/tag/0.3.0
   - https://www.npmjs.com/package/@salesforce-ux/eslint-plugin-slds
-  - https://www.salesforce.com/blog/what-are-styling-hooks/ (허용 목록 밖, 참고만)
+  - https://www.salesforce.com/blog/what-are-styling-hooks/ (Salesforce 공식 블로그)
 
 ### Task 29에서 다시 연 것 (2026-10-09, [B])
 
 v1 Best Practices(정정 근거, (h)), v1 Buttons(`--slds-c-button-radius-border` 0.25rem), v1 Styling Hooks(2.17.0 GA), Component-Level Styling Hooks(Developer Preview), Styling Hook Index(재정의 미지원), Develop(값 할당은 테마 도구 몫), LWC Anti-Patterns, LWC Shadow DOM·Mixed Shadow Mode(synthetic에서 문서 스타일시트가 모든 컴포넌트를 꾸밈), KB 001395244, Summer '24·Summer '25 릴리스 노트, Winter '26 SLDS 2 GA·Component Design Updates, Winter '27 c-hook·Blueprints Updates·Dark Mode GA 릴리스 노트, MDN `attachShadow`.
+
+수정 라운드 2(2026-10-09): v1 Best Practices("Shared and component-level styling hooks" 문장, [W]), Develop(세 층), Spring '25 SLDS 2 릴리스 노트("아직 지원하지 않음"), Winter '26 Component Design Updates(폐기 표: font-family·lineheight·accent-dark-1), Help "Customize Screen Style and Layout in a Screen Flow", Developers 블로그 2024/01, Admins 블로그 2개, www.salesforce.com 블로그 2개([W]). [W]는 WebFetch, 나머지는 [B].
