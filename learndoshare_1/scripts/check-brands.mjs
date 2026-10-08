@@ -1,6 +1,7 @@
 // brands/*/util.css 규칙을 검사한다. 사용: node scripts/check-brands.mjs (pnpm test에 포함)
 //  - :root에 --slds-g-* global hook, --slds-s-* 컴포넌트 hook, --milvus-* 변수만 정의한다. 클래스 규칙은 쓰지 않는다
-//  - --slds-s-*는 지금 org가 기본 컴포넌트를 synthetic으로 그려서 닿는다(#16). native로 바뀌면 효과가 사라질 수 있다(#18)
+//  - --slds-s-*는 지금 org가 기본 컴포넌트를 synthetic으로 그려서 닿는다(#16). native로 바뀌어도 g·s 구분 없이 상속되지만,
+//    기본 컴포넌트의 native CSS가 읽는 이름에만 효과가 남는다(추정, 실측 필요. #18, docs/research/2026-10-08/synthesis.md 0장 5번)
 //  - --slds-s-*는 SLDS 2 CSS가 정의하는 이름만, --milvus-*는 밀버스 컴포넌트가 읽는 이름만 쓴다. 오타는 아무 효과 없이 지나가기 때문이다
 //  - 브랜드 색 hook은 org Themes and Branding이 원본이다(pnpm sync:theme이 palette로 가져온다)
 import { existsSync, readFileSync, readdirSync } from "node:fs";

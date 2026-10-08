@@ -9,6 +9,7 @@
 <body>
 <nav class="topnav"><div class="topnav-inner">
   <a href="../README.md">README</a>
+  <a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html">00 개념</a>
   <a class="active" href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html">01 SLDS</a>
   <a href="02-LWC%20%EA%B8%B0%EC%B4%88.html">02 LWC</a>
   <a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html">03 Storybook</a>
@@ -17,6 +18,7 @@
   <a href="06-%EB%A1%9C%EC%BB%AC%20%EA%B0%9C%EB%B0%9C%20%EB%8F%84%EA%B5%AC%20%EB%B9%84%EA%B5%90.html">06 도구 비교</a>
   <a href="07-pnpm.html">07 pnpm</a>
   <a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html">08 Claude Code</a>
+  <a href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html">09 override</a>
 </div></nav>
 
 <div class="layout">
@@ -32,7 +34,7 @@
     <li><a href="#linter">SLDS Linter</a></li>
     <li><a href="#gaps">base 컴포넌트의 빈틈</a></li>
     <li><a href="#themes">Themes and Branding</a></li>
-    <li><a href="#button">브랜드별 버튼 디자인</a></li>
+    <li><a href="#button">브랜드 모양과 milvusButton</a></li>
     <li><a href="#criteria">컴포넌트 추가 기준</a></li>
     <li><a href="#quiz">스스로 점검</a></li>
     <li><a href="#refs">참고</a></li>
@@ -43,19 +45,21 @@
 <header class="hero">
   <div class="eyebrow">LEARN 01 · 전체 기초</div>
   <h1>세일즈포스 디자인 시스템</h1>
-  <p class="lead">SLDS가 무엇으로 이루어져 있는지, SLDS 2에서 무엇이 바뀌었는지, 그리고 밀버스가 SLDS 위에서 무엇을 추가하고 무엇을 건드리지 않는지 정리한다.</p>
-  <div class="meta"><span>예상 1.5시간</span><span>선행 없음</span><span>2026-09-26 공식 문서 · 패키지로 확인</span><span>SLDS 사이트 표기 Summer '26 v3.3.3</span></div>
+  <p class="lead">SLDS가 무엇으로 이루어져 있는지, SLDS 2에서 무엇이 바뀌었는지, 그리고 밀버스가 SLDS 위에서 무엇을 추가하고 무엇을 건드리지 않는지 정리한다. 개념(디자인 토큰, styling hook, shadow DOM)을 처음 본다면 <a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html">00 개념</a>을 먼저 읽는다.</p>
+  <div class="meta"><span>예상 1.5시간</span><span>선행: 00 개념</span><span>2026-10-09 갱신 · 공식 문서와 패키지로 다시 확인</span><span>SLDS 사이트 표기 Fall '26 v3.4.1</span></div>
 </header>
 
 <section id="why">
   <h2>왜 알아야 하나</h2>
-  <p>밀버스의 첫 번째 원칙은 <b>"SLDS를 최대한 쓰고, 없는 것만 추가한다"</b>이다. 무엇이 "없는 것"인지 판단하려면 SLDS가 무엇을 제공하는지 먼저 알아야 한다.</p>
-  <p>또 우리 org는 <b>SLDS 2</b> 테마(<code>Milvus_DesignSystem</code>)를 쓴다. 인터넷 자료 상당수는 SLDS 1 기준이라, 그대로 따라 하면 SLDS 2에서 동작하지 않거나 가이드라인을 어기게 된다.</p>
+  <p>밀버스의 첫 번째 원칙은 <b>"SLDS가 제공하는 것을 최대한 쓴다"</b>이다(README 1.3, 2026-10-09 갱신). 밀버스는 SLDS에 없는 것만 더한다. 무엇이 SLDS에 없는지 판단하려면 SLDS가 무엇을 제공하는지 먼저 알아야 한다. Salesforce도 기본 컴포넌트(<code>lightning-*</code>)를 가장 먼저 쓰라고 권한다.</p>
+  <p><b>기본 우선 (2026-10-09 갱신).</b> 기본 상태는 Salesforce 기본 모양에 브랜드 색과 로고만 org 테마로 바꾼 것이다. 모양을 바꾸는 <code>util.css</code>는 브랜드 요청이 있을 때만 쓴다. 공식 권고 밖의 방법이기 때문이다. 결정 기록은 <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서</a> 1장에 있다.</p>
+  <p>우리 org는 <b>SLDS 2</b> 테마(<code>Milvus_DesignSystem</code>, <code>brands/Milvus_DesignSystem/theme.json</code>의 <code>designSystemVersion</code>이 <code>SLDS_v2</code>)를 쓴다. 인터넷 자료 상당수는 SLDS 1 기준이라, 그대로 따라 하면 SLDS 2에서 동작하지 않거나 가이드라인을 어기게 된다.</p>
   <div class="cards">
-    <div class="card"><h4>무엇을 가져다 쓰나</h4><p>블루프린트, base 컴포넌트(<code>lightning-*</code>), styling hook</p></div>
-    <div class="card"><h4>무엇을 하지 않나</h4><p><code>--slds-g-*</code> 재정의(opt-in <code>override.css</code> 예외), SLDS 클래스 덮어쓰기, 하드코딩 색</p></div>
-    <div class="card"><h4>무엇을 추가하나</h4><p>SLDS에 없는 컴포넌트, 브랜드 차이를 담는 <code>--milvus-*</code> 변수</p></div>
+    <div class="card"><h4>무엇을 가져다 쓰나</h4><p>org 테마(브랜드 색·로고), base 컴포넌트(<code>lightning-*</code>), 블루프린트, styling hook</p></div>
+    <div class="card"><h4>무엇을 하지 않나</h4><p>컴포넌트 CSS에서 <code>--slds-g-*</code> 재정의, SLDS 클래스 덮어쓰기, 하드코딩 색. 지금 예외는 브랜드 <code>util.css</code> 하나뿐이다(<a href="#hooks">styling hook</a>). 클래스 규칙을 갖는 <code>milvusBridge.css</code>와 opt-in <code>milvusOverride.css</code>는 계획 단계다</p></div>
+    <div class="card"><h4>무엇을 추가하나</h4><p>SLDS에 없는 기능을 맡는 밀버스 컴포넌트와 <code>--milvus-*</code> 변수. 모양만 바꾸려고 컴포넌트를 만들지 않는다 (2026-10-09 갱신)</p></div>
   </div>
+  <p class="sources">출처: <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_enhancedlex.htm&amp;type=5">Salesforce Help: Salesforce Cosmos Theme and SLDS 2 Availability</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2: Color Modes (Component Customization Layers)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC 개발자 가이드: Compare SLDS Versions</a> (확인 2026-10-09) · <a href="../README.md">README 1.3 원칙 (프로젝트 결정)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (기본 우선, opt-in override 결정), 5.1 (층)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="parts">
@@ -63,9 +67,9 @@
   <div class="table-wrap"><table>
     <tr><th>구성 요소</th><th>무엇인가</th><th>우리가 쓰는 방식</th></tr>
     <tr><td>블루프린트 (blueprint)</td><td>HTML/CSS 패턴. <code>slds-button</code>, <code>slds-badge</code> 같은 클래스와 마크업 구조</td><td>base 컴포넌트가 없는 것을 만들 때 마크업의 기준으로 쓴다</td></tr>
-    <tr><td>base 컴포넌트</td><td><code>lightning-button</code> 등 <code>lightning-*</code> LWC. 블루프린트를 구현한 것</td><td>있으면 무조건 이것부터 쓴다</td></tr>
-    <tr><td>styling hook</td><td>CSS 사용자 정의 속성(<code>--slds-g-*</code> 등). 색, 간격, 반경 등을 값 대신 이름으로 참조</td><td>커스텀 컴포넌트 CSS에서 <b>읽기 전용</b>으로 참조한다</td></tr>
-    <tr><td>가이드라인</td><td>접근성, 문구, 레이아웃 등 사용 지침</td><td>새 컴포넌트를 설계할 때 따른다</td></tr>
+    <tr><td>base 컴포넌트</td><td><code>lightning-button</code> 등 <code>lightning-*</code> LWC. 블루프린트를 구현한 것</td><td>있으면 이것부터 쓴다</td></tr>
+    <tr><td>styling hook</td><td>CSS 사용자 정의 속성(<code>--slds-g-*</code> 등). 색, 간격, 반경 등을 값 대신 이름으로 참조</td><td>컴포넌트 CSS에서는 <b>읽기 전용</b>으로 참조한다</td></tr>
+    <tr><td>가이드라인</td><td>접근성(대비 등), 사용 지침</td><td>새 컴포넌트를 설계할 때 따른다</td></tr>
   </table></div>
   <div class="flow">
     <div class="step"><b>블루프린트</b>HTML/CSS 패턴 (<code>slds-*</code> 클래스)</div>
@@ -74,7 +78,8 @@
     <div class="arrow">→</div>
     <div class="step"><b>styling hook</b>둘 다 hook 값을 읽어 색·간격을 정한다</div>
   </div>
-  <p>SLDS 2는 SLDS 1의 블루프린트를 그대로 재사용한다. 바뀐 것은 블루프린트가 아니라 그 아래의 CSS 구조와 hook이다.</p>
+  <p>SLDS 2는 SLDS 1의 블루프린트를 그대로 쓴다. 블루프린트는 SLDS 2 사이트에 다시 싣지 않고 SLDS 1 사이트에 있다. 바뀐 것은 블루프린트가 아니라 그 아래의 CSS 구조와 hook이다.</p>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC 개발자 가이드: Compare SLDS Versions</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC 개발자 가이드: SLDS Styling Hooks</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-badge.html">Lightning Component Reference: lightning-badge (Design)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2: Color Modes (Accessibility Standards)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="slds2">
@@ -82,32 +87,39 @@
   <p>SLDS 2는 Spring '25에 소개됐다. <b>구조와 시각 디자인을 분리</b>하는 새 CSS 프레임워크 위에 만들어졌고, 시각 디자인은 styling hook으로 바뀐다.</p>
   <div class="table-wrap"><table>
     <tr><th>항목</th><th>SLDS 1</th><th>SLDS 2</th></tr>
-    <tr><td>기본 테마</td><td>Lightning Blue</td><td>Cosmos (Winter '25에 "Enhanced Lightning UI"라는 이름으로 베타)</td></tr>
-    <tr><td>제공 상태</td><td>계속 사용 가능</td><td>Winter '26부터 모든 에디션 GA. <b>새 org는 기본</b>, 기존 org는 Themes and Branding에서 선택(opt-in)</td></tr>
-    <tr><td>다크 모드</td><td>없음</td><td>Winter '26부터 SLDS 2 테마에서 지원</td></tr>
-    <tr><td>design token (<code>--lwc-*</code>)</td><td>사용 가능</td><td><span class="tag bad">지원 안 함</span> deprecated. 예: <code>--lwc-colorBackgroundAlt</code></td></tr>
-    <tr><td>component hook (<code>--slds-c-*</code>)</td><td>사용 가능</td><td><span class="tag bad">아직 지원 안 함</span></td></tr>
+    <tr><td>기본 테마</td><td>Lightning Blue</td><td>Salesforce Cosmos (Winter '25에 "Enhanced Lightning UI"라는 임시 이름으로 베타)</td></tr>
+    <tr><td>제공 상태</td><td>계속 사용 가능</td><td>Winter '26부터 모든 에디션 GA. Developer, Enterprise, Pro Suite, Professional, Starter Suite, Unlimited 에디션은 <b>새 org에서 기본으로 켜진다</b>. <b>Essentials Edition은 새 org에서도 Cosmos가 기본이 아니고</b> Setup에서 켠다. 기존 org는 Themes and Branding에서 선택(opt-in) (2026-10-09 갱신)</td></tr>
+    <tr><td>다크 모드</td><td>없음</td><td>Winter '26부터 관리자가 SLDS 2 테마에서 켤 수 있다</td></tr>
+    <tr><td>design token (<code>--lwc-*</code>)</td><td>사용 가능</td><td><span class="tag bad">지원 안 함</span> SLDS Linter는 deprecated로 보고 global hook으로 바꾸라고 안내한다</td></tr>
+    <tr><td>component hook (<code>--slds-c-*</code>)</td><td>사용 가능</td><td><span class="tag bad">운영에 쓸 수 없음</span> LWC 개발자 가이드: 아직 지원하지 않음. SLDS 사이트(Styling API): Developer Preview(운영에 쓰지 말 것) (2026-10-09 갱신)</td></tr>
+    <tr><td>Visualforce</td><td><code>&lt;apex:slds/&gt;</code></td><td>Help는 "Winter '26부터 VF 페이지에서 SLDS 2를 쓸 수 있다"고 적는다. 조건은 둘이다. Setup → User Interface의 Visualforce 설정 "Use SLDS 2 for pages that include &lt;apex:slds&gt; when an SLDS 2 theme is active"를 켜고, SLDS 2 테마를 활성화한다. <code>&lt;apex:slds&gt;</code>의 <code>lightningStyleMode</code>(API 65.0 이상) 기본값 <code>Auto</code>는 이 org 설정을 따른다. <code>SLDS1</code>로 두면 SLDS 1로 고정한다 (2026-10-09 갱신)</td></tr>
   </table></div>
-  <div class="callout warn"><strong>SLDS 2가 적용되지 않는 곳</strong>모바일 앱, 빌더(Flow Builder, Lightning App Builder), Lightning Out, Experience Cloud는 SLDS 2를 지원하지 않고 계획도 없다고 공식 문서에 적혀 있다. 이 화면들에서는 SLDS 1 기준으로 보인다는 점을 기억한다.</div>
+  <div class="callout warn"><strong>SLDS 2가 적용되지 않는 곳</strong>Salesforce 모바일 앱, 빌더(Flow Builder, Lightning App Builder), Lightning Out, Experience Cloud는 SLDS 2를 지원할 계획이 없다고 공식 문서에 적혀 있다. SLDS 2를 지원하지 않는 앱이나 영역은 SLDS 2를 켜도 SLDS 1 모양으로 보인다.</div>
   <div class="callout project"><strong>현재 상태</strong>org <code>learndoshare_1</code>은 SLDS 2 테마 <code>Milvus_DesignSystem</code>을 쓴다 (<a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>에서 조회). 그래서 밀버스 컴포넌트 CSS는 <code>--lwc-*</code> token과 <code>--slds-c-*</code> hook에 기대면 안 된다.</div>
+  <div class="callout warn"><strong>VF가 SLDS 2를 쓰는 조건 (2026-10-09 갱신)</strong>Help에 따르면 <code>&lt;apex:slds&gt;</code>를 포함한 VF 페이지가 SLDS 2를 쓰려면 User Interface 설정 "Use SLDS 2 for pages that include &lt;apex:slds&gt; when an SLDS 2 theme is active"를 켜고 SLDS 2 테마를 써야 한다. <code>lightningStyleMode</code> 기본값 <code>Auto</code>는 이 org 설정을 따른다. 테마가 SLDS 2라는 것만으로 VF가 SLDS 2가 되지는 않는다. 2026-10-08 org 프로브에서는 VF 페이지의 <code>&lt;apex:slds/&gt;</code>가 SLDS 1로 그려졌고, 그래서 util.css가 효과가 없었다. 그때 이 설정 상태를 기록하지 않아 원인은 <span class="tag warn">미확인</span>이다. 설정이 꺼져 있었다면 문서와 어긋나지 않는 결과다(<a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html#vf">00 문서 6절</a>). 10/12 org 프로브에서 확인한다(설계 14장). 이 공식 경로가 되면 VF에 SLDS 2 CSS를 따로 넣는 <code>milvusVf</code>는 필요 없거나 util.css가 있을 때만 필요하다. 확인 전까지 <code>milvusVf</code>는 계획으로 둔다.</div>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC 개발자 가이드: Compare SLDS Versions</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_enhancedlex.htm&amp;type=5">Salesforce Help: Salesforce Cosmos Theme and SLDS 2 Availability (에디션별 기본값, Essentials 예외, VF)</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.lex_themes_and_branding_considerations.htm&amp;type=5">Salesforce Help: Considerations for Themes and Branding</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html">SLDS Linter: Rules (lwc-token-to-slds-hook)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-slds.html">Visualforce 개발자 가이드: apex:slds</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_settings.htm&amp;type=5">Salesforce Help: User Interface Settings (Visualforce Settings)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/7708aa-styling-api">SLDS 2: Styling API (Component-level Styling Hooks, Developer Preview)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (VF 결과)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 14장 (VF 공식 SLDS 2 경로, 10/12 org 프로브)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="hooks">
   <h2>styling hook</h2>
+  <p>공식 입장과 밀버스가 실제로 쓰는 범위가 다르다. 둘을 나눠 적는다.</p>
   <div class="table-wrap"><table>
-    <tr><th>접두사</th><th>종류</th><th>우리가 써도 되나</th></tr>
-    <tr><td><code>--slds-g-*</code></td><td>global hook. 색, 폰트, 간격, 크기, 반경, 그림자, 시간(duration)</td><td><span class="tag ok">읽기만</span> 재정의 금지</td></tr>
-    <tr><td><code>--slds-c-*</code></td><td>component hook. 특정 컴포넌트 하나의 모양 조절</td><td><span class="tag bad">SLDS 2에서 안 됨</span> SLDS 1에서만 사용 가능</td></tr>
-    <tr><td><code>--_slds-*</code>, <code>--slds-s-*</code></td><td>private / 내부용</td><td><span class="tag bad">금지</span> 내부 구현이라 예고 없이 바뀐다</td></tr>
-    <tr><td><code>--milvus-*</code></td><td>밀버스가 정의하는 사내 변수</td><td><span class="tag ok">사용</span> 브랜드 root에서만 정의</td></tr>
+    <tr><th>접두사</th><th>종류</th><th>공식 입장</th><th>밀버스 (2026-10-09 갱신)</th></tr>
+    <tr><td><code>--slds-g-*</code></td><td>global hook. 공식 범주는 색, 그림자, 테두리·반경, 글자, 간격, 크기 6개다. 패키지에는 <code>--slds-g-duration-*</code> 8개도 정의돼 있지만 SLDS 2 CSS와 기본 컴포넌트 CSS 어디에서도 읽지 않는다 (2026-10-09 갱신)</td><td>재정의하지 말고 읽기 전용으로 쓴다</td><td><span class="tag ok">읽기</span> 컴포넌트 CSS에서는 읽기만. <span class="tag warn">예외</span> 브랜드 <code>util.css</code>의 <code>:root</code>에서는 브랜드 색 계열(accent 등)을 뺀 것을 재정의한다</td></tr>
+    <tr><td><code>--slds-s-*</code></td><td>컴포넌트 묶음 hook. SLDS 2 CSS가 <code>.slds-button</code> 같은 규칙 안에서 읽는다</td><td>공식 패키지인 SLDS Linter ESLint 플러그인의 README는 <code>--_slds-*</code>와 함께 <b>Salesforce 내부용(private) hook</b>으로 분류한다(<code>no-slds-private-var</code>)</td><td><span class="tag warn">예외</span> <code>util.css</code>에서 이름에 <code>color</code>가 없고 SLDS 2 CSS가 정의하는 것만 쓴다(PR #19). 기본 컴포넌트가 native shadow로 바뀌면 효과가 사라질 수 있다</td></tr>
+    <tr><td><code>--slds-c-*</code></td><td>component hook. 특정 컴포넌트 하나의 모양 조절</td><td>LWC 개발자 가이드: SLDS 2에서 아직 지원하지 않는다. SLDS 사이트(Styling API): Developer Preview, 운영에 쓰지 말 것</td><td><span class="tag bad">금지</span></td></tr>
+    <tr><td><code>--_slds-*</code></td><td>private. Salesforce 내부용</td><td>지워야 한다</td><td><span class="tag bad">금지</span></td></tr>
+    <tr><td><code>--milvus-*</code></td><td>밀버스가 정의하는 변수</td><td>(사내 변수는 자기 접두사를 쓰라는 규칙에 맞음)</td><td><span class="tag ok">사용</span> <code>util.css</code>에서 정의하고 밀버스 컴포넌트가 읽는다</td></tr>
   </table></div>
-  <div class="callout key"><strong>component hook에 대한 공식 입장</strong>Salesforce 문서는 "component styling hook은 SLDS 2에서 아직 지원되지 않으며, 커스텀 컴포넌트가 이를 쓴다면 당분간 org를 SLDS 1 테마로 유지하라"고 안내한다. 우리 org는 이미 SLDS 2이므로 component hook은 선택지가 아니다.</div>
-  <p>SLDS 1 시절의 global 색 hook도 SLDS 2에서 여전히 동작하지만, Salesforce는 새로운 <b>의미 기반(semantic) UI 색 hook</b>을 쓰라고 권장한다. 아래 계열이 그것이다.</p>
+  <div class="callout key"><strong>component hook에 대한 공식 입장 (2026-10-09 갱신)</strong>공식 문서 두 곳의 표현이 다르다. LWC 개발자 가이드는 "component styling hook은 SLDS 2에서 아직 지원되지 않으며, 커스텀 컴포넌트가 이를 쓴다면 당분간 org를 SLDS 1 테마로 유지하라"고 안내한다. SLDS 사이트의 Styling API 페이지는 SLDS 2의 component-level styling hook을 <b>Developer Preview</b>로 두고, 정식 출시 전에는 운영에 쓰지 말라고 적는다. 어느 쪽이든 우리 org(SLDS 2)에서 component hook은 선택지가 아니다.</div>
+  <div class="callout warn"><strong><code>util.css</code> 예외는 알고 택한 것이다</strong>global hook 재정의와 <code>--slds-s-*</code> 사용은 공식 권고 밖이다. 특히 <code>--slds-s-*</code>는 Salesforce가 내부용(private)으로 분류한 hook이다. 밀버스는 #18에서 공식 권고 밖인 것을 알고 허용했고, private 분류를 확인한 뒤에도 기본 우선에서는 요청이 있을 때만 쓰므로 당장 바꾸지 않는다(설계 15장 미정 항목). 지금 org는 기본 컴포넌트를 synthetic shadow로 그려서 문서에 넣은 <code>util.css</code>가 컴포넌트 안까지 닿는다(2026-10-08 org 프로브에서 <code>--slds-s-input-radius-border</code>까지 닿음). 그래서 <b>기본 우선</b>으로, 브랜드 요청이 있을 때만 쓴다. 앞으로의 허용 범위(중립 색, 포커스 그림자 등)는 설계 5.2의 <b>계획</b>이고 아직 검사 스크립트에 들어가지 않았다.</div>
+  <p>SLDS 1 시절의 global 색 hook도 SLDS 2에서 그대로 쓸 수 있지만, Salesforce는 새로운 <b>의미 기반(semantic) UI 색 hook</b>으로 바꾸라고 권장한다. 아래 계열이 그것이다.</p>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC 개발자 가이드: SLDS Styling Hooks (Support Limitations)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC 개발자 가이드: Compare SLDS Versions</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/777f5a-global-styling-hooks">SLDS 2: Global Styling Hooks (범주 6개)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/7708aa-styling-api">SLDS 2: Styling API (Component-level Styling Hooks, Developer Preview)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2: Color Modes (Implementation Rules)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/eslint-plugin-slds">npm: @salesforce-ux/eslint-plugin-slds README (no-slds-private-var)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce-ux/slds-linter/blob/main/packages/eslint-plugin-slds/README.md">GitHub: salesforce-ux/slds-linter, eslint-plugin-slds README</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html">SLDS Linter: Rules</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (loadStyle 도달 범위)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 감사 종합 1장 움직임 행·2.6 (duration hook은 읽는 곳 0), 2장 (util.css 규칙)</a> (확인 2026-10-09) · <a href="../README.md">README 2장 (#18 <code>--slds-s-*</code> 허용 결정)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 15장 (<code>--slds-s-*</code> 허용 유지 여부)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="colors">
   <h2>색 hook 계열</h2>
-  <p>모두 <code>--slds-g-color-</code>로 시작한다. 표에는 접두사를 뺀 나머지만 적었다.</p>
+  <p>모두 <code>--slds-g-color-</code>로 시작한다. 표에는 접두사를 뺀 나머지만 적었다. 이름은 설치된 SLDS 2 패키지(<code>@salesforce-ux/design-system-2</code> 2.264.2)의 정의로 확인했다.</p>
   <div class="table-wrap"><table>
     <tr><th>계열</th><th>hook (접두사 생략)</th><th>용도</th></tr>
     <tr><td>Accent</td><td><code>accent-1..3</code>, <code>accent-container-1..3</code>, <code>accent-dark-1..2</code>, <code>accent-light-1..2</code>, <code>on-accent-1..3</code>, <code>border-accent-1..3</code></td><td>브랜드 강조색. <b>org 브랜드 색을 따라간다</b></td></tr>
@@ -119,47 +131,47 @@
     <tr><td>palette</td><td><code>palette-blue-10..95</code> 등</td><td>원색 팔레트</td></tr>
   </table></div>
   <ul>
-    <li><b>이름 규칙</b>: <code>container</code>는 면(배경), <code>on-*</code>는 그 위에 올라가는 글자·아이콘 색이다. <code>success-container-1</code> 배경에는 <code>on-success-1</code> 글자를 쓴다</li>
-    <li><b>의미 hook 우선</b>: <code>neutral-base-100</code>(유틸리티)보다 <code>surface-container-1</code>(의미)을 쓴다. 다크 모드나 테마가 바뀌어도 의미에 맞는 색으로 따라간다</li>
-    <li><b>accent는 브랜드 색</b>: <code>accent-1</code>은 org의 브랜드 색으로 결정된다(themeOwned). 관리자가 브랜드 색을 바꾸면 accent 계열이 함께 바뀐다</li>
+    <li><b>이름 규칙</b>: <code>container</code>는 면(배경), <code>on-*</code>는 그 위에 올라가는 글자·아이콘 색이다. 배경과 글자 hook은 짝을 맞춰 쓴다. <code>success-container-1</code> 배경에는 <code>on-success-1</code> 글자를 쓴다</li>
+    <li><b>의미 hook 우선</b>: <code>neutral-base-100</code>(유틸리티)보다 <code>surface-container-1</code>(의미)을 쓴다. 다크 모드로 바뀌어도 의미에 맞는 색으로 따라간다</li>
+    <li><b>accent는 브랜드 색</b>: <code>accent-1</code>의 값은 <code>var(--slds-r-color-brand-50)</code>이다. org 브랜드 색에서 만든 팔레트의 50단계다. 2026-10-08 org 프로브에서 브랜드 색 <code>#2E7D32</code>를 켜자 accent가 <code>#468244</code>(우리 팔레트 규칙의 50단계)가 됐다</li>
   </ul>
-  <p>패키지 <code>@salesforce-ux/design-system</code> 2.264.1의 CSS에서 직접 세어 보니 <code>--slds-g-color-*</code> hook이 <b>330개</b> 정의돼 있다. 이 CSS를 Storybook에 넣으면 org 없이도 hook을 쓸 수 있다. 실제로 확인한 값의 예는 다음과 같다.</p>
-<pre data-file="@salesforce-ux/design-system 2.264.1 · assets/styles/salesforce-lightning-design-system.css (발췌)"><code>--slds-g-color-accent-1: var(--lwc-brandPrimary, var(--slds-r-color-brand-60));
---slds-g-color-surface-container-1: #fff;
---slds-g-color-on-accent-1: var(--slds-g-color-neutral-base-100);
---slds-g-color-border-1: var(--slds-g-color-neutral-base-80);</code></pre>
-  <p class="c">관련 패키지: hook·token 패키지는 <code>@salesforce-ux/design-tokens</code> (4.1.0). <code>@salesforce-ux/sds-styling-hooks</code>는 deprecated이므로 설치하지 않는다.</p>
+  <p>SLDS 2 패키지 CSS에는 <code>--slds-g-color-*</code> 이름이 <b>326개</b> 정의돼 있다(분석 자료 <code>hookdefs.json</code>). 이 CSS를 Storybook에 넣으면 org 없이도 hook을 쓸 수 있다. 실제 값의 예는 다음과 같다.</p>
+<pre data-file="@salesforce-ux/design-system-2 2.264.2 · dist/css/bundled/slds2.cosmos.css (발췌)"><code>--slds-g-color-accent-1: var(--slds-r-color-brand-50);
+--slds-g-color-surface-container-1: light-dark(#fff, #242424);
+--slds-g-color-on-accent-1: #fff;
+--slds-g-color-border-1: light-dark(#c9c9c9, #444);</code></pre>
+  <p class="c">관련 패키지: token 빌드 패키지는 <code>@salesforce-ux/design-tokens</code> (4.1.0). <code>@salesforce-ux/sds-styling-hooks</code>는 deprecated("design-tokens v4.0.0을 쓰라")이므로 설치하지 않는다.</p>
+  <p class="sources">출처: <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2: Color Modes (Semantic Color System)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC 개발자 가이드: Compare SLDS Versions</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm: @salesforce-ux/design-system-2</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/hookdefs.json">분석 자료: hookdefs.json (SLDS 2 hook 정의값)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (브랜드 색과 accent)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-tokens">npm: @salesforce-ux/design-tokens</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/sds-styling-hooks">npm: @salesforce-ux/sds-styling-hooks (deprecated)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="rules">
   <h2>hook 사용 규칙</h2>
-  <div class="callout bad"><strong>global hook을 재정의하지 않는다</strong>공식 Color Modes 페이지의 모범 사례는 "<code>--slds-g-*</code>로 시작하는 hook을 재정의하지 말고 읽기 전용으로 소비하라. 재정의하면 UI가 깨질 수 있다"이다.</div>
-  <p>또 hook을 쓸 때는 <b>항상 fallback</b>을 둔다. hook이 없는 환경(SLDS 1 테마, Storybook 설정 누락 등)에서도 깨지지 않게 하기 위해서다.</p>
-<pre data-file="force-app/main/default/lwc/milvusCard/milvusCard.css"><code><span class="c">/* 좋음: 의미 hook + fallback */</span>
+  <div class="callout bad"><strong>컴포넌트 CSS에서 global hook을 재정의하지 않는다</strong>공식 Color Modes 페이지의 구현 규칙은 "<code>--slds-g-*</code>로 시작하는 hook을 재정의하지 말고 읽기 전용으로 소비하라. 재정의하면 UI가 깨질 수 있다"이다. 밀버스의 예외는 브랜드 <code>util.css</code> 하나다(<a href="#hooks">styling hook</a>).</div>
+  <p>또 hook을 쓸 때는 <b>항상 fallback</b>을 둔다. SLDS 1과 SLDS 2를 오가는 org나 Storybook 설정 누락처럼 hook이 없는 환경에서도 깨지지 않게 하기 위해서다.</p>
+<pre data-file="force-app/main/default/lwc/milvusCard/milvusCard.css (예시)"><code><span class="c">/* 좋음: 의미 hook + fallback */</span>
 .card {
   background: var(--slds-g-color-surface-container-1, #fff);
-  <span class="c">/* 기존 --lwc token을 쓰던 코드를 옮길 때: 옛 token을 fallback으로 */</span>
-  border-color: var(--slds-g-color-border-1, var(--lwc-colorBorder));
+  border-color: var(--slds-g-color-border-1, #c9c9c9);
 }
 
 <span class="c">/* 나쁨 */</span>
 :host { --slds-g-color-accent-1: #e4002b; }   <span class="c">/* global hook 재정의 */</span>
 .title { color: #0176d3; }                      <span class="c">/* 하드코딩 색 */</span>
 .x { color: var(--slds-g-color-accent-1); }     <span class="c">/* fallback 없음 */</span></code></pre>
-  <p>공식 권장 패턴은 <code>var(--slds-g-color-surface-container-1, var(--lwc-colorBackgroundAlt))</code>처럼 <b>SLDS 2 hook을 앞에, 옛 token을 fallback으로</b> 두는 것이다. 반대로 <code>--lwc</code> token의 fallback에 SLDS hook을 넣는 것은 금지된다.</p>
-  <div class="callout warn"><strong>위 예시의 <code>--lwc-colorBorder</code></strong><span class="tag warn">미확인</span> fallback으로 쓴 token 이름은 설명용이다. 실제 이전 작업 때는 원래 코드에 있던 token 이름을 그대로 쓴다.</div>
+  <p>옛 <code>--lwc</code> token을 쓰던 코드를 옮길 때는 <b>SLDS 2 hook을 앞에, 옛 token을 fallback으로</b> 둔다. SLDS Linter 규칙 문서의 예는 <code>padding: var(--slds-g-spacing-4, var(--lwc-cardBodyPadding));</code>이다. 반대로 <code>--lwc</code> token의 fallback에 SLDS hook을 넣는 것은 규칙 위반이다.</p>
+  <p class="sources">출처: <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2: Color Modes (Implementation Rules, Common Developer Pitfalls)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html">SLDS Linter: Rules (lwc-token-to-slds-hook, no-sldshook-fallback-for-lwctoken, no-slds-var-without-fallback)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/hookdefs.json">분석 자료: hookdefs.json (fallback 값)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="linter">
   <h2>SLDS Linter</h2>
-  <p>위 규칙을 사람이 기억하지 않아도 되게 해 주는 도구다. SLDS 2로 옮길 때 문제가 되는 CSS와 HTML을 찾아 준다.</p>
+  <p>위 규칙을 사람이 기억하지 않아도 되게 해 주는 도구다. 코드를 SLDS 2 규칙으로 검사하고, 고칠 방법을 제안하고, 한 번에 고칠 수도 있다. Salesforce Code Analyzer에도 규칙이 들어 있다.</p>
   <div class="table-wrap"><table>
-    <tr><th>패키지</th><th>버전 (2026-09-26)</th><th>용도</th></tr>
-    <tr><td><code>@salesforce-ux/slds-linter</code></td><td>1.2.1</td><td>CLI. 실행 파일 <code>slds-linter</code>, 명령 <code>lint</code> / <code>report</code>(SARIF) / <code>emit</code></td></tr>
-    <tr><td><code>@salesforce-ux/eslint-plugin-slds</code></td><td>1.2.1</td><td>ESLint 플러그인. ESLint VS Code 확장과 함께 쓰면 편집 중에 표시된다</td></tr>
+    <tr><th>패키지</th><th>버전 (2026-10-09)</th><th>용도</th></tr>
+    <tr><td><code>@salesforce-ux/slds-linter</code></td><td>1.2.1</td><td>CLI. 실행 파일 <code>slds-linter</code>, 명령 <code>lint</code> / <code>report</code>(SARIF·CSV) / <code>emit</code></td></tr>
+    <tr><td><code>@salesforce-ux/eslint-plugin-slds</code></td><td>1.2.1</td><td>ESLint 플러그인. ESLint 8 또는 9 이상과 함께 쓴다</td></tr>
   </table></div>
-  <p>공식 문서의 Node 요구는 18.4 이상이고, 패키지 <code>engines</code> 필드는 <code>&gt;=18.18.0</code>이다. 우리 로컬 Node 24는 둘 다 충족한다. Salesforce Code Analyzer에도 통합돼 있다.</p>
-<pre><code><span class="c"># 설치 없이 한 번 실행 (공식 문서는 npx로 안내. pnpm dlx는 pnpm의 일반 동작이며 Salesforce 문서에는 없다)</span>
+  <p>공식 문서의 Node 요구는 v18.4.0 이상이고, 두 패키지의 <code>engines</code> 필드는 <code>&gt;=18.18.0</code>이다. 우리 로컬 Node 24는 둘 다 충족한다.</p>
+<pre><code><span class="c"># 설치 없이 한 번 실행 (공식 문서는 npx로 안내한다. pnpm에서는 pnpm dlx가 같은 일을 한다)</span>
 pnpm dlx @salesforce-ux/slds-linter lint force-app
 
 <span class="c"># 프로젝트에 설치해서 쓰기</span>
@@ -172,89 +184,107 @@ pnpm exec slds-linter report force-app   <span class="c"># SARIF 보고서</span
     <tr><td><code>no-slds-var-without-fallback</code></td><td>fallback 없는 hook</td></tr>
     <tr><td><code>lwc-token-to-slds-hook</code></td><td><code>--lwc</code> token 사용. SLDS 2 hook으로 바꾸고 옛 값을 fallback으로 두라고 안내</td></tr>
     <tr><td><code>no-sldshook-fallback-for-lwctoken</code></td><td><code>--lwc</code> token의 fallback에 SLDS hook을 넣는 것</td></tr>
-    <tr><td><code>no-slds-namespace-for-custom-hooks</code></td><td>사내 변수에 <code>--slds</code> 접두사 사용. 자기 접두사(<code>--milvus-*</code>)를 쓴다</td></tr>
-    <tr><td><code>no-slds-private-var</code></td><td>private hook(<code>--_slds-*</code>) 사용</td></tr>
+    <tr><td><code>no-slds-namespace-for-custom-hooks</code></td><td>사내 변수에 <code>--slds</code>·<code>--sds</code> 접두사 사용. 자기 접두사(<code>--milvus-*</code>)를 쓴다</td></tr>
+    <tr><td><code>no-slds-private-var</code></td><td>private hook 사용. 플러그인 README는 <code>--_slds-</code>와 <code>--slds-s-</code>를 Salesforce 내부용(private)으로 적는다</td></tr>
     <tr><td><code>no-hardcoded-values-slds2</code></td><td>색·크기 하드코딩</td></tr>
-    <tr><td><code>no-unsupported-hooks-slds2</code></td><td>SLDS 2에서 지원하지 않는 hook</td></tr>
-    <tr><td><code>no-deprecated-classes-slds2</code></td><td>SLDS 2에서 deprecated된 클래스</td></tr>
+    <tr><td><code>no-unsupported-hooks-slds2</code></td><td>SLDS 2에 없는 hook</td></tr>
+    <tr><td><code>no-deprecated-classes-slds2</code></td><td>SLDS 2에 없는 클래스</td></tr>
     <tr><td><code>no-slds-class-overrides</code></td><td><code>.slds-*</code> 클래스 덮어쓰기</td></tr>
-    <tr><td><code>enforce-bem-usage</code></td><td>옛 BEM 표기 대신 현재 클래스 표기 사용</td></tr>
+    <tr><td><code>enforce-bem-usage</code></td><td>옛 BEM 표기(<code>--</code>) 대신 현재 표기(<code>_</code>) 사용</td></tr>
   </table></div>
-  <div class="callout warn"><strong>SLDS Validator와 헷갈리지 말 것</strong>"SLDS Validator"(<code>salesforce.salesforce-vscode-slds</code>)는 별개의 오래된 VS Code 확장이다. 새로 설정할 때는 SLDS Linter(ESLint 플러그인 + ESLint 확장)를 쓴다.</div>
-  <div class="callout project"><strong>도입 방식</strong>ESLint 플러그인을 <code>pnpm add -D</code>로 넣고 lint-staged에 연결하면 커밋 전에 규칙 위반이 걸러진다. 구체적인 설정은 Phase 1에서 정한다.</div>
+  <div class="callout warn"><strong>SLDS Validator와 헷갈리지 말 것</strong>SLDS Validator는 Salesforce Extension Pack에 들어 있는 별개의 VS Code 확장이다. 공식 문서는 SLDS Linter의 장점으로 쉬운 설정, 한 번에 고치기, Code Analyzer 통합을 든다. 새로 설정할 때는 SLDS Linter를 쓴다.</div>
+  <div class="callout project"><strong>도입 방식</strong>CLAUDE.md 4장 기준으로 SLDS Linter는 Phase 8에 <code>pnpm lint</code>에 더한다. <code>util.css</code>는 이 린터 대신 저장소의 검사 스크립트(<code>pnpm test</code>의 <code>check-brands.mjs</code>)가 규칙을 본다. <code>no-slds-private-var</code>가 <code>util.css</code>의 <code>--slds-s-*</code>를 경고할 수 있다는 점을 알고 둔다.</div>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/get-started-intro.html">SLDS Linter: Get Started</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/get-started-setup-linter.html">SLDS Linter: Set Up</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-commands.html">SLDS Linter: Commands</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html">SLDS Linter: Rules</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/slds-linter">npm: @salesforce-ux/slds-linter</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/eslint-plugin-slds">npm: @salesforce-ux/eslint-plugin-slds</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/slds-validator/guide/set-up.html">SLDS Validator: Set Up</a> (확인 2026-10-09) · <a href="https://pnpm.io/10.x/cli/dlx">pnpm 10.x: pnpm dlx (저장소는 pnpm 10.13.1)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="gaps">
   <h2>base 컴포넌트의 빈틈</h2>
-  <p>"없는 것만 추가한다"의 실제 예다. 아래 두 가지는 공식 문서로 빈틈을 확인했기 때문에 밀버스 컴포넌트로 만든다.</p>
+  <p>SLDS에 없는 것만 더하는 실제 예다. 아래 두 가지는 공식 문서로 빈틈을 확인했기 때문에 밀버스 컴포넌트로 만든다.</p>
   <h3>lightning-badge: 의미색을 고를 속성이 없다</h3>
   <ul>
-    <li>속성은 <code>label</code>, <code>icon-name</code>, <code>icon-position</code>, <code>icon-alternative-text</code> 네 개뿐이다. <code>variant</code> 속성이 없다</li>
+    <li>속성은 <code>label</code>, <code>icon-name</code>, <code>icon-position</code>(<code>start</code>·<code>end</code>), <code>icon-alternative-text</code> 네 개뿐이다. <code>variant</code> 속성이 없다</li>
     <li>색은 유틸리티 클래스로 바꾼다. 예: <code>&lt;lightning-badge label="완료" class="slds-theme_success"&gt;&lt;/lightning-badge&gt;</code></li>
-    <li>badge 블루프린트에는 success / warning / error / info / inverse / light 변형이 있다</li>
-    <li>badge의 component hook은 SLDS 1 전용이다</li>
+    <li>SLDS 1 badge 블루프린트에는 기본, 진한(<code>slds-badge_inverse</code>), 가장 밝은(<code>slds-badge_lightest</code>), 성공·경고·오류(<code>slds-theme_success</code>·<code>_warning</code>·<code>_error</code>) 변형이 있다. 정보(info) 변형은 없다</li>
+    <li>badge의 component hook은 SLDS 1에서만 지원된다</li>
   </ul>
-  <p>그래서 "상태값을 넣으면 알맞은 의미색이 나오는 뱃지"를 <code>milvusBadge</code>로 만든다. 사용하는 쪽이 클래스 이름을 외울 필요가 없고, 색은 Feedback 계열 hook을 따른다.</p>
+  <p>그래서 "상태값을 넣으면 알맞은 의미색이 나오는 뱃지"를 <code>milvusBadge</code>로 만든다. 사용하는 쪽이 클래스 이름을 외울 필요가 없다.</p>
   <h3>lightning-combobox: 다중 선택이 안 된다</h3>
   <ul>
     <li>공식 문서: "Multiple selection is not supported." 다중 선택이 필요하면 <code>lightning-dual-listbox</code>를 쓰라고 안내한다</li>
-    <li><code>lightning-select</code>는 <code>multiple</code>(+ <code>size</code>)을 지원하지만 브라우저 기본 목록 상자로 그려진다</li>
+    <li><code>lightning-select</code>는 <code>multiple</code>(+ <code>size</code>)을 지원하지만 HTML <code>select</code> 요소라서 대부분의 브라우저가 스크롤 목록 상자로 그린다</li>
     <li>즉 <b>검색 가능한 다중 선택 콤보박스</b>는 base 컴포넌트에 없다</li>
   </ul>
   <p>그래서 <code>milvusMultiSelect</code>를 만든다.</p>
-  <div class="callout project"><strong>설계 원칙과의 연결</strong>두 컴포넌트 모두 <b>표현 컴포넌트</b>로 만든다. 데이터 조회(<code>@wire</code>, Apex)는 이를 감싸는 컨테이너가 맡는다. 그래야 Storybook에서 org 없이 모든 상태를 나열할 수 있다 (<a href="06-%EB%A1%9C%EC%BB%AC%20%EA%B0%9C%EB%B0%9C%20%EB%8F%84%EA%B5%AC%20%EB%B9%84%EA%B5%90.html">06 도구 비교</a>).</div>
+  <div class="callout project"><strong>설계 원칙과의 연결</strong>두 컴포넌트 모두 <b>표현 컴포넌트</b>로 만든다(README 1.3). 데이터 조회(<code>@wire</code>, Apex)는 이를 감싸는 컨테이너가 맡는다. 그래야 Storybook에서 org 없이 모든 상태를 나열할 수 있다 (<a href="02-LWC%20%EA%B8%B0%EC%B4%88.html">02 LWC</a>의 표현 / 컨테이너 분리).</div>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-badge.html">Lightning Component Reference: lightning-badge</a> (확인 2026-10-09) · <a href="https://v1.lightningdesignsystem.com/components/badges/">SLDS 1: Badges 블루프린트</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-combobox.html">Lightning Component Reference: lightning-combobox</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-select.html">Lightning Component Reference: lightning-select</a> (확인 2026-10-09) · <a href="../README.md">README 1.3 원칙 (표현 컴포넌트 분리)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="themes">
   <h2>Themes and Branding</h2>
   <p>Setup의 Themes and Branding은 org 전체의 브랜드 색과 로고를 정하는 곳이다. 밀버스의 "색은 org에서 온다" 원칙의 출발점이다.</p>
   <ul>
-    <li>org에서 <b>활성 테마는 하나</b>다. 커스텀 테마는 최대 300개까지 만들 수 있다</li>
-    <li>내장 테마는 편집하거나 복제할 수 없다</li>
+    <li>org에서 <b>활성 테마는 하나</b>이고 org 전체에 적용된다. 커스텀 테마는 최대 300개까지 만들 수 있다</li>
+    <li>Salesforce가 제공하는 내장 테마는 수정하거나 복제할 수 없다</li>
     <li>Salesforce Classic과 네이티브 모바일 앱에는 적용되지 않는다</li>
-    <li><b>SLDS 2 테마에서는 배경색, 배경 이미지, 전역 헤더 색을 설정할 수 없다</b> (접근성 때문)</li>
-    <li>폰트 설정은 문서에 없다. 폰트는 org에서 오지 않는다</li>
-    <li>앱 단위 브랜딩(App Manager)은 내장 테마(Lightning Lite / Blue)를 항상 덮어쓴다. 커스텀 테마를 덮어쓰려면 App Manager에서 덮어쓰기 옵션을 켜야 한다</li>
+    <li><b>SLDS 2 테마에서는 배경색, 배경 이미지, 전역 헤더 색을 쓸 수 없다</b> (접근성 때문)</li>
+    <li>브랜드 색은 그대로 쓰지 않고 접근성 있는 버전으로 바꿔 쓴다. 이 색을 무시하는 설정은 SLDS 1 커스텀 테마에만 있다</li>
+    <li>커스텀 테마 문서가 다루는 것은 색 팔레트(브랜드 색), 로고, 배경 이미지, 그룹·사용자 배너, (SLDS 2) 고급 accent 색 등이다. 글꼴 설정은 나오지 않는다. 밀버스도 글꼴은 바꾸지 않는다</li>
+    <li>App Manager에서 테마 덮어쓰기 옵션을 켜지 않아도 앱의 브랜드 이미지와 색은 내장 테마(Lightning Lite, Lightning Blue)를 항상 덮어쓴다. 커스텀 테마를 덮어쓰려면 그 옵션이 필요하다고 읽힌다 <span class="tag warn">미확인</span> (문서는 내장 테마 쪽만 직접 적는다)</li>
   </ul>
-  <div class="callout project"><strong>색과 폰트의 출처</strong>브랜드 색 → org Themes and Branding (배포 불필요) → accent hook이 따라감. 폰트·브랜드 고유 모양 → <code>brands/&lt;브랜드&gt;/root.css</code>의 <code>--milvus-*</code> 변수 (배포 필요). org 테마 데이터 구조는 <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>에 있다.</div>
+  <div class="callout project"><strong>색과 모양의 출처 (2026-10-09 갱신)</strong>브랜드 색·로고 → org 테마(<code>BrandingSet</code>, <code>LightningExperienceTheme</code> 메타데이터). 메타데이터로 만들고 활성화하는 것까지 배포로 된다(2026-10-08 org 프로브). accent hook이 이 색을 따라간다. 모양(반경, 간격 등) → 브랜드 요청이 있을 때만 <code>util.css</code>. org 테마 데이터 구조는 <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>에 있다.</div>
+  <p class="sources">출처: <a href="https://help.salesforce.com/s/articleView?id=xcloud.lex_themes_and_branding_considerations.htm&amp;type=5">Salesforce Help: Considerations for Themes and Branding</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.brand_create_custom_theme.htm&amp;type=5">Salesforce Help: Create a Custom Theme</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (테마 메타데이터 배포·활성화)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="button">
-  <h2>브랜드별 버튼 디자인</h2>
-  <div class="callout key"><strong>이 절이 가장 중요하다</strong>"브랜드마다 버튼 모양(모서리, 굵기 등)을 다르게 해 달라"는 요청은 반드시 나온다. SLDS 2에서는 <b><code>lightning-button</code>의 모양을 브랜드별로 바꾸는 공식 방법이 없다.</b> component hook(<code>--slds-c-button-*</code>)은 SLDS 1 전용이고, global hook은 읽기 전용이기 때문이다.</div>
+  <h2>브랜드 모양과 milvusButton</h2>
+  <div class="callout key"><strong>이 절이 가장 중요하다 (2026-10-09 갱신)</strong>"브랜드마다 버튼 모양(모서리, 굵기 등)을 다르게 해 달라"는 요청은 반드시 나온다. SLDS 2에는 <b><code>lightning-button</code>의 모양을 브랜드별로 바꾸는 공식 방법이 없다.</b> component hook(<code>--slds-c-button-*</code>)은 SLDS 2에서 지원되지 않고(LWC 개발자 가이드. SLDS 사이트는 Developer Preview로 두고 운영에 쓰지 말라고 한다), global hook은 읽기 전용이고, SLDS 클래스를 직접 덮어쓰는 것은 지원되지 않는 안티패턴이다.</div>
   <h3>밀버스의 대응 순서</h3>
   <div class="table-wrap"><table>
     <tr><th>순서</th><th>요구</th><th>방법</th><th>판단</th></tr>
-    <tr><td>1</td><td>브랜드 색만 다르면 된다</td><td>org Themes and Branding에서 브랜드 색 지정. <code>lightning-button</code>이 accent 색을 따라간다</td><td><span class="tag ok">권장</span> 코드 변경 없음</td></tr>
-    <tr><td>2</td><td>특별한 요구 없음</td><td><code>lightning-button</code>을 그대로 쓴다</td><td><span class="tag ok">기본값</span></td></tr>
-    <tr><td>3</td><td>브랜드 고유 모양이 꼭 필요하다</td><td><code>root.css</code>에 <code>--milvus-button-*</code> 정의 + SLDS 버튼 블루프린트(<code>slds-button</code> 마크업) 기반 <code>milvusButton</code>. fallback은 SLDS 기본값</td><td><span class="tag ok">구현함</span> 파일럿 컴포넌트</td></tr>
-    <tr><td>4</td><td>고객사가 <code>lightning-button</code> 자체의 모양까지 바꾸길 원한다</td><td>opt-in 확장 계층 <code>brands/&lt;브랜드&gt;/override.css</code>에서 모양 관련 <code>--slds-g-*</code>(반경, 폰트)만 재정의. <code>milvus.config.json</code>의 <code>"overrides": true</code>인 브랜드에만 로드</td><td><span class="tag warn">공식 권고 밖</span> 확인 후에만, 릴리스마다 재확인</td></tr>
+    <tr><td>1</td><td>특별한 요구 없음, 또는 브랜드 색만 다르면 된다</td><td>Salesforce 기본 모양 그대로. org 테마의 브랜드 색·로고만 바꾼다. <code>lightning-button</code>이 accent 색을 따라간다</td><td><span class="tag ok">기본</span> 공식 기능, 코드 없음</td></tr>
+    <tr><td>2</td><td>브랜드가 전체 모양을 바꾸길 원한다</td><td><code>util.css</code>의 <code>:root</code>에서 global hook 재정의. 예: <code>--slds-g-radius-border-pill</code>. 같은 hook을 읽는 모든 컴포넌트가 함께 바뀐다</td><td><span class="tag warn">공식 권고 밖</span> 요청이 있을 때만</td></tr>
+    <tr><td>3</td><td>특정 컴포넌트 묶음만 바꾸고 싶다</td><td><code>util.css</code>에서 색이 아닌 <code>--slds-s-*</code>. 예: <code>--slds-s-button-radius-border</code></td><td><span class="tag warn">공식 권고 밖</span> Salesforce 내부용(private)으로 분류된 hook이다. native 전환 때 효과가 사라질 수 있다</td></tr>
+    <tr><td>4</td><td>hook이 아예 없는 항목(움직임 등)을 모든 컴포넌트에서 바꾼다</td><td>패키지의 <code>milvusBridge.css</code>(클래스 규칙, <code>--milvus-*</code>를 읽음). 브랜드는 브리지 변수 값만 정한다</td><td><span class="tag info">계획</span> 설계 5.6, 구현 전</td></tr>
+    <tr><td>5</td><td>hook·브리지로 안 되는 기존 컴포넌트의 모양</td><td>프로젝트 소유 opt-in <code>milvusOverride.css</code>의 클래스 규칙. 마지막에 싣는다</td><td><span class="tag warn">공식 권고 밖</span> 마지막 수단. native 전환·업데이트에 약하다는 것을 알린다. <span class="tag info">계획</span> 설계 5.1</td></tr>
   </table></div>
+  <p>모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다. 밀버스 컴포넌트는 SLDS에 기능이 없을 때만 만든다(2026-10-09 결정). 두 방식의 비교와 권하지 않는 이유는 <a href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html">09 override와 공식 권고</a>에 있다.</p>
+  <p>SLDS 2 CSS에서 버튼 반경은 세 hook을 차례로 읽는다. 그래서 2번과 3번이 둘 다 동작한다.</p>
+<pre data-file="@salesforce-ux/design-system-2 2.264.2 · slds2.cosmos.css (발췌)"><code>.slds-button {
+  border-radius: var(
+    --slds-c-button-radius-border,
+    var(--slds-s-button-radius-border, var(--slds-g-radius-border-2))
+  );
+}
+--slds-s-button-radius-border: var(--slds-g-radius-border-pill);   <span class="c">/* 기본은 알약형 15rem */</span></code></pre>
+  <h3>util.css 예시</h3>
+<pre data-file="brands/Sample_Forest/util.css (발췌)"><code>:root {
+  <span class="c">/* 알약형(버튼, 토글, 필, 경로, 원형 진행 표시줄) → 각진 모서리 */</span>
+  --slds-g-radius-border-pill: var(--slds-g-radius-border-1);
+  <span class="c">/* 입력창 (기본 0.5rem) → 조금 덜 둥글게 */</span>
+  --slds-g-radius-border-2: 0.25rem;
 
-  <h3>3번 방법의 예시</h3>
-<pre data-file="brands/&lt;브랜드&gt;/root.css"><code><span class="c">/* 브랜드 차이는 여기서 --milvus-* 로만 표현한다. 색은 넣지 않는다(org에서 온다) */</span>
-:root {
-  --milvus-button-radius: var(--slds-g-radius-border-pill, 15rem);
-  --milvus-button-font-weight: var(--slds-g-font-weight-7, 700);
+  <span class="c">/* 밀버스 컴포넌트 변수: 버튼만 굵은 글씨 */</span>
+  --milvus-button-custom: on;
+  --milvus-button-font-weight: var(--slds-g-font-weight-7);
 }</code></pre>
-<pre data-file="force-app/main/default/lwc/milvusButton/milvusButton.html"><code>&lt;template&gt;
-  &lt;button class="slds-button slds-button_brand milvus-button" type="button" onclick={handleClick}&gt;
-    {label}
-  &lt;/button&gt;
-&lt;/template&gt;</code></pre>
-<pre data-file="force-app/main/default/lwc/milvusButton/milvusButton.css"><code><span class="c">/* .slds-* 클래스를 덮어쓰지 않고, 자기 클래스에만 스타일을 준다 */</span>
-.milvus-button {
-  <span class="c">/* 브랜드 값 → 없으면 SLDS hook → 없으면 SLDS 기본값 */</span>
-  border-radius: var(--milvus-button-radius, var(--slds-g-radius-border-2, 0.25rem));
-  font-weight: var(--milvus-button-font-weight, inherit);
-}</code></pre>
-  <p>이렇게 하면 브랜드 root가 없는 곳에서는 SLDS 기본 버튼과 똑같이 보이고, 색은 여전히 <code>slds-button_brand</code>가 accent hook을 따라간다.</p>
   <ul>
-    <li><span class="tag warn">정정</span> 아래 값은 SLDS 1 패키지 기준이다. SLDS 2(<code>@salesforce-ux/design-system-2</code> 2.264.2 Cosmos)에서는 <code>--slds-g-radius-border-1..4</code>가 0.25 / 0.5 / 0.75 / 1.25rem으로 다르다. 우리 org는 SLDS 2이므로 SLDS 2 값을 기준으로 한다. (SLDS 1 기준) <code>--slds-g-radius-border-2</code>(0.25rem), <code>--slds-g-radius-border-pill</code>(15rem), <code>--slds-g-font-weight-7</code>(700)은 <code>@salesforce-ux/design-system</code> 2.264.1 CSS에서 이름과 값을 직접 확인했다. SLDS 버튼 블루프린트의 기본 반경 fallback도 <code>0.25rem</code>이다</li>
-    <li>반경 hook은 <code>radius-border-1..4</code>, <code>pill</code>, <code>circle</code>이 있다</li>
+    <li><b>LEX에 거는 방법:</b> 2026-10-08 org 프로브는 정적 리소스를 <code>loadStyle</code>로 문서 head에 넣었다. 프로브 컴포넌트뿐 아니라 같은 페이지의 표준 헤더 버튼과 <code>LightningAlert</code> 모달까지 바뀌었다. 패키지에서는 밀버스 컴포넌트가 부르는 <code>loadBrand</code>로 넣을 <b>계획</b>이다(설계 5.5)</li>
+    <li><b>VF (2026-10-09 갱신):</b> 같은 프로브에서 <code>&lt;apex:slds/&gt;</code>는 SLDS 1로 그려졌고 util.css는 효과가 없었다. SLDS 2 CSS를 넣으면 작동했다. 즉 VF가 LEX와 다르게 보인 원인은 util.css가 아니라 SLDS 버전이다. Help에 따르면 VF가 SLDS 2를 쓰려면 User Interface 설정 "Use SLDS 2 for pages that include &lt;apex:slds&gt; when an SLDS 2 theme is active"를 켜고 SLDS 2 테마를 써야 한다(<code>lightningStyleMode</code> 기본값 <code>Auto</code>는 이 설정을 따른다). 프로브 때 이 설정 상태는 기록이 없어 SLDS 1로 그려진 원인은 <span class="tag warn">미확인</span>이다. 10/12 org 프로브에서 확인한다(<a href="#slds2">SLDS 1과 SLDS 2</a>)</li>
+    <li><b>검사:</b> <code>pnpm test</code>의 <code>check-brands.mjs</code>가 <code>util.css</code>를 본다. <code>:root</code> 하나, <code>--slds-g-*</code>(브랜드 색 계열 제외), 색이 아니고 SLDS 2 CSS가 정의하는 <code>--slds-s-*</code>, 밀버스 컴포넌트가 읽는 <code>--milvus-*</code>만 통과한다</li>
   </ul>
-  <div class="callout project"><strong>결정 (2026-09-26)</strong>공식 권고는 아니지만 고객사별 니즈가 다양하므로 <code>milvusButton</code>을 파일럿으로 구현한다. 그래도 고객사가 <code>lightning-button</code> 자체를 바꾸길 원하면 4번(opt-in <code>override.css</code>)을 쓴다. 이때 색(accent 계열)은 재정의하지 않는다. 색은 org 테마가 원본이다. Salesforce가 SLDS 2 component hook을 지원하면 4번을 그쪽으로 옮긴다.</div>
-  <div class="callout warn"><strong>대가를 알고 쓴다</strong><code>milvusButton</code>은 <code>lightning-button</code>이 해 주던 것(아이콘 배치, 비활성 처리, 접근성 속성 등)을 직접 맞춰야 한다. 그래서 "모양이 꼭 달라야 하는가"를 먼저 묻고, 필요한 브랜드에서만 쓴다. <span class="tag warn">미확인</span> SLDS 2 org 화면에서 <code>slds-button_brand</code> 마크업이 <code>lightning-button</code>과 완전히 같게 보이는지는 아직 비교하지 않았다.</div>
+  <h3>milvusButton의 역할: 비교 예시 (2026-10-09 갱신)</h3>
+  <p>버튼만 다르게 하는 것은 지금 <code>util.css</code>의 <code>--slds-s-button-*</code>로도 된다. 한때는 hook이 없는 모양과 native 전환 대비를 <code>milvusButton</code>에 맡기려 했다. 2026-10-09 결정으로 모양만 바꾸려고 새 컴포넌트를 만들지 않고, hook·브리지로 안 되는 모양은 <code>milvusOverride.css</code>로 바꾼다. <code>milvusButton</code>은 지우지 않고 "새로 만드는 방식"의 비교 예시로 둔다(09 실험 A). <code>&lt;c-milvus-button&gt;</code>은 <code>util.css</code>에 <code>--milvus-button-custom: on</code>이 있으면 SLDS 버튼 블루프린트로 그리고, 없으면 <code>lightning-button</code>을 그대로 그린다.</p>
+<pre data-file="force-app/main/default/lwc/milvusButton/milvusButton.css (발췌)"><code><span class="c">/* 브랜드 값이 없으면 lightning-button과 같은 값(util.css의 버튼 hook → SLDS 2 기본값)으로 떨어진다 */</span>
+.milvus-button {
+  border-radius: var(
+    --milvus-button-radius,
+    var(--slds-s-button-radius-border, var(--slds-g-radius-border-pill, 15rem))
+  );
+  font-weight: var(--milvus-button-font-weight, var(--slds-g-font-weight-6, 600));
+}</code></pre>
+  <div class="callout warn"><strong>켠다면 감수할 대가</strong>블루프린트로 그리면 <code>lightning-button</code>이 해 주던 것(아이콘 배치, 비활성 처리, 접근성 속성 등)을 직접 맞춰야 한다. 지금 <code>milvusButton</code>은 이 대가를 보여 주는 비교 예시다. 브랜드 모양을 바꾸려고 운영에서 켜는 수단이 아니고, 모양 요청은 hook → 브리지 → <code>milvusOverride.css</code> 순으로 받는다(2026-10-09 갱신, <a href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html">09 override와 공식 권고</a> 실험 A). <span class="tag warn">미확인</span> SLDS 2 org 화면에서 블루프린트 버튼이 <code>lightning-button</code>과 완전히 같게 보이는지는 아직 org에서 나란히 비교하지 않았다.</div>
+  <aside class="legacy"><strong>이전 설계 (2026-10-09 갱신)</strong>2026-09-26에는 브랜드 차이를 <code>brands/&lt;브랜드&gt;/root.css</code>(<code>--milvus-*</code> 변수만)에 두고, 고객사가 <code>lightning-button</code> 자체의 모양까지 원하면 opt-in 확장 계층 <code>brands/&lt;브랜드&gt;/override.css</code>(<code>milvus.config.json</code>의 <code>"overrides": true</code>일 때만 로드)에서 모양 관련 <code>--slds-g-*</code>만 재정의하려 했다. 2026-10-07(#11)에 둘을 <code>util.css</code> 하나로 합쳤고 override.css는 만들지 않았다. 앞으로 패키지에서는 이 파일이 <code>staticresources/milvusBrand.css</code>가 된다(설계 문서 맨 앞 "이 문서가 대체하는 것").</aside>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC 개발자 가이드: SLDS Styling Hooks (Support Limitations, 클래스 덮어쓰기 안티패턴)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2: Color Modes (Implementation Rules)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm: @salesforce-ux/design-system-2</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/hookdefs.json">분석 자료: hookdefs.json (반경 hook 값)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (LEX loadStyle, VF)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 감사 종합 (native 전환, 브리지)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-slds.html">Visualforce 개발자 가이드: apex:slds (lightningStyleMode)</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_settings.htm&amp;type=5">Salesforce Help: User Interface Settings (Visualforce Settings)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/7708aa-styling-api">SLDS 2: Styling API (Component-level Styling Hooks, Developer Preview)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/eslint-plugin-slds">npm: @salesforce-ux/eslint-plugin-slds README (no-slds-private-var)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (10/9 opt-in override), 5.1 (반영 순서, milvusOverride.css), 5.5·5.6 (loadBrand, milvusBridge.css 계획), 14장 (10/12 org 프로브)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="criteria">
@@ -263,42 +293,48 @@ pnpm exec slds-linter report force-app   <span class="c"># SARIF 보고서</span
     <tr><th>상황</th><th>결정</th></tr>
     <tr><td>2곳 이상에서 필요하다</td><td>밀버스 공용 컴포넌트로 만든다</td></tr>
     <tr><td>1곳에서만 필요하다</td><td>해당 프로젝트 안에 만든다</td></tr>
-    <tr><td>base 컴포넌트 조합이나 root style로 해결된다</td><td>만들지 않는다</td></tr>
+    <tr><td>org 테마, base 컴포넌트 조합, <code>util.css</code>로 해결된다</td><td>만들지 않는다</td></tr>
     <tr><td>블루프린트는 있는데 LWC(base 컴포넌트)가 없다</td><td>우선순위 높음. 블루프린트 마크업으로 구현한다</td></tr>
   </table></div>
-  <div class="callout project"><strong>판단 순서</strong>① base 컴포넌트에 있나 → 쓴다. ② 조합이나 root.css로 되나 → 만들지 않는다. ③ 블루프린트가 있나 → 블루프린트로 만든다. ④ 몇 곳에서 쓰나 → 공용 / 프로젝트 결정.</div>
+  <div class="callout project"><strong>판단 순서 (2026-10-09 갱신)</strong>① org 테마(색·로고)로 되나 → 코드를 쓰지 않는다. ② base 컴포넌트에 있나 → 쓴다. ③ 브랜드 요청이 있고 <code>util.css</code>의 hook으로 되나 → 변수만 더한다. hook으로 안 되는 모양이면 브리지 변수, 그래도 안 되면 <code>milvusOverride.css</code>(마지막 수단)로 바꾸고 새 컴포넌트는 만들지 않는다. ④ 기능이 없고 블루프린트가 있나 → 블루프린트로 밀버스 컴포넌트를 만든다. ⑤ 몇 곳에서 쓰나 → 공용 / 프로젝트 결정. 공식 문서도 base 컴포넌트 → 블루프린트 → global hook으로 꾸민 커스텀 컴포넌트 순으로 권한다.</div>
+  <p class="sources">출처: <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2: Color Modes (Component Customization Layers)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC 개발자 가이드: SLDS Styling Hooks (design variation → 유틸리티 클래스 → hook 순서)</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_enhancedlex.htm&amp;type=5">Salesforce Help: Salesforce Cosmos Theme and SLDS 2 Availability (base 컴포넌트가 우선)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (10/9 opt-in override, 밀버스 컴포넌트는 기능이 없을 때만), 5.1 (반영 순서)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="quiz" class="quiz">
   <h2>스스로 점검</h2>
   <details><summary>Q1. 우리 org(SLDS 2)에서 <code>--slds-c-button-radius-border</code>로 버튼 모서리를 바꾸면 되나?</summary>
-    <p>안 된다. component hook(<code>--slds-c-*</code>)은 SLDS 1에서만 지원된다. 브랜드 고유 모양이 필요하면 <code>root.css</code>의 <code>--milvus-button-*</code>와 <code>milvusButton</code>을 쓴다. <code>lightning-button</code> 자체까지 바꿔야 하면 opt-in <code>override.css</code>를 쓰되 공식 권고 밖임을 알고 쓴다.</p></details>
-  <details><summary>Q2. 브랜드 A만 강조색을 빨강으로 하고 싶다. <code>--slds-g-color-accent-1</code>을 root.css에서 바꾸면 되나?</summary>
-    <p>안 된다. global hook 재정의는 공식 가이드라인 밖이고, 밀버스는 opt-in <code>override.css</code>에서도 색(accent 계열)은 재정의하지 않는다. 색은 org Themes and Branding의 브랜드 색으로 정하고, accent 계열이 그것을 따라가게 둔다.</p></details>
+    <p>안 된다. component hook(<code>--slds-c-*</code>)은 LWC 개발자 가이드 기준 SLDS 2에서 아직 지원되지 않고, SLDS 사이트도 Developer Preview로 두고 운영에 쓰지 말라고 한다. 먼저 정말 모양이 달라야 하는지 묻는다(기본 우선). 필요하면 <code>util.css</code>에 <code>--slds-s-button-radius-border</code>나 global hook을 쓰되 공식 권고 밖임을 알고 쓴다(<code>--slds-s-*</code>는 Salesforce 내부용 private hook으로 분류된다). hook·브리지로 안 되는 모양이면 opt-in <code>milvusOverride.css</code>(마지막 수단, 공식 권고 밖)를 쓴다. 모양만 바꾸려고 새 컴포넌트를 만들지 않는다 (2026-10-09 갱신).</p></details>
+  <details><summary>Q2. 브랜드 A만 강조색을 빨강으로 하고 싶다. <code>--slds-g-color-accent-1</code>을 util.css에서 바꾸면 되나?</summary>
+    <p>안 된다. 색의 원본은 org 테마다. Themes and Branding(또는 <code>BrandingSet</code> 메타데이터)의 브랜드 색으로 정하고 accent 계열이 그것을 따라가게 둔다. <code>check-brands.mjs</code>도 accent 계열 재정의를 막는다.</p></details>
   <details><summary>Q3. <code>var(--slds-g-color-surface-container-1)</code>만 쓰면 무엇이 문제인가?</summary>
     <p>fallback이 없다. hook이 없는 환경에서 값이 비어 깨진다. <code>no-slds-var-without-fallback</code> 규칙에 걸린다. <code>var(--slds-g-color-surface-container-1, #fff)</code>처럼 쓴다.</p></details>
   <details><summary>Q4. 상태별 색 뱃지가 필요하다. 왜 <code>lightning-badge</code>에 <code>variant="success"</code>를 주지 않나?</summary>
     <p><code>lightning-badge</code>에는 <code>variant</code> 속성이 없다(<code>label</code>, <code>icon-name</code>, <code>icon-position</code>, <code>icon-alternative-text</code>뿐). 유틸리티 클래스로 색을 바꿀 수는 있지만, 상태값만으로 의미색을 고르게 하려고 <code>milvusBadge</code>를 만든다.</p></details>
   <details><summary>Q5. 공식 문서에 <code>npx @salesforce-ux/slds-linter lint</code>라고 나온다. 어떻게 실행하나?</summary>
-    <p><code>pnpm dlx @salesforce-ux/slds-linter lint force-app</code>. 프로젝트에 설치했다면 <code>pnpm exec slds-linter lint force-app</code>. pnpm 대응은 pnpm의 일반 동작이며 Salesforce 문서에 적힌 것은 아니다.</p></details>
+    <p><code>pnpm dlx @salesforce-ux/slds-linter lint force-app</code>. 프로젝트에 설치했다면 <code>pnpm exec slds-linter lint force-app</code>. <code>pnpm dlx</code>는 패키지를 의존성으로 설치하지 않고 받아서 실행한다.</p></details>
+  <details><summary>Q6. VF 페이지에서 util.css가 효과가 없다. util.css를 고쳐야 하나?</summary>
+    <p>아니다. 2026-10-08 프로브에서 원인은 <code>&lt;apex:slds/&gt;</code>가 SLDS 1로 그려진 것이었다. SLDS 2 CSS를 넣으면 util.css가 작동했다. Help에 따르면 VF가 SLDS 2를 쓰려면 User Interface의 Visualforce 설정 "Use SLDS 2 for pages that include &lt;apex:slds&gt; when an SLDS 2 theme is active"를 켜고 SLDS 2 테마를 써야 한다. <code>lightningStyleMode</code>(API 65.0 이상) 기본값 <code>Auto</code>는 이 설정을 따른다. 프로브 때 이 설정이 켜져 있었는지는 기록이 없어 원인은 미확인이고, 10/12 org 프로브에서 확인한다. (2026-10-09 갱신)</p></details>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC 개발자 가이드: SLDS Styling Hooks</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2: Color Modes</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html">SLDS Linter: Rules</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-badge.html">Lightning Component Reference: lightning-badge</a> (확인 2026-10-09) · <a href="https://pnpm.io/10.x/cli/dlx">pnpm 10.x: pnpm dlx (저장소는 pnpm 10.13.1)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-slds.html">Visualforce 개발자 가이드: apex:slds</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_settings.htm&amp;type=5">Salesforce Help: User Interface Settings (Visualforce Settings)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/7708aa-styling-api">SLDS 2: Styling API (Developer Preview)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/eslint-plugin-slds">npm: @salesforce-ux/eslint-plugin-slds README (no-slds-private-var)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장·5.1 (Q1: 반영 순서, opt-in override)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="refs">
   <h2>참고</h2>
   <ul class="refs">
-    <li><a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC Guide — SLDS 1 and SLDS 2</a></li>
-    <li><a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_enhancedlex.htm&amp;type=5">Salesforce Help — SLDS 2 / Cosmos 테마</a></li>
-    <li><a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC Guide — Styling Hooks</a></li>
-    <li><a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS — Color Modes (global hook 재정의 금지)</a> · <a href="https://github.com/salesforce-ux/design-system-md-docs">design-system-md-docs (hook 목록)</a></li>
-    <li><a href="https://github.com/salesforce-ux/slds-linter">slds-linter (GitHub)</a> · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/get-started-intro.html">SLDS Linter Guide</a></li>
-    <li><a href="https://developer.salesforce.com/docs/component-library/bundle/lightning-badge/specification">Component Library — lightning-badge</a> · <a href="https://developer.salesforce.com/docs/component-library/bundle/lightning-combobox/documentation">lightning-combobox</a> · <a href="https://developer.salesforce.com/docs/component-library/bundle/lightning-select/documentation">lightning-select</a></li>
-    <li>npm 레지스트리: <code>@salesforce-ux/design-system</code> 2.264.1 (CSS에서 hook 이름·값 직접 확인), <code>@salesforce-ux/design-tokens</code> 4.1.0, <code>@salesforce-ux/slds-linter</code> 1.2.1 (<code>pnpm view</code>로 확인)</li>
+    <li><a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC Guide — Compare SLDS Versions</a> · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC Guide — SLDS Styling Hooks</a></li>
+    <li><a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_enhancedlex.htm&amp;type=5">Salesforce Help — Cosmos Theme and SLDS 2 Availability</a> · <a href="https://help.salesforce.com/s/articleView?id=xcloud.lex_themes_and_branding_considerations.htm&amp;type=5">Considerations for Themes and Branding</a> · <a href="https://help.salesforce.com/s/articleView?id=xcloud.brand_create_custom_theme.htm&amp;type=5">Create a Custom Theme</a></li>
+    <li><a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2 — Color Modes (global hook 재정의 금지, fallback, 커스터마이즈 층)</a> · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/7708aa-styling-api">Styling API</a> · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/777f5a-global-styling-hooks">Global Styling Hooks</a></li>
+    <li><a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/get-started-intro.html">SLDS Linter Guide</a> · <a href="https://github.com/salesforce-ux/slds-linter">slds-linter (GitHub)</a> · <a href="https://developer.salesforce.com/docs/platform/slds-validator/guide/get-started.html">SLDS Validator Guide</a></li>
+    <li><a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-badge.html">Component Reference — lightning-badge</a> · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-combobox.html">lightning-combobox</a> · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-select.html">lightning-select</a> · <a href="https://v1.lightningdesignsystem.com/components/badges/">SLDS 1 Badges</a></li>
+    <li><a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-slds.html">Visualforce Guide — apex:slds</a> · <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_settings.htm&amp;type=5">Salesforce Help — User Interface Settings (Visualforce Settings)</a></li>
+    <li>npm: <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">@salesforce-ux/design-system-2</a> 2.264.2, <a href="https://www.npmjs.com/package/@salesforce-ux/design-tokens">@salesforce-ux/design-tokens</a> 4.1.0, <a href="https://www.npmjs.com/package/@salesforce-ux/slds-linter">@salesforce-ux/slds-linter</a> 1.2.1, <a href="https://www.npmjs.com/package/@salesforce-ux/eslint-plugin-slds">@salesforce-ux/eslint-plugin-slds</a> 1.2.1 (버전은 <code>pnpm view</code>로 함께 확인)</li>
+    <li>실측 기록: <a href="../docs/research/2026-10-08/README.md">연구 자료 2026-10-08</a> · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브</a> · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 감사 종합</a></li>
   </ul>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC 개발자 가이드: Compare SLDS Versions</a> (확인 2026-10-09) · <a href="https://github.com/salesforce-ux/slds-linter">GitHub: salesforce-ux/slds-linter</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/README.md">연구 자료 2026-10-08 안내</a> (확인 2026-10-09)</p>
 </section>
 
 <footer class="doc-foot">
   <span>밀버스 디자인 시스템 · Learn 01</span>
-  <span>2026-09-26 기준. 공식 문서와 <code>@salesforce-ux/design-system</code> 2.264.1 CSS로 확인함</span>
+  <span>2026-10-09 갱신. 공식 문서와 <code>@salesforce-ux/design-system-2</code> 2.264.2, org 프로브 기록으로 확인함</span>
 </footer>
 </main>
 </div>

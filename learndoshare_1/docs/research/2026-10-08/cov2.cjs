@@ -1,0 +1,15 @@
+const fs=require("fs"),path=require("path");
+const {postcss,OUT,LBC,SLDS2_COMPONENTS}=require("./paths.cjs");
+const SP=/^(padding|margin|gap|row-gap|column-gap)(-.*)?$|^inset/, SZ=/^(width|height|min-width|min-height|max-width|max-height|block-size|inline-size|min-block-size|min-inline-size|max-block-size|max-inline-size)$/;
+const KW=/^(inherit|initial|unset|none|0|auto|transparent|currentcolor|100%|50%|0%|normal|-1|1|inherit !important|none !important|0 !important|auto !important|100% !important|fit-content|max-content|min-content)$/i;
+function kind(v){const s=v.trim(); if(/var\(--(slds-[gsc]|sds-c)-/.test(s)) return "hook"; if(/var\(--/.test(s)) return "otherVar"; if(KW.test(s)) return "keyword"; return "literal";}
+function relevant(v){const s=v.replace(/\s*!important/,"").trim(); if(/^-?\d*\.?\d+%$/.test(s)) return false; if(/^-?[12]px$/.test(s)) return false; if(/^-?0\.0625rem$/.test(s)) return false; if(/v[wh]\b/.test(s)&&!/rem|px/.test(s)) return false; return /\d/.test(s);}
+function scanFile(f){const css=fs.readFileSync(f,"utf8");let r;try{r=postcss.parse(css)}catch(e){return []} const rows=[]; r.walkDecls(d=>{ if(d.prop.startsWith("--"))return; if(!(SP.test(d.prop)||SZ.test(d.prop)))return; let p=d.parent,kf=false; while(p){if(p.type==="atrule"&&/keyframes/.test(p.name))kf=true;p=p.parent} if(kf)return; rows.push({prop:d.prop,value:d.value,sel:(d.parent.selector||"").replace(/\s+/g," "),kind:kind(d.value),file:path.basename(f)});}); return rows;}
+function bucket(rows){ const h=rows.filter(r=>r.kind==="hook").length, rel=rows.filter(r=>r.kind==="literal"&&relevant(r.value)).length; if(!rows.length) return ["noDecl",h,rel]; if(h===0&&rel===0) return ["minor",h,rel]; if(rel===0) return ["full",h,rel]; if(h>0) return ["partial",h,rel]; return ["none",h,rel];}
+const res={slds2:{},lbc:{}};
+const S=SLDS2_COMPONENTS;
+for(const c of fs.readdirSync(S)){ const dir=path.join(S,c); if(!fs.statSync(dir).isDirectory())continue; let rows=[]; for(const f of fs.readdirSync(dir)) if(f.endsWith(".css")&&!f.includes("deprecated")) rows=rows.concat(scanFile(path.join(dir,f))); res.slds2[c]={b:bucket(rows),rows}; }
+const L=LBC;
+for(const c of fs.readdirSync(L)){ const dir=path.join(L,c); if(!fs.statSync(dir).isDirectory())continue; const files=fs.readdirSync(dir); const hasHtml=files.some(f=>f.endsWith(".html"))||fs.existsSync(path.join(dir,"templates")); let rows=[]; for(const f of files) if(f.endsWith(".css")) rows=rows.concat(scanFile(path.join(dir,f))); res.lbc[c]={b:bucket(rows),rows,hasHtml,hasCss:files.some(f=>f.endsWith(".css")),meta:files.some(f=>f.endsWith(".js-meta.xml"))}; }
+fs.writeFileSync(path.join(OUT,"cov2.json"),JSON.stringify(res));
+for(const src of ["slds2","lbc"]){ const B={}; for(const [c,v] of Object.entries(res[src])){ (B[v.b[0]]=B[v.b[0]]||[]).push(c+(v.b[0]==="partial"||v.b[0]==="none"?`(${v.b[1]}/${v.b[2]})`:"")); } console.log("##",src,Object.keys(res[src]).length); for(const [k,v] of Object.entries(B)) console.log(k,v.length,":",v.join(", ")); }
