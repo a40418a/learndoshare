@@ -447,8 +447,9 @@ pnpm sync:theme
 | 6 | [로컬 개발 도구 비교](<Learn/06-로컬 개발 도구 비교.html>) | `sf lightning dev`, LWC Garden, Storybook, org 내 문서 앱 비교와 역할 분담 | 7 | 1시간 |
 | 7 | [pnpm](<Learn/07-pnpm.html>) | strict node_modules, 버전별 차이(10 / 11+), 빌드 스크립트 승인, hoisting, husky | 1 | 1시간 |
 | 8 | [Claude Code 런북](<Learn/08-Claude Code 런북.html>) | `CLAUDE.md`, skill, 프로젝트 시작 워크플로를 Claude Code가 수행하게 만드는 법 | 6 | 1시간 |
+| 9 | [override와 공식 권고](<Learn/09-override와 공식 권고.html>) | 새 컴포넌트 vs 덮어쓰기, SLDS 1·2 커스터마이즈 범위, Salesforce가 권하지 않는 이유, 실험 A~C(세 방식 비교, synthetic·native 라이브 데모, 업데이트 위험), opt-in `milvusOverride.css` | 9 (발표) | 1시간 |
 
-**추천 순서:** 0 → 1 → 7 → 2 → 3 → 4 → 5 → 8 → 6. 0(개념)으로 전체 그림을 잡고, 1(SLDS)과 7(pnpm)을 읽으면 Phase 1을 바로 시작할 수 있다.
+**추천 순서:** 0 → 1 → 7 → 2 → 3 → 4 → 5 → 8 → 6 → 9. 0(개념)으로 전체 그림을 잡고, 1(SLDS)과 7(pnpm)을 읽으면 Phase 1을 바로 시작할 수 있다. 9는 발표에서 override를 설명하기 전에 읽는다.
 
 ---
 

@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>override와 공식 권고</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+/* 실험 B 데모 배치 (이 문서 전용) */
+.demo { border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin: 14px 0; background: var(--surface); }
+.demo-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin: 12px 0; }
+.demo-panel { margin: 0; padding: 12px; border: 1px dashed var(--border); border-radius: var(--radius); }
+.demo-panel figcaption { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+.demo-stage { display: flex; flex-wrap: wrap; gap: 8px; }
+.demo-toggle { display: inline-flex; gap: 8px; align-items: center; font-weight: 600; }
+.demo td { white-space: nowrap; }
+</style>
+<!-- 실험 B: 두 칸이 함께 쓰는 "컴포넌트 CSS". (나)에는 스크립트가 같은 내용을 shadow root 안에 넣는다 -->
+<style id="demo-base">
+.slds-button {
+  border-radius: var(--slds-s-button-radius-border, 15rem);
+  font-weight: 400;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.875rem;
+  padding: 0 1rem;
+  color: var(--text);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.slds-button.demo-fixed { border-radius: 15rem; }
+</style>
+<!-- 실험 B: 토글로 켜고 끄는 전역 CSS (클래스 규칙 1개 + hook 변수 1개) -->
+<style id="demo-global">
+.slds-button { font-weight: 700; }
+:root { --slds-s-button-radius-border: 0; }
+</style>
+</head>
+<body>
+<nav class="topnav"><div class="topnav-inner">
+  <a href="../README.md">README</a>
+  <a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html">00 개념</a>
+  <a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html">01 SLDS</a>
+  <a href="02-LWC%20%EA%B8%B0%EC%B4%88.html">02 LWC</a>
+  <a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html">03 Storybook</a>
+  <a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html">04 통합</a>
+  <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>
+  <a href="06-%EB%A1%9C%EC%BB%AC%20%EA%B0%9C%EB%B0%9C%20%EB%8F%84%EA%B5%AC%20%EB%B9%84%EA%B5%90.html">06 도구 비교</a>
+  <a href="07-pnpm.html">07 pnpm</a>
+  <a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html">08 Claude Code</a>
+  <a class="active" href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html">09 override</a>
+</div></nav>
+
+<div class="layout">
+<aside class="toc">
+  <strong>목차</strong>
+  <ol>
+    <li><a href="#question">1. 새로 만들까, 덮어쓸까</a></li>
+    <li><a href="#scope">2. SLDS 1과 2의 커스터마이즈 범위</a></li>
+    <li><a href="#why">3. 권하지 않는 이유</a></li>
+    <li><a href="#exp-a">4. 실험 A: 같은 요구, 세 방식</a></li>
+    <li><a href="#exp-b">5. 실험 B: synthetic과 native</a></li>
+    <li><a href="#exp-c">6. 실험 C: 업데이트 위험</a></li>
+    <li><a href="#choice">7. 밀버스의 선택</a></li>
+    <li><a href="#summary">8. 발표용 요약</a></li>
+    <li><a href="#quiz">9. 스스로 점검</a></li>
+  </ol>
+</aside>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">LEARN 09 · override</div>
+  <h1>override와 공식 권고</h1>
+  <p class="lead">기존 컴포넌트의 모양을 바꿀 때 새 컴포넌트를 만들지, 기존 컴포넌트의 CSS를 덮어쓸지 정리한다. Salesforce가 덮어쓰기를 권하지 않는 이유를 공식 자료로 확인하고, 세 가지 실험으로 직접 비교한다. 발표에서 "두 방식을 다 해 봤고, 이래서 공식적으로는 권하지 않는다"를 설명하는 것이 목표다.</p>
+  <div class="meta"><span>예상 1시간</span><span>선행: 00 개념 · 01 SLDS</span><span>2026-10-09 공식 문서 · 설치된 패키지 · 실측 기록으로 확인</span></div>
+</header>
+
+<div class="callout key"><strong>표시 규칙</strong><span class="tag warn">미확인</span>은 공식 문서나 실측으로 확인하지 못한 것이다. <span class="tag warn">추정</span>은 공식 문서가 밝히지 않아 우리가 해석한 것이다. <span class="tag info">계획</span>은 설계만 있고 아직 구현하지 않은 것이다. 이 문서의 공식 자료 조사는 <a href="../docs/research/2026-10-09-slds2-customization.md">2026-10-09 조사 기록</a>에 원문 위치와 함께 있다.</div>
+
+<section id="question">
+  <h2>1. 질문: 새로 만들까, 덮어쓸까</h2>
+  <h3>개념</h3>
+  <p>기존 컴포넌트의 모양을 바꾸는 길은 둘이다. 하나는 같은 기능의 컴포넌트를 새로 만들어 원하는 모양으로 그리는 것이다. 다른 하나는 기존 컴포넌트를 그대로 쓰고, 그 컴포넌트에 걸린 CSS를 바깥에서 덮어쓰는 것(override)이다. 둘 다 디자인 시스템이 정한 모양에서 벗어나는 일이라, 드는 비용과 깨질 위험을 비교해서 고른다.</p>
+  <h3>Salesforce에서는</h3>
+  <ul>
+    <li><b>권장 순서:</b> base 컴포넌트(<code>lightning-*</code>)의 속성 → 맞는 base 컴포넌트가 없을 때 블루프린트 → hook을 읽는 커스텀 컴포넌트. SLDS 2 사이트는 블루프린트를 "가능하면 피한다"고 표시하고, base 컴포넌트의 커스터마이즈는 제한적이라고 적는다</li>
+    <li><b>덮어쓰기:</b> LWC 개발자 가이드는 base 컴포넌트의 스타일 override를 문서화된 styling hook을 쓸 때만 지원한다고 적는다. SLDS 클래스를 덮어쓰거나 렌더된 내부 마크업을 겨냥한 스타일은 지원하지 않는다. 가이드의 안티패턴 예시가 바로 <code>.slds-button { padding: 16px; }</code> 같은 규칙이다</li>
+    <li><b>새로 만들기:</b> 블루프린트는 모양만 있는 HTML·CSS 틀이라 동작과 로직이 없고, 플랫폼의 최신 개선과 보호를 받지 못한다. 그래서 base 컴포넌트가 해 주던 동작과 접근성을 직접 맞춰야 한다</li>
+  </ul>
+  <h3>밀버스에서는</h3>
+  <div class="table-wrap"><table>
+    <tr><th></th><th>새 컴포넌트 (<code>milvusButton</code>)</th><th>덮어쓰기 (<code>milvusOverride.css</code>)</th></tr>
+    <tr><td>하는 일</td><td>블루프린트 마크업으로 버튼을 다시 그리고 <code>--milvus-*</code> 변수를 읽는다</td><td><code>lightning-button</code>은 그대로 두고 <code>.slds-button</code> 같은 클래스 규칙을 문서 CSS로 덮는다</td></tr>
+    <tr><td>바뀌는 곳</td><td><code>&lt;c-milvus-button&gt;</code>으로 바꾼 곳만</td><td>그 CSS가 들어간 페이지의 모든 해당 요소. 지금 org(synthetic)에서는 표준 UI까지</td></tr>
+    <tr><td>드는 일</td><td>접근성, 아이콘, 비활성 처리를 직접 맞추고, 사용처를 모두 바꾼다</td><td>규칙 몇 줄. 대신 Salesforce가 클래스·선택자를 바꿀 때마다 확인한다</td></tr>
+    <tr><td>깨지는 때</td><td>블루프린트 마크업이 바뀔 때</td><td>native shadow 전환, 내부 클래스·마크업 변경</td></tr>
+    <tr><td>공식 지위</td><td>블루프린트 사용은 허용(가능하면 피함)</td><td>지원하지 않음</td></tr>
+  </table></div>
+  <div class="callout project"><strong>2026-10-09 결정: 모양만 바꾸려고 새 컴포넌트를 만들지 않는다</strong>기존 컴포넌트의 모양을 hook·브리지로 바꿀 수 없으면, 새 밀버스 컴포넌트 대신 프로젝트 소유 <code>milvusOverride.css</code>의 클래스 규칙으로 바꾼다. 공식 권고 밖이라는 것을 알고 쓰고, 사용자에게도 알린다. 밀버스 컴포넌트는 SLDS에 기능이 없을 때만 만든다. 이미 만든 <code>milvusButton</code>은 "새로 만드는 방식"의 비교 예시로 남긴다. <span class="tag info">계획</span> <code>milvusOverride.css</code>는 아직 없다(설계 5.1, 5.5).</div>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-antipatterns.html">LWC Developer Guide — Anti-Patterns for Component Styling</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/755aff-components/b/459d9d">SLDS 2 — Components, Component Blueprints 탭 (가능하면 피함, 플랫폼 개선·보호 없음)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/755aff-components/b/31438b">SLDS 2 — Components, Component Architecture 탭 (base 컴포넌트 커스터마이즈 제한)</a> (확인 2026-10-09) · <a href="https://v1.lightningdesignsystem.com/dev-guidelines/best-practices/">SLDS 1 — Development Best Practices (How to Use SLDS, 세 층)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (1장 10/9 opt-in override 결정, 5.1 층, 5.5 싣는 순서)</a> (확인 2026-10-09) · <a href="../README.md">README 2장 (milvusButton #4)</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="scope">
+  <h2>2. SLDS 1과 SLDS 2의 커스터마이즈 범위</h2>
+  <h3>개념</h3>
+  <p>커스터마이즈 범위는 "누가, 어디서, 무엇을 바꿀 수 있는가"다. 같은 CSS라도 <b>공식 지원</b>(업그레이드 뒤에도 Salesforce가 동작을 책임진다)과 <b>실제로 동작함</b>(지금 화면에서 바뀐다)은 다르다. 이 둘을 섞으면 "공식 문서는 안 된다는데 우리 org에서는 된다"는 혼란이 생긴다.</p>
+  <h3>Salesforce에서는</h3>
+  <div class="table-wrap"><table>
+    <tr><th>항목</th><th>SLDS 1</th><th>SLDS 2 (2026-10-09)</th><th>변화</th></tr>
+    <tr><td>컴포넌트 hook <code>--slds-c-*</code></td><td>2.17.0(Spring '22)부터 GA. 버튼 반경 <code>--slds-c-button-radius-border</code>는 기본 0.25rem으로 문서화되어 있다</td><td>LWC 개발자 가이드는 "현재 미지원". SLDS 사이트와 Winter '27 릴리스 노트는 Developer Preview(운영에 쓰지 말 것, 케이스로 신청)</td><td><span class="tag bad">줄어듦</span> GA → DP</td></tr>
+    <tr><td>global hook <code>--slds-g-*</code> 재할당</td><td>컴포넌트 안 재할당 금지(테스트 실패, SLDS 2에서 사이트가 깨질 수 있음)</td><td>고객 커스터마이즈에서 재정의를 지원하지 않는다. 값 할당은 테마 도구의 몫이다</td><td>변화 없음. 원래 공식 수단이 아니었다</td></tr>
+    <tr><td>shared hook <code>--slds-s-*</code></td><td>문서에 없음</td><td>SLDS 1 Best Practices는 shared·컴포넌트 hook이 SLDS 2에서 지원되지 않는다고 적는다. 공식 SLDS Linter는 private(Salesforce 내부용)로 분류한다</td><td>원래 공개 API가 아니었다</td></tr>
+    <tr><td>디자인 토큰 <code>--lwc-*</code></td><td>동작</td><td>설정을 지원하지 않고, 다시 할당한 값은 무시된다</td><td><span class="tag bad">줄어듦</span></td></tr>
+    <tr><td><code>.slds-*</code> 클래스 덮어쓰기</td><td>지원하지 않음(실제로는 동작)</td><td>지원하지 않음. 실제로 닿는지는 shadow 모드가 정한다(5절)</td><td>지원 범위는 같다. 깨질 위험이 커졌다</td></tr>
+    <tr><td>관리자 테마 색 옵션</td><td>배경색, 배경 이미지, 글로벌 헤더 색, "Override accessibility brand color"</td><td>모두 SLDS 2 테마에서는 쓸 수 없다(접근성)</td><td><span class="tag bad">줄어듦</span></td></tr>
+    <tr><td>관리자 테마 새 기능</td><td>—</td><td>브랜드 색에서 WCAG 대비를 맞춘 accent 자동 생성, advanced accent(재정의는 강하게 비권장), 다크 모드(Winter '27 GA, 2026-09부터), 다크 모드용 로고</td><td><span class="tag ok">늘어남</span></td></tr>
+    <tr><td>hook 값의 성격</td><td>고정값 중심</td><td>hook마다 라이트·다크 값이 있고, 밀도에 따라 바뀌는 간격 hook이 있다. 릴리스에서 이름이 폐기되기도 한다(Winter '26: <code>--slds-g-font-family</code> → <code>--slds-g-font-family-base</code> 등)</td><td>값이 동적이 됨</td></tr>
+  </table></div>
+  <p>정리하면 <b>컴포넌트 하나를 CSS로 고치던 자유는 줄었고, 테마로 시스템 전체를 바꾸는 자유는 늘었다.</b> 공식 자료는 "줄였다"고 쓰지 않는다. Winter '26 GA 릴리스 노트는 SLDS 2가 구조와 시각 스타일을 분리해 더 깊은 커스터마이즈와 테마를 준다고 쓴다.</p>
+  <div class="callout warn"><strong>"SLDS 2에서는 무시된다"는 무엇을 말하나 (2026-10-09 원문 확인)</strong>
+    <ul>
+      <li><b>공식 문장:</b> SLDS 1 Best Practices의 "Update Styling Hooks" 절, <code>--slds-*</code> 소절 "Replace a Styling Hook as a Value for a Selector that You Don't Own"은 세 문장이다. 컴포넌트에 대한 직접 CSS 커스터마이즈는 SLDS 2에서 지원하지 않는다. CSS를 지워 문제가 생기면 아직 바꾸지 말라. 다시 할당한 값은 SLDS 1에서는 계속 동작하지만 "will be ignored in SLDS 2"다</li>
+      <li><b>우리 실측:</b> 2026-10-08 org 프로브에서 <code>loadStyle</code>로 넣은 <code>:root</code>의 hook 두 개(<code>--slds-g-radius-border-pill</code>, <code>--slds-s-input-radius-border</code>)는 프로브 컴포넌트, 표준 헤더 버튼, <code>LightningAlert</code> 모달까지 닿았다</li>
+      <li><b>차이의 이유:</b> ① 그 문장의 주어는 남의 선택자에 <b>다시 할당한 hook 값</b>이다. 같은 페이지의 <code>--lwc-*</code> 소절도 같은 꼴이다. 클래스 규칙의 속성 값을 말하는 문장이 아니다. ② 설치된 SLDS 2 CSS(2.264.2)는 <code>--lwc-*</code>를 3곳(브랜드 이미지)에서만 읽는다. 옛 이름에 넣은 값은 읽는 곳이 없어 효과가 없다. 반대로 우리가 넣은 두 이름은 SLDS 2 CSS가 지금 읽는 이름이라 닿았다. ③ "지원하지 않는다"는 정책이다. 동작을 보장하지 않는다는 뜻이지, 플랫폼이 그 CSS를 걸러 낸다는 뜻이 아니다</li>
+      <li><b>남은 빈칸:</b> 클래스 규칙은 그 프로브에 들어 있지 않았다. "지금 org에서는 클래스 규칙도 닿는다"는 2026-10-07 synthetic 실측과, LWC 개발자 가이드의 설명(synthetic에서는 문서 맨 위의 공유 스타일시트가 페이지의 모든 컴포넌트를 꾸밀 수 있다)에서 나온 결론이다. org에서 클래스 규칙을 직접 잰 기록은 없다 <span class="tag warn">미확인</span>. 10/12 org 프로브(Task 9)에서 클래스 규칙 하나를 함께 넣어 재 보자 <span class="tag info">제안</span></li>
+    </ul>
+  </div>
+  <h3>밀버스에서는</h3>
+  <ul>
+    <li>우리 org는 SLDS 2 테마를 쓰고, 밀버스는 SLDS 2 org를 기준으로 한다(설계 1장 #22). 그래서 SLDS 1의 공식 수단(c hook GA)은 쓸 수 없다</li>
+    <li>"기본 우선"은 늘어난 쪽(관리자 테마)을 먼저 쓰는 결정이다. 줄어든 쪽을 메우는 util.css·브리지·override는 모두 공식 권고 밖이다</li>
+  </ul>
+  <p class="sources">출처: <a href="https://v1.lightningdesignsystem.com/dev-guidelines/best-practices/">SLDS 1 — Development Best Practices (Update Styling Hooks, --lwc-*·--slds-* 소절)</a> (확인 2026-10-09) · <a href="https://v1.lightningdesignsystem.com/platforms/lightning/styling-hooks/">SLDS 1 — Styling Hooks (2.17.0 GA)</a> (확인 2026-10-09) · <a href="https://v1.lightningdesignsystem.com/components/buttons/">SLDS 1 — Buttons (Styling Hooks 표, radius 0.25rem)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/0213f9-component-level-styling-hooks">SLDS 2 — Component-Level Styling Hooks (Developer Preview)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC Developer Guide — Compare SLDS Versions</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_slds_c_level_hooks.htm&amp;release=264&amp;type=5">Winter '27 릴리스 노트 — Component-Level Hooks (Developer Preview)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/98b493-styling-hook-index">SLDS 2 — Styling Hook Index (재정의 미지원)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/547b38-develop">SLDS 2 — Develop (값 할당은 테마 도구 몫)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce-ux/slds-linter/blob/main/packages/eslint-plugin-slds/README.md">GitHub salesforce-ux/slds-linter — eslint-plugin-slds README (private hook)</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.lex_themes_and_branding_considerations.htm&amp;type=5">Salesforce Help — Considerations for Themes and Branding</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.brand_custom_configurations.htm&amp;type=5">Salesforce Help — Manage Custom Configurations for Themes</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_slds_dark_mode_ga.htm&amp;release=264&amp;type=5">Winter '27 릴리스 노트 — Dark Mode (GA)</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_slds2_ga.htm&amp;release=258&amp;type=5">Winter '26 릴리스 노트 — SLDS 2 (GA)</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_slds_updates.htm&amp;release=258&amp;type=5">Winter '26 릴리스 노트 — SLDS Component Design Updates (폐기된 global hook)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-mixed-shadow.html">LWC Developer Guide — Mixed Shadow Mode (synthetic의 전역 스타일시트)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm — @salesforce-ux/design-system-2</a> (설치된 2.264.2의 CSS를 grep으로 확인 2026-10-09) · <a href="../docs/research/2026-10-09-slds2-customization.md">공식 자료 조사 (c)표, (h) "무시된다" 정정</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (loadStyle로 넣은 hook 두 개)</a> (확인 2026-10-09) · <a href="../README.md">README 3장 (2026-10-07 synthetic 실측)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (1장 SLDS 2 기준 #22, 기본 우선)</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="why">
+  <h2>3. Salesforce가 권하지 않는 이유</h2>
+  <h3>개념</h3>
+  <p>규칙을 설명할 때는 공식 자료가 직접 밝힌 이유와, 밝히지 않아 우리가 짐작한 이유를 나눠 말해야 한다. 짐작을 공식 이유처럼 말하면 발표에서 반박당한다.</p>
+  <h3>Salesforce에서는: 공식 자료가 밝힌 것</h3>
+  <ol>
+    <li><b>hook 값의 주인은 SLDS다.</b> global hook 값은 SLDS가 정하고, Salesforce가 언제든 바꾸고 릴리스 노트로 알린다. 값 할당은 테마 도구의 몫이고, 고객 커스터마이즈에서 재정의하는 것은 지원하지 않는다(Global Styling Hooks, Develop, Styling Hook Index)</li>
+    <li><b>테마는 hook 값을 바꾸는 방식으로 동작한다.</b> 활성 테마에 따라 global hook 값이 바뀌고, Themes and Branding도 특정 hook 값을 덮어써서 브랜드를 입힌다(Styling API)</li>
+    <li><b>내부는 언제든 다시 설계된다.</b> Salesforce는 성능, 기능, 접근성을 위해 컴포넌트 내부를 다시 설계할 자유가 필요하다고 적는다. HTML, CSS, DOM의 하위 호환을 보장한 적이 없고, 내부 변경은 대개 문서화하지 않는다. 지원되지 않는 커스터마이즈는 시각 회귀나 테스트 실패를 낼 수 있고, Salesforce UI 개선을 받아들이기 어렵게 만든다(Anti-Patterns, KB 001395244, Summer '24 릴리스 노트)</li>
+    <li><b>native shadow로 옮겨 가는 중이다.</b> 성능과 Web Components 표준을 위해 base 컴포넌트를 native shadow에 맞게 바꾸고 있고, 그 과정에서 내부 DOM 구조가 바뀐다. Spring '23부터 90개가 넘는 base 컴포넌트가 바뀌었다(Summer '25 릴리스 노트)</li>
+    <li><b>하드코딩과 재할당은 테마·다크 모드·접근성 개선을 따라가지 못한다.</b> global hook 재할당은 SLDS 2에서 레이아웃을 깨뜨릴 수 있다(Transition to SLDS 2)</li>
+    <li><b>관리자 테마 옵션 일부는 접근성 때문에 뺐다.</b> 배경색, 배경 이미지, 글로벌 헤더 색은 SLDS 2 테마에서 쓸 수 없고, accent 재정의는 강하게 권하지 않는다(Considerations for Themes and Branding, Manage Custom Configurations)</li>
+  </ol>
+  <h3>Salesforce에서는: 공식 자료가 밝히지 않은 것</h3>
+  <div class="table-wrap"><table>
+    <tr><th>질문</th><th>공식 자료에 있는 것</th><th>우리 해석</th></tr>
+    <tr><td>컴포넌트 hook을 SLDS 2 출시 때 왜 뺐나</td><td>Spring '25는 "아직 지원하지 않음", LWC 가이드는 "작업 중"이라고만 쓴다. Winter '27에 범주와 modifier 패턴을 갖춘 Styling API로 다시 나왔다</td><td><span class="tag warn">추정</span> SLDS 2 테마(g hook 참조) 위에서 이름 체계를 다시 설계하는 동안 비워 두었다</td></tr>
+    <tr><td><code>--slds-s-*</code>를 왜 private로 두었나</td><td>린터는 "내부용"이라는 분류만 적는다. Winter '27에 <code>--slds-s-table-color</code> 매핑을 접근성 이유로 바꿨다</td><td><span class="tag warn">추정</span> 컴포넌트 사이 내부 배선 값이라 릴리스마다 매핑을 바꿀 수 있게 공개 계약에서 뺐다</td></tr>
+    <tr><td>global hook 재정의를 막는 설계 의도 전체</td><td>소유권("테마 도구 몫")과 결과(테스트 실패, 레이아웃 깨짐)까지만 밝힌다. hook마다 라이트·다크 값이 다르다</td><td><span class="tag warn">추정</span> 고객이 <code>:root</code>에 값을 고정하면 모드·밀도 전환과 접근성 조정이 그 hook에서 멈춘다</td></tr>
+    <tr><td>native 전환과 컴포넌트 hook 축소의 관계</td><td>둘을 직접 잇는 문장은 없다. "native에서는 클래스 대신 hook", "컴포넌트 hook은 shadow 경계를 넘어 상속된다"만 있다</td><td><span class="tag warn">추정</span> native 전환이 클래스 override를 막는 방향을 굳혔고, hook을 유일한 공식 통로로 만들었다</td></tr>
+    <tr><td>"커스터마이즈가 줄었다"는 인식에 대한 답</td><td>찾지 못했다. 공식 메시지는 일관되게 "더 깊은 커스터마이즈와 테마"다</td><td>—</td></tr>
+  </table></div>
+  <h3>밀버스에서는</h3>
+  <ul>
+    <li>발표에서는 1~6만 "Salesforce가 밝힌 이유"로 말하고, 표의 해석은 "추정"이라고 밝힌다</li>
+    <li>"기본 우선"은 1·2번과 맞는다. 브랜드는 org 테마로 입히고 hook은 읽기만 한다. override는 3·4번 위험을 알고 쓰는 예외다</li>
+  </ul>
+  <p class="sources">출처: <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/777f5a-global-styling-hooks">SLDS 2 — Global Styling Hooks</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/547b38-develop">SLDS 2 — Develop</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/98b493-styling-hook-index">SLDS 2 — Styling Hook Index</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/7708aa-styling-api">SLDS 2 — Styling API</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-antipatterns.html">LWC Developer Guide — Anti-Patterns for Component Styling</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=001395244&amp;type=1">Salesforce Help — Salesforce Component Internals Are Protected (KB 001395244)</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_lc_design_system_updates.htm&amp;release=250&amp;type=5">Summer '24 릴리스 노트 — Confirm Your Components Use Supported Design System Customizations</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_lc_native_shadow_dom.htm&amp;release=256&amp;type=5">Summer '25 릴리스 노트 — Internal DOM Structure Is Changing for Lightning Base Components</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/8184ad-transition-to-slds-2">SLDS 2 — Transition to SLDS 2</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.lex_themes_and_branding_considerations.htm&amp;type=5">Salesforce Help — Considerations for Themes and Branding</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.brand_custom_configurations.htm&amp;type=5">Salesforce Help — Manage Custom Configurations for Themes</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC Developer Guide — Compare SLDS Versions</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_slds_c_level_hooks.htm&amp;release=264&amp;type=5">Winter '27 릴리스 노트 — Component-Level Hooks</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_slds_updates.htm&amp;release=264&amp;type=5">Winter '27 릴리스 노트 — Component Blueprints Updates (--slds-s-table-color)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce-ux/slds-linter/blob/main/packages/eslint-plugin-slds/README.md">GitHub salesforce-ux/slds-linter — eslint-plugin-slds README</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-09-slds2-customization.md">공식 자료 조사 (b) 밝힌 이유, (e) 밝히지 않은 부분</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (1장 기본 우선)</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="exp-a">
+  <h2>4. 실험 A: 같은 요구를 세 방식으로</h2>
+  <h3>개념</h3>
+  <p>같은 요구를 여러 방식으로 풀어 보면 방식마다 무엇을 대가로 내는지 보인다. 요구는 "버튼을 각지게, 글자를 굵게"다.</p>
+  <h3>Salesforce에서는: 버튼 CSS가 읽는 것</h3>
+<pre data-file="@salesforce-ux/design-system-2 2.264.2 · slds2.cosmos.css (발췌)"><code><span class="c">/* @layer component 안의 :where(html) — SLDS 2가 c hook으로 버튼 굵기를 600으로 둔다 */</span>
+--slds-c-button-font-weight: var(--slds-g-font-weight-6);
+
+.slds-button {
+  border-radius: var(--slds-c-button-radius-border,
+    var(--slds-s-button-radius-border, var(--slds-g-radius-border-2)));
+  font-weight: var(--slds-c-button-font-weight, var(--slds-g-font-weight-4));
+}
+<span class="c">/* 버튼 그룹의 위치별 모서리는 더 구체적인 선택자가 s hook을 직접 읽는다 */</span>
+.slds-button-group .slds-button:first-child {
+  border-start-start-radius: var(--slds-s-button-radius-border);
+  border-end-start-radius: var(--slds-s-button-radius-border);
+}</code></pre>
+  <ul>
+    <li>모서리: <code>--slds-s-button-radius-border</code>를 읽는 줄이 30개다. Cosmos 테마에서 이 값은 <code>--slds-g-radius-border-pill</code>(15rem)이다</li>
+    <li>굵기: 버튼만 가리키는 이름은 c hook <code>--slds-c-button-font-weight</code>뿐이다. 그 기본값 <code>--slds-g-font-weight-6</code>은 전역 hook이라 18줄이 읽는다</li>
+  </ul>
+  <h3>밀버스에서는: 세 방식</h3>
+<pre data-file="① util.css hook (milvusBrand.css)"><code>:root {
+  --slds-s-button-radius-border: 0;   <span class="c">/* 각지게: 버튼과 버튼 그룹 30줄이 함께 바뀐다 */</span>
+  <span class="c">/* 굵게: 버튼만 바꾸는 허용 hook이 없다.
+     --slds-c-button-font-weight는 c hook(Developer Preview, util.css 금지)
+     --slds-g-font-weight-6을 바꾸면 600을 쓰는 모든 글자가 굵어진다 */</span>
+}</code></pre>
+<pre data-file="② override 클래스 규칙 (milvusOverride.css, 계획)"><code>.slds-button { border-radius: 0; font-weight: 700; }
+<span class="c">/* 단독 버튼은 바뀐다. 버튼 그룹의 첫째·끝 버튼 바깥 모서리는
+   더 구체적인 SLDS 선택자(명시도 0,3,0)에 져서 둥근 채로 남는다 */</span></code></pre>
+<pre data-file="③ 밀버스 컴포넌트 (util.css 변수 + 화면 코드)"><code>:root {
+  --milvus-button-custom: on;                          <span class="c">/* 블루프린트로 그린다 */</span>
+  --milvus-button-radius: 0;
+  --milvus-button-font-weight: var(--slds-g-font-weight-7);
+}
+&lt;c-milvus-button label="저장" variant="brand"&gt;&lt;/c-milvus-button&gt;   <span class="c">&lt;!-- lightning-button 대신 --&gt;</span></code></pre>
+  <div class="table-wrap"><table>
+    <tr><th></th><th>① util.css hook</th><th>② override 클래스 규칙</th><th>③ 밀버스 컴포넌트</th></tr>
+    <tr><td>각지게</td><td><span class="tag ok">됨</span> 단독·그룹 모두 0px (로컬 실측)</td><td><span class="tag warn">일부</span> 단독만 0px. 그룹 첫째·끝 바깥 모서리는 240px로 남음 (로컬 실측). 맞추려면 SLDS 선택자를 따라 써야 한다</td><td><span class="tag ok">됨</span></td></tr>
+    <tr><td>굵게</td><td><span class="tag bad">버튼만은 안 됨</span> c hook은 금지, g hook은 전역</td><td><span class="tag ok">됨</span> 700 (로컬 실측)</td><td><span class="tag ok">됨</span></td></tr>
+    <tr><td>닿는 범위</td><td>같은 페이지의 모든 버튼. org에서 g hook(<code>--slds-g-radius-border-pill</code>)이 표준 헤더 버튼과 모달까지 닿았다 (2026-10-08 실측)</td><td>synthetic에서는 페이지의 모든 <code>.slds-button</code> <span class="tag warn">org 미측정</span>. native 컴포넌트 안에는 닿지 않는다</td><td><code>&lt;c-milvus-button&gt;</code>으로 바꾼 곳만. 표준 UI 버튼은 그대로라 한 화면에서 모양이 섞인다</td></tr>
+    <tr><td>native 전환 뒤</td><td>custom property는 상속된다. 기본 컴포넌트의 native CSS(<code>button.slds.css</code>)도 <code>--slds-s-button-radius-border</code>를 읽으므로 닿을 가능성이 높다 <span class="tag warn">추정</span></td><td>기본 컴포넌트 안에는 닿지 않는다 (5절)</td><td>우리 컴포넌트는 shadow 모드를 스스로 정한다. 그 안의 블루프린트 클래스는 SLDS 변경을 그대로 받는다</td></tr>
+    <tr><td>유지 비용</td><td>낮다. 이름 폐기·매핑 변경은 릴리스 노트로 알린다</td><td>릴리스마다 클래스·선택자를 다시 확인한다</td><td>접근성, 아이콘, 비활성, variant를 직접 맞추고 사용처를 모두 바꾼다</td></tr>
+    <tr><td>공식 지위</td><td>권고 밖. s hook은 private, g 재정의는 미지원</td><td>지원하지 않음. 가이드의 안티패턴 예시와 같은 꼴</td><td>hook 읽기는 공식. 블루프린트는 가능하면 피함</td></tr>
+  </table></div>
+  <div class="callout ok"><strong>무엇을 배웠나</strong>hook은 Salesforce가 정한 읽기 지점이 있는 곳까지만 바꾸지만, 그 범위 안에서는 숨은 선택자까지 한 번에 바뀐다. 클래스 규칙은 어디든 바꿀 수 있지만 Salesforce의 선택자를 하나씩 따라가야 한다. 새 컴포넌트는 가장 확실하지만 가장 비싸고, 표준 UI와 모양이 갈라진다.</div>
+  <h3>직접 확인하기</h3>
+<pre><code><span class="c"># learndoshare_1에서. 버튼 모서리 s hook을 읽는 줄 수 (2.264.2에서 30)</span>
+grep -c "var(--slds-s-button-radius-border" node_modules/@salesforce-ux/design-system-2/dist/css/bundled/slds2.cosmos.css
+<span class="c"># 버튼 굵기 c hook의 기본값</span>
+grep -n -F -- "--slds-c-button-font-weight:" node_modules/@salesforce-ux/design-system-2/dist/css/bundled/slds2.cosmos.css</code></pre>
+  <p>로컬 실측 방법(SLDS 2 CSS만 실은 HTML에서 <code>getComputedStyle</code>)과 결과 표는 조사 기록 (i)에 있다.</p>
+  <p class="sources">출처: <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm — @salesforce-ux/design-system-2</a> (설치된 2.264.2의 CSS를 grep으로 확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">npm — lightning-base-components</a> (설치된 1.28.19-alpha의 button.slds.css 확인 2026-10-09) · <a href="../docs/research/2026-10-09-slds2-customization.md">조사 기록 (i) 로컬 실측: 버튼 그룹과 굵기</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-antipatterns.html">LWC Developer Guide — Anti-Patterns for Component Styling</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/0213f9-component-level-styling-hooks">SLDS 2 — Component-Level Styling Hooks (Developer Preview)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/98b493-styling-hook-index">SLDS 2 — Styling Hook Index</a> (확인 2026-10-09) · <a href="https://github.com/salesforce-ux/slds-linter/blob/main/packages/eslint-plugin-slds/README.md">GitHub salesforce-ux/slds-linter — eslint-plugin-slds README (private hook)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/755aff-components">SLDS 2 — Components</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-mixed-shadow.html">LWC Developer Guide — Mixed Shadow Mode (shadowSupportMode)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (헤더 버튼·모달까지 닿음)</a> (확인 2026-10-09) · <a href="../README.md">README 2장 (milvusButton, --milvus-button-custom)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (5.1 milvusOverride.css, 5.2 util.css 규칙)</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="exp-b">
+  <h2>5. 실험 B: synthetic과 native를 나란히</h2>
+  <h3>개념</h3>
+  <p>shadow DOM은 컴포넌트 내부를 감싸 페이지의 CSS 규칙이 들어가지 못하게 한다. 그러나 상속은 경계를 넘는다. shadow 트리의 맨 위 요소는 호스트에서 상속받고, <code>--</code>로 만든 사용자 정의 속성은 기본적으로 상속된다. 그래서 클래스 규칙은 막히고 hook 변수는 들어간다. 단, 안쪽 CSS가 그 이름을 <code>var()</code>로 읽어야 효과가 있다.</p>
+  <h3>Salesforce에서는</h3>
+  <ul>
+    <li>LEX는 synthetic shadow(폴리필)를 쓴다. LWC 개발자 가이드는 synthetic에서는 문서 맨 위의 공유 스타일시트가 페이지의 모든 컴포넌트를 꾸밀 수 있고, native에서는 컴포넌트 스타일을 번들에 넣어야 한다고 적는다</li>
+    <li>base 컴포넌트는 native shadow로 옮겨 가는 중이다(3절 4번)</li>
+  </ul>
+  <h3>직접 해 보기</h3>
+  <p>두 칸에 같은 마크업(<code>.slds-button</code> 두 개)과 같은 "컴포넌트 CSS"를 둔다. (가)는 그림자 없는 일반 DOM이라 synthetic처럼 문서 CSS가 닿는다. (나)는 <code>attachShadow</code>로 만든 진짜 shadow root 안에 둔다. 아래 전역 CSS를 켜고 끄며 결과를 본다.</p>
+<pre data-file="전역 CSS (토글 대상)"><code><span class="c">/* 클래스 규칙 1개 */</span>
+.slds-button { font-weight: 700; }
+<span class="c">/* hook 변수 1개 */</span>
+:root { --slds-s-button-radius-border: 0; }</code></pre>
+<pre data-file="두 칸이 함께 쓰는 컴포넌트 CSS (발췌)"><code><span class="c">/* 첫 번째 버튼: hook을 읽는 규칙 */</span>
+.slds-button { border-radius: var(--slds-s-button-radius-border, 15rem); font-weight: 400; }
+<span class="c">/* 두 번째 버튼: 값을 직접 쓰는 규칙 (hook을 읽지 않는다) */</span>
+.slds-button.demo-fixed { border-radius: 15rem; }</code></pre>
+  <div class="demo" id="demo">
+    <label class="demo-toggle"><input type="checkbox" id="demo-switch" checked> 전역 CSS 켜기</label>
+    <div class="demo-grid">
+      <figure class="demo-panel">
+        <figcaption>(가) 그림자 없는 일반 DOM — synthetic처럼</figcaption>
+        <div class="demo-stage" id="demo-light"></div>
+      </figure>
+      <figure class="demo-panel">
+        <figcaption>(나) <code>attachShadow</code>로 만든 native shadow</figcaption>
+        <div class="demo-stage" id="demo-host"></div>
+      </figure>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>칸</th><th>버튼</th><th>모서리 (hook)</th><th>굵기 (클래스)</th></tr></thead>
+      <tbody id="demo-result"><tr><td colspan="4">스크립트가 실행되면 계산된 값이 여기에 나온다</td></tr></tbody>
+    </table></div>
+    <p class="c" id="demo-status" role="status" aria-live="polite"></p>
+  </div>
+  <template id="demo-buttons">
+    <button type="button" class="slds-button">hook을 읽는 규칙</button>
+    <button type="button" class="slds-button demo-fixed">값을 직접 쓰는 규칙</button>
+  </template>
+  <h4>예상 결과 (전역 CSS를 켰을 때)</h4>
+  <div class="table-wrap"><table>
+    <tr><th>칸</th><th>버튼</th><th>모서리</th><th>굵기</th><th>이유</th></tr>
+    <tr><td>(가)</td><td>hook을 읽는 규칙</td><td><b>0px, 각짐</b></td><td><b>700</b></td><td>문서 CSS가 그대로 닿는다</td></tr>
+    <tr><td>(가)</td><td>값을 직접 쓰는 규칙</td><td>240px, 둥긂</td><td><b>700</b></td><td>클래스 규칙은 닿지만, 모서리는 hook을 읽지 않는다</td></tr>
+    <tr><td>(나)</td><td>hook을 읽는 규칙</td><td><b>0px, 각짐</b></td><td>400</td><td>변수는 상속으로 들어가고, 클래스 규칙은 경계에서 막힌다</td></tr>
+    <tr><td>(나)</td><td>값을 직접 쓰는 규칙</td><td>240px, 둥긂</td><td>400</td><td>변수는 들어갔지만 읽는 곳이 없다</td></tr>
+  </table></div>
+  <p>끄면 네 버튼 모두 240px(15rem)과 400으로 돌아간다. 2026-10-09에 내장 브라우저(Chromium)에서 이 페이지를 열어 위 표와 같은 값이 나오는 것을 확인했다.</p>
+  <h3>밀버스에서는</h3>
+  <ul>
+    <li><b>전제 수정(전 컴포넌트 분석 0장 5번):</b> "native에서는 <code>--slds-s-*</code>가 닿지 않는다"는 지나친 서술이다. custom property는 g·s 구분 없이 상속된다. native에서는 SLDS 전역 CSS 안의 읽기 지점이 사라지고, 기본 컴포넌트의 native CSS가 읽는 이름에만 닿는다. 두 번째 버튼이 그 경우다 <span class="tag warn">추정, org 실측 필요</span></li>
+    <li>그래서 native 전환 뒤에는 클래스 규칙(<code>milvusBridge.css</code>, <code>milvusOverride.css</code>)은 기본 컴포넌트 안에서 효과를 잃고, util.css의 hook도 읽는 이름이 바뀐 곳에서는 효과를 잃는다(설계 9.1의 "native" 열)</li>
+  </ul>
+  <h3>직접 확인하기</h3>
+  <ul>
+    <li>DevTools Elements에서 (나) 칸을 펼치면 <code>#shadow-root (open)</code> 아래에 <code>&lt;style&gt;</code>과 버튼이 있다. (가) 칸에는 없다</li>
+    <li>(나)의 첫 버튼을 선택하고 Computed 탭에서 <code>--slds-s-button-radius-border</code>가 상속된 값으로 보이는지 본다</li>
+  </ul>
+  <p class="sources">출처: <a href="https://www.w3.org/TR/css-scoping-1/">W3C — CSS Scoping Module Level 1 (shadow 트리와 상속)</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/attachShadow">MDN — Element.attachShadow()</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties">MDN — Using CSS custom properties (상속)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-mixed-shadow.html">LWC Developer Guide — Mixed Shadow Mode (synthetic의 공유 스타일시트)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (0장 5번 전제 수정, 2.8)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (9.1 native 열, 5.6 브리지 위험)</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="exp-c">
+  <h2>6. 실험 C: 업데이트 위험</h2>
+  <h3>개념</h3>
+  <p>override는 "지금 이 버전의 마크업과 선택자"에 기댄다. 그래서 버전이 바뀔 때 무엇이 바뀌었는지 실제 패키지에서 찾아 보면 위험의 크기를 잴 수 있다.</p>
+  <h3>Salesforce에서는: 패키지와 릴리스 노트에서 찾은 사례</h3>
+  <div class="table-wrap"><table>
+    <tr><th>사례</th><th>무엇이 다른가</th><th>override(클래스 규칙)에 미치는 영향</th><th>hook에 미치는 영향</th></tr>
+    <tr><td>1. 버튼 반경의 원본</td><td>SLDS 1: 공개 c hook <code>--slds-c-button-radius-border</code>, 기본 0.25rem. SLDS 2 Cosmos: <code>--slds-s-button-radius-border</code> → <code>--slds-g-radius-border-pill</code>(15rem). 같은 2.264.2의 Lightning Blue 테마: → <code>--slds-g-radius-border-2</code>(0.25rem)</td><td>값을 박으면 테마·버전과 상관없이 그 값이 된다. 관리자가 테마를 바꿔도 따라가지 않는다</td><td>테마가 바꾼 값을 따라간다. 다만 읽는 이름이 버전마다 다르다(SLDS 1은 c, SLDS 2는 s)</td></tr>
+    <tr><td>2. 같은 모양, 여러 선택자</td><td>SLDS 2 CSS는 버튼 그룹의 위치별 모서리를 더 구체적인 선택자로 따로 정한다</td><td><code>.slds-button</code> 한 줄로는 그룹 첫째·끝의 바깥 모서리가 안 바뀐다(실험 A). 선택자가 늘거나 바뀌면 다시 따라가야 한다</td><td>그 선택자들도 같은 s hook을 읽어 함께 바뀐다</td></tr>
+    <tr><td>3. native 전환</td><td><code>lightning-base-components</code> 1.28.19-alpha는 <code>package.json</code>의 <code>lwc.nativeShadowEnabledComponents</code>에 156개를 지정했다. <code>lightning-button</code>, <code>-badge</code>, <code>-input</code>, <code>-card</code>가 들어 있다. native일 때 <code>lightning-button</code>은 호스트에 <code>data-render-mode="shadow"</code>를 붙이고, 안쪽 버튼을 <code>[part~='button']</code> 선택자로 꾸민다</td><td>문서의 <code>.slds-button</code> 규칙은 shadow 안에 닿지 않는다(실험 B)</td><td>상속으로 들어간다. 단 읽는 이름이 다르다. 예: 버튼 굵기는 synthetic에서 c hook → g hook, native에서 <code>--slds-s-button-font-weight</code></td></tr>
+    <tr><td>4. 릴리스마다 이름·매핑·클래스 동작</td><td>Winter '26: <code>--slds-g-font-family</code> → <code>-base</code>, <code>--slds-g-font-lineheight-*</code> → <code>--slds-g-font-line-height-*</code> 등 폐기. Winter '27: <code>--slds-s-table-color</code>가 <code>neutral-base-0</code>(검정)으로 바뀌고, <code>slds-nubbin_left</code>·<code>_right</code>가 물리 방향으로 고정되며 논리 방향 <code>slds-nubbin_start</code>·<code>_end</code>가 생겼다</td><td>클래스의 동작이 바뀌면 그 클래스에 기댄 규칙이 RTL 등에서 의도와 다르게 보인다</td><td>폐기된 이름은 2.264.2에 새 이름을 가리키는 별칭으로 남아 있다. 릴리스 노트가 대체 이름을 알려 준다</td></tr>
+  </table></div>
+<pre data-file="lightning-base-components 1.28.19-alpha · src/lightning/button/button.slds.css (발췌)"><code>:host([data-render-mode="shadow"]) [part~='button'] {
+  font-weight: var(--sds-c-button-font-weight, var(--slds-s-button-font-weight));
+  border-width: var(--sds-c-button-sizing-border, var(--slds-s-button-sizing-border, 1px));
+}</code></pre>
+  <h3>밀버스에서는</h3>
+  <ul>
+    <li>org는 아직 기본 컴포넌트를 synthetic으로 그린다(2026-10-07 실측). 156개 목록은 npm 패키지의 지정이고, org에 언제 적용될지는 <span class="tag warn">미확인</span>이다</li>
+    <li>위 사례 1·4는 테마 전환이나 정기 릴리스만으로도 생긴다. native 전환을 기다리지 않아도 override는 깨질 수 있다</li>
+  </ul>
+  <h3>직접 확인하기</h3>
+<pre><code><span class="c"># native 지원으로 지정된 기본 컴포넌트 수 (1.28.19-alpha에서 156)</span>
+node -e 'console.log(require("lightning-base-components/package.json").lwc.nativeShadowEnabledComponents.length)'
+<span class="c"># 두 테마의 버튼 반경 매핑 비교</span>
+grep -n -- "--slds-s-button-radius-border:" node_modules/@salesforce-ux/design-system-2/dist/css/bundled/slds2.*.css</code></pre>
+  <p class="sources">출처: <a href="https://v1.lightningdesignsystem.com/components/buttons/">SLDS 1 — Buttons (Styling Hooks 표)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm — @salesforce-ux/design-system-2</a> (설치된 2.264.2의 cosmos·lightning-blue CSS를 grep으로 확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">npm — lightning-base-components</a> (설치된 1.28.19-alpha의 package.json, button.js, button.slds.css 확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_lc_native_shadow_dom.htm&amp;release=256&amp;type=5">Summer '25 릴리스 노트 — Internal DOM Structure Is Changing for Lightning Base Components</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_slds_updates.htm&amp;release=258&amp;type=5">Winter '26 릴리스 노트 — SLDS Component Design Updates (폐기된 global hook)</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_slds_updates.htm&amp;release=264&amp;type=5">Winter '27 릴리스 노트 — Component Blueprints Updates (표 글자색, nubbin)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-09-slds2-customization.md">조사 기록 (i) 로컬 실측</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (2.8 두 모드가 읽는 hook)</a> (확인 2026-10-09) · <a href="../README.md">README 3장 (LWC shadow 모드 실측, 2026-10-07)</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="choice">
+  <h2>7. 밀버스의 선택</h2>
+  <h3>개념</h3>
+  <p>공식 경로로 안 되는 요구를 들어줄 때는 "쓰지 않는다"와 "아무렇게나 쓴다" 사이에 규칙을 둔다. 마지막 수단으로만 쓰고, 깨지면 먼저 알아채는 장치를 함께 둔다.</p>
+  <h3>Salesforce에서는</h3>
+  <p>공식 경로는 org 테마(색·로고)와 hook 읽기다(2·3절). 그 밖의 방법은 모두 지원 범위 밖이고, 내부 변경은 대개 문서화되지 않는다. 그래서 깨짐을 알아채는 일은 쓰는 쪽의 몫이다.</p>
+  <h3>밀버스에서는</h3>
+  <div class="flow">
+    <div class="step"><b>1. org 테마</b>브랜드 색·로고. 기본 우선</div><div class="arrow">→</div>
+    <div class="step"><b>2. util.css g hook</b>전체 모양</div><div class="arrow">→</div>
+    <div class="step"><b>3. util.css s hook</b>특정 컴포넌트</div><div class="arrow">→</div>
+    <div class="step"><b>4. 브리지 변수</b>hook이 없는 항목</div><div class="arrow">→</div>
+    <div class="step"><b>5. milvusOverride.css</b>마지막 수단</div>
+  </div>
+  <ul>
+    <li><b>기본 우선:</b> 기본은 Salesforce 모양 + 브랜드 색·로고다. 2~5는 브랜드 요청이 있을 때만 쓴다</li>
+    <li><b>override는 opt-in이다:</b> <code>milvusOverride.css</code>는 프로젝트 소유이고 처음엔 비어 있다. LEX에서는 <code>loadBrand</code>가 <code>milvusBridge</code> → <code>milvusBrand</code> → <code>milvusOverride</code> 순서로 실어 override가 마지막에 이긴다. VF에서는 <code>milvusHead</code>가 같은 순서로 싣는다 <span class="tag info">계획</span></li>
+    <li><b>override 규칙:</b> <code>check --style</code>은 막지 않고 경고한다. hex 색, <code>!important</code>, <code>.slds-*</code>가 아닌 선택자, 브랜드 색(accent) hook 재정의가 경고 대상이다. <code>@font-face</code>·<code>@import</code>는 실패다(글꼴은 바꾸지 않는다) <span class="tag info">계획</span></li>
+    <li><b>알린다:</b> override를 쓸 때는 그 규칙이 native 전환과 Salesforce 업데이트에 약하다는 것을 사용자에게 말한다</li>
+    <li><b>밀버스 컴포넌트는 기능이 없을 때만:</b> 모양만 바꾸려고 만들지 않는다. <code>milvusButton</code>은 실험 A의 비교 예시로 남는다</li>
+  </ul>
+  <h4>깨짐을 먼저 알아채는 장치 <span class="tag info">계획</span></h4>
+  <div class="table-wrap"><table>
+    <tr><th>장치</th><th>무엇을 잡나</th><th>근거</th></tr>
+    <tr><td><code>detectNativeShadow</code> 경고</td><td>org에서 밀버스 컴포넌트가 자기 템플릿 안의 <code>lightning-*</code> 호스트에 <code>data-render-mode="shadow"</code>가 있는지 보고, 있으면 개발 콘솔에 경고한다. native 전환이 시작된 것을 처음 알아채는 곳이다</td><td>설계 9.2 감지 1</td></tr>
+    <tr><td>정적 반영 검사</td><td>SLDS 2나 기본 컴포넌트 버전을 올릴 때 native 지원 목록, 새 하드코딩, hook 이름 변화, 브리지 선택자 소실을 기준 파일과 비교해 실패시킨다(실험 C의 사례 3·4)</td><td>설계 9.2 감지 2, 9.6의 1</td></tr>
+    <tr><td>Storybook 확인</td><td>org와 같은 synthetic 빌드에 native 빌드를 더해 "전환 시 잃는 항목"을 보고, 반영 검사 페이지에서 브리지를 켜고 끄며 비교한다(실험 B를 컴포넌트 전체로 넓힌 것)</td><td>설계 9.2 대비, 9.6의 2</td></tr>
+    <tr><td>릴리스 노트 확인</td><td>연 3회 Salesforce 릴리스마다 native shadow 항목을 사람이 확인한다</td><td>설계 9.2 감지 3</td></tr>
+  </table></div>
+  <p class="sources">출처: <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (1장 기본 우선·opt-in override, 5.1 층과 override 규칙, 5.5 싣는 순서, 9.2 native 전환 대비, 9.6 자동 확인)</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=001395244&amp;type=1">Salesforce Help — Salesforce Component Internals Are Protected (KB 001395244)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">npm — lightning-base-components</a> (설치본 button.js의 data-render-mode 확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (2.8 감지와 대비)</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="summary">
+  <h2>8. 발표용 요약 3줄</h2>
+  <ol>
+    <li><b>SLDS 2는 커스터마이즈의 자리를 옮겼다.</b> 컴포넌트별 CSS 대신 테마와 hook이다. 공식 경로는 org 테마(색·로고)와 hook 읽기뿐이고, hook 재정의와 클래스 덮어쓰기는 지원하지 않는다.</li>
+    <li><b>지금 org는 synthetic이라 덮어쓰기가 닿지만, 언제든 깨질 수 있다.</b> native shadow에서는 클래스 규칙이 막히고, 컴포넌트가 읽는 hook만 들어간다(실험 B). 선택자와 이름은 테마·릴리스마다 바뀐다(실험 A·C).</li>
+    <li><b>그래서 밀버스는 기본 우선이다.</b> 요청이 있을 때만 hook → 브리지 → opt-in override 순으로 쓰고, 새 컴포넌트는 기능이 없을 때만 만든다. 깨짐은 감지 장치로 먼저 알아챈다.</li>
+  </ol>
+  <p class="sources">출처: <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/98b493-styling-hook-index">SLDS 2 — Styling Hook Index</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-antipatterns.html">LWC Developer Guide — Anti-Patterns for Component Styling</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=release-notes.rn_lc_native_shadow_dom.htm&amp;release=256&amp;type=5">Summer '25 릴리스 노트 — Internal DOM Structure Is Changing</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-09-slds2-customization.md">공식 자료 조사와 로컬 실측</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (1장, 5.1, 9.2)</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="quiz" class="quiz">
+  <h2>9. 스스로 점검</h2>
+  <details><summary>Q1. 고객사가 "버튼만 각지게"를 원한다. 밀버스는 어떤 순서로 제안하나?</summary>
+    <p>먼저 정말 모양이 달라야 하는지 묻는다(기본 우선). 필요하면 util.css의 <code>--slds-s-button-radius-border: 0</code>을 제안한다. 버튼 그룹까지 함께 바뀌고 표준 UI 버튼에도 닿는다. 공식 권고 밖이고 s hook은 private로 분류된다는 것을 알린다. hook으로 안 되는 모양일 때만 <code>milvusOverride.css</code>로 내려간다. 새 버튼 컴포넌트는 만들지 않는다.</p></details>
+  <details><summary>Q2. SLDS 1 Best Practices에 "will be ignored in SLDS 2"가 있는데, 우리 org에서는 util.css가 닿았다. 모순인가?</summary>
+    <p>아니다. 그 문장은 남의 선택자에 다시 할당한 hook 값, 특히 SLDS 2가 더는 읽지 않는 옛 이름(<code>--lwc-*</code> 등)을 말한다. "지원하지 않는다"는 정책이지 차단이 아니다. 우리가 넣은 hook은 SLDS 2 CSS가 읽는 이름이었고, org가 synthetic이라 닿았다. 클래스 규칙은 아직 org에서 직접 재지 않았다.</p></details>
+  <details><summary>Q3. 실험 B에서 전역 CSS를 켰을 때 (나)의 첫 버튼은 각지는데 굵어지지 않는다. 왜?</summary>
+    <p>hook 변수(<code>--slds-s-button-radius-border</code>)는 custom property라서 상속으로 shadow 안에 들어가고, 안쪽 CSS가 그 이름을 읽는다. 클래스 규칙(<code>.slds-button { font-weight: 700 }</code>)은 문서의 규칙이라 shadow 경계에서 막힌다.</p></details>
+  <details><summary>Q4. (나)의 두 번째 버튼은 hook 변수가 들어갔는데도 둥글다. 무엇을 뜻하나?</summary>
+    <p>안쪽 CSS가 그 이름을 읽지 않고 값을 직접 쓰기 때문이다. native에서 hook이 "닿는다"와 "효과가 있다"는 다르다. 기본 컴포넌트의 native CSS가 읽는 이름에만 효과가 있다(전 컴포넌트 분석의 전제 수정).</p></details>
+  <details><summary>Q5. <code>.slds-button { border-radius: 0 }</code>을 넣었더니 버튼 그룹의 양 끝이 둥근 채다. 왜이고, 어떻게 고치나?</summary>
+    <p>SLDS 2 CSS가 그룹의 위치별 모서리를 <code>.slds-button-group .slds-button:first-child</code> 같은 더 구체적인 선택자로 따로 정하기 때문이다. 그 선택자들이 <code>--slds-s-button-radius-border</code>를 직접 읽으므로, 그 hook을 0으로 두면 한 번에 바뀐다. 클래스 규칙으로 고치려면 SLDS 선택자를 하나씩 따라 써야 한다.</p></details>
+  <details><summary>Q6. "버튼만 굵게"는 util.css hook으로 왜 안 되나?</summary>
+    <p>SLDS 2 CSS의 버튼 굵기는 c hook <code>--slds-c-button-font-weight</code>를 읽고, 그 기본값이 전역 hook <code>--slds-g-font-weight-6</code>이다. c hook은 SLDS 2에서 Developer Preview라 util.css가 막고, g hook을 바꾸면 600을 쓰는 다른 글자도 모두 굵어진다. <code>--slds-s-button-font-weight</code>는 지금 org가 쓰는 SLDS 2 CSS가 읽지 않는다.</p></details>
+  <details><summary>Q7. Salesforce는 왜 SLDS 2에서 컴포넌트 hook을 뺐나?</summary>
+    <p>공식 문서에는 이유가 없다. "아직 지원하지 않음", "작업 중"이라고만 썼고, Winter '27에 Developer Preview로 다시 나왔다. 이름 체계를 다시 설계하는 동안 비웠다는 것은 우리의 추정이다. 발표에서는 추정이라고 밝힌다.</p></details>
+  <p class="sources">출처: <a href="https://v1.lightningdesignsystem.com/dev-guidelines/best-practices/">SLDS 1 — Development Best Practices (Q2)</a> (확인 2026-10-09) · <a href="https://www.w3.org/TR/css-scoping-1/">W3C — CSS Scoping Module Level 1 (Q3)</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties">MDN — Using CSS custom properties (Q3)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm — @salesforce-ux/design-system-2 (Q5·Q6, 설치된 2.264.2 CSS)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/0213f9-component-level-styling-hooks">SLDS 2 — Component-Level Styling Hooks (Q6·Q7)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC Developer Guide — Compare SLDS Versions (Q7)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce-ux/slds-linter/blob/main/packages/eslint-plugin-slds/README.md">GitHub salesforce-ux/slds-linter — eslint-plugin-slds README (Q1 private)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-09-slds2-customization.md">공식 자료 조사 (h) 정정, (i) 로컬 실측 (Q2·Q5·Q6)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (Q2)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (Q4 전제 수정)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (Q1: 1장, 5.1·5.2)</a> (확인 2026-10-09)</p>
+</section>
+
+<footer class="doc-foot">
+  <span>밀버스 디자인 시스템 · Learn 09</span>
+  <span>2026-10-09 기준. 공식 문서, 설치된 패키지(<code>@salesforce-ux/design-system-2</code> 2.264.2, <code>lightning-base-components</code> 1.28.19-alpha), <code>docs/research/</code>로 확인함</span>
+</footer>
+</main>
+</div>
+
+<script>
+// 실험 B: 같은 버튼 두 개를 (가) 일반 DOM과 (나) shadow root에 넣고, 전역 CSS를 켜고 끄며 계산된 값을 표에 쓴다
+(() => {
+  const base = document.getElementById("demo-base");
+  const globalCss = document.getElementById("demo-global");
+  const light = document.getElementById("demo-light");
+  const host = document.getElementById("demo-host");
+  const toggle = document.getElementById("demo-switch");
+  const tpl = document.getElementById("demo-buttons");
+  const out = document.getElementById("demo-result");
+  const status = document.getElementById("demo-status");
+  if (!base || !globalCss || !light || !host || !toggle || !tpl || !out || !status) return;
+  if (typeof host.attachShadow !== "function") {
+    status.textContent = "이 브라우저는 attachShadow를 지원하지 않아 (나) 칸을 만들 수 없다.";
+    return;
+  }
+  light.append(tpl.content.cloneNode(true));
+  const root = host.attachShadow({ mode: "open" });
+  const style = document.createElement("style");
+  style.textContent = base.textContent; // 두 칸이 같은 컴포넌트 CSS를 쓴다
+  root.append(style, tpl.content.cloneNode(true));
+
+  const scopes = [["(가)", light], ["(나)", root]];
+  const cell = (text) => {
+    const td = document.createElement("td");
+    td.textContent = text;
+    return td;
+  };
+  function render() {
+    globalCss.disabled = !toggle.checked;
+    const rows = [];
+    for (const [name, scope] of scopes)
+      for (const button of scope.querySelectorAll("button")) {
+        const cs = getComputedStyle(button);
+        const radius = cs.borderTopLeftRadius;
+        const weight = cs.fontWeight;
+        const tr = document.createElement("tr");
+        tr.append(
+          cell(name),
+          cell(button.textContent),
+          cell(`${radius} (${parseFloat(radius) === 0 ? "각짐" : "둥긂"})`),
+          cell(`${weight} (${Number(weight) >= 700 ? "굵음" : "보통"})`)
+        );
+        rows.push(tr);
+      }
+    out.replaceChildren(...rows);
+    status.textContent = toggle.checked ? "전역 CSS를 켰다." : "전역 CSS를 껐다.";
+  }
+  toggle.addEventListener("change", render);
+  render();
+})();
+</script>
+</body>
+</html>
