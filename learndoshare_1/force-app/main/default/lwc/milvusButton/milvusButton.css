@@ -1,8 +1,8 @@
-/* 브랜드 값(--milvus-button-*)이 없으면 SLDS 2 버튼 기본값으로 떨어진다 */
+/* 브랜드 값(--milvus-button-*)이 없으면 lightning-button과 같은 값(util.css의 버튼 컴포넌트 hook → SLDS 2 기본값)으로 떨어진다 */
 .milvus-button {
   border-radius: var(
     --milvus-button-radius,
-    var(--slds-g-radius-border-pill, 15rem)
+    var(--slds-s-button-radius-border, var(--slds-g-radius-border-pill, 15rem))
   );
   /* .slds-button 블루프린트는 400이지만 org의 lightning-button은 600이다(2026-10-07 실측). 같게 보이도록 600으로 떨어진다 */
   font-weight: var(
@@ -11,7 +11,7 @@
   );
   padding-inline: var(
     --milvus-button-padding-inline,
-    var(--slds-g-spacing-4, 1rem)
+    var(--slds-s-button-spacing-inline, var(--slds-g-spacing-4, 1rem))
   );
 }
 

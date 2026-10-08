@@ -8,9 +8,10 @@ export default {
       description: {
         component: `브랜드마다 **\`brands/<브랜드>/util.css\` 파일 하나**로 모든 컴포넌트(\`lightning-*\` 포함)의 모양을 바꾼다. 상단 툴바에서 브랜드를 바꾸면 \`컴포넌트/기본\` 전체가 그 브랜드의 util.css로 그려진다.
 
-- **쓸 수 있는 것은 \`:root\`의 SLDS 2 global hook(\`--slds-g-*\`)과 밀버스 컴포넌트가 읽는 \`--milvus-*\` 변수뿐이다.** 지금 org는 \`lightning-button\`·\`-input\` 같은 기본 컴포넌트를 synthetic shadow로 그려서 클래스 규칙과 컴포넌트 hook(\`--slds-c-*\`·\`--sds-c-*\`·\`--slds-s-*\`)도 닿는다. 하지만 npm 패키지가 156개를 native shadow 지원으로 지정해 두어, native로 바뀌면 상속되는 global hook만 닿는다. 그래서 바뀌어도 계속 닿는 global hook만 쓴다 (2026-10-07 org 실측)
-- 그래도 global hook마다 영향을 주는 컴포넌트 묶음이 달라서 묶음별 조절은 된다. 아래 **영향 지도**를 보고 고른다. 예: 버튼 반경은 \`--slds-g-radius-border-pill\`, 입력창은 \`-2\`, 카드는 \`-4\`
-- 특정 컴포넌트 하나만 따로 바꾸는 것은 기본 컴포넌트로는 안 된다. 그런 요구는 밀버스 컴포넌트로 만들고, 그 컴포넌트가 읽는 \`--milvus-*\` 변수를 util.css에 넣는다 (예: \`--milvus-button-*\` → \`컴포넌트/밀버스 추가/Button\`)
+- **쓸 수 있는 것은 \`:root\`의 global hook(\`--slds-g-*\`), 컴포넌트 hook(\`--slds-s-*\`), 밀버스 컴포넌트가 읽는 \`--milvus-*\` 변수뿐이다.** 클래스 규칙은 쓰지 않는다
+- **global hook**은 같은 hook을 쓰는 컴포넌트 묶음을 함께 바꾼다. 예: \`--slds-g-radius-border-pill\`은 버튼, 토글, 필(pill), 경로(path), 원형 진행 표시줄의 반경을 함께 바꾼다. 뱃지는 \`radius-border-1\`을 쓰므로 바뀌지 않는다
+- **컴포넌트 hook**은 그 컴포넌트만 바꾼다. 예: \`--slds-s-button-radius-border\`는 버튼 반경만 바꾼다. 쓸 수 있는 이름은 아래 **영향 지도**의 오른쪽 열에 있다. 색 hook(\`--slds-s-*color*\`)은 브랜드 색에 이어진 것이 많아 쓰지 않는다
+- 컴포넌트 hook은 지금 org가 \`lightning-*\`를 synthetic shadow로 그려서 닿는다(2026-10-07 org 실측). npm 패키지가 156개를 native shadow 지원으로 지정해 두어 **native로 바뀌면 효과가 사라질 수 있다.** 그때도 유지해야 하는 모양은 밀버스 컴포넌트(\`--milvus-*\`)로 만든다 (예: \`컴포넌트/밀버스 추가/Button\`)
 - **브랜드 색은 바꾸지 않는다.** 색은 org Themes and Branding이 원본이고 \`pnpm sync:theme\`이 가져온다. \`pnpm test\`가 util.css 규칙을 검사한다
 - **공식 권고 밖이다.** SLDS는 global hook 재정의를 권하지 않는다. Salesforce 릴리스마다 Storybook과 org 화면을 다시 확인한다
 - org에서는 util.css를 정적 리소스로 올려 \`loadStyle\`로 문서에 넣는다. 이때 **같은 화면의 표준 Salesforce UI에도 적용된다**`
@@ -73,7 +74,7 @@ export const 영향_지도 = {
     const note = document.createElement("p");
     note.className = "slds-text-body_small slds-m-bottom_small";
     note.textContent =
-      "SLDS 2 CSS에서 자동으로 읽은 표. 왼쪽 hook을 util.css에서 바꾸면 오른쪽 컴포넌트 속성이 함께 바뀐다 (색 hook 제외).";
+      "SLDS 2 CSS에서 자동으로 읽은 표 (색 hook 제외). 왼쪽 global hook을 util.css에서 바꾸면 오른쪽 컴포넌트 속성이 함께 바뀐다. 오른쪽 이름(--slds-s-<이름>)을 util.css에 직접 넣으면 그 컴포넌트 속성만 바뀐다.";
     const table = document.createElement("table");
     table.className = "slds-table slds-table_bordered slds-table_cell-buffer";
     table.innerHTML =

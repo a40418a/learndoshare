@@ -69,9 +69,9 @@ export default {
 | \`--milvus-button-custom\`이 없음 | **SLDS 기본**: \`lightning-button\` 그대로 |
 | \`--milvus-button-custom: on\` | **밀버스 커스텀**: SLDS 버튼 블루프린트 + \`--milvus-button-radius\` · \`-font-weight\` · \`-padding-inline\` |
 
-- **언제 쓰나:** util.css의 global hook은 같은 hook을 쓰는 컴포넌트를 모두 바꾼다. 예를 들어 \`--slds-g-radius-border-pill\`을 바꾸면 버튼과 함께 뱃지 등도 바뀐다. **버튼만** 다르게 하려면 \`--milvus-button-*\`를 쓴다
+- **언제 쓰나:** 버튼 반경·굵기·여백만 바꾸는 것은 util.css의 컴포넌트 hook(\`--slds-s-button-*\`)으로도 되고, 그러면 \`lightning-button\`과 이 컴포넌트가 함께 바뀐다. 하지만 기본 컴포넌트가 native shadow로 바뀌면 컴포넌트 hook은 효과가 사라진다. 그때도 유지해야 하는 버튼 모양은 \`--milvus-button-*\`로 정한다
 - 상단 툴바에서 브랜드를 바꿔 보면 된다. \`Milvus_DesignSystem\`은 SLDS 기본이고, \`Sample_Forest\`는 밀버스 커스텀(굵은 글씨)이다
-- \`--milvus-button-*\`를 정하지 않으면 SLDS 값으로 떨어진다. 그래서 커스텀 모드에서도 util.css의 global hook(반경 등)을 따른다
+- \`--milvus-button-*\`를 정하지 않으면 SLDS 값으로 떨어진다. 그래서 커스텀 모드에서도 util.css의 버튼 컴포넌트 hook과 global hook(반경 등)을 따른다
 - 색은 두 모드 모두 org 브랜드 색(accent hook)을 따른다
 - 버튼을 직접 \`<button>\`이나 \`lightning-button\`으로 만들지 않는다. 브랜드가 바뀌어도 화면 코드를 고치지 않기 위해서다`
       }
