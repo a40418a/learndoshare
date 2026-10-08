@@ -170,6 +170,36 @@ learndoshare_1/
 - [ ] **Step 4: 확인한다.** `node scripts/check-learn.ts` → 0, `node --test tests/check-learn.test.ts`(이 시점에는 `test:node` 스크립트가 아직 없다). 브라우저로 00 문서를 열어 목차·표·출처 링크가 깨지지 않는지 본다
 - [ ] **Step 5: 커밋.** `[Docs] 학습 자료 00: 디자인 시스템 개념과 Salesforce 구현 (#N)`
 
+### Task 29: Learn 09 "override와 공식 권고" (M0, 2026-10-09 사용자 요청)
+
+모양만 바꾸려고 새 컴포넌트를 만드는 대신 opt-in override를 쓰기로 했다(설계 1장 10/9). 발표에서 사용자가 "두 방식을 다 해 봤고, 이래서 공식적으로는 권하지 않는다"를 설명할 수 있게, 비권고 이유와 직접 해 보는 실험을 한 문서에 담는다.
+
+**Files:**
+- Create:
+  - `Learn/09-override와 공식 권고.html`
+  - `docs/research/2026-10-09-slds2-customization.md`: SLDS 2가 커스터마이즈를 좁힌 이유에 대한 공식 자료 조사 결과(스크래치 `slds2-why/answer.md`와 조사 기록을 옮기고, 출처 URL·확인 날짜 유지)
+- Modify:
+  - 모든 Learn 문서의 `topnav`: 맨 끝에 `09 override` 링크
+  - `Learn/00` 8절: 층에 `milvusOverride.css`(opt-in, 마지막 수단)를 넣고 09 링크
+  - `README.md` 7장: 09 행, 추천 순서 끝에 9
+
+**09 문서의 절** (출처 규칙은 Task 0과 같다)
+1. 질문: 기존 컴포넌트의 모양을 바꿀 때, 새 컴포넌트를 만들 것인가 덮어쓸 것인가
+2. SLDS 1과 SLDS 2의 커스터마이즈 범위 비교: 무엇이 줄고 무엇이 생겼나(관리자 테마 설정, hook 종류별 지원 상태)
+3. Salesforce가 비권고하는 이유: 공식 자료가 밝힌 것과 밝히지 않은 것을 나눠 쓴다. 추정은 "추정"으로 표시
+4. 실험 A — 같은 요구("버튼을 각지게, 글자를 굵게")를 세 방식으로: util.css hook, override 클래스 규칙, 밀버스 컴포넌트(`milvusButton`). 방식마다 코드, 닿는 범위, 유지 비용을 표로
+5. 실험 B — 페이지 안 라이브 데모: 같은 전역 CSS(클래스 규칙 1개 + hook 변수 1개)를 (가) 그림자 없는 일반 DOM(synthetic처럼 전역 CSS가 닿음)과 (나) `attachShadow`로 만든 native shadow 안의 `.slds-button`에 적용해 나란히 보여 준다. 토글로 전역 CSS를 켜고 끈다. 결과: 클래스 규칙은 native에서 닿지 않고, 상속되는 custom property는 닿는다. 단 native에서도 컴포넌트 CSS가 그 이름을 읽어야 효과가 있다(research synthesis 5번). 외부 라이브러리 없이 인라인 `<script>`
+6. 실험 C — 업데이트 위험: 실제 패키지에서 확인한 클래스·마크업 차이 사례(예: SLDS 1과 SLDS 2의 버튼 반경 규칙, `lightning-base-components`가 native 지원으로 지정한 156개). 근거는 설치된 패키지 소스나 docs/research
+7. 밀버스의 선택: 기본 우선, override는 마지막 수단, 감지 장치(`detectNativeShadow` 경고, 정적 반영 검사, Storybook 확인)
+8. 발표용 요약 3줄
+9. 스스로 점검
+
+- [ ] **Step 1:** 조사 결과를 `docs/research/2026-10-09-slds2-customization.md`로 옮긴다. 개인정보·절대 경로가 없는지 확인한다
+- [ ] **Step 2:** 09 문서를 쓴다. 실험 B 데모는 브라우저로 열어 두 칸의 결과가 설명과 같은지 확인한다(파일을 내장 브라우저로 열 수 없으면 `node`로 HTML 구조만 확인하고 보고서에 적는다)
+- [ ] **Step 3:** topnav, 00 8절, README 7장을 고친다
+- [ ] **Step 4:** `node scripts/check-learn.ts` → 0, `node --test tests/check-learn.test.ts`
+- [ ] **Step 5: 커밋.** `[Docs] 학습 자료 09: override와 공식 권고 (#21)`
+
 ---
 
 ## M1 설치 경로 스파이크 (10/12 오전)
@@ -374,7 +404,7 @@ test("생성된 examples.json과 카탈로그 스토리에 절대 경로와 'nod
 **Interfaces:**
 - Produces (`c/milvusScript`):
   - `loadBrand(component: LightningElement): Promise<void>`
-    - `loadStyle(component, milvusBridge)` 다음에 `loadStyle(component, milvusBrand)`를 부른다(`@salesforce/resourceUrl/milvusBridge`, `/milvusBrand`)
+    - `loadStyle(component, milvusBridge)` → `loadStyle(component, milvusBrand)` → `loadStyle(component, milvusOverride)` 순서로 부른다(`@salesforce/resourceUrl/milvusBridge`, `/milvusBrand`, `/milvusOverride`). override가 마지막이라 이긴다(설계 5.1)
     - 실패해도 던지지 않고 `console.error`로 남긴다
   - `detectNativeShadow(root: ParentNode): string[]`. `data-render-mode="shadow"`인 `lightning-*` 태그 이름을 돌려준다
 - 세 컴포넌트는 `connectedCallback`에서 `loadBrand(this)`를 부른다. 첫 `renderedCallback`에서 `detectNativeShadow` 결과가 있으면 `console.warn("[milvus] native shadow로 그려지는 기본 컴포넌트: ...")`를 낸다
@@ -384,7 +414,7 @@ test("생성된 examples.json과 카탈로그 스토리에 절대 경로와 'nod
 
 - [ ] **Step 1: 실패하는 테스트.** `milvusScript.test.ts`에 쓴다. sfdx-lwc-jest의 기본 stub을 쓴다
 ```ts
-it("milvusBridge 다음 milvusBrand 순서로 loadStyle을 부른다", async () => { await loadBrand(el); expect(loadStyle.mock.calls.map((c) => c[1])).toEqual([bridgeUrl, brandUrl]); });
+it("milvusBridge → milvusBrand → milvusOverride 순서로 loadStyle을 부른다", async () => { await loadBrand(el); expect(loadStyle.mock.calls.map((c) => c[1])).toEqual([bridgeUrl, brandUrl, overrideUrl]); });
 it("data-render-mode=shadow인 lightning-* 이름을 돌려준다", () => expect(detectNativeShadow(fixture)).toEqual(["lightning-button"]));
 it("loadStyle이 실패해도 던지지 않고 console.error로 남긴다", ...);
 ```
@@ -420,6 +450,7 @@ it("loadStyle이 실패해도 던지지 않고 console.error로 남긴다", ...)
 - Produces (`lib/rules.ts`):
   - `type Issue = { file: string; rule: string; message: string; fix?: string }`
   - `checkUtilCss(css: string, file: string, ctx: RuleContext): Issue[]`
+  - `checkOverrideCss(css: string, file: string): { warnings: Issue[]; errors: Issue[] }` (설계 5.1). 경고: hex 색, `!important`, `.slds-*`가 아닌 선택자, 브랜드 색(accent) hook 재정의. 오류: `@font-face`, `@import`
   - 상수
     - `BRAND_COLOR_PATTERNS`
     - `FEEDBACK_HOOKS`: 설계 5.3 표
@@ -446,6 +477,9 @@ test("light-dark(#111, #eee)의 대비는 #111로 잰다", ...);
 test("주석 안의 선언은 무시한다", ...);
 test("letter-spacing은 허용, color 같은 다른 일반 속성은 거부", ...);
 test("--milvus-*는 milvusVars에 있을 때만 허용", ...);
+test("override: .slds-button{border-radius:0}은 경고·오류 없음", ...);
+test("override: hex 색, !important, .my-class 선택자, --slds-g-color-accent-1 재정의는 경고", ...);
+test("override: @font-face와 @import는 오류", ...);
 ```
 - [ ] **Step 2: 실패를 확인한다.** `pnpm test:node`
 - [ ] **Step 3: 구현.** postcss로 파싱한다. CLAUDE.md 3장과 README 2장의 util.css 규칙을 설계 5.2 표와 같게 고친다
@@ -462,7 +496,7 @@ test("--milvus-*는 milvusVars에 있을 때만 허용", ...);
   - `templates/claude/hooks/milvus-check.mjs`
   - `templates/force-app/main/default/lwc/tsconfig.json`
   - `templates/force-app/main/default/components/milvusHead.component`(+`-meta.xml`)
-  - `templates/force-app/main/default/staticresources/`: `milvusBrand.css`, `milvusBridge.css`, `milvusVf.css`. 각각 `.resource-meta.xml`(`contentType: text/css`)을 둔다
+  - `templates/force-app/main/default/staticresources/`: `milvusBrand.css`, `milvusBridge.css`, `milvusOverride.css`, `milvusVf.css`. 각각 `.resource-meta.xml`(`contentType: text/css`)을 둔다
   - `templates/brand/brandingSet.xml`, `templates/brand/theme.xml`
 - Create: `lib/bridge-vars.ts`, `lib/spec-items.ts`, `lib/fixed-list.ts`, `lib/managed.ts`, `tests/spec-items.test.ts`, `tests/managed.test.ts`
 
@@ -494,6 +528,7 @@ test("--milvus-*는 milvusVars에 있을 때만 허용", ...);
   - `sha256(content: string | Buffer): string`
 - `templates/claude/settings.json`은 설계 7.2의 값을 그대로 쓴다. hook 명령은 `node "$CLAUDE_PROJECT_DIR"/.claude/hooks/milvus-check.mjs`다
 - `templates/.../milvusBrand.css`는 설명 주석과 빈 `:root {}`만 둔다. 기본 상태는 Salesforce 기본 모양이다(설계 1장 10/9 "기본 우선")
+- `templates/.../milvusOverride.css`는 설명 주석만 둔다: 마지막 수단이고 공식 권고 밖이며 native 전환·업데이트에 깨질 수 있다는 것, Learn 09 링크. `managedFiles`에서 `kind: "owned"`
 
 - [ ] **Step 1: 실패하는 테스트**
 ```ts
@@ -515,7 +550,7 @@ test("vf:false면 milvusHead와 milvusVf가 목록에 없다", ...);
 
 - [ ] **Step 1: 배포할 파일을 준비한다.**
   - `milvusBrand`: 중립 색 `surface-2`, `surface-container-1`, `on-surface-3`, `border-1`을 `light-dark()`로 넣고, 피드백 색 hook도 넣는다
-  - 빈 `milvusBridge`: `loadBrand`가 참조하므로 필요하다
+  - 빈 `milvusBridge`, 빈 `milvusOverride`: `loadBrand`가 참조하므로 필요하다
   - 확인용 LWC: `lightning__UrlAddressable`, `loadBrand` 사용
   - 유틸리티 바용 LWC: 화면 없이 `loadBrand`만 부른다
   - VF 테스트 페이지: SLDS 2 + 팔레트 + util.css
@@ -609,6 +644,7 @@ test("이미 있는 milvusBrand.css는 건너뛰고 skipped에 넣는다", ...);
 test("LightningExperience.settings는 만들지 않는다", ...);
 test("sfdx-project.json에 defaultLwcLanguage, package.json에 storybook 스크립트를 없을 때만 추가한다", ...);
 test("--no-vf면 milvusHead·milvusVf를 만들지 않고 config.vf가 거짓", ...);
+test("milvusOverride.css를 설명 주석만 있는 상태로 만들고, 이미 있으면 건너뛴다", ...);
 // 아래는 모두 '1을 돌려주고 쓴 파일이 0개'
 test("Node 22.17", ...); test("깨진 .claude/settings.json", ...); test("--brand와 --from-org를 함께 / 둘 다 없음", ...);
 test("브랜드 이름 '1A'", ...); test("기본 패키지 폴더가 force-app이 아님", ...);
@@ -634,13 +670,14 @@ test("--from-org인데 커스텀 테마가 없거나 조회 실패 (가짜 SfRun
 **Interfaces:**
 - Consumes: `loadRuleContext`, `checkUtilCss`(Task 7), `readConfig`, `findProject`(Task 11), `managedFiles`, `sha256`(Task 8)
 - Produces (`cli/check.ts`): `runCheck(o: { root: string; style: boolean }): Promise<{ code: 0 | 1 | 2; issues: Issue[]; regenerated: string[] }>`
-  - `style: true`: util.css 규칙과 대비만 본다. `dist/hooks-index.json`만 읽는다. 실패하면 2
+  - `style: true`: util.css 규칙과 대비, `milvusOverride.css`의 `checkOverrideCss`를 본다. `dist/hooks-index.json`만 읽는다. util.css 위반이나 override 오류면 2, override 경고만 있으면 stderr에 경고를 내고 0
   - `style: false`: 전체를 본다. 규칙, 밀버스 관리 파일 sha256, 타입 검사(`lwc/milvus*`만). 실패하면 1. VF 처리는 Task 24에서 붙인다
-- hook(`milvus-check.mjs`, ESM): stdin의 `tool_input.file_path`가 `staticresources/milvusBrand.css`나 `brandingSets/`일 때만 `pnpm milvus check --style`을 실행한다. 종료 코드와 stderr를 그대로 전달한다
+- hook(`milvus-check.mjs`, ESM): stdin의 `tool_input.file_path`가 `staticresources/milvusBrand.css`, `staticresources/milvusOverride.css`, `brandingSets/`일 때만 `pnpm milvus check --style`을 실행한다. 종료 코드와 stderr를 그대로 전달한다
 
 - [ ] **Step 1: 실패하는 테스트**
 ```ts
 test("--style은 규칙 위반에서 2와 stderr의 고칠 값", ...);
+test("--style은 override 경고만 있으면 0이고 stderr에 '공식 권고 밖' 경고", ...);
 test("--style은 200ms 안에 끝난다 (hooks-index.json 사용)", ...);
 test("밀버스 관리 파일을 고치면 전체 check가 1이고 'pnpm milvus update --force'를 안내한다", ...);
 test("프로젝트 자체 컴포넌트의 타입 오류는 무시한다", ...);
@@ -817,7 +854,7 @@ test("생성된 --milvus-* 이름이 loadRuleContext의 milvusVars에 잡힌다"
 
 **Interfaces:**
 - Consumes: `readBranding`(Task 10), `brandPalette`(Task 4), `loadRuleContext`·`checkUtilCss`(Task 7), `MilvusConfig`(Task 11)
-- Produces: `type BrandData = { name: string; label: string; source: "org" | "sample" | "project" | "slds"; palette: Record<number, string>; utilCss: string; bridgeCss: string; logoUrl?: string; error?: string }`
+- Produces: `type BrandData = { name: string; label: string; source: "org" | "sample" | "project" | "slds"; palette: Record<number, string>; utilCss: string; bridgeCss: string; overrideCss: string; logoUrl?: string; error?: string }`
 - Produces: `brandsFromRepo(repoDir: string): BrandData[]`, `brandsFromProject(projectDir: string, config: MilvusConfig): BrandData[]`
   - 프로젝트 모드는 프로젝트 브랜드와 "SLDS 기본"(`source: "slds"`, util·bridge 없음)을 돌려준다
   - BrandingSet이 없거나 `checkUtilCss`가 issue를 내면, 프로젝트 브랜드 대신 `error` 메시지를 담은 `slds` 브랜드를 돌려준다
@@ -830,7 +867,7 @@ test("생성된 --milvus-* 이름이 loadRuleContext의 milvusVars에 잡힌다"
   - alias `@milvus/lwc`는 프로젝트 모드에서 `<projectDir>/.milvus/lwc`, 저장소 모드에서 `dist/lwc`다
   - `server.fs.allow`에 `projectDir`를 넣는다. stories glob은 `../stories/**/*.stories.@(js|ts)`다
 - `.storybook/preview.ts`: 브랜드에 `error`가 있으면 화면 위에 오류 배너를 그린다
-- `.storybook/brand.ts`: `applyBrand(name)`이 팔레트를 `:root`에 넣는다. 그다음 `<style id="milvus-brand-bridge">`와 `<style id="milvus-brand-util">`를 이 순서로 넣는다
+- `.storybook/brand.ts`: `applyBrand(name)`이 팔레트를 `:root`에 넣는다. 그다음 `<style id="milvus-brand-bridge">`, `<style id="milvus-brand-util">`, `<style id="milvus-brand-override">`를 이 순서로 넣는다
 
 - [ ] **Step 1: 실패하는 테스트**
 ```ts
@@ -909,6 +946,7 @@ test("로고 절은 '요청: <상대 경로>' 한 줄", ...);
 - SKILL.md frontmatter: `name: milvus-brand`, `description`(브랜드 요청 반영, 입력 형식 5종)
 - SKILL.md 본문
   - 설계 6.2의 7단계, 6.3 프리셋, 6.4 입력 형식
+  - 반영 순서(설계 5.1): org 테마 → global hook → 컴포넌트 hook → 브리지 변수 → `milvusOverride.css`(마지막 수단). override를 쓰면 사용자에게 "공식 권고 밖, native 전환·업데이트에 약함"을 알리고 Learn 09를 안내한다. 모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다
   - 9.3 매핑 요약(`SPEC_ITEMS` 기준), 5.2 규칙 요약
   - 5.3 피드백 색 처리: 테두리는 글자색을 쓰고, hover·active는 `darkerStep`으로 계산한다(`node -e`)
   - 5.4 브랜드 색 설명: 입력 색, 50단계, 40단계와 대비
@@ -976,7 +1014,7 @@ test("SKILL.md는 'pnpm milvus deploy --yes'를 채팅 승인 뒤에만 실행�
   - `sourceDirs`에 넣는 것
     - `lwc/milvus*`: 밀버스 번들 각각
     - `classes/utils/design`: 있으면
-    - `staticresources/milvusBrand.*`, `staticresources/milvusBridge.*`
+    - `staticresources/milvusBrand.*`, `staticresources/milvusBridge.*`, `staticresources/milvusOverride.*`
     - `brandingSets/LEXTHEMING<브랜드>.*`, `lightningExperienceThemes/<브랜드>.*`
     - `contentassets/<브랜드>Logo.*`: 있으면
     - `config.vf`가 참이면 `staticresources/milvusVf.*`, `components/milvusHead.*`
@@ -995,7 +1033,7 @@ test("인자가 없으면 config.targetOrg를 쓰고 sf 기본 org를 묻지 않
 test("milvus.config.json이 없으면 1이고 'pnpm milvus init'을 안내한다", ...);
 test("sf가 없거나 로그인 만료(code≠0)면 deploy start를 부르지 않고 1", ...);   // 리뷰 중점 4
 test("1단계 실패 시 2단계를 부르지 않고 failures를 출력한다", ...);              // 리뷰 중점 4
-test("sourceDirs에 milvusBridge와 contentassets 로고가 있고 프로젝트 자체 컴포넌트는 없다", ...);
+test("sourceDirs에 milvusBridge·milvusOverride와 contentassets 로고가 있고 프로젝트 자체 컴포넌트는 없다", ...);
 test("vf:false면 milvusVf·milvusHead가 없다", ...);
 test("settings 파일에는 activeThemeName 하나만", ...);
 test("check가 실패하면 배포하지 않는다", ...);
@@ -1031,7 +1069,7 @@ test("출력에 --url-only와 액세스 토큰 형식 문자열이 없다", ...)
 **Interfaces:**
 - Produces (`lib/vf.ts`): `buildMilvusVfCss(sldsCss: string, brandColor: string): string`. SLDS 2 `slds2.cosmos.css` 전체 뒤에 `:root{--slds-r-color-brand-<단계>: <brandPalette 값>}`을 붙인다
 - `runCheck({style:false})`: `config.vf`가 참이면 `milvusVf.css`를 지금 `BRAND_COLOR`로 다시 쓰고 `regenerated`에 넣는다(설계 3장의 "[생성]")
-- `milvusHead.component`: `<apex:component>` 안에 `<apex:stylesheet>` 세 개를 이 순서로 둔다: `{!$Resource.milvusVf}`, `{!$Resource.milvusBridge}`, `{!$Resource.milvusBrand}`
+- `milvusHead.component`: `<apex:component>` 안에 `<apex:stylesheet>` 네 개를 이 순서로 둔다: `{!$Resource.milvusVf}`, `{!$Resource.milvusBridge}`, `{!$Resource.milvusBrand}`, `{!$Resource.milvusOverride}`
 
 - [ ] **Step 1: 실패하는 테스트**
 ```ts
@@ -1142,7 +1180,7 @@ test("BRAND_COLOR를 바꾼 뒤 deploy가 check를 통과해 계획을 출력한
 9. 손대지 않는 기존 Storybook 파일의 TS 전환
 
 **절대 빼지 않는 것:**
-- Task 0 (학습 자료 기초)
+- Task 0 (학습 자료 기초), Task 29 (Learn 09 override와 공식 권고, 발표용)
 - Task 1·2 (설치)
 - Task 7 (규칙), 11 (`init`), 12 (`check`)
 - Task 14 (정적 검사), 15 (브리지)
