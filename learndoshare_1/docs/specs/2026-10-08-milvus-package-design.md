@@ -63,7 +63,7 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 | 10/8 | 브랜드는 버튼 같은 일부가 아니라 모든 컴포넌트에 반영되어야 한다 | 사용자 요구. 9장의 전 컴포넌트 분석과 자동 확인으로 지킨다 |
 | 10/8 | 전 컴포넌트 분석에 따라 util.css 허용 범위를 넓힌다(중립 색, 포커스 그림자 조건부, 기본 컴포넌트가 읽는 s hook, 색 s hook 6개, `letter-spacing`) | 이전 규칙으로는 바탕·면·글자·테두리 같은 중립색 요청을 하나도 들어줄 수 없었다(9.1) |
 | 10/8 | 모든 방법을 써도 바꿀 수 없는 항목은 "Salesforce 고정" 목록(9.4)으로 두고 화면과 발표에 표시한다 | 사용자 합의 |
-| 10/8 | hook이 없는 항목(움직임 등)에 한해 Salesforce 클래스를 덮어쓰는 규칙을 제한적으로 허용한다. 이 규칙은 패키지의 `milvusBridge.css`에만 두고 밀버스 변수를 읽게 한다 | 사용자 선택(C). 지금 org에서 동작하지만 native 전환·업데이트 때 깨질 수 있어 자동 확인으로 감시한다 |
+| 10/8 | hook이 없는 항목(움직임 등)에 한해 Salesforce 클래스를 덮어쓰는 규칙을 제한적으로 허용한다. 이 규칙은 패키지의 `milvusBridge.css`에만 두고 밀버스 변수를 읽게 한다 | 사용자 선택(C). synthetic인 지금 org에서는 동작할 것으로 본다(10/8 프로브는 hook만 쟀고 클래스 규칙은 재지 않음 — 14장, 10/12 측정). native 전환·업데이트 때 깨질 수 있어 자동 확인으로 감시한다 |
 | 10/9 | **기본 우선.** 기본 상태는 Salesforce 기본 모양에 브랜드 색·로고(BrandingSet, 공식 기능)만 바꾼 것이다. `init` 직후 util.css(`milvusBrand.css`)는 비어 있고, 브랜드 요청이 있을 때만 util.css와 브리지 변수로 모양을 바꾼다. VF는 모양을 바꾸지 않아도 `milvusVf`(SLDS 2 + 팔레트)로 LEX와 맞춘다 | 사용자 선택. util.css는 공식 권고 밖이라 필요할 때만 쓴다. VF가 LEX와 다른 원인은 SLDS 1이지 util.css가 아니다 |
 | 10/9 | **opt-in override.** 기존 컴포넌트(`lightning-button` 등)의 모양을 hook·브리지로 바꿀 수 없으면, 새 밀버스 컴포넌트를 만들지 않고 프로젝트 소유 `milvusOverride.css`의 클래스 규칙으로 바꾼다. 공식 권고 밖임을 알고 쓴다. 밀버스 컴포넌트는 기능이 없을 때만 만든다(기존 `milvusButton`은 비교 예시로 유지). 비권고 이유와 실험은 Learn 09에 정리한다 | 사용자 요청. 모양만 바꾸려고 컴포넌트를 새로 만드는 것은 비효율적이다. 지금 org는 synthetic이라 클래스 규칙이 닿을 것으로 본다. 10/8 프로브는 `:root`의 hook 두 개만 넣었고 클래스 규칙은 넣지 않았다. 이 판단은 10/7 synthetic 실측과 LWC 개발자 가이드 Mixed Shadow Mode 설명에서 나온 것이다(**미확인**, 2026-10-09 정정, Learn 09 2절). native 전환·마크업 변경 때 깨질 수 있다는 것을 발표에서 직접 보여 준다 |
 | 10/9 | SLDS 2(Cosmos) org를 기준으로 한다. SLDS 1 테마 org 지원은 발표 뒤 검토한다(#22) | 사용자 선택. SLDS 1은 컴포넌트 hook(`--slds-c-*`)이 공식이고 VF가 그대로 맞는 장점이 있지만, org 테마는 고객사가 고르는 설정이고 새 org 기본은 SLDS 2다(Essentials 제외). 지금까지의 실측·Storybook·팔레트가 모두 SLDS 2 기준이다 |
@@ -603,6 +603,7 @@ PR #19의 검사 스크립트, CLAUDE.md 3장, 이 표가 지금 서로 다르�
 | Vite 개발 서버 미들웨어로 요청 파일을 저장할 수 있는가 | 10/12 스파이크 |
 | 피드백 색 hook을 util.css로 바꾸면 LEX 표준 화면에도 반영되는가 | 10/12 org 프로브 |
 | VF에서 `milvusVf.css` + `milvusBrand`가 SLDS 2·팔레트·util.css를 함께 적용하는가 | 10/12 org 프로브 |
+| `loadStyle`로 넣은 클래스 규칙(예: `.slds-button { border-radius: 0 }`)이 LEX의 `lightning-button` 안까지 닿는가. 10/8 프로브는 hook 두 개만 쟀다. `milvusBridge`·`milvusOverride`의 전제다 | 10/12 org 프로브 |
 | **VF 공식 SLDS 2 경로:** Help "User Interface Settings"의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active" 설정과 `<apex:slds lightningStyleMode>`(API 65.0+, 기본 Auto)가 있다(2026-10-09 공식 문서 확인, Learn 00·01). 10/8 프로브는 API 67.0 페이지에서 SLDS 1로 그려졌고 그때 설정 상태는 기록이 없다. 설정을 켜면 org 테마 팔레트까지 들어오는가. 들어오면 `milvusVf`는 util.css가 있을 때만 필요하거나 아예 필요 없다(4.4, 5.5, Task 24 재검토) | 10/12 org 프로브(설정 읽기는 자유, 변경은 승인) |
 | pnpm 11.5.3 이후(10.x는 10.34.2 이후) 프로젝트 `.npmrc`의 `${…}` 치환을 하지 않는다는 pnpm.io 설명(Learn 07)과 0장·3장의 `.npmrc` 안내가 맞는가. 안 맞으면 토큰 줄은 `~/.npmrc`, 범위 레지스트리는 `pnpm-workspace.yaml`의 `registries`로 안내한다 | 10/12 `v0.0.1` 설치 확인 |
 | `Bash(pnpm milvus deploy *)`가 인자 없는 명령에도 걸리는가 | 10/13 |
