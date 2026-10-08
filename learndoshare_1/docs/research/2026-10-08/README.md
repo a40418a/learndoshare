@@ -61,11 +61,11 @@
 
 ## 다시 만들기
 
-`learndoshare_1`에서 `pnpm install`을 한 뒤 실행한다. 큰 JSON이 저장소에 생기지 않도록 출력 폴더(`AUDIT_OUT`)를 저장소 밖으로 지정한다. 지정하지 않으면 이 폴더에 쓴다.
+`learndoshare_1`에서 `pnpm install`을 한 뒤 실행한다. 출력 폴더는 기본으로 OS 임시 폴더 아래 `milvus-audit-2026-10-08`이다(Node `os.tmpdir()`, 없으면 만든다). 그래서 큰 JSON이 저장소에 생기지 않고, 커밋된 `summary.md`와 JSON도 덮어쓰지 않는다. 다른 폴더에 쓰려면 `AUDIT_OUT`으로 넘긴다. (2026-10-09 갱신: 전에는 `AUDIT_OUT`이 없으면 이 폴더에 썼다)
 
 ```sh
 cd docs/research/2026-10-08
-export AUDIT_OUT="$(mktemp -d)"
+# export AUDIT_OUT="$(mktemp -d)"   # 선택: 기본 임시 폴더 대신 쓸 곳
 
 node extract.cjs         # decls.json, summary.md
 node shape.cjs           # shape.json
@@ -88,4 +88,5 @@ node hookcheck.cjs --slds-g-radius-border-pill --slds-g-color-accent-4
 ```
 
 - 다른 프로젝트의 패키지를 분석하려면 `MILVUS_ROOT=<그 프로젝트 루트>`를 함께 넘긴다
+- 커밋된 결과(`summary.md`, 위 "결과 JSON" 4개)를 바꾸려면 출력 폴더에서 이 폴더로 직접 복사한다. 스크립트는 이 폴더에 쓰지 않는다
 - 2026-10-09 확인: 위 순서로 다시 실행한 결과 `summary.md`와 JSON 9개(`decls`, `shape`, `color-rows`, `hookdefs`, `state`, `cov2`, `cov3`, `covstate`, `icon-cov`)가 원본과 바이트 단위로 같았다

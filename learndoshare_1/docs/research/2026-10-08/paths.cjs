@@ -1,12 +1,15 @@
-// 분석 스크립트가 함께 쓰는 위치 (읽기만 함)
+// 분석 스크립트가 함께 쓰는 위치 (패키지는 읽기만 하고, 결과는 OUT에만 쓴다)
 // - ROOT: 패키지를 찾을 프로젝트 루트. 기본은 이 폴더에서 세 단계 위(learndoshare_1). 다른 곳은 MILVUS_ROOT로 넘긴다
-// - OUT: 생성 JSON을 읽고 쓰는 폴더. 기본은 이 폴더. 큰 JSON을 저장소 밖에 두려면 AUDIT_OUT으로 넘긴다
+// - OUT: 생성 JSON·summary.md를 읽고 쓰는 폴더. 기본은 OS 임시 폴더 아래 milvus-audit-2026-10-08 (커밋된 이 폴더를 덮어쓰지 않는다). 다른 곳은 AUDIT_OUT으로 넘긴다
 // - SLDS2, LBC: 설치된 패키지 폴더 (pnpm 심볼릭 링크와 상관없이 require.resolve로 찾음)
+const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const { createRequire } = require("module");
 
 const ROOT = path.resolve(process.env.MILVUS_ROOT || path.join(__dirname, "../../.."));
-const OUT = path.resolve(process.env.AUDIT_OUT || __dirname);
+const OUT = path.resolve(process.env.AUDIT_OUT || path.join(os.tmpdir(), "milvus-audit-2026-10-08"));
+fs.mkdirSync(OUT, { recursive: true });
 const req = createRequire(path.join(ROOT, "package.json"));
 const pkgDir = (name) => path.dirname(req.resolve(name + "/package.json"));
 const SLDS2 = pkgDir("@salesforce-ux/design-system-2");
