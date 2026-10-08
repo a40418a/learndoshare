@@ -324,12 +324,13 @@ node hk.cjs --slds-s-button-radius-border</code></pre>
   <h3>직접 확인하기</h3>
 <pre><code><span class="c"># learndoshare_1에서 pnpm install 뒤</span>
 cd docs/research/2026-10-08
-export AUDIT_OUT="$(mktemp -d)"      <span class="c"># 큰 JSON을 저장소 밖에 쓴다</span>
-node extract.cjs                     <span class="c"># 선언 분류표 summary.md를 다시 만든다</span>
+<span class="c"># 출력은 기본으로 OS 임시 폴더 아래 milvus-audit-2026-10-08에 쓴다 (저장소 밖, 2026-10-09 갱신)</span>
+<span class="c"># export AUDIT_OUT="$(mktemp -d)"   # 선택: 다른 폴더에 쓰고 싶을 때만</span>
+node extract.cjs                    <span class="c"># 선언 분류표 summary.md를 다시 만든다</span>
 node motion.cjs                      <span class="c"># 움직임 hook 비율</span>
 node hk.cjs --slds-g-duration-quickly   <span class="c"># 정의 수와 읽는 곳 수</span></code></pre>
   <p>다시 실행한 결과가 원본과 바이트 단위로 같았다는 기록이 연구 자료 안내에 있다.</p>
-  <p class="sources">출처: <a href="../docs/research/2026-10-08/summary.md">선언 분류 요약 (summary.md)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">8개 항목 감사 종합 (synthesis.md 0·1·2.6·2.7장)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/README.md">연구 자료 안내 (다시 만들기)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (1장 10/8 결정, 9.1 표, 9.4 "Salesforce 고정" 목록 사용자 합의)</a> (확인 2026-10-09) ·<a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm — @salesforce-ux/design-system-2</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">npm — lightning-base-components</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="../docs/research/2026-10-08/summary.md">선언 분류 요약 (summary.md)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">8개 항목 감사 종합 (synthesis.md 0·1·2.6·2.7장)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/README.md">연구 자료 안내 (다시 만들기)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (1장 10/8 결정, 9.1 표, 9.4 "Salesforce 고정" 목록 사용자 합의)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm — @salesforce-ux/design-system-2</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">npm — lightning-base-components</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="layers">
