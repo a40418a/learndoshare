@@ -596,6 +596,8 @@ PR #19의 검사 스크립트, CLAUDE.md 3장, 이 표가 지금 서로 다르�
 | Vite 개발 서버 미들웨어로 요청 파일을 저장할 수 있는가 | 10/12 스파이크 |
 | 피드백 색 hook을 util.css로 바꾸면 LEX 표준 화면에도 반영되는가 | 10/12 org 프로브 |
 | VF에서 `milvusVf.css` + `milvusBrand`가 SLDS 2·팔레트·util.css를 함께 적용하는가 | 10/12 org 프로브 |
+| **VF 공식 SLDS 2 경로:** Help "User Interface Settings"의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active" 설정과 `<apex:slds lightningStyleMode>`(API 65.0+, 기본 Auto)가 있다(2026-10-09 공식 문서 확인, Learn 00·01). 10/8 프로브는 API 67.0 페이지에서 SLDS 1로 그려졌고 그때 설정 상태는 기록이 없다. 설정을 켜면 org 테마 팔레트까지 들어오는가. 들어오면 `milvusVf`는 util.css가 있을 때만 필요하거나 아예 필요 없다(4.4, 5.5, Task 24 재검토) | 10/12 org 프로브(설정 읽기는 자유, 변경은 승인) |
+| pnpm 11.5.3 이후 프로젝트 `.npmrc`의 `${…}` 치환을 하지 않는다는 pnpm.io 설명(Learn 07)과 0장·3장의 `.npmrc` 안내가 맞는가. 안 맞으면 토큰 줄은 `~/.npmrc`, 범위 레지스트리는 `pnpm-workspace.yaml`의 `registries`로 안내한다 | 10/12 `v0.0.1` 설치 확인 |
 | `Bash(pnpm milvus deploy *)`가 인자 없는 명령에도 걸리는가 | 10/13 |
 | `sfdx-project.json`의 `defaultLwcLanguage` 키가 실제 스키마에 있고 VS Code가 따르는가 (설치된 `@salesforce/core` 스키마에서 확인함, VS Code 동작은 미확인) | 10/13 |
 | `Edit(...)` deny 규칙이 의도대로 막는가 | 10/13 |
@@ -607,6 +609,8 @@ PR #19의 검사 스크립트, CLAUDE.md 3장, 이 표가 지금 서로 다르�
 ## 15. 미정
 
 - 회사 GitHub 조직으로 옮길지(패키지 범위 이름이 바뀐다)
+- `BrandingSet`의 SLDS 2 전용 색 속성(`ACCENT_COLOR_1~3`, `CONTAINER_ACCENT_COLOR_1~3`(API 64), `ACCENT_CONTAINER_CONTENT_COLOR_1~3`(API 65))을 브랜드 명세에 넣을지. 공식 기능이라 "기본 우선"에 맞는다(2026-10-09 Metadata API 문서 확인, Learn 00)
+- `--slds-s-*` 허용(#18) 유지 여부: 공식 `@salesforce-ux/eslint-plugin-slds`는 `--slds-s-*`를 Salesforce 내부용 private hook으로 분류한다(Learn 00·01). "기본 우선"에서는 util.css가 요청 시에만 쓰이므로 당장 바꾸지 않는다
 - 앱 전체에 util.css를 거는 방법(유틸리티 바는 LWC 백그라운드 로딩이 지원되지 않음)
 - 브랜드 글꼴(발표 뒤 검토)
 - native 전환 감지가 울렸을 때 9.2의 c hook 목록을 열지

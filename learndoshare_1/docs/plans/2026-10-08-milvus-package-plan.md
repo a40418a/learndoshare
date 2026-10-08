@@ -526,6 +526,7 @@ test("vf:false면 milvusHead와 milvusVf가 목록에 없다", ...);
   - VF 페이지의 버튼·입력·배경
   - 유틸리티 바만 있는 표준 화면에 `milvusBrand` link가 생기는가
   - 정의가 없는 hook(`--slds-g-color-accent-4` 등)의 계산 값
+  - VF 공식 SLDS 2 경로(설계 14장): User Interface 설정 "Use SLDS 2 for pages that include `<apex:slds>`…"의 현재 값을 `Settings` 조회로 읽는다. 꺼져 있으면 켜는 것은 따로 승인받는다. 켠 상태에서 `<apex:slds/>`만 쓴 VF 페이지가 SLDS 2와 org 팔레트로 그려지는지 잰다. 결과에 따라 Task 24(milvusVf)의 범위를 다시 정한다
   - `lightning-*` 호스트의 `data-render-mode`(읽기만)
 - [ ] **Step 4: 정리한다.** 삭제 배포는 따로 승인을 받는다. 테마를 지우면 BrandingSet도 함께 지워지므로 둘을 나눠 배포한다
 - [ ] **Step 5: 기록한다.** 설계 13·14장에 반영하고, 이 내용은 M2 PR에 넣는다
