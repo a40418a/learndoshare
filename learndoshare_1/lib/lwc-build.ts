@@ -42,7 +42,11 @@ const stripTypes: Plugin = {
     const compilerOptions = { target: ts.ScriptTarget.ESNext, module: ts.ModuleKind.ESNext, experimentalDecorators: false };
     // ponytail: map을 만들지 않는다. 다음 단계인 LWC 플러그인도 sourcemap을 만들지 않으므로(sourcemap 기본 false)
     // 컴포넌트 줄 위치는 원래도 정확하지 않다. 디버깅에 필요해지면 둘 다 켠다
-    return { code: ts.transpileModule(code, { fileName: id, compilerOptions }).outputText, map: null };
+    const { outputText, diagnostics } = ts.transpileModule(code, { fileName: id, reportDiagnostics: true, compilerOptions });
+    // 문법 오류가 있어도 결과는 나온다(복구하며 코드 일부를 버린다). 문법 진단이 있으면 빌드를 멈춘다
+    const d = diagnostics?.[0];
+    if (d) this.error(ts.flattenDiagnosticMessageText(d.messageText, "\n"), d.start);
+    return { code: outputText, map: null };
   }
 };
 

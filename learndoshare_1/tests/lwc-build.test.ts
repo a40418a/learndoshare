@@ -40,6 +40,13 @@ test("lightning/platformResourceLoader와 @salesforce/resourceUrl/x를 import해
   assert.equal(loadScript, loadStyle);
 });
 
+test(".ts 문법 오류가 있으면 빌드가 실패한다", async () => {
+  // transpileModule은 문법 오류를 복구해 코드 일부(여기선 foo)를 버린 결과를 낸다. 성공으로 넘기면 안 된다
+  const broken = join(fixture, "c/broken/broken.ts");
+  const build = buildLwc({ out: join(tmp, "broken"), entries: { catalog: join(fixture, "catalog.js") }, modules: [{ name: "c/probe", path: broken }] });
+  await assert.rejects(build, (e: Error & { plugin?: string; id?: string }) => e.plugin === "milvus-strip-types" && !!e.id?.startsWith(broken));
+});
+
 test("synthetic-shadow chunk가 index.js의 첫 import다", async () => {
   const firstImport = (await output("index.js")).split("\n").find((line) => line.startsWith("import "));
   assert.match(firstImport ?? "", /^import '\.\/synthetic-shadow-[\w-]+\.js';$/);
