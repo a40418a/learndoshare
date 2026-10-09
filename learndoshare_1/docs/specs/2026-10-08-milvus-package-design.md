@@ -38,6 +38,9 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 3. pnpm milvus storybook        → 브랜드 명세 페이지에 항목별·전체 요청 입력 → 저장
 4. Claude Code: "브랜드 요청 반영해줘"  → 브랜드 명세 표 제안 → 승인 → 파일 작성 → check → 화면 갱신
 5. pnpm milvus deploy           → 배포 계획 확인 → 채팅 승인 → pnpm milvus deploy --yes
+6. org에서 사람이 직접 (메타데이터로 할 수 없음, 7.1)
+   - 앱 전체 브랜드: App Manager에서 앱마다 유틸리티 바에 milvusBrandLoader 추가, "앱이 열릴 때 백그라운드로 로드" 체크
+   - VF를 쓰면: Setup → User Interface → Visualforce Settings의 VF SLDS 2 설정 켜기
 ```
 
 **성공 기준:** 새 SFDX 프로젝트(`learndoshare_2`)에서 위 흐름이 막힘 없이 org 화면(LEX)까지 이어지고, 브랜드 값이 9장의 자동 확인에서 모든 컴포넌트에 반영된다. VF는 11장 빼는 순서 ②까지 포함한다.
@@ -69,8 +72,8 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 | 10/9 | **opt-in override.** 기존 컴포넌트(`lightning-button` 등)의 모양을 hook·브리지로 바꿀 수 없으면, 새 밀버스 컴포넌트를 만들지 않고 프로젝트 소유 `milvusOverride.css`의 클래스 규칙으로 바꾼다. 공식 권고 밖임을 알고 쓴다. 밀버스 컴포넌트는 기능이 없을 때만 만든다(기존 `milvusButton`은 비교 예시로 유지). 비권고 이유와 실험은 Learn 09에 정리한다 | 사용자 요청. 모양만 바꾸려고 컴포넌트를 새로 만드는 것은 비효율적이다. 지금 org는 synthetic이라 클래스 규칙이 닿을 것으로 본다. 10/8 프로브는 `:root`의 hook 두 개만 넣었고 클래스 규칙은 넣지 않았다. 이 판단은 10/7 synthetic 실측과 LWC 개발자 가이드 Mixed Shadow Mode 설명에서 나온 것이다(2026-10-09 정정, Learn 09 2절). 같은 날 프로브로 클래스 규칙이 닿는 것을 확인했다(13장). native 전환·마크업 변경 때 깨질 수 있다는 것을 발표에서 직접 보여 준다 |
 | 10/9 | SLDS 2(Cosmos) org를 기준으로 한다. SLDS 1 테마 org 지원은 발표 뒤 검토한다(#22) | 사용자 선택. SLDS 1은 컴포넌트 hook(`--slds-c-*`)이 공식이고 VF가 그대로 맞는 장점이 있지만, org 테마는 고객사가 고르는 설정이고 새 org 기본은 SLDS 2다(Essentials 제외). 지금까지의 실측·Storybook·팔레트가 모두 SLDS 2 기준이다 |
 | 10/9 | **D1 LWC는 JS.** 밀버스 저장소와 고객 프로젝트 모두 LWC(밀버스 컴포넌트, `milvusScript`, `milvusBrandLoader`)는 `.js`로 쓴다. CLI·`lib`·스크립트·Storybook 설정·node 테스트는 `.ts`를 유지한다. `init`은 고객 `sfdx-project.json`의 `defaultLwcLanguage`를 바꾸지 않는다. 고객 `lwc/tsconfig.json`, `@types/jest`, `tsconfig.lwc.base.json`, `lwc-platform.d.ts`는 필요 없다 | 사용자 선택. org가 `.ts` LWC를 타입 검사해 `this.template`·`this.dispatchEvent`를 거부했고(LWC1539), 공식 문서는 배포 전에 JS로 변환하라고 한다(8장, 13장). CLI 쪽은 org에 올라가지 않고 Node가 `.ts`를 직접 실행한다 |
-| 10/9 | **D2 VF는 공식 설정 + 팔레트.** Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켜고, `<apex:slds/>` + 팔레트 CSS(`milvusVf`, 약 620바이트) + `milvusBridge`·`milvusBrand`·`milvusOverride`로 VF를 LEX와 맞춘다. SLDS 2 CSS 전체 사본(약 1MB)은 쓰지 않는다. 정적 리소스 이름은 `milvusVf` 그대로다 | 사용자 선택. 설정을 켜면 SLDS 2가 되지만 org 테마 팔레트는 들어오지 않고, 팔레트를 더하면 LEX와 같았다(13장). 이 설정은 Metadata API로 읽거나 배포할 수 없어 고객 org에서 Setup으로 직접 켠다. `deploy`와 `milvus-design.md`가 안내한다. 학습 org는 켜 둔 상태로 둔다 |
-| 10/9 | **D3 앱 전체 브랜드.** 화면 없는 LWC `milvusBrandLoader`(대상 `lightning__UtilityBar`, `loadBrand(this)`만)를 패키지에 넣는다. 앱에 붙이는 것은 사용자가 App Manager에서 한다(유틸리티 항목 추가, "앱이 열릴 때 백그라운드로 로드" 체크). `deploy`는 고객 앱 메타데이터를 바꾸지 않는다 | 사용자 선택. 유틸리티 항목의 백그라운드 로드만으로 그 앱의 모든 페이지에 브랜드 CSS가 들어갔다(9.7, 13장) |
+| 10/9 | **D2 VF는 공식 설정 + 팔레트.** Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켜고, `<apex:slds/>` + 팔레트 CSS(`milvusVf`, 약 620바이트) + `milvusBridge`·`milvusBrand`·`milvusOverride`로 VF를 LEX와 맞춘다. SLDS 2 CSS 전체 사본(약 1MB)은 쓰지 않는다. 정적 리소스 이름은 `milvusVf` 그대로다 | 사용자 선택. 설정을 켜면 SLDS 2가 되지만 org 테마 팔레트는 들어오지 않고, 팔레트를 더하면 LEX와 같았다(13장). 단 프로브는 직접 만든 `<head>` 안의 `<apex:slds/>`와 `slds-scope` 래퍼로 쟀다. `<c:milvusHead/>`(컴포넌트 안의 `<apex:slds/>`) 구성은 Task 24에서 잰다(5.5, 14장). 이 설정은 Metadata API로 읽거나 배포할 수 없어 고객 org에서 Setup으로 직접 켠다. `deploy`와 `milvus-design.md`가 안내한다. 학습 org는 켜 둔 상태로 둔다 |
+| 10/9 | **D3 앱 전체 브랜드.** 화면 없는 LWC `milvusBrandLoader`(대상 `lightning__UtilityBar`, `loadBrand(this)`만)를 패키지에 넣는다. 앱에 붙이는 것은 사용자가 App Manager에서 한다(유틸리티 항목 추가, "앱이 열릴 때 백그라운드로 로드" 체크). `deploy`는 고객 앱 메타데이터를 바꾸지 않는다 | 사용자 선택. 유틸리티 항목의 백그라운드 로드만으로 그 앱의 표준 화면(리드 목록)에 브랜드 CSS가 들어갔다(9.7, 13장) |
 | 10/9 | **D4 TS 배포 단계 없음.** `deploy`에 TS → JS 변환 단계를 넣지 않는다 | LWC가 JS이므로 필요 없다 |
 
 ---
@@ -110,7 +113,7 @@ package.json                                       [소유] "storybook": "milvus
 .claude/skills/milvus-brand/SKILL.md               [관리] 브랜드 입력 skill
 .claude/hooks/milvus-check.mjs                     [관리] util.css·브랜드 메타데이터 수정 후 check --style
 .gitignore                                         [소유] .milvus/ 줄 추가
-.forceignore                                       [소유] **/tsconfig.json, **/__tests__/** 줄 추가 (없을 때만)
+.forceignore                                       [소유] **/__tests__/** 줄 추가 (없을 때만. 밀버스 LWC가 JS라 tsconfig 줄은 넣지 않는다, 10/9 D1)
 .npmrc                                             [소유] 범위 두 줄이 없으면 추가 (0장 준비를 팀원과 공유)
 force-app/main/default/
   lwc/milvusBadge/, milvusButton/, milvusMultiSelect/ …   [관리] 밀버스 컴포넌트 (.js)
@@ -257,9 +260,10 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 
 ### 5.5 LEX와 VF에 util.css를 거는 방법
 - **LEX:** 밀버스 컴포넌트가 나타날 때 `milvusScript`의 `loadBrand(this)`가 `loadStyle`로 `milvusBridge`, `milvusBrand`, `milvusOverride`를 차례로 문서 head에 넣는다. 같은 페이지의 표준 UI와 `body`에 붙는 모달·토스트까지 바뀐다(실측). 프로젝트 컴포넌트도 같은 함수를 부를 수 있다
-- **LEX 앱 전체:** 화면 없는 `milvusBrandLoader`를 앱의 유틸리티 바에 넣고 "앱이 열릴 때 백그라운드로 로드"를 켜면, 커스텀 컴포넌트가 없는 표준 화면을 포함해 그 앱의 모든 페이지에 들어간다. 다른 앱에는 들어가지 않는다(10/9 실측, 9.7). 붙이는 것은 사용자가 App Manager에서 한다(10/9 D3). 로더가 없는 앱의 표준 화면에는 테마 색만 적용된다
-- **VF:** 고객 org에서 Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켠다(Metadata API로 읽거나 배포할 수 없음). 페이지에 `<c:milvusHead/>` 한 줄을 넣는다. `milvusHead`는 `<apex:slds/>`를 넣고, `milvusVf`(팔레트), `milvusBridge`, `milvusBrand`, `milvusOverride` 순서로 `<apex:stylesheet>`를 넣는다(10/9 D2). 설정을 켠 `<apex:slds/>`는 SLDS 2이지만 팔레트가 Salesforce 기본(`#066afe`)이라 `milvusVf`가 필요하다. 설정이 꺼져 있으면 SLDS 1로 그려지고 util.css가 효과가 없다(10/9 실측, 13장)
-- 한계: 10/8 방식(SLDS 2 CSS 사본)은 사본이 참조하는 기본 아바타 이미지(`../../public/*.png`)가 패키지에 없다는 한계가 있었다. `<apex:slds/>`는 org의 스타일시트를 쓰지만 아바타 이미지가 보이는지는 재지 않았다(**미확인**)
+- **LEX 앱 전체:** 화면 없는 `milvusBrandLoader`를 앱의 유틸리티 바에 넣고 "앱이 열릴 때 백그라운드로 로드"를 켜면, 커스텀 컴포넌트가 없는 표준 화면에도 들어간다. 다른 앱에는 들어가지 않는다(10/9 실측, 잰 화면은 리드 목록 하나, 9.7). 붙이는 것은 사용자가 App Manager에서 한다(10/9 D3). 로더가 없는 앱의 표준 화면에는 테마 색만 적용된다
+- **VF:** 고객 org에서 Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켠다(Metadata API로 읽거나 배포할 수 없음). 페이지에 `<c:milvusHead/>`를 넣는다(이 구성 자체는 아직 재지 않았다, 아래). `milvusHead`는 `<apex:slds/>`를 넣고, `milvusVf`(팔레트), `milvusBridge`, `milvusBrand`, `milvusOverride` 순서로 `<apex:stylesheet>`를 넣는다(10/9 D2). 설정을 켠 `<apex:slds/>`는 SLDS 2이지만 팔레트가 Salesforce 기본(`#066afe`)이라 `milvusVf`가 필요하다. 설정이 꺼져 있으면 SLDS 1로 그려지고 util.css가 효과가 없다(10/9 실측, 13장)
+  - 잰 형태와 다르다: 10/9 프로브 페이지는 `applyHtmlTag="false"`로 직접 만든 `<head>` 안에 `<apex:slds/>`를 두고 본문 전체를 `<div class="slds-scope">`로 감쌌다. util.css와 팔레트는 측정 때 link로 붙였다. `<c:milvusHead/>` 구성에서 (1) 컴포넌트 안의 `<apex:slds/>`도 설정의 SLDS 2 전환 대상인지, (2) `slds-scope` 래퍼가 필요한지, (3) `<apex:slds/>`와 `<apex:stylesheet>`가 어떤 순서로 출력되는지는 재지 않았다(**미확인**, 14장). Task 24 Step 4에서 래퍼가 있는 페이지와 없는 페이지를 모두 잰다. 래퍼가 필요하면 여기와 7.1(`milvus-design.md`)에 적는다
+- 한계: 10/8 방식(SLDS 2 CSS 사본)은 사본이 참조하는 기본 아바타 이미지(`../../public/*.png`)가 패키지에 없다는 한계가 있었다. `<apex:slds/>`는 org의 스타일시트를 쓰지만 아바타 이미지가 보이는지는 재지 않았다(**미확인**, 14장)
 
 ### 5.6 `milvusBridge.css` — hook이 없는 항목을 잇는 클래스 규칙 (제한적 허용)
 - hook이 0개이거나 허용된 hook이 없는 항목만 다룬다. hook이 있는 항목은 계속 hook만 쓴다
@@ -368,12 +372,12 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 2. 준비물: Node 22.18 이상(23.x는 23.6 이상), pnpm, sf CLI, GitHub 토큰 `NODE_AUTH_TOKEN`, `.npmrc` 두 줄, org 로그인
 3. 세팅 순서 체크리스트: `init` → 브랜드 요청 입력 → 반영 → `storybook` 확인 → `deploy`. 배포 뒤 사람이 org에서 하는 일 두 가지(10/9 D2·D3)
    - VF를 쓰면 Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켠다. 메타데이터로 켤 수 없다
-   - 앱 전체에 브랜드를 걸려면 App Manager에서 그 앱의 유틸리티 바에 `milvusBrandLoader`를 추가하고 "앱이 열릴 때 백그라운드로 로드"를 체크한다. 앱마다 한다. 안 하면 밀버스 컴포넌트가 있는 페이지에만 걸린다
+   - 앱 전체에 브랜드를 걸려면 App Manager에서 그 앱의 유틸리티 바에 `milvusBrandLoader`를 추가하고 "앱이 열릴 때 백그라운드로 로드"를 체크한다. 앱마다 한다. 안 하면 밀버스 컴포넌트가 있는 페이지에만 걸린다. 로더는 보이는 유틸리티 항목이라 유틸리티 바에 버튼으로 나온다(라벨·아이콘은 App Manager에서 정한다). 템플릿이 비어 있어 패널을 열어도 아무것도 그리지 않는다
 4. 파일 지도: [관리] / [소유] / [생성] (3장과 같음)
 5. 디자인 규칙: 판단 순서, util.css 규칙(5.2), 색은 `BrandingSet`에서만, LWC는 JavaScript(`.js`, 10/9 D1), `milvus` 접두사는 밀버스 전용
 6. Claude에게 시키는 법: 예시 문장, skill 이름
 7. 배포 안전장치: 배포는 `pnpm milvus deploy`로만, 계획 확인 후 `--yes`, 활성 테마는 org 전체에 적용, 테마 반영은 새로고침 후
-8. 업데이트와 문제 해결: `milvus update`(`--force`), GitHub 토큰 오류, VF는 `<c:milvusHead/>`, 프로젝트 전체 배포로 `milvusHead`를 올릴 때는 `milvusVf.css`가 커밋되어 있어야 함, VF가 SLDS 1(버튼 반경 4px)로 보이면 위 VF 설정 확인, 표준 화면에 브랜드가 안 보이면 `milvusBrandLoader` 백그라운드 로드 확인
+8. 업데이트와 문제 해결: `milvus update`(`--force`), GitHub 토큰 오류, VF는 `<c:milvusHead/>`(`slds-scope` 래퍼가 필요한지는 Task 24 측정 뒤 적는다, 5.5), 프로젝트 전체 배포로 `milvusHead`를 올릴 때는 `milvusVf.css`가 커밋되어 있어야 함, VF가 SLDS 1(버튼 반경 4px)로 보이면 위 VF 설정 확인, 표준 화면에 브랜드가 안 보이면 `milvusBrandLoader` 백그라운드 로드 확인
 
 ### 7.2 `.claude/settings.json` (병합할 내용)
 
@@ -528,7 +532,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 
 ### 9.7 "모든 컴포넌트"에는 "모든 화면"도 들어간다
 - util.css와 브리지는 `loadBrand`를 부른 컴포넌트가 있는 페이지에 들어간다. 그런 컴포넌트가 없는 표준 레코드 페이지에는 org 테마 색만 적용된다
-- **해결 (10/9 실측, D3):** 앱 유틸리티 바에 화면 없는 LWC를 두고 백그라운드로 로드하게 하면(FlexiPage decorator `eager` = `true`), 유틸리티 패널을 열지 않아도 그 앱의 모든 페이지에 브랜드 CSS가 들어갔다. 다른 앱(판매)을 새로 불러오면 들어가지 않았다. 공식 문서의 "백그라운드 유틸리티 항목"(`lightning:backgroundUtilityItem`)은 Aura 전용이라 쓰지 않고, 보이는 유틸리티 항목의 백그라운드 로드를 쓴다([기록](../research/2026-10-09-org-probe.md) 3.7)
+- **해결 (10/9 실측, D3):** 앱 유틸리티 바에 화면 없는 LWC를 두고 백그라운드로 로드하게 하면(FlexiPage decorator `eager` = `true`), 유틸리티 패널을 열지 않아도 그 앱의 표준 화면(리드 목록)에 브랜드 CSS가 들어갔다. 잰 화면은 이것 하나다. 유틸리티 바는 앱의 모든 페이지에 붙으므로 다른 페이지도 같다고 본다. 다른 앱(판매)을 새로 불러오면 들어가지 않았다. 공식 문서의 "백그라운드 유틸리티 항목"(`lightning:backgroundUtilityItem`)은 Aura 전용이라 쓰지 않고, 보이는 유틸리티 항목의 백그라운드 로드를 쓴다([기록](../research/2026-10-09-org-probe.md) 3.7)
 - 패키지는 이 용도의 `milvusBrandLoader`(대상 `lightning__UtilityBar`, 빈 템플릿, `connectedCallback`에서 `loadBrand(this)`만)를 [관리] 파일로 넣는다. 앱에 붙이는 것은 사용자가 App Manager에서 앱마다 한다(유틸리티 항목 추가, "앱이 열릴 때 백그라운드로 로드" 체크). `deploy`는 고객 앱 메타데이터를 바꾸지 않는다
 - App Manager의 "앱이 열릴 때 백그라운드로 로드" 체크가 프로브에서 쓴 decorator `eager`와 같은지는 **미확인**이다(14장)
 
@@ -622,11 +626,11 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | `.ts` LWC를 그대로 배포하면 실패한다. org가 `.ts`를 타입 검사하며 `this.template`·`this.dispatchEvent`를 "type에 없음"(LWC1539)으로 거부한다. `transpileModule`로 만든 JS를 배포하면 성공하고, `c/milvusScript` import와 `loadBrand`(세 link)가 동작한다. 공식 문서: LWC 컴파일러는 TS를 컴파일하지 않으므로 배포 전에 JS로 변환해야 하고, 플랫폼은 TS를 저장하지 않는다 | 10/9 프로브 ([기록](../research/2026-10-09-org-probe.md) 3.1), LWC 개발자 가이드 "TypeScript (Developer Preview)" (확인 2026-10-09) |
 | 프로브 화면의 기본 컴포넌트는 전부 synthetic이다(`lightning-*` 호스트 90개 중 `data-render-mode` 0개) | 10/9 프로브 (기록 3.2) |
 | `loadStyle`로 넣은 클래스 규칙 `.slds-button { border-radius: 0 }`이 `lightning-button` 안 버튼과 같은 화면의 표준 헤더 버튼 대부분에 닿는다. 더 구체적인 선택자가 있는 버튼(`appdev-panel-button` 4px, `search-button` 8px, 즐겨찾기 별 240px)은 예외다 | 10/9 프로브 (기록 3.3) |
-| util.css의 중립 색 hook이 LEX 표준 UI에 반영된다: 페이지 바탕(`html`, `surface-2`), 전역 헤더·검색(`surface-container-1`), 글자색(`on-surface-3`, 494개 요소), 테두리(`border-1`), 카드·입력 배경 | 10/9 프로브 (기록 3.4) |
+| util.css의 중립 색 hook이 LEX 프로브 화면의 표준 UI에 반영된다: 페이지 바탕(`html`, `surface-2`), 전역 헤더·검색(`surface-container-1`), 글자색(`on-surface-3`, 494개 요소), 테두리(`border-1`, 전역 생성 메뉴·패널 7개 요소). 카드·입력 배경은 프로브 컴포넌트 안의 `lightning-card`·`lightning-input`에서 쟀다(표준 레코드 화면의 카드는 재지 않음) | 10/9 프로브 (기록 3.4) |
 | util.css의 피드백 색 hook이 LEX 표준 UI에 반영된다: 시스템 경고 배너, `body`에 붙는 표준 토스트 error·warning·success(container 배경, `on-*` 글자). info 토스트는 재지 못했다 | 10/9 프로브 (기록 3.5) |
 | `--slds-g-color-accent-4`, `--slds-g-info-container-1`, `--slds-s-button-shadow-hover`는 org에서도 정의가 없다(빈 값) | 10/9 프로브 (기록 3.6) |
-| 화면 없는 LWC 유틸리티 항목을 백그라운드 로드(FlexiPage decorator `eager` = `true`)로 두면, 패널을 열지 않아도 그 앱의 모든 페이지(표준 목록 화면 포함)에 `loadBrand`의 세 link가 들어간다. 다른 앱에는 들어가지 않는다 | 10/9 프로브 (기록 3.7) |
-| VF Visualforce Settings의 SLDS 2 설정을 켜면 `<apex:slds/>`가 `slds-plus.css`(SLDS 2)로 바뀐다. 그러나 팔레트는 Salesforce 기본(`accent-1`·`brand-base-50` = `#066afe`)이고 org 테마 브랜드 색은 들어오지 않는다. util.css를 더하면 중립·피드백이 바뀌고, 팔레트 CSS(약 620바이트)를 더하면 브랜드 버튼이 `#2976ca`로 LEX와 같다. 10/8 방식(SLDS 2 사본 + 팔레트 + util.css)도 LEX와 같다 | 10/9 프로브 (기록 3.8) |
+| 화면 없는 LWC 유틸리티 항목을 백그라운드 로드(FlexiPage decorator `eager` = `true`)로 두면, 패널을 열지 않아도 그 앱의 표준 목록 화면(리드 목록, 잰 화면은 이것 하나)에 `loadBrand`의 세 link가 들어간다. 다른 앱(판매)에는 들어가지 않는다 | 10/9 프로브 (기록 3.7) |
+| VF Visualforce Settings의 SLDS 2 설정을 켜면 `<apex:slds/>`가 `slds-plus.css`(SLDS 2)로 바뀐다. 그러나 팔레트는 Salesforce 기본(`accent-1`·`brand-base-50` = `#066afe`)이고 org 테마 브랜드 색은 들어오지 않는다. util.css를 더하면 중립·피드백이 바뀌고, 팔레트 CSS(약 620바이트)를 더하면 브랜드 버튼이 `#2976ca`로 LEX와 같다. 10/8 방식(SLDS 2 사본 + 팔레트 + util.css)도 LEX와 같다. 잰 페이지는 `applyHtmlTag="false"`로 직접 만든 `<head>` 안에 `<apex:slds/>`, 본문은 `slds-scope` 래퍼, util.css·팔레트는 측정 때 link로 붙였다(`milvusHead` 구성은 14장) | 10/9 프로브 (기록 3.8) |
 | 위 VF 설정은 Metadata API로 읽거나 배포할 수 없다. `UserInterfaceSettings` 문서(API 68.0)에 필드가 없고, org의 Settings 168종을 모두 받아도 없다 | Metadata API 문서, org 조회 (10/9) |
 | 잰 표본에서 npm `slds2.cosmos.css` 2.264.2의 hook 기본값은 org 런타임 값과 같다(중립 색, 피드백 색, 반경, 간격). 다른 것은 브랜드 계열(`accent-1`·`accent-2`·`brand-base-50`)뿐이고, org가 테마 브랜드 색의 팔레트를 넣기 때문이다 | 10/9 프로브와 로컬 비교 (기록 3.9) |
 
@@ -641,6 +645,11 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | `Bash(pnpm milvus deploy *)`가 인자 없는 명령에도 걸리는가 | 10/13 |
 | `Edit(...)` deny 규칙이 의도대로 막는가 | 10/13 |
 | App Manager의 유틸리티 항목 속성 "앱이 열릴 때 백그라운드로 로드"(Load in background when app opens) 체크가 10/9 프로브에서 쓴 FlexiPage decorator `eager` = `true`와 같은 설정인가. `milvus-design.md`가 App Manager 경로로 안내하므로 화면에서 체크한 뒤 `milvusBrandLoader`가 동작하는지 본다(9.7) | Task 23 리허설 |
+| VF `milvusHead` 컴포넌트 안의 `<apex:slds/>`도 Visualforce Settings SLDS 2 설정의 대상("pages that include `<apex:slds>`")이 되는가. 10/9 프로브는 페이지에 직접 둔 `<apex:slds/>`만 쟀다(5.5) | Task 24 Step 4 |
+| SLDS 2(`slds-plus.css`)에서도 VF 본문에 `slds-scope` 래퍼가 필요한가. 프로브 페이지는 래퍼가 있었다. 필요하면 5.5·7.1에 적는다 | Task 24 Step 4 (래퍼 있는 페이지와 없는 페이지) |
+| `milvusHead` 안의 `<apex:slds/>`와 `<apex:stylesheet>` 4개가 어떤 순서로 출력되는가. 프로브는 util.css·팔레트를 측정 때 link로 뒤에 붙였다 | Task 24 Step 4 |
+| 설정을 켠 `<apex:slds/>`에서 SLDS 2 CSS가 참조하는 기본 아바타 이미지가 보이는가(5.5, 기록 3.8) | Task 24 Step 4 |
+| org `accent-2`의 다크 값(`#87aef7`)이 팔레트 70단계(`#8cb1f7`)와 다른 원인. 다크 모드가 범위 밖이라 지금 화면에는 영향이 없다(기록 3.9) | 다크 모드 검토 때 |
 | native에서 기본 컴포넌트 CSS가 직접 읽는 `--slds-s-*`에 `:root` 값이 닿는가 (9.1 전제 수정) | 발표 뒤 native 빌드 |
 | info 토스트에 피드백 색이 반영되는가(10/9 프로브에서 동시 표시 3개 제한으로 못 잼), `shadow-1`의 org 값이 npm 값과 같은가(구조만 기록) | 필요할 때 org 프로브(읽기만) |
 
