@@ -1,11 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { appendFileSync, copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { delimiter, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { runCheck } from "../cli/check.ts";
+import { join } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { checkCommand, runCheck } from "../cli/check.ts";
 import { runInit } from "../cli/init.ts";
 import { suggestPassingText } from "../lib/contrast.ts";
 import { hooksIndexFromSource } from "../lib/hooks-index.ts";
@@ -134,43 +134,122 @@ test("밀버스 관리 파일을 고치면 전체 check가 1이고 'pnpm milvus 
   });
 });
 
-test("hook은 다른 파일 수정에는 check를 실행하지 않는다", async () => {
-  // 가짜 pnpm: 실행 폴더와 인자를 기록하고, check --style 실패처럼 stderr와 2를 낸다
-  const bin = mkdtempSync(join(tmpdir(), "가짜 pnpm-"));
-  const log = join(bin, "calls.log");
-  writeFileSync(join(bin, "pnpm"), `#!/bin/sh\necho "$(pwd -P)|$*" >> "${log}"\necho "고칠 값: #123456" >&2\nexit 2\n`, { mode: 0o755 });
-  const hook = join(pkgRoot, "templates/claude/hooks/milvus-check.mjs");
-  const run = (file_path: string) =>
-    spawnSync(process.execPath, [hook], {
-      input: JSON.stringify({ hook_event_name: "PostToolUse", tool_name: "Edit", tool_input: { file_path } }),
-      encoding: "utf8",
-      env: { ...process.env, PATH: `${bin}${delimiter}${process.env.PATH}` },
-    });
-  try {
-    await withProject(async (root) => {
-      const others = [`${FA}/lwc/myCard/myCard.css`, `${RES}/milvusBrand.resource-meta.xml`, `${RES}/milvusBridge.css`, "brands/acme/milvusBrand.css", "README.md"];
-      for (const rel of others) {
-        const r = run(join(root, rel));
-        assert.equal(r.status, 0, rel);
-        assert.equal(r.stderr, "", rel);
-      }
-      assert.ok(!existsSync(log), "다른 파일에서 pnpm이 실행되었다");
+test("--style은 BrandingSet의 BRAND_COLOR가 #RRGGBB가 아니면 2와 고칠 값", async () => {
+  await withProject(async (root) => {
+    const file = `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`;
+    assert.equal((await check(root, true)).result.code, 0); // init이 만든 BrandingSet(#0176D3)은 통과
+    write(root, file, readFileSync(join(root, file), "utf8").replace("#0176D3", "#abc"));
+    const r = await check(root, true);
+    assert.equal(r.result.code, 2, r.stderr);
+    assert.deepEqual(r.result.issues.map((i) => [i.file, i.rule]), [[file, "brand-color"]]);
+    assert.ok(r.stderr.includes("#abc") && r.stderr.includes("고칠 값: #RRGGBB"), r.stderr);
+  });
+});
 
-      const targets = [`${RES}/milvusBrand.css`, `${RES}/milvusOverride.css`, `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`];
-      for (const rel of targets) {
-        const r = run(join(root, rel));
-        assert.equal(r.status, 2, rel); // 종료 코드와 stderr를 그대로 넘긴다
-        assert.equal(r.stderr, "고칠 값: #123456\n", rel);
-      }
-      const calls = readFileSync(log, "utf8").trim().split("\n");
-      assert.equal(calls.length, targets.length);
-      for (const c of calls) {
-        const [cwd, args] = c.split("|");
-        assert.equal(args, "milvus check --style");
-        assert.ok(cwd.startsWith(realpathSync(root)), cwd); // 고친 파일이 있는 프로젝트 안에서 실행한다
-      }
-    });
+test("check 명령은 옵션 오류에만 사용법을 붙인다", async () => {
+  const empty = mkdtempSync(join(tmpdir(), "밀버스 빈 폴더-"));
+  const before = process.cwd();
+  try {
+    process.chdir(empty);
+    const bad = await capture(() => checkCommand(["--bogus"]));
+    assert.equal(bad.result, 1);
+    assert.match(bad.stderr, /사용법: pnpm milvus check/);
+    const noProject = await capture(() => checkCommand([]));
+    assert.equal(noProject.result, 1);
+    assert.match(noProject.stderr, /sfdx-project\.json을 찾지 못했습니다/);
+    assert.doesNotMatch(noProject.stderr, /사용법/);
   } finally {
-    rmSync(bin, { recursive: true, force: true });
+    process.chdir(before);
+    rmSync(empty, { recursive: true, force: true });
   }
+});
+
+// hook 테스트. 가짜 CLI는 node 스크립트지만 Windows에서는 실행해 보지 않았다
+const posixOnly = { skip: process.platform === "win32" && "Windows에서 확인하지 않음" };
+const hook = join(pkgRoot, "templates/claude/hooks/milvus-check.mjs");
+const PKG = "node_modules/@a40418a/milvus-design-system";
+
+// 프로젝트에 패키지가 설치된 것처럼 둔다. dist/cli/index.js는 저장소 CLI의 main을 부른다(dist를 빌드하지 않는다)
+function installPackage(root: string) {
+  mkdirSync(join(root, PKG, "dist/cli"), { recursive: true });
+  writeFileSync(join(root, PKG, "package.json"), JSON.stringify({ name: "@a40418a/milvus-design-system", type: "module" }));
+  const main = JSON.stringify(pathToFileURL(join(pkgRoot, "cli/index.ts")).href);
+  writeFileSync(join(root, PKG, "dist/cli/index.js"), `import { main } from ${main};\nprocess.exitCode = await main(process.argv.slice(2));\n`);
+}
+
+// Claude Code처럼 hook을 실행한다. PATH를 비워 pnpm 없이 도는지 본다. 패키지는 CLAUDE_PROJECT_DIR(없으면 입력의 cwd)에서 찾는다
+function runHook(input: unknown, projectDir?: string) {
+  const env: NodeJS.ProcessEnv = { ...process.env, PATH: "" };
+  delete env.CLAUDE_PROJECT_DIR;
+  if (projectDir) env.CLAUDE_PROJECT_DIR = projectDir;
+  return spawnSync(process.execPath, [hook], { input: typeof input === "string" ? input : JSON.stringify(input), encoding: "utf8", env });
+}
+const edit = (cwd: string, file_path: string) => ({ hook_event_name: "PostToolUse", tool_name: "Edit", cwd, tool_input: { file_path } });
+const TARGETS = [`${RES}/milvusBrand.css`, `${RES}/milvusOverride.css`, `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`];
+
+test("hook은 다른 파일 수정에는 check를 실행하지 않는다", posixOnly, async () => {
+  await withProject(async (root) => {
+    installPackage(root);
+    // check --style이 실패할 상태. 다른 파일에서 check를 실행했다면 2가 나온다
+    write(root, `${RES}/milvusBrand.css`, ":root {\n  --slds-g-color-success-1: #7FBF7F;\n}\n");
+    const others = [`${FA}/lwc/myCard/myCard.css`, `${RES}/milvusBrand.resource-meta.xml`, `${RES}/milvusBridge.css`, "brands/acme/milvusBrand.css", "README.md"];
+    for (const rel of others) {
+      const r = runHook(edit(root, join(root, rel)));
+      assert.deepEqual([r.status, r.stdout, r.stderr], [0, "", ""], rel);
+    }
+
+    // 대상 파일이면 패키지 CLI를 pnpm 없이 직접 실행하고, 2와 stderr(고칠 값)를 그대로 넘긴다. stdout은 비운다
+    const fix = suggestPassingText("#7fbf7f", "#ffffff");
+    for (const rel of TARGETS) {
+      const r = runHook(edit(root, join(root, rel)));
+      assert.equal(r.status, 2, `${rel}\n${r.stderr}`);
+      assert.ok(r.stderr.includes(`고칠 값: ${fix}`), r.stderr);
+      assert.equal(r.stdout, "", rel);
+    }
+  });
+});
+
+test("hook은 override 경고만 있으면 0이고 stdout JSON의 additionalContext로 Claude에게 알린다", posixOnly, async () => {
+  await withProject(async (root) => {
+    installPackage(root);
+    copyFileSync(fixture("override-warn.css"), join(root, `${RES}/milvusOverride.css`));
+    const r = runHook(edit(root, join(root, `${RES}/milvusOverride.css`)));
+    assert.equal(r.status, 0, r.stderr);
+    assert.equal(r.stderr, "");
+    const out = JSON.parse(r.stdout);
+    assert.deepEqual(Object.keys(out), ["hookSpecificOutput"]);
+    assert.deepEqual(Object.keys(out.hookSpecificOutput), ["hookEventName", "additionalContext"]);
+    assert.equal(out.hookSpecificOutput.hookEventName, "PostToolUse");
+    const context: string = out.hookSpecificOutput.additionalContext;
+    assert.match(context, /milvusOverride\.css 경고 \d+개\. 공식 권고 밖/);
+    for (const warning of ["#ff0000", "!important", ".my-class"]) assert.ok(context.includes(warning), warning);
+
+    // 경고가 없으면 아무것도 쓰지 않는다(check의 "통과" 줄도 넘기지 않는다)
+    write(root, `${RES}/milvusOverride.css`, "");
+    const clean = runHook(edit(root, join(root, `${RES}/milvusOverride.css`)));
+    assert.deepEqual([clean.status, clean.stdout, clean.stderr], [0, "", ""]);
+  });
+});
+
+test("hook은 입력 JSON 오류와 패키지를 찾지 못한 경우 한국어 오류와 1", posixOnly, async () => {
+  const bad = runHook("{ not json");
+  assert.equal(bad.status, 1);
+  assert.match(bad.stderr, /입력 JSON을 읽지 못했습니다/);
+
+  await withProject(async (root) => {
+    const r = runHook(edit(root, join(root, TARGETS[0]))); // node_modules에 패키지가 없다
+    assert.equal(r.status, 1, r.stderr);
+    assert.match(r.stderr, /@a40418a\/milvus-design-system을 찾지 못했습니다/);
+    assert.equal(r.stdout, "");
+
+    // CLAUDE_PROJECT_DIR이 있으면 입력의 cwd보다 먼저 쓴다
+    installPackage(root);
+    const elsewhere = mkdtempSync(join(tmpdir(), "밀버스 다른 폴더-"));
+    try {
+      assert.equal(runHook(edit(root, join(root, TARGETS[0])), elsewhere).status, 1);
+      assert.equal(runHook(edit(elsewhere, join(root, TARGETS[0])), root).status, 0);
+    } finally {
+      rmSync(elsewhere, { recursive: true, force: true });
+    }
+  });
 });

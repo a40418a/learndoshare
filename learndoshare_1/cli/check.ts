@@ -1,12 +1,13 @@
 // milvus check (설계 4.3, 10장)
-// - --style: hook이 milvusBrand.css·milvusOverride.css·브랜드 메타데이터를 고칠 때마다 실행한다. util.css 규칙·대비(5.2, 5.3)와
-//   milvusOverride.css(5.1)만 보고, hook 이름은 설치된 패키지의 dist/hooks-index.json에서 읽는다(lib/hooks-index.ts).
-//   실패하면 2(Claude Code가 stderr를 Claude에게 보여 준다)
+// - --style: hook이 milvusBrand.css·milvusOverride.css·brandingSets/를 고칠 때마다 실행한다. util.css 규칙·대비(5.2, 5.3),
+//   milvusOverride.css(5.1), BrandingSet의 BRAND_COLOR 형식만 보고, hook 이름은 설치된 패키지의 dist/hooks-index.json에서
+//   읽는다(lib/hooks-index.ts). 실패하면 2(Claude Code가 stderr를 Claude에게 보여 준다)
 // - 전체: deploy와 CI가 실행한다. --style 항목 + 밀버스 관리 파일 sha256(milvus.config.json). 실패하면 1.
 //   밀버스 LWC는 JS라 타입 검사는 하지 않는다(10/9 D1). milvusVf.css 다시 만들기는 Task 24에서 붙인다
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
+import { readBranding } from "../lib/branding.ts";
 import { loadRuleContext } from "../lib/hooks-index.ts";
 import { sha256 } from "../lib/managed.ts";
 import { checkOverrideCss, checkUtilCss, type Issue } from "../lib/rules.ts";
@@ -15,6 +16,7 @@ import { findProject, packageInfo, readConfig } from "./context.ts";
 const RES = "force-app/main/default/staticresources";
 const BRAND_CSS = `${RES}/milvusBrand.css`;
 const OVERRIDE_CSS = `${RES}/milvusOverride.css`;
+const BRANDING_SETS = "force-app/main/default/brandingSets";
 const USAGE = "사용법: pnpm milvus check [--style]";
 
 const lines = (issues: Issue[]) => issues.map((i) => `  ${i.file}  ${i.message}${i.fix ? ` → 고칠 값: ${i.fix}` : ""}\n`).join("");
@@ -36,6 +38,22 @@ function managedIssues(root: string): Issue[] {
   });
 }
 
+// brandingSets/*.brandingSet-meta.xml의 BRAND_COLOR가 #RRGGBB인지(readBranding이 없거나 틀리면 던진다)
+function brandingIssues(root: string): Issue[] {
+  const dir = join(root, BRANDING_SETS);
+  if (!existsSync(dir)) return [];
+  return readdirSync(dir)
+    .filter((f) => f.endsWith(".brandingSet-meta.xml"))
+    .flatMap((f): Issue[] => {
+      try {
+        readBranding(readFileSync(join(dir, f), "utf8"));
+        return [];
+      } catch (e) {
+        return [{ file: `${BRANDING_SETS}/${f}`, rule: "brand-color", message: (e as Error).message, fix: "#RRGGBB 형식의 색(예: #0176D3)" }];
+      }
+    });
+}
+
 /**
  * 검사 결과를 stderr에 쓰고 종료 코드를 돌려준다. issues는 실패시키는 문제만 담는다(override 경고는 stderr에만).
  * pkgRoot는 dist/hooks-index.json을 찾을 패키지 폴더다. 기본은 이 패키지다
@@ -54,7 +72,7 @@ export async function runCheck(o: { root: string; style: boolean; pkgRoot?: stri
   }
   const override = read(OVERRIDE_CSS);
   const { warnings, errors } = override === undefined ? { warnings: [], errors: [] } : checkOverrideCss(override, OVERRIDE_CSS);
-  issues.push(...errors);
+  issues.push(...errors, ...brandingIssues(o.root));
   if (!o.style) issues.push(...managedIssues(o.root));
 
   if (warnings.length) {
@@ -68,18 +86,19 @@ export async function runCheck(o: { root: string; style: boolean; pkgRoot?: stri
 
 /** pnpm milvus check [--style]. sfdx-project.json이 있는 폴더를 위로 찾아 검사한다 */
 export async function checkCommand(argv: string[]): Promise<number> {
+  let style: boolean;
   try {
-    let style: boolean;
-    try {
-      style = parseArgs({ args: argv, options: { style: { type: "boolean" } } }).values.style === true;
-    } catch {
-      throw new Error(`옵션이 올바르지 않습니다(알 수 없는 옵션 또는 남는 인자): ${argv.join(" ")}`);
-    }
+    style = parseArgs({ args: argv, options: { style: { type: "boolean" } } }).values.style === true;
+  } catch {
+    process.stderr.write(`milvus check 실패: 옵션이 올바르지 않습니다(알 수 없는 옵션 또는 남는 인자): ${argv.join(" ")}\n${USAGE}\n`);
+    return 1;
+  }
+  try {
     const { code } = await runCheck({ root: findProject(process.cwd()).root, style });
     if (code === 0) process.stdout.write(`milvus check${style ? " --style" : ""} 통과\n`);
     return code;
   } catch (e) {
-    process.stderr.write(`milvus check 실패: ${(e as Error).message}\n${USAGE}\n`);
+    process.stderr.write(`milvus check 실패: ${(e as Error).message}\n`);
     return 1;
   }
 }
