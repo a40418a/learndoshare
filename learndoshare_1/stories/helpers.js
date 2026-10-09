@@ -1,7 +1,7 @@
-// Rollup으로 미리 컴파일한 LWC 번들 (pnpm build:lwc). Storybook(Vite)은 결과물만 읽는다.
-import { createElement } from "../dist/lwc/index.js";
+// Rollup으로 미리 컴파일한 LWC 번들 (pnpm build:lwc). Storybook(Vite)은 결과물만 @milvus/lwc alias로 읽는다.
+import { createElement } from "@milvus/lwc/index.js";
 
-export * from "../dist/lwc/index.js";
+export * from "@milvus/lwc/index.js";
 
 /**
  * LWC 컴포넌트를 DOM 요소로 만든다.
