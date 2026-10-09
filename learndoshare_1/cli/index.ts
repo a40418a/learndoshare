@@ -3,13 +3,15 @@
 import { realpathSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
+import { checkCommand } from "./check.ts";
 import { packageInfo } from "./context.ts";
 import { runInit } from "./init.ts";
 
-const USAGE = "사용법: milvus --version | milvus init --target-org <별칭> (--brand <이름> | --from-org) [--no-vf]";
+const USAGE = "사용법: milvus --version | milvus init --target-org <별칭> (--brand <이름> | --from-org) [--no-vf] | milvus check [--style]";
 
 export async function main(argv: string[]): Promise<number> {
   if (argv[0] === "init") return runInit(argv.slice(1));
+  if (argv[0] === "check") return checkCommand(argv.slice(1));
   // strict: false — 명령별 옵션(--target-org 등)은 각 명령이 읽는다
   const { values, positionals } = parseArgs({
     args: argv,
