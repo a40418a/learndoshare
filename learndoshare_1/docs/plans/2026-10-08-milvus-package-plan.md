@@ -598,7 +598,7 @@ test("vf:false면 milvusHead와 milvusVf가 목록에 없다", ...);
   - `readBranding(xml: string): { brandColor: string; brandImage?: string }`
   - `writeBrandingSet(o: { name: string; brandColor: string; logo?: boolean }): string`. `logo`가 참이면 `BRAND_IMAGE` = `/file-asset/<name>Logo?v=1`
   - `writeTheme(name: string): string`. `defaultBrandingSet` = `LEXTHEMING<name>`, `designSystemVersion` = `SLDS_v2`
-  - `writeContentAssetMeta(name: string): string`. `<name>Logo` 자산의 `.asset-meta.xml`
+  - `writeContentAssetMeta(name: string, logoFile: string): string`. `<name>Logo` 자산의 `.asset-meta.xml`. `logoFile`은 사용자가 준 로고 파일 경로이고 확장자만 쓴다: `pathOnClient` = `<name>Logo<확장자 소문자>`, 확장자가 없으면 던진다(`pathOnClient`는 필수이고 org 자산에도 원래 확장자가 있다)
   - `writeActiveThemeSettings(name: string): string`. mdapi 형식의 `LightningExperience.settings`로, `activeThemeName` 한 필드만 담는다
   - `writeSettingsPackageXml(): string`. `Settings` 타입 `LightningExperience` 한 항목의 `package.xml`
   - `isValidBrandName(name: string): boolean`
@@ -633,6 +633,7 @@ test("isValidBrandName: 'Milvus_DS' 참, '밀버스'·'A__B'·'Ab_'·'1A' 거짓
 - Produces (`cli/init.ts`):
   - `type Op = { kind: "copy" | "create" | "merge-json" | "append-lines" | "add-key"; dest: string; src?: string; content?: string; lines?: string[]; key?: string; value?: unknown }`
   - `planInit(o: { root: string; pkgRoot: string; targetOrg: string; brand: string; vf: boolean; logoFile?: string }): Op[]`
+    - 로고 메타는 `writeContentAssetMeta(brand, logoFile)`로 만든다(Task 10. 두 번째 인자의 확장자가 `pathOnClient`에 들어간다)
   - `applyOps(root: string, ops: Op[]): { written: string[]; skipped: string[] }`
   - `runInit(argv: string[], deps?: { sf?: SfRunner; nodeVersion?: string }): Promise<number>`. 옵션은 `--target-org`, `--brand`, `--from-org`, `--no-vf`다. 기본은 VF를 포함한다
 
@@ -951,7 +952,7 @@ test("로고 절은 '요청: <상대 경로>' 한 줄", ...);
   - 9.3 매핑 요약(`SPEC_ITEMS` 기준), 5.2 규칙 요약
   - 5.3 피드백 색 처리: 테두리는 글자색을 쓰고, hover·active는 `darkerStep`으로 계산한다(`node -e`)
   - 5.4 브랜드 색 설명: 입력 색, 50단계, 40단계와 대비
-  - 로고 처리: 사용자가 준 파일을 `contentassets/<이름>Logo.asset`으로 복사하고, `writeContentAssetMeta` 형식으로 메타를 쓰고, `BRAND_IMAGE`를 설정한다
+  - 로고 처리: 사용자가 준 파일을 `contentassets/<이름>Logo.asset`으로 복사하고, `writeContentAssetMeta(<이름>, <사용자가 준 파일 경로>)` 형식으로 메타를 쓰고(`pathOnClient`는 `<이름>Logo<원래 확장자>`), `BRAND_IMAGE`를 설정한다
   - 반영 후 요청 파일에 `반영: <날짜>`를 적는다
   - 배포는 2단계다: `pnpm milvus deploy` → 채팅 승인 → `--yes`
 - `milvus-design.md`: 설계 7.1의 8개 절. 1절에는 값을 쓰지 않는다
