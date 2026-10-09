@@ -1,1 +1,6 @@
-<!-- LightningExperienceTheme(<이름>, defaultBrandingSet = LEXTHEMING<이름>) 틀(설계 3장). 내용은 아직 쓰지 않았다 -->
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningExperienceTheme xmlns="http://soap.sforce.com/2006/04/metadata">
+    <defaultBrandingSet>LEXTHEMINGBrandName</defaultBrandingSet>
+    <designSystemVersion>SLDS_v2</designSystemVersion>
+    <masterLabel>BrandName</masterLabel>
+</LightningExperienceTheme>
