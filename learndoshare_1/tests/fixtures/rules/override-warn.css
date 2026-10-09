@@ -1,0 +1,16 @@
+/* 경고 4종: hex 색, !important, .slds-*가 아닌 선택자, 브랜드 색 hook 재정의 */
+.slds-button {
+  color: #ff0000;
+}
+
+.slds-card {
+  border-radius: 0 !important;
+}
+
+.my-class {
+  border-radius: 0;
+}
+
+.slds-badge {
+  --slds-g-color-accent-1: var(--slds-g-color-neutral-base-10);
+}

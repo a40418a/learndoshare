@@ -37,7 +37,7 @@
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
     "build:cli": "tsc -p tsconfig.build.json",
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p force-app/main/default/lwc/tsconfig.json",
-    "prepack": "pnpm build:cli",
+    "prepack": "pnpm build:cli && node scripts/build-hooks-index.ts",
     "build:lwc": "node scripts/generate-slds-catalog.mjs && node scripts/build-lwc.ts",
     "storybook": "pnpm build:lwc && storybook dev -p 6006",
     "build-storybook": "pnpm build:lwc && storybook build -o storybook-static",
@@ -46,7 +46,7 @@
     "prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "prepare": "husky || true",
     "precommit": "lint-staged",
-    "test:brands": "node scripts/check-brands.mjs"
+    "test:brands": "node scripts/check-brands.ts"
   },
   "dependencies": {
     "@lwc/engine-dom": "9.4.3",

@@ -1,14 +1,19 @@
 /*
  * Sample_Forest 브랜드 util.css — 이 파일 하나로 모든 컴포넌트(lightning-* 포함)의 모양을 바꾼다.
  *
- * 쓸 수 있는 것은 :root의 SLDS 2 global hook(--slds-g-*, 전체 모양), 컴포넌트 hook(--slds-s-*, 특정 컴포넌트 묶음),
- * 밀버스 컴포넌트가 읽는 --milvus-* 변수뿐이다. 클래스 규칙은 쓰지 않는다.
+ * 규칙은 설계 5.2·5.3이다(lib/rules.ts, pnpm test:brands가 검사). :root 블록 하나에 다음만 쓴다. 클래스 규칙과 @font-face는 쓰지 않는다.
+ *  - --slds-g-* 중 이름에 color가 없는 것(반경, 간격, 크기, 글자, 그림자). 글꼴(--slds-g-font-family*)은 바꾸지 않는다.
+ *    shadow-4를 바꾸면 포커스 표시에 쓰이는 shadow-5·-6을 기본값으로 따로 적는다. 포커스 그림자 값의 색은 brand-base-15·neutral-base-100 var만
+ *  - 중립 색(surface, on-surface, border-1/2, neutral-base, disabled, inverse 등)은 light-dark()로, 글자·면 대비 4.5:1 이상
+ *  - 피드백 색(설계 5.3 표의 이름만), 기본 컴포넌트만 읽는 g 이름 5개
+ *  - SLDS 2 CSS나 기본 컴포넌트 CSS가 읽는 --slds-s-*. 색 s hook은 hover·선택 바탕 6개만, 값은 중립 g hook 하나를 참조
+ *  - 밀버스 컴포넌트나 milvusBridge.css가 읽는 --milvus-*, 상속 속성 letter-spacing
+ * 읽는 곳이 없는 이름은 아무 효과가 없어서 막는다. 브랜드 색(accent 계열)은 org 테마가 원본이라 여기서 바꾸지 않는다.
+ *
  * 지금 org는 기본 컴포넌트를 synthetic shadow로 그려서 SLDS 전역 CSS가 읽는 hook이 모두 닿는다. npm 패키지가 156개를 native shadow
  * 지원으로 지정해 두었다. native로 바뀌어도 custom property는 g·s 구분 없이 상속되지만, SLDS 전역 CSS 안의 읽기 지점이 사라져
  * 기본 컴포넌트의 native CSS가 읽는 이름에만 효과가 남는다(추정, 실측 필요. docs/research/2026-10-08/synthesis.md 0장 5번). 어떤 hook이 어떤 컴포넌트에 영향을 주는지는
  * Storybook "Foundations / 브랜드 스타일 (util.css)" 페이지에 자동으로 나온다.
- *
- * 브랜드 색(accent 계열)은 org 테마가 원본이라 여기서 바꾸지 않는다 (pnpm test가 막는다).
  */
 :root {
   /* 알약형(버튼, 토글, 필, 경로, 원형 진행 표시줄) → 각진 모서리. 뱃지는 radius-border-1을 쓴다 */
