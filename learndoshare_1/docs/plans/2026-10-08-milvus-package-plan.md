@@ -24,10 +24,9 @@
 - `engines.node`: `^22.18.0 || >=23.6.0`
 - `package.json`에 `"type": "module"`을 넣는다. CommonJS 설정 파일은 `.cjs`로 둔다
 - 패키지는 `@a40418a/milvus-design-system`, 레지스트리는 `https://npm.pkg.github.com`, 실행 파일은 `milvus`다
-- CLI·스크립트·`lib`·Storybook 코드는 `.ts`로 쓴다
+- LWC는 `.js`로 쓴다(10/9 결정 D1, 설계 8장). CLI·`lib`·스크립트·Storybook은 `.ts`로 쓴다
   - 상대 import에는 `.ts`를 붙인다(`allowImportingTsExtensions`, `rewriteRelativeImportExtensions`)
   - `erasableSyntaxOnly`를 켠다(enum, namespace 값, 생성자 매개변수 속성 금지)
-- LWC도 `.ts`로 쓴다: `target: ESNext`, `experimentalDecorators: false`
 
 **메시지와 값**
 - 사용자에게 보이는 모든 메시지는 한국어로 쓴다(CLI 출력, 오류, Storybook 화면, skill, Learn). 식별자·명령·경로만 원문으로 둔다
@@ -75,8 +74,8 @@
 | --- | --- | --- | --- |
 | **M0 학습 자료 기초** | 10/12 첫 작업 (10/9에 해도 됨) | `[Docs] 학습 자료: 디자인 시스템 개념과 Salesforce 구현` | `docs/<번호>-learn-foundation` |
 | M1 설치 경로 스파이크 | 10/12 오전 | `[Spike] 패키지 발행·설치와 node_modules Storybook 확인` | `spike/<번호>-install-path` |
-| M2 TS 전환과 규칙 통합 | 10/12 오후 | `[Feat] TypeScript 전환과 util.css 규칙 통합` | `feat/<번호>-ts-rules` |
-| M3 init·check | 10/13 | `[Feat] milvus init·check 명령` | `feat/<번호>-init-check` |
+| M2 TS 전환과 규칙 통합 (LWC TS는 10/9 Task 30에서 되돌림) | 10/12 오후 | `[Feat] TypeScript 전환과 util.css 규칙 통합` | `feat/<번호>-ts-rules` |
+| M3 init·check (맨 앞에 Task 30: LWC JS 복귀·`milvusBrandLoader`) | 10/13 | `[Feat] milvus init·check 명령` | `feat/<번호>-init-check` |
 | M4 정적 반영 검사·브리지 | 10/13 | `[Feat] 전 컴포넌트 반영 검사와 milvusBridge` | `feat/<번호>-audit-bridge` |
 | M5 Storybook 프로젝트 모드·명세·skill | 10/14 | `[Feat] 프로젝트 모드 Storybook, 브랜드 명세 페이지, milvus-brand skill` | `feat/<번호>-storybook-project` |
 | M6 deploy·리허설·VF | 10/15 | `[Feat] milvus deploy와 Visualforce 지원` | `feat/<번호>-deploy-vf` |
@@ -92,7 +91,7 @@ learndoshare_1/
   package.json                    이름·type·publishConfig·files·bin·engines·scripts (Task 1, 4)
   tsconfig.json                   저장소 타입 검사 (Task 4)
   tsconfig.build.json             cli·lib → dist/ (Task 1)
-  tsconfig.lwc.base.json          프로젝트 lwc/tsconfig.json이 extends (Task 6)
+  (tsconfig.lwc.base.json, lwc-platform.d.ts, force-app/main/default/lwc/tsconfig.json은 Task 6에서 만들고 Task 30에서 지운다)
   eslint.config.cjs, jest.config.cjs   CommonJS 설정 (Task 1에서 이름 변경)
   .husky/pre-commit               pnpm precommit (Task 1)
   cli/index.ts                    진입점 (Task 1)
@@ -111,9 +110,10 @@ learndoshare_1/
   scripts/audit/*.ts, scripts/bridge/*.ts
   audit/baseline.json, audit/report.json, dist/hooks-index.json (생성)
   templates/                      프로젝트에 복사할 원본
-  force-app/main/default/lwc/milvus*/   밀버스 LWC (.ts)
+  force-app/main/default/lwc/milvus*/   밀버스 LWC (.js, Task 30. milvusBrandLoader 포함)
   .storybook/*.ts, stories/**     Storybook
   docs/research/2026-10-08/       분석 스크립트와 결과 (Task 0)
+  docs/research/2026-10-09-org-probe.md   org 프로브 2차 결과 (Task 9)
   tests/*.test.ts                 node --test
 ../.github/workflows/publish.yml  태그 v* 발행 (Task 2)
 ```
@@ -385,6 +385,8 @@ test("생성된 examples.json과 카탈로그 스토리에 절대 경로와 'nod
 
 ### Task 6: 밀버스 컴포넌트 TS 전환과 loadBrand
 
+> **10/9 메모:** Task 9 org 프로브에서 `.ts` LWC 배포가 거부되어 결정 D1로 LWC는 JS로 되돌린다(Task 30). `loadBrand`·`detectNativeShadow`의 동작은 그대로 두고, 이 태스크의 TS 관련 파일(`tsconfig.lwc.base.json`, `lwc/tsconfig.json`, `lwc-platform.d.ts`, ESLint `.ts` 블록, `typecheck`의 lwc 부분, `@types/jest`)은 Task 30에서 지운다.
+
 **Files:**
 - Rename: `milvusBadge`·`milvusButton`·`milvusMultiSelect`의 `.js` → `.ts`, `__tests__/*.test.js` → `.test.ts`
 - Create:
@@ -488,6 +490,8 @@ test("override: @font-face와 @import는 오류", ...);
 
 ### Task 8: templates 틀, 브리지 변수, 명세 항목, 고정 목록, 관리 파일
 
+> **10/9 메모:** `templates/force-app/main/default/lwc/tsconfig.json`과 그 관리 파일 항목·deny 규칙은 Task 30에서 지운다(결정 D1). `milvusVf.css` 틀은 SLDS 2 사본이 아니라 브랜드 팔레트(`:root{--slds-r-color-brand-*}`)용이다(결정 D2, Task 24). 틀의 설명 주석은 Task 24에서 바꾼다.
+
 **Files:**
 - Create: `templates/` 전부. 내용이 아직 정해지지 않은 파일은 한 줄 주석만 넣는다
   - `templates/milvus-design.md`
@@ -546,6 +550,8 @@ test("vf:false면 milvusHead와 milvusVf가 목록에 없다", ...);
 
 ### Task 9: org 프로브 (사용자 승인 필요, 코드 커밋 없음)
 
+> **결과 (2026-10-09 실행):** [`docs/research/2026-10-09-org-probe.md`](../research/2026-10-09-org-probe.md), 설계 13·14장. `.ts` LWC 배포 실패(JS로는 성공), 클래스 규칙·중립 색·피드백 색이 LEX 표준 UI에 반영, 유틸리티 바 백그라운드 로드 동작, VF는 공식 설정 + 팔레트로 LEX와 같음. 이 결과로 결정 D1~D4(설계 1장)가 나왔다. 기록은 M2 PR이 아니라 M3 브랜치(#28)에 넣었다.
+
 **대상:** `learndoshare_1` org. 프로브 파일은 저장소 밖 임시 폴더에 둔다
 
 - [ ] **Step 1: 배포할 파일을 준비한다.**
@@ -581,6 +587,78 @@ test("vf:false면 milvusHead와 milvusVf가 목록에 없다", ...);
 ---
 
 ## M3 init·check (10/13)
+
+### Task 30: LWC를 JS로 되돌리고 milvusBrandLoader 추가
+
+10/9 결정 D1·D3·D4(설계 1장, 8장, 9.7). org가 `.ts` LWC를 타입 검사해 배포를 거부했다(Task 9, `docs/research/2026-10-09-org-probe.md` 3.1). 밀버스 컴포넌트와 `milvusScript`는 **로직을 그대로 두고 타입 표기만 지운다**(`loadBrand`, `detectNativeShadow`, `@api`, 접근성 처리 그대로). 함께 앱 전체 브랜드용 `milvusBrandLoader`를 더한다. Task 11(`init`의 관리 파일 목록)과 Task 12(`check`)가 이 결과를 전제로 하므로 M3에서 가장 먼저 한다.
+
+**Files:**
+- Rename + Modify (타입 표기만 지운다. 이력이 이어지게 `git mv`로 옮긴다)
+  - `force-app/main/default/lwc/milvusBadge/milvusBadge.ts` → `milvusBadge.js`
+  - `force-app/main/default/lwc/milvusButton/milvusButton.ts` → `milvusButton.js`
+  - `force-app/main/default/lwc/milvusMultiSelect/milvusMultiSelect.ts` → `milvusMultiSelect.js`
+  - `force-app/main/default/lwc/milvusScript/milvusScript.ts` → `milvusScript.js`
+  - 네 번들의 `__tests__/*.test.ts` → `*.test.js`
+- Create:
+  - `force-app/main/default/lwc/milvusBrandLoader/milvusBrandLoader.js`, `milvusBrandLoader.html`, `milvusBrandLoader.js-meta.xml`
+  - `stories/components/milvus/BrandLoader.stories.js`
+  - `tests/lwc-js.test.ts`
+- Delete:
+  - `tsconfig.lwc.base.json`, `lwc-platform.d.ts`
+  - `force-app/main/default/lwc/tsconfig.json`
+  - `templates/force-app/main/default/lwc/tsconfig.json`
+- Modify:
+  - `package.json`
+    - `typecheck` = `tsc --noEmit -p tsconfig.json` (lwc 부분 제거)
+    - `files`에서 `tsconfig.lwc.base.json`, `lwc-platform.d.ts` 제거
+    - `lint` = `eslint "force-app/**/lwc/**/*.js"`, lint-staged의 `**/{aura,lwc}/**/*.{js,ts}` → `**/{aura,lwc}/**/*.js`
+    - devDependency `@types/jest` 제거(`tsconfig.lwc.base.json`의 `types: ["jest"]` 말고 쓰는 곳이 없는지 먼저 `grep`으로 확인한다)
+  - `eslint.config.cjs`: `**/lwc/**/*.ts` 블록과 `recommended-ts` require를 지운다. 테스트 블록 패턴은 `**/lwc/**/*.test.js`
+  - `lib/managed.ts`: `force-app/main/default/lwc/tsconfig.json` 항목을 지운다
+  - `templates/claude/settings.json`: `Edit(/force-app/main/default/lwc/tsconfig.json)`을 지운다(설계 7.2)
+  - `lib/hooks-index.ts`: `loadRuleContext`의 `milvusVars` 수집 대상을 `lwc/milvus*`의 `.css`·`.ts`에서 `.css`·`.js`로 바꾼다(설계 5.2). 주석도 고친다
+  - `stories/lwc-entry.js`: `export { default as MilvusBrandLoader } from "c/milvusBrandLoader";`
+  - `tests/managed.test.ts`, `tests/rules.test.ts`, `tests/pack.test.ts`: `.ts` LWC를 기대하던 곳을 `.js`로
+  - (판단) `lib/lwc-build.ts`의 `.ts` 타입 제거 플러그인(`stripTypes`)과 `sfdxLwcModules`의 `.ts` 우선 규칙, `tests/lwc-build.test.ts`의 `.ts` 테스트, `tests/fixtures/lwc-ts`
+    - 저장소와 고객 프로젝트의 밀버스 LWC에는 `.ts`가 없어진다. 남는 사용처는 고객 프로젝트 자체 `.ts` LWC(Storybook 프로젝트 모드가 `sfdxLwcModules`로 함께 빌드)뿐이다
+    - 남겨도 된다. 쓰는 곳이 없다고 판단하면 지우고, 테스트와 픽스처를 `.js`로 바꾼다. 어느 쪽이든 판단과 이유를 보고서에 적는다
+
+**Interfaces:**
+- `c/milvusScript`(`milvusScript.js`): `loadBrand(component)`, `detectNativeShadow(root)`. 시그니처와 동작은 Task 6과 같다. 타입은 JSDoc 주석으로만 남겨도 된다
+- 세 컴포넌트: `connectedCallback`에서 `loadBrand(this)`, 첫 `renderedCallback`에서 `detectNativeShadow` 경고. Task 6과 같다
+- Produces (`c/milvusBrandLoader`)
+  - `milvusBrandLoader.js`: `connectedCallback`에서 `loadBrand(this)`만 부른다. 템플릿에 기본 컴포넌트가 없으므로 `detectNativeShadow`는 부르지 않는다
+  - `milvusBrandLoader.html`: `<template></template>` (화면 없음)
+  - `milvusBrandLoader.js-meta.xml`: `apiVersion` 67.0, `isExposed` `true`, `masterLabel` `Milvus Brand Loader`, `description`(앱 유틸리티 바에 두고 "앱이 열릴 때 백그라운드로 로드"를 켜면 그 앱의 모든 페이지에 브랜드 CSS를 넣는다), `targets`는 `lightning__UtilityBar` 하나
+  - LWC Jest 테스트는 만들지 않는다(설계 11장, 10/9 사용자 결정)
+  - 앱에 붙이는 것은 사용자가 App Manager에서 한다. 이 태스크는 앱 메타데이터(FlexiPage, `CustomApplication`)를 만들지 않는다(결정 D3)
+- `BrandLoader.stories.js`: 제목 `컴포넌트/밀버스 추가/BrandLoader`. 컴포넌트를 붙여도 아무것도 그리지 않고 오류가 없다는 것과, App Manager에서 앱에 붙이는 순서(유틸리티 항목 추가 → "앱이 열릴 때 백그라운드로 로드" 체크)를 설명한다. Storybook에서는 `loadStyle`이 대체 모듈이라 바로 끝난다(Task 5)
+- `managedFiles`: `lwc/tsconfig.json`이 빠지고 `milvusBrandLoader`의 세 파일이 `managed`로 들어간다(번들 폴더를 읽으므로 코드 변경은 tsconfig 항목 삭제뿐)
+
+- [ ] **Step 1: 실패하는 테스트.** `tests/lwc-js.test.ts`를 만들고 기존 테스트의 기대를 바꾼다
+```ts
+// tests/lwc-js.test.ts
+test("lwc/milvus* 아래(__tests__ 포함)에 .ts 파일이 없고 번들마다 <이름>.js가 있다", ...);
+test("milvusBrandLoader: targets는 lightning__UtilityBar 하나, isExposed true, 템플릿은 비어 있다", ...);
+test("milvusBrandLoader.js는 c/milvusScript의 loadBrand를 import해 connectedCallback에서 loadBrand(this)를 부른다", ...);
+test("tsconfig.lwc.base.json, lwc-platform.d.ts, lwc/tsconfig.json, templates의 lwc/tsconfig.json이 없다", ...);
+// tests/managed.test.ts
+test("managedFiles에 lwc/tsconfig.json이 없고 milvusScript.js와 milvusBrandLoader의 .js·.html·.js-meta.xml이 있다", ...);
+// tests/rules.test.ts (기존 loadRuleContext 테스트의 픽스처를 milvusFoo.js로)
+test("loadRuleContext: milvusVars는 lwc/milvus*의 .css·.js에서 모은다", ...);
+// tests/pack.test.ts
+test("pack 결과에 tsconfig.lwc.base.json·lwc-platform.d.ts와 force-app 아래 .ts가 없고 milvusBrandLoader.js가 있다", ...);
+```
+- [ ] **Step 2: 실패를 확인한다.** `pnpm test:node` (새 테스트와 바꾼 기대가 실패해야 한다)
+- [ ] **Step 3: 구현.**
+  - `git mv`로 `.ts` → `.js`, `.test.ts` → `.test.js`. `import type`, 매개변수·반환 타입, `as`, 타입 별칭과 제네릭 표기만 지운다. `@api` 데코레이터와 로직은 그대로 둔다
+  - 위 Delete·Modify를 반영한다
+  - `milvusBrandLoader` 세 파일과 스토리를 만들고 `stories/lwc-entry.js`에 export를 더한다
+  - `lib/lwc-build.ts` 타입 제거 플러그인은 위 판단대로 처리한다
+- [ ] **Step 4: 통과를 확인한다.**
+  - `pnpm lint && pnpm test` (`typecheck`는 `tsconfig.json`만, 기존 Jest 테스트 4개는 `.test.js`로 통과, `test:node` 통과)
+  - `pnpm build-storybook`. 밀버스 Badge·Button·MultiSelect 스토리와 BrandLoader 스토리가 그려지고 콘솔 오류가 없는지 본다
+- [ ] **Step 5: 커밋.** `[Refactor] LWC를 JS로 되돌리고 milvusBrandLoader 추가 (#28)`
 
 ### Task 10: 병합 도구와 브랜드 XML
 
@@ -644,7 +722,7 @@ test("CLAUDE.md에 정확히 '@milvus-design.md' 한 줄을 추가하고 기존 
 test(".npmrc 범위 두 줄이 없을 때만 추가한다", ...);
 test("이미 있는 milvusBrand.css는 건너뛰고 skipped에 넣는다", ...);
 test("LightningExperience.settings는 만들지 않는다", ...);
-test("sfdx-project.json에 defaultLwcLanguage, package.json에 storybook 스크립트를 없을 때만 추가한다", ...);
+test("sfdx-project.json은 바꾸지 않고(defaultLwcLanguage를 넣지 않는다, 10/9 D1), package.json에 storybook 스크립트를 없을 때만 추가한다", ...);
 test("--no-vf면 milvusHead·milvusVf를 만들지 않고 config.vf가 거짓", ...);
 test("milvusOverride.css를 설명 주석만 있는 상태로 만들고, 이미 있으면 건너뛴다", ...);
 // 아래는 모두 '1을 돌려주고 쓴 파일이 0개'
@@ -673,7 +751,7 @@ test("--from-org인데 커스텀 테마가 없거나 조회 실패 (가짜 SfRun
 - Consumes: `loadRuleContext`, `checkUtilCss`(Task 7), `readConfig`, `findProject`(Task 11), `managedFiles`, `sha256`(Task 8)
 - Produces (`cli/check.ts`): `runCheck(o: { root: string; style: boolean }): Promise<{ code: 0 | 1 | 2; issues: Issue[]; regenerated: string[] }>`
   - `style: true`: util.css 규칙과 대비, `milvusOverride.css`의 `checkOverrideCss`를 본다. `dist/hooks-index.json`만 읽는다. util.css 위반이나 override 오류면 2, override 경고만 있으면 stderr에 경고를 내고 0
-  - `style: false`: 전체를 본다. 규칙, 밀버스 관리 파일 sha256, 타입 검사(`lwc/milvus*`만). 실패하면 1. VF 처리는 Task 24에서 붙인다
+  - `style: false`: 전체를 본다. 규칙, 밀버스 관리 파일 sha256. 실패하면 1. VF 처리는 Task 24에서 붙인다. 밀버스 LWC는 JS라 타입 검사는 하지 않는다(10/9 D1)
 - hook(`milvus-check.mjs`, ESM): stdin의 `tool_input.file_path`가 `staticresources/milvusBrand.css`, `staticresources/milvusOverride.css`, `brandingSets/`일 때만 `pnpm milvus check --style`을 실행한다. 종료 코드와 stderr를 그대로 전달한다
 
 - [ ] **Step 1: 실패하는 테스트**
@@ -682,11 +760,10 @@ test("--style은 규칙 위반에서 2와 stderr의 고칠 값", ...);
 test("--style은 override 경고만 있으면 0이고 stderr에 '공식 권고 밖' 경고", ...);
 test("--style은 200ms 안에 끝난다 (hooks-index.json 사용)", ...);
 test("밀버스 관리 파일을 고치면 전체 check가 1이고 'pnpm milvus update --force'를 안내한다", ...);
-test("프로젝트 자체 컴포넌트의 타입 오류는 무시한다", ...);
 test("hook은 다른 파일 수정에는 check를 실행하지 않는다", ...);
 ```
 - [ ] **Step 2: 실패를 확인한다.** `pnpm test:node`
-- [ ] **Step 3: 구현.** 타입 검사는 `typescript` API로 `milvus*/**/*.ts`만 본다
+- [ ] **Step 3: 구현.**
 - [ ] **Step 4: 통과를 확인한다.** `pnpm test:node`
 - [ ] **Step 5: 커밋.** `[Feat] milvus check와 util.css 검사 hook (#N)`
 
@@ -715,12 +792,13 @@ test("hook은 다른 파일 수정에는 check를 실행하지 않는다", ...);
 ### M3 마무리: 수동 확인과 학습 자료 갱신
 
 - [ ] **Step 1: 수동 확인.** `pnpm pack` tgz를 `learndoshare_2`에 설치하고 `init`을 실행한 뒤 확인한다. 결과는 설계 13·14장에 옮긴다
-  - Claude Code에 `lwc/milvusBadge/milvusBadge.ts`를 고치게 하면 거부되는가(`Edit` deny)
+  - Claude Code에 `lwc/milvusBadge/milvusBadge.js`를 고치게 하면 거부되는가(`Edit` deny)
   - 인자 없는 `pnpm milvus deploy`를 실행하게 하면 확인을 묻는가(`ask`)
-  - VS Code에서 새 LWC를 만들면 `.ts`로 생기는가(`defaultLwcLanguage`)
 - [ ] **Step 2:** 다음 문서를 고친다
   - `Learn/08-Claude Code 런북.html`: `init`, `milvus-design.md`, `permissions.ask`·`deny`, hook 1개
   - `Learn/07-pnpm.html`: 설치 준비, `pnpm milvus`
+  - `Learn/02-LWC 기초.html`: LWC는 JS(10/9 D1), `.ts` 배포가 거부된 실측과 공식 문서, `milvusBrandLoader`(Task 30)
+  - `Learn/00` 5·6절: Task 9(10/9) 결과. 클래스 규칙 도달, 유틸리티 바 백그라운드 로드, VF 공식 설정 + 팔레트(`docs/research/2026-10-09-org-probe.md`를 출처로)
 - [ ] **Step 3: 커밋.** `[Docs] M3 결과를 학습 자료에 반영 (#N)`
 
 ---
@@ -1014,13 +1092,15 @@ test("SKILL.md는 'pnpm milvus deploy --yes'를 채팅 승인 뒤에만 실행�
   - 대상 org는 `--target-org` → `config.targetOrg` 순서로 정한다. sf 기본 org는 쓰지 않는다
   - 지금 활성 테마는 `Settings:LightningExperience` 조회로 읽는다
   - `sourceDirs`에 넣는 것
-    - `lwc/milvus*`: 밀버스 번들 각각
+    - `lwc/milvus*`: 밀버스 번들 각각(`milvusBrandLoader` 포함). LWC는 `.js`라 TS → JS 변환 단계가 없다(10/9 D4)
     - `classes/utils/design`: 있으면
     - `staticresources/milvusBrand.*`, `staticresources/milvusBridge.*`, `staticresources/milvusOverride.*`
     - `brandingSets/LEXTHEMING<브랜드>.*`, `lightningExperienceThemes/<브랜드>.*`
     - `contentassets/<브랜드>Logo.*`: 있으면
     - `config.vf`가 참이면 `staticresources/milvusVf.*`, `components/milvusHead.*`
+    - 앱 메타데이터(`flexipages`, `applications`)는 넣지 않는다. `milvusBrandLoader`를 앱에 붙이는 것은 사용자가 App Manager에서 한다(10/9 D3)
   - `settingsDir`: `.milvus/deploy/settings-mdapi`(`package.xml` + `settings/LightningExperience.settings`)
+  - 계획 출력: `config.vf`가 참이면 VF 설정 안내를 낸다. "VF 페이지가 SLDS 2로 그려지려면 Setup → User Interface → Visualforce Settings의 \"Use SLDS 2 for pages that include <apex:slds> when an SLDS 2 theme is active\"를 켜야 합니다. 이 설정은 메타데이터로 읽거나 바꿀 수 없어 deploy가 확인하지 못합니다"(설계 4.4, 10/9 D2)
 - Produces: `executeDeploy(plan: DeployPlan, sf: SfRunner): Promise<{ code: number; stage: "metadata" | "activate" | "done"; failures: { name: string; problem: string }[] }>`
   - 1단계: `sf project deploy start`에 `sourceDirs`마다 `--source-dir`를 붙이고 `--json`을 쓴다. 원자적이라 실패하면 롤백된다. 실패하면 `componentFailures`를 보여 준다
   - 2단계: 1단계가 성공했을 때만 `sf project deploy start --metadata-dir <settingsDir>`를 실행한다
@@ -1035,8 +1115,9 @@ test("인자가 없으면 config.targetOrg를 쓰고 sf 기본 org를 묻지 않
 test("milvus.config.json이 없으면 1이고 'pnpm milvus init'을 안내한다", ...);
 test("sf가 없거나 로그인 만료(code≠0)면 deploy start를 부르지 않고 1", ...);   // 리뷰 중점 4
 test("1단계 실패 시 2단계를 부르지 않고 failures를 출력한다", ...);              // 리뷰 중점 4
-test("sourceDirs에 milvusBridge·milvusOverride와 contentassets 로고가 있고 프로젝트 자체 컴포넌트는 없다", ...);
+test("sourceDirs에 milvusBridge·milvusOverride·milvusBrandLoader와 contentassets 로고가 있고, 프로젝트 자체 컴포넌트와 flexipages·applications는 없다", ...);
 test("vf:false면 milvusVf·milvusHead가 없다", ...);
+test("vf:true면 계획 출력에 VF SLDS 2 설정 안내가 있고, vf:false면 없다", ...);
 test("settings 파일에는 activeThemeName 하나만", ...);
 test("check가 실패하면 배포하지 않는다", ...);
 test("경고 '활성 테마 변경은 org 전체 사용자 화면에 적용됩니다'를 출력한다", ...);
@@ -1056,7 +1137,7 @@ test("출력에 --url-only와 액세스 토큰 형식 문자열이 없다", ...)
 - [ ] **Step 2:** `pnpm milvus init --target-org learndoshare_1 --brand Rehearsal --no-vf`를 두 번 실행해 결과가 같은지 확인한다
 - [ ] **Step 3:** `pnpm milvus storybook`을 띄운다. 명세 페이지에서 요청을 입력·저장하고, Claude Code에 "브랜드 요청 반영해줘"를 요청한 뒤 화면이 바뀌는지 확인한다
 - [ ] **Step 4:** `pnpm milvus deploy`로 계획을 확인한다. 사용자 승인을 받은 뒤 `--yes`로 실행한다(활성 테마 변경은 org 전체 화면에 적용됨)
-- [ ] **Step 5:** LEX를 측정한다(밀버스 컴포넌트가 있는 페이지, 표준 화면). 활성 테마를 되돌리는 배포도 승인을 받아 실행한다
+- [ ] **Step 5:** LEX를 측정한다(밀버스 컴포넌트가 있는 페이지, 표준 화면). 앱 전체 브랜드는 사용자가 App Manager에서 한 앱의 유틸리티 바에 `milvusBrandLoader`를 추가하고 "앱이 열릴 때 백그라운드로 로드"를 체크한 뒤, 그 앱의 표준 화면을 새로 불러와 milvus link가 들어오는지 본다(설계 14장의 App Manager 항목). 끝나면 사용자가 그 항목을 지운다. 활성 테마를 되돌리는 배포도 승인을 받아 실행한다
 - [ ] **Step 6:** 발견한 문제는 이슈 댓글로 남기고, 고칠 것은 Task 24 전에 처리한다
 
 ### Task 24: Visualforce 지원 (오후, 빼는 순서 ②)
@@ -1069,20 +1150,23 @@ test("출력에 --url-only와 액세스 토큰 형식 문자열이 없다", ...)
   - `cli/init.ts`: VF 기본 포함을 확인한다
 
 **Interfaces:**
-- Produces (`lib/vf.ts`): `buildMilvusVfCss(sldsCss: string, brandColor: string): string`. SLDS 2 `slds2.cosmos.css` 전체 뒤에 `:root{--slds-r-color-brand-<단계>: <brandPalette 값>}`을 붙인다
+- 10/9 결정 D2(설계 5.5): VF는 고객 org의 공식 설정("Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active")과 `<apex:slds/>`로 SLDS 2를 쓰고, 빠진 브랜드 팔레트만 `milvusVf`로 넣는다. SLDS 2 CSS 사본은 넣지 않는다
+- Produces (`lib/vf.ts`): `buildMilvusVfCss(brandColor: string): string`. `brandPalette(brandColor)`의 모든 단계로 `:root{--slds-r-color-brand-<단계>: <값>}`만 만든다(10/9 프로브의 팔레트 CSS는 약 620바이트). SLDS 2 CSS를 받지 않는다
+- `templates/.../milvusVf.css` 틀의 주석을 "VF용 브랜드 팔레트"로 바꾼다
 - `runCheck({style:false})`: `config.vf`가 참이면 `milvusVf.css`를 지금 `BRAND_COLOR`로 다시 쓰고 `regenerated`에 넣는다(설계 3장의 "[생성]")
-- `milvusHead.component`: `<apex:component>` 안에 `<apex:stylesheet>` 네 개를 이 순서로 둔다: `{!$Resource.milvusVf}`, `{!$Resource.milvusBridge}`, `{!$Resource.milvusBrand}`, `{!$Resource.milvusOverride}`
+- `milvusHead.component`: `<apex:component>` 안에 `<apex:slds/>`를 두고, 그 뒤에 `<apex:stylesheet>` 네 개를 이 순서로 둔다: `{!$Resource.milvusVf}`, `{!$Resource.milvusBridge}`, `{!$Resource.milvusBrand}`, `{!$Resource.milvusOverride}`
 
 - [ ] **Step 1: 실패하는 테스트**
 ```ts
 test("#2E7D32이면 --slds-r-color-brand-50:#468244가 있다", ...);
-test("결과 크기가 5MB 미만이다", ...);
+test("결과 크기가 1KB 미만이다", ...);
+test("milvusHead.component는 <apex:slds/> 뒤에 milvusVf, milvusBridge, milvusBrand, milvusOverride 순서로 stylesheet를 둔다", ...);
 test("BRAND_COLOR를 바꾼 뒤 전체 check는 milvusVf.css를 갱신하고 0", ...);
 test("BRAND_COLOR를 바꾼 뒤 deploy가 check를 통과해 계획을 출력한다", ...);
 ```
 - [ ] **Step 2: 실패를 확인한다.** `pnpm test:node`
 - [ ] **Step 3: 구현.**
-- [ ] **Step 4: 확인한다.** `pnpm test:node`. 리허설 org에 VF 페이지 하나(`<c:milvusHead/>`)를 승인받아 배포하고 측정한다
+- [ ] **Step 4: 확인한다.** `pnpm test:node`. 리허설 org에 VF 페이지 하나(`<c:milvusHead/>`)를 승인받아 배포하고 측정한다. 그 org에서 VF SLDS 2 설정이 켜져 있는지 사용자에게 먼저 확인한다(메타데이터로 읽을 수 없음. `learndoshare_1`은 켜 둔 상태). 브랜드 버튼 반경 240px과 배경이 LEX 브랜드 버튼과 같으면 통과다
 - [ ] **Step 5: 커밋.** `[Feat] Visualforce용 milvusVf와 milvusHead (#N)`
 
 ### M6 마무리: 학습 자료 갱신
@@ -1183,6 +1267,7 @@ test("BRAND_COLOR를 바꾼 뒤 deploy가 check를 통과해 계획을 출력한
 
 **절대 빼지 않는 것:**
 - Task 0 (학습 자료 기초), Task 29 (Learn 09 override와 공식 권고, 발표용)
+- Task 30 (LWC JS 복귀. `.ts` LWC는 org에 배포되지 않으므로 `deploy`의 전제다)
 - Task 1·2 (설치)
 - Task 7 (규칙), 11 (`init`), 12 (`check`)
 - Task 14 (정적 검사), 15 (브리지)

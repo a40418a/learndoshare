@@ -1,7 +1,7 @@
 # 밀버스 디자인 시스템 패키지·CLI 설계
 
 - 작성: 2026-10-08 · 이슈 [#20](https://github.com/a40418a/learndoshare/issues/20)
-- 상태: 대화에서 설계 1/4~4/4 승인(2026-10-08). 검토자 4명의 지적 48건 반영. 문서 전체는 사용자 검토 대기
+- 상태: 대화에서 설계 1/4~4/4 승인(2026-10-08). 검토자 4명의 지적 48건 반영. 문서 전체는 사용자 검토 대기. 2026-10-09 org 프로브(Task 9) 결과와 결정 D1~D4 반영([기록](../research/2026-10-09-org-probe.md))
 - 이 문서에서 **LEX**는 Lightning Experience, **VF**는 Visualforce를 뜻한다
 - 용어: **발행**은 패키지를 GitHub Packages에 올리는 것, **배포**는 메타데이터를 Salesforce org에 올리는 것(`pnpm milvus deploy`)이다. **브랜드 명세 페이지**는 Storybook 화면, **브랜드 요청**은 그 페이지가 저장하는 사용자 입력(`milvus-brand-request.md`), **브랜드 명세 표**는 Claude가 채팅으로 제안하는 적용 값 표다
 
@@ -42,7 +42,7 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 
 **성공 기준:** 새 SFDX 프로젝트(`learndoshare_2`)에서 위 흐름이 막힘 없이 org 화면(LEX)까지 이어지고, 브랜드 값이 9장의 자동 확인에서 모든 컴포넌트에 반영된다. VF는 11장 빼는 순서 ②까지 포함한다.
 
-**범위 밖:** 브랜드 글꼴, 앱 전체에 util.css를 거는 유틸리티 바 로더, Figma REST API, Claude Code 플러그인 마켓플레이스, VF 안에서 밀버스 LWC 사용(Lightning Out), 다크 모드.
+**범위 밖:** 브랜드 글꼴, 고객 앱 메타데이터(유틸리티 바) 자동 수정(`milvusBrandLoader`를 앱에 붙이는 것은 사용자가 App Manager에서 한다, 10/9 D3), Figma REST API, Claude Code 플러그인 마켓플레이스, VF 안에서 밀버스 LWC 사용(Lightning Out), 다크 모드.
 
 ---
 
@@ -57,17 +57,21 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 | 10/9 | 패키지 공개 범위는 **공개**로 둔다 | `v0.0.1`이 Actions(`GITHUB_TOKEN`)로 공개 저장소에서 발행되어 공개로 생겼다(문서상 기본은 비공개, 원인 미확인). 내용은 공개 저장소와 같고 org ID·인증 정보가 없다. 설치에는 여전히 토큰이 필요하다. 공개 → 비공개 전환은 문서상 불가할 수 있다. 회사 조직으로 옮길 때 다시 정한다(사용자 선택) |
 | 10/8 | 밀버스 LWC는 하위 폴더 없이 `force-app/main/default/lwc/milvus*`에 둔다. Apex는 `classes/utils/design/`에 둔다 | `lwc/utils/<번들>`처럼 폴더를 한 단계 더 두면 변환할 때 번들 이름이 `utils`로 잡혀 배포할 수 없다(로컬 변환으로 확인). 실제 프로젝트의 공용 컴포넌트(`utilScript` 등)도 `lwc/` 바로 아래에 두고 배포한다 |
 | 10/8 | 브랜드 색은 메타데이터(`BrandingSet`)로 관리하고 배포로 적용한다 | org 실측: 테마 생성, 활성화, 복구가 모두 배포로 된다 |
-| 10/8 | Storybook, CLI, 스크립트, LWC를 TypeScript로 쓴다 | 사용자 요청. LWC `.ts` 직접 배포를 org에서 확인했다 |
-| 10/8 | VF에도 같은 디자인 시스템을 적용한다 | 사용자 요청. 10/8 프로브에서 `<apex:slds/>`가 SLDS 1로 그려져 SLDS 2 리소스를 따로 둔다. 공식 SLDS 2 설정 경로(14장)가 확인되면 다시 정한다 |
+| 10/8 | Storybook, CLI, 스크립트, LWC를 TypeScript로 쓴다. **LWC는 10/9에 JS로 바꿈(D1)** | 사용자 요청. LWC `.ts` 직접 배포를 org에서 확인했다(10/9 정정: `this.template`을 쓰지 않는 번들이었다, 13장) |
+| 10/8 | VF에도 같은 디자인 시스템을 적용한다 | 사용자 요청. 10/8 프로브에서 `<apex:slds/>`가 SLDS 1로 그려져 SLDS 2 리소스를 따로 둔다. 공식 SLDS 2 설정 경로(14장)가 확인되면 다시 정한다(10/9 D2로 다시 정함) |
 | 10/8 | 피드백 색(성공·경고·오류·정보)은 입력한 색 그대로 넣고 대비를 검사한다 | 사용자 선택 |
 | 10/8 | 글꼴은 바꾸지 않는다 | 사용자 선택 |
 | 10/8 | 브랜드는 버튼 같은 일부가 아니라 모든 컴포넌트에 반영되어야 한다 | 사용자 요구. 9장의 전 컴포넌트 분석과 자동 확인으로 지킨다 |
 | 10/8 | 전 컴포넌트 분석에 따라 util.css 허용 범위를 넓힌다(중립 색, 포커스 그림자 조건부, 기본 컴포넌트가 읽는 s hook, 색 s hook 6개, `letter-spacing`) | 이전 규칙으로는 바탕·면·글자·테두리 같은 중립색 요청을 하나도 들어줄 수 없었다(9.1) |
 | 10/8 | 모든 방법을 써도 바꿀 수 없는 항목은 "Salesforce 고정" 목록(9.4)으로 두고 화면과 발표에 표시한다 | 사용자 합의 |
-| 10/8 | hook이 없는 항목(움직임 등)에 한해 Salesforce 클래스를 덮어쓰는 규칙을 제한적으로 허용한다. 이 규칙은 패키지의 `milvusBridge.css`에만 두고 밀버스 변수를 읽게 한다 | 사용자 선택(C). synthetic인 지금 org에서는 동작할 것으로 본다(10/8 프로브는 hook만 쟀고 클래스 규칙은 재지 않음 — 14장, 10/12 측정). native 전환·업데이트 때 깨질 수 있어 자동 확인으로 감시한다 |
-| 10/9 | **기본 우선.** 기본 상태는 Salesforce 기본 모양에 브랜드 색·로고(BrandingSet, 공식 기능)만 바꾼 것이다. `init` 직후 util.css(`milvusBrand.css`)는 비어 있고, 브랜드 요청이 있을 때만 util.css와 브리지 변수로 모양을 바꾼다. VF는 모양을 바꾸지 않아도 `milvusVf`(SLDS 2 + 팔레트)로 LEX와 맞춘다 | 사용자 선택. util.css는 공식 권고 밖이라 필요할 때만 쓴다. VF가 LEX와 다른 원인은 SLDS 1이지 util.css가 아니다 |
-| 10/9 | **opt-in override.** 기존 컴포넌트(`lightning-button` 등)의 모양을 hook·브리지로 바꿀 수 없으면, 새 밀버스 컴포넌트를 만들지 않고 프로젝트 소유 `milvusOverride.css`의 클래스 규칙으로 바꾼다. 공식 권고 밖임을 알고 쓴다. 밀버스 컴포넌트는 기능이 없을 때만 만든다(기존 `milvusButton`은 비교 예시로 유지). 비권고 이유와 실험은 Learn 09에 정리한다 | 사용자 요청. 모양만 바꾸려고 컴포넌트를 새로 만드는 것은 비효율적이다. 지금 org는 synthetic이라 클래스 규칙이 닿을 것으로 본다. 10/8 프로브는 `:root`의 hook 두 개만 넣었고 클래스 규칙은 넣지 않았다. 이 판단은 10/7 synthetic 실측과 LWC 개발자 가이드 Mixed Shadow Mode 설명에서 나온 것이다(**미확인**, 2026-10-09 정정, Learn 09 2절). native 전환·마크업 변경 때 깨질 수 있다는 것을 발표에서 직접 보여 준다 |
+| 10/8 | hook이 없는 항목(움직임 등)에 한해 Salesforce 클래스를 덮어쓰는 규칙을 제한적으로 허용한다. 이 규칙은 패키지의 `milvusBridge.css`에만 두고 밀버스 변수를 읽게 한다 | 사용자 선택(C). synthetic인 지금 org에서는 동작할 것으로 본다(10/8 프로브는 hook만 쟀고 클래스 규칙은 재지 않음). 10/9 프로브에서 `lightning-button` 안과 표준 헤더 버튼까지 닿는 것을 확인했다(13장). native 전환·업데이트 때 깨질 수 있어 자동 확인으로 감시한다 |
+| 10/9 | **기본 우선.** 기본 상태는 Salesforce 기본 모양에 브랜드 색·로고(BrandingSet, 공식 기능)만 바꾼 것이다. `init` 직후 util.css(`milvusBrand.css`)는 비어 있고, 브랜드 요청이 있을 때만 util.css와 브리지 변수로 모양을 바꾼다. VF는 모양을 바꾸지 않아도 `milvusVf`(팔레트)로 LEX와 맞춘다(D2) | 사용자 선택. util.css는 공식 권고 밖이라 필요할 때만 쓴다. VF가 LEX와 다른 원인은 SLDS 1과 빠진 팔레트이지 util.css가 아니다(10/9 프로브) |
+| 10/9 | **opt-in override.** 기존 컴포넌트(`lightning-button` 등)의 모양을 hook·브리지로 바꿀 수 없으면, 새 밀버스 컴포넌트를 만들지 않고 프로젝트 소유 `milvusOverride.css`의 클래스 규칙으로 바꾼다. 공식 권고 밖임을 알고 쓴다. 밀버스 컴포넌트는 기능이 없을 때만 만든다(기존 `milvusButton`은 비교 예시로 유지). 비권고 이유와 실험은 Learn 09에 정리한다 | 사용자 요청. 모양만 바꾸려고 컴포넌트를 새로 만드는 것은 비효율적이다. 지금 org는 synthetic이라 클래스 규칙이 닿을 것으로 본다. 10/8 프로브는 `:root`의 hook 두 개만 넣었고 클래스 규칙은 넣지 않았다. 이 판단은 10/7 synthetic 실측과 LWC 개발자 가이드 Mixed Shadow Mode 설명에서 나온 것이다(2026-10-09 정정, Learn 09 2절). 같은 날 프로브로 클래스 규칙이 닿는 것을 확인했다(13장). native 전환·마크업 변경 때 깨질 수 있다는 것을 발표에서 직접 보여 준다 |
 | 10/9 | SLDS 2(Cosmos) org를 기준으로 한다. SLDS 1 테마 org 지원은 발표 뒤 검토한다(#22) | 사용자 선택. SLDS 1은 컴포넌트 hook(`--slds-c-*`)이 공식이고 VF가 그대로 맞는 장점이 있지만, org 테마는 고객사가 고르는 설정이고 새 org 기본은 SLDS 2다(Essentials 제외). 지금까지의 실측·Storybook·팔레트가 모두 SLDS 2 기준이다 |
+| 10/9 | **D1 LWC는 JS.** 밀버스 저장소와 고객 프로젝트 모두 LWC(밀버스 컴포넌트, `milvusScript`, `milvusBrandLoader`)는 `.js`로 쓴다. CLI·`lib`·스크립트·Storybook 설정·node 테스트는 `.ts`를 유지한다. `init`은 고객 `sfdx-project.json`의 `defaultLwcLanguage`를 바꾸지 않는다. 고객 `lwc/tsconfig.json`, `@types/jest`, `tsconfig.lwc.base.json`, `lwc-platform.d.ts`는 필요 없다 | 사용자 선택. org가 `.ts` LWC를 타입 검사해 `this.template`·`this.dispatchEvent`를 거부했고(LWC1539), 공식 문서는 배포 전에 JS로 변환하라고 한다(8장, 13장). CLI 쪽은 org에 올라가지 않고 Node가 `.ts`를 직접 실행한다 |
+| 10/9 | **D2 VF는 공식 설정 + 팔레트.** Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켜고, `<apex:slds/>` + 팔레트 CSS(`milvusVf`, 약 620바이트) + `milvusBridge`·`milvusBrand`·`milvusOverride`로 VF를 LEX와 맞춘다. SLDS 2 CSS 전체 사본(약 1MB)은 쓰지 않는다. 정적 리소스 이름은 `milvusVf` 그대로다 | 사용자 선택. 설정을 켜면 SLDS 2가 되지만 org 테마 팔레트는 들어오지 않고, 팔레트를 더하면 LEX와 같았다(13장). 이 설정은 Metadata API로 읽거나 배포할 수 없어 고객 org에서 Setup으로 직접 켠다. `deploy`와 `milvus-design.md`가 안내한다. 학습 org는 켜 둔 상태로 둔다 |
+| 10/9 | **D3 앱 전체 브랜드.** 화면 없는 LWC `milvusBrandLoader`(대상 `lightning__UtilityBar`, `loadBrand(this)`만)를 패키지에 넣는다. 앱에 붙이는 것은 사용자가 App Manager에서 한다(유틸리티 항목 추가, "앱이 열릴 때 백그라운드로 로드" 체크). `deploy`는 고객 앱 메타데이터를 바꾸지 않는다 | 사용자 선택. 유틸리티 항목의 백그라운드 로드만으로 그 앱의 모든 페이지에 브랜드 CSS가 들어갔다(9.7, 13장) |
+| 10/9 | **D4 TS 배포 단계 없음.** `deploy`에 TS → JS 변환 단계를 넣지 않는다 | LWC가 JS이므로 필요 없다 |
 
 ---
 
@@ -81,7 +85,7 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 | --- | --- |
 | `dist/` | CLI와 Storybook용 스크립트를 JS로 빌드한 것. Node는 `node_modules` 안의 `.ts` 실행을 거부한다. `bin: { "milvus": "dist/cli/index.js" }` |
 | `templates/` | 프로젝트에 복사할 원본(3장의 밀버스 관리 파일과 틀). VF 관련 파일은 "선택 항목"으로 표시한다 |
-| `force-app/main/default/lwc/milvus*/` | 밀버스 LWC (`.ts`). `__tests__`는 넣지 않는다. `files`에는 `force-app/main/default/lwc/milvus*/*`와 `!force-app/**/__tests__`로 쓴다(`milvus*`로 쓰면 pnpm 10.13.1이 부정 패턴을 적용하지 못한다, 10/9 실측) |
+| `force-app/main/default/lwc/milvus*/` | 밀버스 LWC (`.js`, 10/9 D1. `milvusBrandLoader` 포함). `__tests__`는 넣지 않는다. `files`에는 `force-app/main/default/lwc/milvus*/*`와 `!force-app/**/__tests__`로 쓴다(`milvus*`로 쓰면 pnpm 10.13.1이 부정 패턴을 적용하지 못한다, 10/9 실측) |
 | `force-app/main/default/classes/utils/design/` | 밀버스 Apex (생기면) |
 | `.storybook/`, `stories/`, 미리 만든 카탈로그 | 프로젝트 모드 Storybook |
 
@@ -106,13 +110,12 @@ package.json                                       [소유] "storybook": "milvus
 .claude/skills/milvus-brand/SKILL.md               [관리] 브랜드 입력 skill
 .claude/hooks/milvus-check.mjs                     [관리] util.css·브랜드 메타데이터 수정 후 check --style
 .gitignore                                         [소유] .milvus/ 줄 추가
-.forceignore                                       [소유] **/tsconfig.json, **/__tests__/** 줄 추가 (.ts는 배포하므로 넣지 않음)
+.forceignore                                       [소유] **/tsconfig.json, **/__tests__/** 줄 추가 (없을 때만)
 .npmrc                                             [소유] 범위 두 줄이 없으면 추가 (0장 준비를 팀원과 공유)
-sfdx-project.json                                  [소유] "defaultLwcLanguage": "typescript" (키가 없을 때만)
 force-app/main/default/
-  lwc/milvusBadge/, milvusButton/, milvusMultiSelect/ …   [관리] 밀버스 컴포넌트 (.ts)
+  lwc/milvusBadge/, milvusButton/, milvusMultiSelect/ …   [관리] 밀버스 컴포넌트 (.js)
   lwc/milvusScript/                                [관리] 공용 함수 (loadBrand 등)
-  lwc/tsconfig.json                                [관리] 패키지의 기본 설정을 extends
+  lwc/milvusBrandLoader/                           [관리] 앱 전체 브랜드 로더. 화면 없음, 유틸리티 바용 (10/9 D3)
   classes/utils/design/                            [관리] Apex (생기면)
   components/milvusHead.component (+meta)          [관리, 선택] VF 페이지용
   brandingSets/LEXTHEMING<이름>.brandingSet-meta.xml      [소유] 브랜드 색·로고 ← 색의 원본
@@ -120,12 +123,13 @@ force-app/main/default/
   staticresources/milvusBrand.css (+meta)          [소유] util.css ← 모양과 피드백 색, 밀버스 변수 값의 원본
   staticresources/milvusBridge.css (+meta)         [관리] hook이 없는 항목을 밀버스 변수로 잇는 클래스 규칙 (5.6)
   staticresources/milvusOverride.css (+meta)       [소유] opt-in 클래스 규칙. 처음엔 비어 있음, 공식 권고 밖 (5.1)
-  staticresources/milvusVf.css (+meta)             [생성, 선택] VF용 SLDS 2 + 팔레트. deploy·check가 만들고 커밋한다
+  staticresources/milvusVf.css (+meta)             [생성, 선택] VF용 브랜드 팔레트 `:root{--slds-r-color-brand-5~95}` (약 620바이트, 10/9 D2). deploy·check가 만들고 커밋한다
   contentassets/<이름>Logo.asset (+meta)           [소유] 로고를 주면
 ```
 
 - Storybook 설정은 패키지 안에 있어서 프로젝트에 Storybook 파일이 생기지 않는다. `init` 직후 `pnpm milvus storybook`(또는 `pnpm storybook`)으로 바로 확인한다
-- 이미 있는 파일은 덮어쓰지 않고 건너뛴 뒤 목록으로 알려 준다. 예외로 다음 파일은 기존 내용에 더한다: `.claude/settings.json`(설정 병합), `.gitignore`·`.forceignore`·`.npmrc`(줄 추가), `CLAUDE.md`(`@milvus-design.md` 한 줄 추가, 따옴표와 백틱 없이), `package.json`·`sfdx-project.json`(키가 없을 때만 추가). 다시 실행해도 결과가 같다
+- 이미 있는 파일은 덮어쓰지 않고 건너뛴 뒤 목록으로 알려 준다. 예외로 다음 파일은 기존 내용에 더한다: `.claude/settings.json`(설정 병합), `.gitignore`·`.forceignore`·`.npmrc`(줄 추가), `CLAUDE.md`(`@milvus-design.md` 한 줄 추가, 따옴표와 백틱 없이), `package.json`(키가 없을 때만 추가). 다시 실행해도 결과가 같다
+- `sfdx-project.json`은 읽기만 하고 바꾸지 않는다. `defaultLwcLanguage`는 고객 설정 그대로다(10/9 D1)
 - `LightningExperience.settings`(활성 테마)는 만들지 않는다. `deploy`가 그때그때 `.milvus/deploy/`에 `activeThemeName` 한 필드만 담아 만든다. 프로젝트에 같은 이름의 파일이 있어도 쓰지 않는다
 - `milvusVf.css`는 생성 파일이지만 커밋한다. `milvusHead`가 이 리소스를 참조하므로, 팀원이 프로젝트 전체를 배포할 때 리소스가 없어 실패하는 일을 막는다. 전체 `check`가 지금 브랜드 색으로 다시 만든다
 - Claude의 파일 도구는 `permissions.deny`로 [관리] 파일을 고치지 못한다. 다른 경로로 바뀐 것은 `check`의 sha256 비교가 잡는다
@@ -148,6 +152,7 @@ force-app/main/default/
 4. `--from-org`: `Settings:LightningExperience`로 활성 테마 이름을 먼저 읽는다. 그 테마의 `LightningExperienceTheme`, `BrandingSet`, 로고 `ContentAsset`만 임시 폴더로 받아 검증한 뒤 프로젝트에 복사하고 그 이름을 그대로 쓴다. 커스텀 테마가 없거나 조회가 실패하면 아무것도 쓰지 않고 멈춘다
    - `--no-vf`면 VF 파일(`milvusHead`, `milvusVf`)을 만들지 않는다. 기본은 포함한다(`milvus.config.json`의 `vf`)
 5. 3장의 나머지 파일을 만들고, `milvus.config.json`에 대상 org, 브랜드, 밀버스 관리 파일 목록과 sha256을 기록한다
+   - 밀버스 LWC는 `.js` 그대로 복사한다. `lwc/tsconfig.json`을 만들지 않고 `sfdx-project.json`(`defaultLwcLanguage`)을 바꾸지 않는다(10/9 D1)
 
 ### 4.2 `storybook [--build <폴더>]`
 - CLI가 `MILVUS_PROJECT_DIR=<sfdx-project.json이 있는 절대 경로>`를 넘기고, 패키지 안의 설정으로 Storybook을 띄운다
@@ -158,21 +163,21 @@ force-app/main/default/
 - `.storybook/main.ts`는 `server.fs.allow`에 `searchForWorkspaceRoot(root)`와 프로젝트 폴더를 함께 넣는다(`allow`를 직접 주면 Vite 기본값이 빠진다)
 - 브랜드: `milvus.config.json`의 브랜드 이름으로 `brandingSets/LEXTHEMING<이름>`을 읽는다. `BRAND_COLOR` → 팔레트 계산 → `--slds-r-color-brand-*`. `milvusBrand.css`는 문서에 넣는다. 로고는 사이드바에 쓴다. 비교용으로 "SLDS 기본" 브랜드도 함께 고를 수 있다
 - 내용: SLDS 컴포넌트 카탈로그(공식 예제, 73개 컴포넌트, 패키지에 미리 만들어 넣음), 밀버스 컴포넌트(프로젝트 사본으로 그림), 브랜드 명세 페이지(6장), Foundations(색, 영향 지도), 컴포넌트별 "Salesforce 원본과 읽는 hook" 보기(9.5), 반영 검사 페이지(9.6)
-- LWC 빌드: Rollup 앞에서 `typescript.transpileModule`로 타입만 지운다(LWC 컴파일러는 TS를 직접 읽지 못한다). npm에 없는 플랫폼 모듈은 대신하는 모듈로 바꾼다: `lightning/platformResourceLoader`의 `loadStyle`은 바로 끝나는 함수, `@salesforce/resourceUrl/*`은 경로 문자열. 결과는 `.milvus/`에 둔다
+- LWC 빌드: 밀버스 LWC는 `.js`라 그대로 Rollup에 넣는다(10/9 D1). `.ts` 타입 제거 플러그인(`typescript.transpileModule`)은 고객 프로젝트 자체 `.ts` LWC에만 의미가 있어, 남길지는 계획 Task 30에서 정한다. npm에 없는 플랫폼 모듈은 대신하는 모듈로 바꾼다: `lightning/platformResourceLoader`의 `loadStyle`은 바로 끝나는 함수, `@salesforce/resourceUrl/*`은 경로 문자열. 결과는 `.milvus/`에 둔다
 - 브랜드 메타데이터가 없거나 util.css가 규칙을 어기면 SLDS 기본 브랜드로 띄우고 화면 위에 오류를 보여 준다
 - 대체 경로: `node_modules` 안의 설정으로 띄우는 것이 안 되면 `init`이 `.storybook/`을 프로젝트에 복사한다. Task 3 스파이크에서는 필요하지 않았다. 14장의 남은 확인 항목이 실패할 때만 쓴다
 
 ### 4.3 `check [--style]`
 - `--style`(hook이 실행): util.css 규칙(5.2)과 피드백 색 대비(5.3)만 본다. 정규식 수준이라 빠르다. 실패하면 종료 코드 2와 함께 고칠 값을 stderr로 낸다. `milvusOverride.css`는 5.1의 경고만 내고(종료 코드 0) `@font-face`·`@import`만 실패시킨다
-- 전체(deploy와 CI가 실행): `--style` 항목 + `milvusVf.css`를 지금 `BRAND_COLOR`로 다시 만듦(VF 사용 시) + 밀버스 관리 파일 sha256 비교 + 타입 검사(`lwc/milvus*`만, 패키지의 프로젝트용 tsconfig로 `tsc --noEmit`)
+- 전체(deploy와 CI가 실행): `--style` 항목 + `milvusVf.css`(팔레트)를 지금 `BRAND_COLOR`로 다시 만듦(VF 사용 시) + 밀버스 관리 파일 sha256 비교. 밀버스 LWC가 JS라 타입 검사는 하지 않는다(10/9 D1)
 - sha256이 다르면 `pnpm milvus update --force`로 되돌리라고 안내한다
 
 ### 4.4 `deploy [--target-org <별칭>] [--yes]`
 1. 대상 org: `--target-org` → `milvus.config.json` 순서로 정한다. sf 기본 org는 쓰지 않는다. 정해지지 않으면 로그인된 org 목록을 보여 주고 멈춘다
-2. 전체 `check`를 실행한다. 실패하면 멈춘다. 이때 `milvusVf.css`를 다시 만든다(SLDS 2 `slds2.cosmos.css` + `BRAND_COLOR`로 계산한 팔레트, CSS 한 파일, `text/css`)
+2. 전체 `check`를 실행한다. 실패하면 멈춘다. 이때 `milvusVf.css`를 다시 만든다(`BRAND_COLOR`로 계산한 팔레트 `:root{--slds-r-color-brand-5~95}`만, 약 620바이트, `text/css`. SLDS 2 CSS 사본은 넣지 않는다, 10/9 D2)
 3. `sf`가 없거나 대상 org 로그인이 만료되었으면 멈춘다
-4. **계획 출력:** 대상 org, 지금 활성 테마 → 새 활성 테마, 배포 목록, 경고("활성 테마 변경은 org 전체 사용자 화면에 적용됩니다"). `--yes`가 없으면 여기서 끝난다. 사람이 터미널에서 실행했고 `--yes`가 없으면 y/N을 묻는다
-5. `--yes`면 밀버스 관련 메타데이터만 한 번의 배포로 올린다(프로젝트 전체를 배포하지 않는다): 밀버스 LWC, Apex, `milvusBrand`, `milvusBridge`, `milvusOverride`, `BrandingSet`, 테마, 로고, VF 사용 시 `milvusVf`·`milvusHead`. 배포는 원자적이라 하나라도 실패하면 전부 롤백된다
+4. **계획 출력:** 대상 org, 지금 활성 테마 → 새 활성 테마, 배포 목록, 경고("활성 테마 변경은 org 전체 사용자 화면에 적용됩니다"). VF 사용 시 안내도 낸다: VF 페이지가 SLDS 2로 그려지려면 Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켜야 한다. 이 설정은 메타데이터로 읽을 수 없어 `deploy`가 확인하지 못한다. `--yes`가 없으면 여기서 끝난다. 사람이 터미널에서 실행했고 `--yes`가 없으면 y/N을 묻는다
+5. `--yes`면 밀버스 관련 메타데이터만 한 번의 배포로 올린다(프로젝트 전체를 배포하지 않는다): 밀버스 LWC(`.js` 그대로, 변환 단계 없음. `milvusBrandLoader` 포함), Apex, `milvusBrand`, `milvusBridge`, `milvusOverride`, `BrandingSet`, 테마, 로고, VF 사용 시 `milvusVf`·`milvusHead`. 앱 메타데이터(유틸리티 바)는 바꾸지 않는다(10/9 D3). 배포는 원자적이라 하나라도 실패하면 전부 롤백된다
 6. 5가 성공했을 때만 `.milvus/deploy/settings-mdapi/`(mdapi 형식: `package.xml` + `settings/LightningExperience.settings`, `activeThemeName` 한 필드)를 만들어 `--metadata-dir`로 배포한다. 5가 실패하면 실패 항목과 이유를 보여 주고 활성화하지 않는다
 7. 확인용 명령 `sf org open --target-org <별칭> --path <경로>`를 출력한다(실행하지 않음. `--url-only`는 토큰이 든 주소를 출력하므로 쓰지 않는다). LEX 테마 색은 새로고침 뒤에 반영된다(실측)
 
@@ -190,8 +195,8 @@ force-app/main/default/
 
 | 계층 | 원본 | org에 적용되는 방식 |
 | --- | --- | --- |
-| 브랜드 색, 로고 | `BrandingSet` (`BRAND_COLOR`, `BRAND_IMAGE`) | 테마 배포 + 활성화. LEX, Setup, VF(`<apex:slds/>`)에 반영됨(실측) |
-| 모양, 피드백 색, 밀버스 변수 값 | `milvusBrand.css` (util.css) | LEX: 밀버스 컴포넌트가 `loadStyle`로 문서에 넣는다. VF: `milvusHead` |
+| 브랜드 색, 로고 | `BrandingSet` (`BRAND_COLOR`, `BRAND_IMAGE`) | 테마 배포 + 활성화. LEX, Setup에 반영됨(실측). VF는 SLDS 2 설정을 켠 `<apex:slds/>`에 팔레트가 들어오지 않아 `milvusVf`(팔레트 CSS)로 넣는다(10/9 실측, D2) |
+| 모양, 피드백 색, 밀버스 변수 값 | `milvusBrand.css` (util.css) | LEX: 밀버스 컴포넌트가 `loadStyle`로 문서에 넣는다. 앱 전체는 유틸리티 바의 `milvusBrandLoader`(10/9 D3). VF: `milvusHead` |
 | hook이 없는 항목(움직임 등) | `milvusBridge.css` (패키지 제공, 밀버스 변수를 읽음) | `milvusBrand`와 같은 경로로 함께 넣는다 |
 | hook·브리지로 안 되는 모양 (opt-in) | `milvusOverride.css` (프로젝트 소유, 처음엔 비어 있음, 클래스 규칙) | `milvusBrand` 다음, 마지막에 넣는다 |
 | 밀버스 컴포넌트 | `lwc/milvus*` | 배포. 기능이 없을 때만 만든다 |
@@ -214,7 +219,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 피드백 색 hook | 5.3의 표에 있는 이름만 |
 | `--slds-s-*` 중 이름에 `color`가 없는 것 | **SLDS 2 CSS 또는 기본 컴포넌트 CSS가 `var()`로 읽는 이름**이어야 한다(읽는 곳이 없으면 효과가 없다) |
 | 색 `--slds-s-*` 6개: `backdrop-color-background`, `menu-item-color-background-active`, `table-row-color-background-selected`, `navigation-color-background-hover`, `pill-color-background-hover`, `button-color-background-hover` | 값은 중립 g hook만 참조한다. 기본 hover·선택 바탕의 상당수가 브랜드 틴트라서 "회색 hover" 같은 요청을 들어줄 경로다 |
-| `--milvus-*` | 밀버스 컴포넌트(`.css`·`.ts`)나 `milvusBridge.css`가 읽는 이름 |
+| `--milvus-*` | 밀버스 컴포넌트(`.css`·`.js`)나 `milvusBridge.css`가 읽는 이름 |
 | 상속 속성 `letter-spacing` | 자간 하나만. 다른 일반 속성은 금지 |
 
 | 금지 | 이유 |
@@ -251,9 +256,10 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 - 팔레트 자체 검사에 "50·40·30단계는 흰색과 4.5:1 이상"을 추가한다
 
 ### 5.5 LEX와 VF에 util.css를 거는 방법
-- **LEX:** 밀버스 컴포넌트가 나타날 때 `milvusScript`의 `loadBrand(this)`가 `loadStyle`로 `milvusBridge`, `milvusBrand`, `milvusOverride`를 차례로 문서 head에 넣는다. 같은 페이지의 표준 UI와 `body`에 붙는 모달까지 바뀐다(실측). 프로젝트 컴포넌트도 같은 함수를 부를 수 있다. 커스텀 컴포넌트가 없는 표준 화면에는 테마 색만 적용된다
-- **VF:** 페이지에 `<c:milvusHead/>` 한 줄을 넣는다. `milvusHead`는 `milvusVf`, `milvusBridge`, `milvusBrand`, `milvusOverride` 순서로 `<apex:stylesheet>`를 넣는다. `<apex:slds/>`는 10/8 프로브에서 SLDS 1로 그려져 쓰지 않는다. Help에 따르면 User Interface 설정 "Use SLDS 2 for pages that include `<apex:slds>`…"를 켜고 SLDS 2 테마를 쓰면 SLDS 2가 된다(14장, 10/12 확인). 그렇게 되면 `<apex:slds/>` + `milvusBridge`·`milvusBrand`·`milvusOverride`만으로 충분한지 다시 정한다
-- 한계: SLDS 2 CSS가 참조하는 기본 아바타 이미지(`../../public/*.png`)는 패키지에 없어 VF에서 보이지 않는다
+- **LEX:** 밀버스 컴포넌트가 나타날 때 `milvusScript`의 `loadBrand(this)`가 `loadStyle`로 `milvusBridge`, `milvusBrand`, `milvusOverride`를 차례로 문서 head에 넣는다. 같은 페이지의 표준 UI와 `body`에 붙는 모달·토스트까지 바뀐다(실측). 프로젝트 컴포넌트도 같은 함수를 부를 수 있다
+- **LEX 앱 전체:** 화면 없는 `milvusBrandLoader`를 앱의 유틸리티 바에 넣고 "앱이 열릴 때 백그라운드로 로드"를 켜면, 커스텀 컴포넌트가 없는 표준 화면을 포함해 그 앱의 모든 페이지에 들어간다. 다른 앱에는 들어가지 않는다(10/9 실측, 9.7). 붙이는 것은 사용자가 App Manager에서 한다(10/9 D3). 로더가 없는 앱의 표준 화면에는 테마 색만 적용된다
+- **VF:** 고객 org에서 Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켠다(Metadata API로 읽거나 배포할 수 없음). 페이지에 `<c:milvusHead/>` 한 줄을 넣는다. `milvusHead`는 `<apex:slds/>`를 넣고, `milvusVf`(팔레트), `milvusBridge`, `milvusBrand`, `milvusOverride` 순서로 `<apex:stylesheet>`를 넣는다(10/9 D2). 설정을 켠 `<apex:slds/>`는 SLDS 2이지만 팔레트가 Salesforce 기본(`#066afe`)이라 `milvusVf`가 필요하다. 설정이 꺼져 있으면 SLDS 1로 그려지고 util.css가 효과가 없다(10/9 실측, 13장)
+- 한계: 10/8 방식(SLDS 2 CSS 사본)은 사본이 참조하는 기본 아바타 이미지(`../../public/*.png`)가 패키지에 없다는 한계가 있었다. `<apex:slds/>`는 org의 스타일시트를 쓰지만 아바타 이미지가 보이는지는 재지 않았다(**미확인**)
 
 ### 5.6 `milvusBridge.css` — hook이 없는 항목을 잇는 클래스 규칙 (제한적 허용)
 - hook이 0개이거나 허용된 hook이 없는 항목만 다룬다. hook이 있는 항목은 계속 hook만 쓴다
@@ -360,12 +366,14 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 ### 7.1 `milvus-design.md` (프로젝트 루트, 200줄 이하, [관리])
 1. 이 프로젝트의 밀버스 설정: 값은 쓰지 않고 "`milvus.config.json`을 본다"고만 적는다(원본을 하나로)
 2. 준비물: Node 22.18 이상(23.x는 23.6 이상), pnpm, sf CLI, GitHub 토큰 `NODE_AUTH_TOKEN`, `.npmrc` 두 줄, org 로그인
-3. 세팅 순서 체크리스트: `init` → 브랜드 요청 입력 → 반영 → `storybook` 확인 → `deploy`
+3. 세팅 순서 체크리스트: `init` → 브랜드 요청 입력 → 반영 → `storybook` 확인 → `deploy`. 배포 뒤 사람이 org에서 하는 일 두 가지(10/9 D2·D3)
+   - VF를 쓰면 Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켠다. 메타데이터로 켤 수 없다
+   - 앱 전체에 브랜드를 걸려면 App Manager에서 그 앱의 유틸리티 바에 `milvusBrandLoader`를 추가하고 "앱이 열릴 때 백그라운드로 로드"를 체크한다. 앱마다 한다. 안 하면 밀버스 컴포넌트가 있는 페이지에만 걸린다
 4. 파일 지도: [관리] / [소유] / [생성] (3장과 같음)
-5. 디자인 규칙: 판단 순서, util.css 규칙(5.2), 색은 `BrandingSet`에서만, LWC는 TypeScript, `milvus` 접두사는 밀버스 전용
+5. 디자인 규칙: 판단 순서, util.css 규칙(5.2), 색은 `BrandingSet`에서만, LWC는 JavaScript(`.js`, 10/9 D1), `milvus` 접두사는 밀버스 전용
 6. Claude에게 시키는 법: 예시 문장, skill 이름
 7. 배포 안전장치: 배포는 `pnpm milvus deploy`로만, 계획 확인 후 `--yes`, 활성 테마는 org 전체에 적용, 테마 반영은 새로고침 후
-8. 업데이트와 문제 해결: `milvus update`(`--force`), GitHub 토큰 오류, VF는 `<c:milvusHead/>`, 프로젝트 전체 배포로 `milvusHead`를 올릴 때는 `milvusVf.css`가 커밋되어 있어야 함
+8. 업데이트와 문제 해결: `milvus update`(`--force`), GitHub 토큰 오류, VF는 `<c:milvusHead/>`, 프로젝트 전체 배포로 `milvusHead`를 올릴 때는 `milvusVf.css`가 커밋되어 있어야 함, VF가 SLDS 1(버튼 반경 4px)로 보이면 위 VF 설정 확인, 표준 화면에 브랜드가 안 보이면 `milvusBrandLoader` 백그라운드 로드 확인
 
 ### 7.2 `.claude/settings.json` (병합할 내용)
 
@@ -380,7 +388,6 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
     "deny": [
       "Bash(sf org display)", "Bash(sf org display *)", "Bash(sf org open --url-only *)",
       "Edit(/force-app/main/default/lwc/milvus*/**)",
-      "Edit(/force-app/main/default/lwc/tsconfig.json)",
       "Edit(/force-app/main/default/classes/utils/design/**)",
       "Edit(/force-app/main/default/components/milvusHead.component*)",
       "Edit(/force-app/main/default/staticresources/milvusVf.*)",
@@ -412,14 +419,17 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | CLI, 스크립트 | `.ts`. 저장소 안에서는 Node가 그대로 실행한다. 패키지 발행 때 `tsc`로 `dist/`에 JS로 빌드 |
 | Storybook 설정, 스토리, 카탈로그 생성 스토리 | `.ts`. Vite가 타입을 지우고, 검사는 `tsc --noEmit`. 기존 파일은 손대는 작업에서 함께 바꾼다(11장) |
 | Rollup 결과물 `dist/lwc` | JS + 생성기가 만드는 `.d.ts` |
-| 밀버스 LWC와 테스트 | `.ts`, `.test.ts`. org에 `.ts`를 그대로 배포한다 |
+| 밀버스 LWC와 테스트 | **`.js`, `.test.js`** (10/9 D1). 밀버스 저장소와 고객 프로젝트 모두. org에 그대로 배포한다 |
 
-- `tsconfig` 핵심: `target: ESNext`(데코레이터를 그대로 둔다), `experimentalDecorators: false`, `strict`. CLI용은 `erasableSyntaxOnly`, `allowImportingTsExtensions`, `rewriteRelativeImportExtensions`
-- 타입: `lwc` 패키지 타입을 쓰면 `@api`에 `// @ts-ignore`가 필요 없다(로컬 확인). 플랫폼 모듈(`lightning/platformResourceLoader`, `@salesforce/resourceUrl/*` 등) 타입은 패키지의 `lwc-platform.d.ts`로 선언한다(2026-10-09 Task 6. `@salesforce/lightning-types`는 쓰지 않는다)
-- `sfdx-project.json`의 `"defaultLwcLanguage": "typescript"`로 VS Code가 TS 컴포넌트를 바로 만든다
-- `check`의 `--milvus-*` 수집 대상에 `.ts`를 넣는다(지금 스크립트는 `.css`·`.js`만 본다)
-- ESLint가 `.ts`를 검사하도록 10/12에 설정한다. 새 의존성이 필요하면 PR에 이유를 적는다
-- **위험과 대체 경로:** 공식 LWC 가이드(Developer Preview)에는 "TS는 배포할 수 없다"고 적혀 있어 org 실측(API 67) 결과와 다르다. Salesforce가 동작을 바꾸면 `deploy`가 배포 직전에 `tsc`로 JS를 만들어 보낸다. 이 대체 경로는 로컬에서 확인했다
+- **LWC를 TypeScript에서 뺀 이유 (10/9)**
+  - org 프로브에서 `.ts` LWC를 그대로 배포하면 실패했다. org가 `.ts`를 타입 검사하며 `this.template`·`this.dispatchEvent`를 "type에 없음"(LWC1539)으로 거부했다. 10/8의 ".ts만 있는 번들 배포 성공"은 `this.template`을 쓰지 않는 번들이었다(13장, [기록](../research/2026-10-09-org-probe.md))
+  - 공식 문서(LWC 개발자 가이드 "TypeScript (Developer Preview)", 확인 2026-10-09): LWC 컴파일러는 TS를 컴파일하지 않으므로 배포 전에 JS로 변환해야 하고, 플랫폼은 TS를 저장하지 않는다
+  - TS로 쓰면 `deploy`에 변환 단계, 고객 프로젝트에 `lwc/tsconfig.json`·`@types/jest`·플랫폼 모듈 타입 선언이 필요하다. JS로 쓰면 모두 필요 없다(D4). CLI 쪽은 org에 올라가지 않아 이 문제가 없다
+- `tsconfig` 핵심(CLI·`lib`·스크립트): `target: ESNext`, `strict`, `erasableSyntaxOnly`, `allowImportingTsExtensions`, `rewriteRelativeImportExtensions`
+- `init`은 고객 `sfdx-project.json`의 `defaultLwcLanguage`를 바꾸지 않는다. 고객 프로젝트의 기본 LWC 언어는 고객 설정 그대로다
+- `check`의 `--milvus-*` 수집 대상은 밀버스 LWC의 `.css`·`.js`다(Task 30에서 `.ts`를 `.js`로 바꾼다)
+- ESLint는 LWC에 `@salesforce/eslint-config-lwc/recommended`(JS)를 쓴다. `.ts` LWC 블록은 Task 30에서 지운다
+- 이전 설계(10/8~10/9 Task 6): 밀버스 LWC `.ts`, `tsconfig.lwc.base.json`, `lwc-platform.d.ts`, 고객 `lwc/tsconfig.json`, `"defaultLwcLanguage": "typescript"`. Task 30에서 모두 지운다
 
 ---
 
@@ -513,18 +523,20 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 ### 9.6 자동 확인
 1. **정적 검사 (CI, 브라우저 없이):** SLDS 2 CSS와 기본 컴포넌트 CSS를 postcss(Vite와 함께 이미 설치됨, 스크립트에서 쓰려고 devDependency로 명시)로 파싱해 각 선언의 `var()` 체인을 기본값까지 풀고 "명세 항목 → 닿음 / 브리지 / 빈틈 / 고정"으로 판정한다. 결과를 기준 파일(JSON)과 비교해 새 하드코딩, hook 변화, native 지원 목록 변화, 브리지 선택자 소실이 생기면 실패시킨다. 이 결과가 9.5 보기의 데이터가 된다
 2. **동적 검사 (Storybook "반영 검사" 페이지):** 허용된 모든 hook과 브리지 변수에 서로 구별되는 값을 넣은 센티널 브랜드(예: 반경 7·9·11px, hook마다 다른 색상각, 0.777s)를 만든다. 모든 스토리를 기본 브랜드와 센티널 브랜드로 그려 요소마다 `getComputedStyle`(`::before`·`::after` 포함)을 비교한다. 값이 다르면 "반영", 같으면 "빈틈 후보"다. disabled는 스토리 변형으로, focus는 `focus()` 뒤에 잰다. 브리지를 끄고 한 번 더 돌리면 브리지가 맡는 범위가 나온다. 처음에는 수동으로 돌린다(CI 자동화는 헤드리스 브라우저라는 새 의존성이 필요)
-3. **org 확인:** 읽기만 하는 확인으로 `lightning-*` 호스트의 `data-render-mode`를 본다. 센티널 브랜드를 org에 배포해 대표 화면을 비교하는 것은 승인을 받은 뒤 10/12 org 프로브와 함께 한다
+3. **org 확인:** 읽기만 하는 확인으로 `lightning-*` 호스트의 `data-render-mode`를 본다(10/9 프로브: 0개, 전부 synthetic). 센티널 브랜드를 org에 배포해 대표 화면을 비교하는 것은 Task 26 뒤로 미룬다(배포는 승인 후)
 4. **판정 기준:** 명세 항목마다 "반영된 컴포넌트 수 / 해당 컴포넌트 수"를 지금·native로 낸다. 빈틈이 9.4 목록에 없으면 실패다. 9.4에 새 항목을 넣으려면 사용자 합의가 필요하다
 
 ### 9.7 "모든 컴포넌트"에는 "모든 화면"도 들어간다
-- util.css와 브리지는 밀버스 컴포넌트가 `loadStyle`을 부른 페이지에만 들어간다. 표준 레코드 페이지만 있는 화면에는 org 테마 색만 적용된다
-- 후보: 앱 유틸리티 바에 화면이 없는 밀버스 컴포넌트를 두고 "앱이 열릴 때 백그라운드로 로드"를 켜면 앱의 모든 페이지에서 `loadBrand`가 실행될 수 있다. 공식 문서의 "백그라운드 유틸리티 항목" 패턴은 Aura 전용이라, LWC 유틸리티 항목에 이 설정이 동작하는지는 **미확인**이다. 10/12 org 프로브로 확인하고, 안 되면 "밀버스 컴포넌트가 있는 페이지만"을 한계로 적는다
+- util.css와 브리지는 `loadBrand`를 부른 컴포넌트가 있는 페이지에 들어간다. 그런 컴포넌트가 없는 표준 레코드 페이지에는 org 테마 색만 적용된다
+- **해결 (10/9 실측, D3):** 앱 유틸리티 바에 화면 없는 LWC를 두고 백그라운드로 로드하게 하면(FlexiPage decorator `eager` = `true`), 유틸리티 패널을 열지 않아도 그 앱의 모든 페이지에 브랜드 CSS가 들어갔다. 다른 앱(판매)을 새로 불러오면 들어가지 않았다. 공식 문서의 "백그라운드 유틸리티 항목"(`lightning:backgroundUtilityItem`)은 Aura 전용이라 쓰지 않고, 보이는 유틸리티 항목의 백그라운드 로드를 쓴다([기록](../research/2026-10-09-org-probe.md) 3.7)
+- 패키지는 이 용도의 `milvusBrandLoader`(대상 `lightning__UtilityBar`, 빈 템플릿, `connectedCallback`에서 `loadBrand(this)`만)를 [관리] 파일로 넣는다. 앱에 붙이는 것은 사용자가 App Manager에서 앱마다 한다(유틸리티 항목 추가, "앱이 열릴 때 백그라운드로 로드" 체크). `deploy`는 고객 앱 메타데이터를 바꾸지 않는다
+- App Manager의 "앱이 열릴 때 백그라운드로 로드" 체크가 프로브에서 쓴 decorator `eager`와 같은지는 **미확인**이다(14장)
 
 ### 9.8 분석 중 함께 발견한 것
 - `brands/Sample_Forest/util.css` 주석의 "버튼·뱃지 등 알약형"은 틀렸다. 뱃지는 `--slds-g-radius-border-1`을 읽는다
-- 정의되지 않은 hook을 읽는 곳이 있다: `--slds-g-color-accent-4`(기본 컴포넌트 13개, 기본값 없음), `--slds-g-info-container-1`, `--slds-s-button-shadow-hover`. org가 정의하는지는 미확인이다
+- 정의되지 않은 hook을 읽는 곳이 있다: `--slds-g-color-accent-4`(기본 컴포넌트 13개, 기본값 없음), `--slds-g-info-container-1`, `--slds-s-button-shadow-hover`. org도 정의하지 않는다(10/9 실측, 13장)
 - 기본 컴포넌트 `primitiveColorpickerButton`의 포커스 값이 무효라서 포커스 링이 안 보일 수 있다(추정)
-- npm 번들의 hook 기본값과 org 런타임의 값이 같은지는 미확인이다
+- npm 번들의 hook 기본값과 org 런타임의 값: 잰 표본에서 중립·피드백·모양·간격은 같고, 브랜드 계열(`accent`, `brand-base`)만 org 테마 팔레트 때문에 다르다(10/9 실측, 13장)
 
 ---
 
@@ -551,8 +563,8 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
   - `check`: 통과·실패 예시 파일(5.2, 5.3의 각 규칙)
   - `init`: 두 번 실행해도 같은 결과, `CLAUDE.md`에 추가된 줄이 정확히 `@milvus-design.md`인지
   - `update`: 로컬 수정 감지, 전부 반영 또는 아무것도 바꾸지 않음
-- LWC: 이미 있는 Jest `.test.ts`는 유지한다. 새 LWC에는 Jest 테스트를 굳이 만들지 않는다(10/9 사용자 결정). 화면 확인은 Storybook 스토리로 한다
-- 타입 검사: `tsc --noEmit`
+- LWC: 이미 있는 Jest 테스트는 유지한다(Task 30에서 `.test.ts`를 `.test.js`로 되돌림). 새 LWC(`milvusBrandLoader` 등)에는 Jest 테스트를 굳이 만들지 않는다(10/9 사용자 결정). 화면 확인은 Storybook 스토리로 한다
+- 타입 검사: `tsc --noEmit` (CLI·`lib`·스크립트·테스트. LWC는 JS라 대상이 아니다)
 - 전 컴포넌트 반영: 9.6의 정적 검사(CI, 기준 파일 비교)와 센티널 브랜드로 돌리는 동적 검사(Storybook, 처음에는 수동)
 - CI: lint, 타입 검사, 테스트, 정적 반영 검사, Storybook 빌드. 태그 `v*`이면 GitHub Packages 발행
 - 리허설: `learndoshare_2`에서 `pnpm pack` tgz로 설치 → `init` → 브랜드 요청 입력 → 반영 → Storybook → 배포(승인 후) → LEX·VF 화면 확인
@@ -565,10 +577,10 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | --- | --- | --- |
 | 10/12(월) 첫 작업 (10/9에 해도 됨) | **학습 자료 기초:** `Learn/00-디자인 시스템과 Salesforce.html`(디자인 시스템 개념과 Salesforce 구현), 낡은 `root.css`·`override.css` 설명 정리, 분석 자료를 `docs/research/`로 보관. Learn의 모든 절에 공신력 있는 출처(공식 문서·공식 소스·실측 기록)를 단다. **Learn 09 "override와 공식 권고"**: SLDS 2가 커스터마이즈를 좁힌 공식 이유, override와 hook을 synthetic·native에 직접 적용해 보는 실험, 밀버스의 선택 | Learn 검사(legacy·출처) 통과 |
 | 10/12(월) 오전 | **설치 경로 스파이크:** 패키지 이름·`publishConfig`·`prepack` 정리, `bin`은 버전만 출력, 발행 workflow, `v0.0.1` 발행. `learndoshare_2`에서 토큰으로 설치하고 `pnpm milvus --version` 확인. `node_modules` 안 설정으로 Storybook을 띄워 프로젝트 파일 하나 읽기와 미들웨어 POST 하나 확인 | 14장 첫 세 항목 확인 |
-| 10/12(월) 오후 | PR #19 병합. TS 전환 PR: 밀버스 컴포넌트 3개 `.ts`, `milvusScript`/`loadBrand`(native 감지 경고 포함), Rollup 타입 제거와 플랫폼 모듈 대체, ESLint `.ts`. **검사 스크립트·CLAUDE.md·5.2를 하나로 맞춤**(중립 색, 포커스 그림자, s hook 범위, 색 s hook 6개, `letter-spacing`). `templates/`의 모든 파일을 틀이라도 먼저 만든다. 승인받은 org 프로브 1회(피드백 색·중립 색 util.css, VF 테스트 페이지, 유틸리티 바 백그라운드 로드) | `pnpm lint`, `pnpm test`(타입 검사 포함), Storybook 빌드, CI 통과 |
-| 10/13(화) | `init`, `check`. 경로 재작업(생성기·Rollup이 루트와 출력 위치를 인자로 받고 결과는 `.milvus/`). **9.6 정적 반영 검사**(분석 스크립트를 옮겨 기준 파일 생성). **`milvusBridge.css` 생성기**(움직임, 줄인 움직임, 컨트롤 높이, 입력창 두께, 자간, 대문자 제목, 커서·밑줄 등. 개체 아이콘 색은 마지막) | `learndoshare_2`에서 `init` 두 번 결과 동일, `pnpm milvus check` 통과, 정적 검사 기준 파일 생성 |
+| 10/12(월) 오후 | PR #19 병합. TS 전환 PR: 밀버스 컴포넌트 3개 `.ts`(10/9 D1로 LWC는 JS로 되돌림, Task 30), `milvusScript`/`loadBrand`(native 감지 경고 포함), Rollup 타입 제거와 플랫폼 모듈 대체, ESLint `.ts`. **검사 스크립트·CLAUDE.md·5.2를 하나로 맞춤**(중립 색, 포커스 그림자, s hook 범위, 색 s hook 6개, `letter-spacing`). `templates/`의 모든 파일을 틀이라도 먼저 만든다. 승인받은 org 프로브 1회(피드백 색·중립 색 util.css, VF 테스트 페이지, 유틸리티 바 백그라운드 로드. 10/9에 실행, 13장) | `pnpm lint`, `pnpm test`(타입 검사 포함), Storybook 빌드, CI 통과 |
+| 10/13(화) | 먼저 LWC JS 복귀와 `milvusBrandLoader`(Task 30). `init`, `check`. 경로 재작업(생성기·Rollup이 루트와 출력 위치를 인자로 받고 결과는 `.milvus/`). **9.6 정적 반영 검사**(분석 스크립트를 옮겨 기준 파일 생성). **`milvusBridge.css` 생성기**(움직임, 줄인 움직임, 컨트롤 높이, 입력창 두께, 자간, 대문자 제목, 커서·밑줄 등. 개체 아이콘 색은 마지막) | `learndoshare_2`에서 `init` 두 번 결과 동일, `pnpm milvus check` 통과, 정적 검사 기준 파일 생성 |
 | 10/14(수) | `storybook` 프로젝트 모드, 브랜드 명세 페이지(9.3 항목 포함)와 저장, skill 반영(9.3 매핑), 9.5 원본·hook 보기 | 요청 입력 → 반영 → 화면 갱신, 9.5 보기에서 컴포넌트별 반영 상태 표시 |
-| 10/15(목) | 오전: `deploy` 핵심(LWC, `milvusBrand`, `milvusBridge`, BrandingSet, 테마, 로고, 활성화) → `learndoshare_2` 리허설(tgz, VF 없이). 오후: VF(`milvusVf`, `milvusHead`) | 리허설 완료 (org 배포는 승인 후), `init` 두 번 결과 동일 재확인 |
+| 10/15(목) | 오전: `deploy` 핵심(LWC, `milvusBrand`, `milvusBridge`, BrandingSet, 테마, 로고, 활성화) → `learndoshare_2` 리허설(tgz, VF 없이). 오후: VF(`milvusVf` 팔레트, `<apex:slds/>`를 넣는 `milvusHead`, VF 설정 안내) | 리허설 완료 (org 배포는 승인 후), `init` 두 번 결과 동일 재확인 |
 | 10/16(금) | 리허설 문제 수정, `update`, 9.6 동적 반영 검사 페이지, README·CLAUDE.md·문서 정리, 최종 발행, **내용 동결** | 동결 |
 
 마일스톤마다 마지막에 바뀐 개념을 `Learn/`에 반영한다. 세부 순서는 구현 계획(`docs/plans/2026-10-08-milvus-package-plan.md`)에 있다.
@@ -587,10 +599,10 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 활성화한 브랜드 색의 LEX accent(`#2E7D32` → `#468244`)가 우리 팔레트 규칙의 50단계와 같다 | org 측정 |
 | 테마를 지우면 그 테마의 `BrandingSet`도 함께 지워진다 | 삭제 배포 |
 | LEX에서 `loadStyle`한 CSS는 문서 head에 들어가 프로브 컴포넌트, 표준 헤더 버튼, `LightningAlert` 모달까지 바꾼다. 컴포넌트 hook도 닿는다 | org 측정 |
-| VF의 `<apex:slds/>`는 SLDS 1이다. 테마 색은 따라오지만 util.css는 효과가 없다. SLDS 2를 넣으면 util.css가 작동하고, 팔레트는 직접 넣어야 한다 | org 측정 |
+| VF의 `<apex:slds/>`는 Visualforce Settings의 SLDS 2 설정이 꺼져 있으면 SLDS 1이다. 테마 색은 따라오지만 util.css는 효과가 없다. SLDS 2를 넣으면 util.css가 작동하고, 팔레트는 직접 넣어야 한다 (10/8 측정 때는 설정 상태 기록 없음. 10/9에 꺼진 상태에서 같은 결과) | org 측정 |
 | 메타데이터로 배포한 새 탭은 프로필에서 숨김이다. 확인용 화면은 `lightning__UrlAddressable`로 연다 | org 측정 |
-| `.ts`만 있는 LWC를 배포하면 org가 `.ts`를 저장하고 타입을 지워 실행한다 | org 배포·조회·화면 |
-| `tsc`(`target: ESNext`)는 `@api`를 그대로 두고, LWC 컴파일러가 공개 속성으로 등록한다. Jest는 `.ts` 컴포넌트와 테스트를 그대로 통과한다. LWC 컴파일러는 TS를 직접 읽지 못한다 | 로컬 |
+| (10/8) `.ts`만 있는 LWC를 배포하면 org가 `.ts`를 저장하고 타입을 지워 실행했다. **10/9 정정:** 그 번들은 `this.template`을 쓰지 않았고, 공식 문서에 없는 동작이다(공식 문서는 플랫폼이 TS를 저장하지 않는다고 적는다). 밀버스는 이 동작에 기대지 않는다(D1) | org 배포·조회·화면 |
+| `tsc`(`target: ESNext`)는 `@api`를 그대로 두고, LWC 컴파일러가 공개 속성으로 등록한다. Jest는 `.ts` 컴포넌트와 테스트를 그대로 통과한다. LWC 컴파일러는 TS를 직접 읽지 못한다 (10/9부터 밀버스 LWC는 JS라 쓰지 않음) | 로컬 |
 | `lwc/utils/<번들>` 구조는 변환할 때 번들 이름이 `<번들>`이 아니라 `utils`로 잡힌다. `lwc/` 바로 아래나 `force-app/x/lwc/<번들>`은 정상이다 | `sf project convert source` |
 | 모달, 알림, 토스트, 툴팁은 `document.body`에 붙는다 | `lightning-base-components` 소스 |
 | GitHub Packages는 `@범위/이름` 형식이 필요하고, 공개 패키지도 설치에 토큰이 필요하다 | GitHub 공식 문서 |
@@ -598,7 +610,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | `permissions.ask`는 auto 모드에서도 실행 전에 묻는다. `Edit(...)` 규칙 하나가 모든 파일 편집 도구를 막는다. `CLAUDE.md`에 `@milvus-design.md`라고 쓰면 그 파일을 함께 불러온다 | Claude Code 공식 문서 |
 | SLDS 2 CSS는 976KB(압축 약 108KB)이고 글꼴 파일을 참조하지 않는다 | 로컬 |
 | Salesforce 원본(`lightning-base-components`) 이용 약관은 복제·공개 게시·배포를 허락하고 약관 동봉을 요구한다 | `LICENSE.txt` |
-| LWC `.ts` 검사는 `@salesforce/eslint-config-lwc`(4.1.2)의 `recommended-ts` 설정으로 한다. `sfdx-lwc-jest`에 `lightning/platformResourceLoader` stub이 있다 | 설치된 패키지 |
+| LWC `.ts` 검사는 `@salesforce/eslint-config-lwc`(4.1.2)의 `recommended-ts` 설정으로 한다(10/9부터 쓰지 않음). `sfdx-lwc-jest`에 `lightning/platformResourceLoader` stub이 있다 | 설치된 패키지 |
 | 패키지에 넣은 Storybook 설정을 `node_modules`에서 그대로 띄울 수 있다. `main.ts`, 형제 `.ts` 모듈(상대 import에 `.ts`), `.ts` 스토리가 동작한다. Storybook이 자체 로더(esbuild)로 `node_modules` 안의 `.ts`도 변환하므로 `dist/`로 컴파일할 필요가 없다. framework(`@storybook/web-components-vite`)와 addon(`addon-docs`, `addon-a11y`, autodocs 화면)도 찾는다 | Task 3 스파이크(2026-10-09): `pnpm pack` tgz를 새 SFDX 프로젝트(`learndoshare_2`)에 `pnpm add -D`, Storybook 10.6.0·Vite 7.3.7, 브라우저로 스토리 화면 확인 |
 | 위 조건: `-c`에 패키지 설정 폴더의 실제 경로(realpath)를 넘겨야 한다. 심볼릭 링크 경로를 넘기면 Vite 루트가 그 경로가 되어 브라우저 쪽 import `storybook/internal/preview/runtime`을 찾지 못하고(`Failed to resolve import`) 미리보기가 빈 화면이 된다. pnpm은 패키지의 의존성을 프로젝트 `node_modules` 바로 아래에 두지 않기 때문이다. pnpm이 만드는 `milvus` 실행 파일은 실제 경로의 `dist/cli/index.js`를 실행한다 | 같은 스파이크(심볼릭 링크 경로·실제 경로 두 번 실행), `node_modules/.bin/milvus` |
 | 별칭으로 import한 프로젝트 파일(`?raw`)은 `server.fs.allow` 없이도 읽힌다. import하지 않고 직접 요청한 프로젝트 파일은 403이고, `server.fs.allow`에 프로젝트 폴더를 넣으면 200이다. 허용 밖 파일은 계속 403이다. `allow`를 직접 주면 Vite의 작업 공간 루트 기본값이 빠진다 | 같은 스파이크, [Vite server.fs.allow](https://vite.dev/config/server-options.html#server-fs-allow) (확인 2026-10-09) |
@@ -607,6 +619,16 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 설치할 때 pnpm 10.13.1이 `esbuild` 빌드 스크립트를 건너뛰었다고 경고한다. 그래도 Storybook의 `.ts` 설정 변환(esbuild)은 동작한다 | 같은 스파이크 |
 | 태그 `v0.0.1` push로 Actions가 GitHub Packages에 발행했다(`GITHUB_TOKEN`, 32초). 패키지는 **공개**로 생겼다(로그인 없이 패키지 페이지와 설치 명령이 보임). GitHub 문서는 새 패키지의 기본을 비공개로 적는다 — 이 경우 공개가 된 이유는 미확인 | Publish run(2026-10-09), 패키지 페이지 익명 접근 |
 | 프로젝트 `.npmrc` 두 줄(0장)과 셸 환경변수 `NODE_AUTH_TOKEN`(`read:packages` classic 토큰)으로 pnpm 10.13.1이 `${NODE_AUTH_TOKEN}`을 치환해 설치한다. `pnpm add -D @a40418a/milvus-design-system@0.0.1` → `pnpm milvus --version`이 `0.0.1` | `learndoshare_2`(2026-10-09) |
+| `.ts` LWC를 그대로 배포하면 실패한다. org가 `.ts`를 타입 검사하며 `this.template`·`this.dispatchEvent`를 "type에 없음"(LWC1539)으로 거부한다. `transpileModule`로 만든 JS를 배포하면 성공하고, `c/milvusScript` import와 `loadBrand`(세 link)가 동작한다. 공식 문서: LWC 컴파일러는 TS를 컴파일하지 않으므로 배포 전에 JS로 변환해야 하고, 플랫폼은 TS를 저장하지 않는다 | 10/9 프로브 ([기록](../research/2026-10-09-org-probe.md) 3.1), LWC 개발자 가이드 "TypeScript (Developer Preview)" (확인 2026-10-09) |
+| 프로브 화면의 기본 컴포넌트는 전부 synthetic이다(`lightning-*` 호스트 90개 중 `data-render-mode` 0개) | 10/9 프로브 (기록 3.2) |
+| `loadStyle`로 넣은 클래스 규칙 `.slds-button { border-radius: 0 }`이 `lightning-button` 안 버튼과 같은 화면의 표준 헤더 버튼 대부분에 닿는다. 더 구체적인 선택자가 있는 버튼(`appdev-panel-button` 4px, `search-button` 8px, 즐겨찾기 별 240px)은 예외다 | 10/9 프로브 (기록 3.3) |
+| util.css의 중립 색 hook이 LEX 표준 UI에 반영된다: 페이지 바탕(`html`, `surface-2`), 전역 헤더·검색(`surface-container-1`), 글자색(`on-surface-3`, 494개 요소), 테두리(`border-1`), 카드·입력 배경 | 10/9 프로브 (기록 3.4) |
+| util.css의 피드백 색 hook이 LEX 표준 UI에 반영된다: 시스템 경고 배너, `body`에 붙는 표준 토스트 error·warning·success(container 배경, `on-*` 글자). info 토스트는 재지 못했다 | 10/9 프로브 (기록 3.5) |
+| `--slds-g-color-accent-4`, `--slds-g-info-container-1`, `--slds-s-button-shadow-hover`는 org에서도 정의가 없다(빈 값) | 10/9 프로브 (기록 3.6) |
+| 화면 없는 LWC 유틸리티 항목을 백그라운드 로드(FlexiPage decorator `eager` = `true`)로 두면, 패널을 열지 않아도 그 앱의 모든 페이지(표준 목록 화면 포함)에 `loadBrand`의 세 link가 들어간다. 다른 앱에는 들어가지 않는다 | 10/9 프로브 (기록 3.7) |
+| VF Visualforce Settings의 SLDS 2 설정을 켜면 `<apex:slds/>`가 `slds-plus.css`(SLDS 2)로 바뀐다. 그러나 팔레트는 Salesforce 기본(`accent-1`·`brand-base-50` = `#066afe`)이고 org 테마 브랜드 색은 들어오지 않는다. util.css를 더하면 중립·피드백이 바뀌고, 팔레트 CSS(약 620바이트)를 더하면 브랜드 버튼이 `#2976ca`로 LEX와 같다. 10/8 방식(SLDS 2 사본 + 팔레트 + util.css)도 LEX와 같다 | 10/9 프로브 (기록 3.8) |
+| 위 VF 설정은 Metadata API로 읽거나 배포할 수 없다. `UserInterfaceSettings` 문서(API 68.0)에 필드가 없고, org의 Settings 168종을 모두 받아도 없다 | Metadata API 문서, org 조회 (10/9) |
+| 잰 표본에서 npm `slds2.cosmos.css` 2.264.2의 hook 기본값은 org 런타임 값과 같다(중립 색, 피드백 색, 반경, 간격). 다른 것은 브랜드 계열(`accent-1`·`accent-2`·`brand-base-50`)뿐이고, org가 테마 브랜드 색의 팔레트를 넣기 때문이다 | 10/9 프로브와 로컬 비교 (기록 3.9) |
 
 ## 14. 미확인 (구현 중 확인할 것)
 
@@ -614,25 +636,18 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | --- | --- |
 | Vite 개발 서버 미들웨어로 요청 파일을 저장할 수 있는가. POST 미들웨어 응답까지는 확인했다(13장) | Task 17 테스트 |
 | `node_modules`의 `.storybook`에서 `preview.ts`·`manager.ts`(manager 번들러), `../lib/*.ts` import, 정적 빌드(`storybook build`, `milvus storybook --build`)도 되는가. Task 3 스파이크는 `main.ts`·형제 `.ts`·스토리·addon만 쟀다 | Task 17 후 tgz 리허설 |
-| 피드백 색 hook을 util.css로 바꾸면 LEX 표준 화면에도 반영되는가 | 10/12 org 프로브 |
-| VF에서 `milvusVf.css` + `milvusBrand`가 SLDS 2·팔레트·util.css를 함께 적용하는가 | 10/12 org 프로브 |
-| `loadStyle`로 넣은 클래스 규칙(예: `.slds-button { border-radius: 0 }`)이 LEX의 `lightning-button` 안까지 닿는가. 10/8 프로브는 hook 두 개만 쟀다. `milvusBridge`·`milvusOverride`의 전제다 | 10/12 org 프로브 |
-| **VF 공식 SLDS 2 경로:** Help "User Interface Settings"의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active" 설정과 `<apex:slds lightningStyleMode>`(API 65.0+, 기본 Auto)가 있다(2026-10-09 공식 문서 확인, Learn 00·01). 10/8 프로브는 API 67.0 페이지에서 SLDS 1로 그려졌고 그때 설정 상태는 기록이 없다. 설정을 켜면 org 테마 팔레트까지 들어오는가. 들어오면 `milvusVf`는 util.css가 있을 때만 필요하거나 아예 필요 없다(4.4, 5.5, Task 24 재검토) | 10/12 org 프로브(설정 읽기는 자유, 변경은 승인) |
 | pnpm 11.5.3 이후(10.x는 10.34.2 이후) 프로젝트 `.npmrc`의 `${…}` 치환을 하지 않는다는 pnpm.io 설명(Learn 07). 10.13.1에서는 치환이 동작했다(13장). 고객 프로젝트가 더 새 pnpm을 쓰면 토큰 줄은 `~/.npmrc`, 범위 레지스트리는 `pnpm-workspace.yaml`의 `registries`로 안내해야 한다 — 그 버전에서 실제 확인 | Task 20(milvus-design.md 설치 안내) 전 |
 | 고객 프로젝트에서 pnpm이 `esbuild` 빌드 스크립트를 건너뛰는 것이 Storybook 정적 빌드·Vite에 영향을 주는가. 영향이 있으면 `init`이 `pnpm.onlyBuiltDependencies`에 `esbuild`를 더한다 | Task 11·18 |
 | `Bash(pnpm milvus deploy *)`가 인자 없는 명령에도 걸리는가 | 10/13 |
-| `sfdx-project.json`의 `defaultLwcLanguage` 키가 실제 스키마에 있고 VS Code가 따르는가 (설치된 `@salesforce/core` 스키마에서 확인함, VS Code 동작은 미확인) | 10/13 |
 | `Edit(...)` deny 규칙이 의도대로 막는가 | 10/13 |
-| LWC 유틸리티 바 항목을 "앱이 열릴 때 백그라운드로 로드"로 두면 앱의 모든 페이지에서 `loadBrand`가 실행되는가 (9.7) | 10/12 org 프로브 |
-| 중립 색 hook을 util.css로 바꾸면 LEX 표준 화면의 바탕·면이 바뀌는가 (LEX가 페이지 바탕을 따로 칠하는지) | 10/12 org 프로브 |
+| App Manager의 유틸리티 항목 속성 "앱이 열릴 때 백그라운드로 로드"(Load in background when app opens) 체크가 10/9 프로브에서 쓴 FlexiPage decorator `eager` = `true`와 같은 설정인가. `milvus-design.md`가 App Manager 경로로 안내하므로 화면에서 체크한 뒤 `milvusBrandLoader`가 동작하는지 본다(9.7) | Task 23 리허설 |
 | native에서 기본 컴포넌트 CSS가 직접 읽는 `--slds-s-*`에 `:root` 값이 닿는가 (9.1 전제 수정) | 발표 뒤 native 빌드 |
-| npm 번들의 hook 기본값과 org 런타임 값이 같은가, `--slds-g-color-accent-4` 등 정의 없는 hook을 org가 정의하는가 | 10/12 org 프로브(읽기만) |
+| info 토스트에 피드백 색이 반영되는가(10/9 프로브에서 동시 표시 3개 제한으로 못 잼), `shadow-1`의 org 값이 npm 값과 같은가(구조만 기록) | 필요할 때 org 프로브(읽기만) |
 
 ## 15. 미정
 
 - 회사 GitHub 조직으로 옮길지(패키지 범위 이름이 바뀐다)
 - `BrandingSet`의 SLDS 2 전용 색 속성(`ACCENT_COLOR_1~3`, `CONTAINER_ACCENT_COLOR_1~3`(API 64), `ACCENT_CONTAINER_CONTENT_COLOR_1~3`(API 65))을 브랜드 명세에 넣을지. 공식 기능이라 "기본 우선"에 맞는다(2026-10-09 Metadata API 문서 확인, Learn 00)
 - `--slds-s-*` 허용(#18) 유지 여부: 공식 `@salesforce-ux/eslint-plugin-slds`는 `--slds-s-*`를 Salesforce 내부용 private hook으로 분류한다(Learn 00·01). "기본 우선"에서는 util.css가 요청 시에만 쓰이므로 당장 바꾸지 않는다
-- 앱 전체에 util.css를 거는 방법(유틸리티 바는 LWC 백그라운드 로딩이 지원되지 않음)
 - 브랜드 글꼴(발표 뒤 검토)
 - native 전환 감지가 울렸을 때 9.2의 c hook 목록을 열지
