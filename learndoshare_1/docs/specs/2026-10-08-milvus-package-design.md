@@ -80,7 +80,7 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 | --- | --- |
 | `dist/` | CLI와 Storybook용 스크립트를 JS로 빌드한 것. Node는 `node_modules` 안의 `.ts` 실행을 거부한다. `bin: { "milvus": "dist/cli/index.js" }` |
 | `templates/` | 프로젝트에 복사할 원본(3장의 밀버스 관리 파일과 틀). VF 관련 파일은 "선택 항목"으로 표시한다 |
-| `force-app/main/default/lwc/milvus*/` | 밀버스 LWC (`.ts`). `__tests__`는 넣지 않는다 |
+| `force-app/main/default/lwc/milvus*/` | 밀버스 LWC (`.ts`). `__tests__`는 넣지 않는다. `files`에는 `force-app/main/default/lwc/milvus*/*`와 `!force-app/**/__tests__`로 쓴다(`milvus*`로 쓰면 pnpm 10.13.1이 부정 패턴을 적용하지 못한다, 10/9 실측) |
 | `force-app/main/default/classes/utils/design/` | 밀버스 Apex (생기면) |
 | `.storybook/`, `stories/`, 미리 만든 카탈로그 | 프로젝트 모드 Storybook |
 
@@ -150,11 +150,16 @@ force-app/main/default/
 
 ### 4.2 `storybook [--build <폴더>]`
 - CLI가 `MILVUS_PROJECT_DIR=<sfdx-project.json이 있는 절대 경로>`를 넘기고, 패키지 안의 설정으로 Storybook을 띄운다
+- 패키지 안의 설정은 `.storybook/`(원본 `.ts`)이다. 컴파일하지 않고 그대로 발행한다(Task 3 스파이크, 13장). 띄우는 방법은 세 가지를 지킨다
+  - storybook 실행 파일은 프로젝트가 아니라 패키지 기준으로 찾는다
+  - `-c`에는 패키지 `.storybook/`의 실제 경로(realpath)를 넘긴다. pnpm의 심볼릭 링크 경로(`node_modules/@a40418a/...`)를 넘기면 미리보기가 빈 화면이 된다
+  - `--host localhost`로 띄운다. 기본은 모든 네트워크 주소에서 듣는데, `server.fs.allow`에 프로젝트 폴더가 들어가므로 프로젝트 파일이 같은 네트워크에 열린다(다른 PC에서 직접 재지는 않았다)
+- `.storybook/main.ts`는 `server.fs.allow`에 `searchForWorkspaceRoot(root)`와 프로젝트 폴더를 함께 넣는다(`allow`를 직접 주면 Vite 기본값이 빠진다)
 - 브랜드: `milvus.config.json`의 브랜드 이름으로 `brandingSets/LEXTHEMING<이름>`을 읽는다. `BRAND_COLOR` → 팔레트 계산 → `--slds-r-color-brand-*`. `milvusBrand.css`는 문서에 넣는다. 로고는 사이드바에 쓴다. 비교용으로 "SLDS 기본" 브랜드도 함께 고를 수 있다
 - 내용: SLDS 컴포넌트 카탈로그(공식 예제, 73개 컴포넌트, 패키지에 미리 만들어 넣음), 밀버스 컴포넌트(프로젝트 사본으로 그림), 브랜드 명세 페이지(6장), Foundations(색, 영향 지도), 컴포넌트별 "Salesforce 원본과 읽는 hook" 보기(9.5), 반영 검사 페이지(9.6)
 - LWC 빌드: Rollup 앞에서 `typescript.transpileModule`로 타입만 지운다(LWC 컴파일러는 TS를 직접 읽지 못한다). npm에 없는 플랫폼 모듈은 대신하는 모듈로 바꾼다: `lightning/platformResourceLoader`의 `loadStyle`은 바로 끝나는 함수, `@salesforce/resourceUrl/*`은 경로 문자열. 결과는 `.milvus/`에 둔다
 - 브랜드 메타데이터가 없거나 util.css가 규칙을 어기면 SLDS 기본 브랜드로 띄우고 화면 위에 오류를 보여 준다
-- 대체 경로: `node_modules` 안의 설정으로 띄우는 것이 안 되면 `init`이 `.storybook/`을 프로젝트에 복사한다
+- 대체 경로: `node_modules` 안의 설정으로 띄우는 것이 안 되면 `init`이 `.storybook/`을 프로젝트에 복사한다. Task 3 스파이크에서는 필요하지 않았다. 14장의 남은 확인 항목이 실패할 때만 쓴다
 
 ### 4.3 `check [--style]`
 - `--style`(hook이 실행): util.css 규칙(5.2)과 피드백 색 대비(5.3)만 본다. 정규식 수준이라 빠르다. 실패하면 종료 코드 2와 함께 고칠 값을 stderr로 낸다. `milvusOverride.css`는 5.1의 경고만 내고(종료 코드 0) `@font-face`·`@import`만 실패시킨다
@@ -593,14 +598,20 @@ PR #19의 검사 스크립트, CLAUDE.md 3장, 이 표가 지금 서로 다르�
 | SLDS 2 CSS는 976KB(압축 약 108KB)이고 글꼴 파일을 참조하지 않는다 | 로컬 |
 | Salesforce 원본(`lightning-base-components`) 이용 약관은 복제·공개 게시·배포를 허락하고 약관 동봉을 요구한다 | `LICENSE.txt` |
 | LWC `.ts` 검사는 `@salesforce/eslint-config-lwc`(4.1.2)의 `recommended-ts` 설정으로 한다. `sfdx-lwc-jest`에 `lightning/platformResourceLoader` stub이 있다 | 설치된 패키지 |
+| 패키지에 넣은 Storybook 설정을 `node_modules`에서 그대로 띄울 수 있다. `main.ts`, 형제 `.ts` 모듈(상대 import에 `.ts`), `.ts` 스토리가 동작한다. Storybook이 자체 로더(esbuild)로 `node_modules` 안의 `.ts`도 변환하므로 `dist/`로 컴파일할 필요가 없다. framework(`@storybook/web-components-vite`)와 addon(`addon-docs`, `addon-a11y`, autodocs 화면)도 찾는다 | Task 3 스파이크(2026-10-09): `pnpm pack` tgz를 새 SFDX 프로젝트(`learndoshare_2`)에 `pnpm add -D`, Storybook 10.6.0·Vite 7.3.7, 브라우저로 스토리 화면 확인 |
+| 위 조건: `-c`에 패키지 설정 폴더의 실제 경로(realpath)를 넘겨야 한다. 심볼릭 링크 경로를 넘기면 Vite 루트가 그 경로가 되어 브라우저 쪽 import `storybook/internal/preview/runtime`을 찾지 못하고(`Failed to resolve import`) 미리보기가 빈 화면이 된다. pnpm은 패키지의 의존성을 프로젝트 `node_modules` 바로 아래에 두지 않기 때문이다. pnpm이 만드는 `milvus` 실행 파일은 실제 경로의 `dist/cli/index.js`를 실행한다 | 같은 스파이크(심볼릭 링크 경로·실제 경로 두 번 실행), `node_modules/.bin/milvus` |
+| 별칭으로 import한 프로젝트 파일(`?raw`)은 `server.fs.allow` 없이도 읽힌다. import하지 않고 직접 요청한 프로젝트 파일은 403이고, `server.fs.allow`에 프로젝트 폴더를 넣으면 200이다. 허용 밖 파일은 계속 403이다. `allow`를 직접 주면 Vite의 작업 공간 루트 기본값이 빠진다 | 같은 스파이크, [Vite server.fs.allow](https://vite.dev/config/server-options.html#server-fs-allow) (확인 2026-10-09) |
+| Vite 플러그인의 `configureServer` 미들웨어가 Storybook 개발 서버 포트에서 응답한다(`POST /__milvus/ping` → `{"ok":true}`) | 같은 스파이크 |
+| Storybook 개발 서버는 기본으로 모든 네트워크 주소(`*:6007`)에서 듣는다. `--host localhost`를 주면 `[::1]`에서만 듣고, 이때 `127.0.0.1`로는 연결되지 않는다 | 같은 스파이크, `lsof` |
+| 설치할 때 pnpm 10.13.1이 `esbuild` 빌드 스크립트를 건너뛰었다고 경고한다. 그래도 Storybook의 `.ts` 설정 변환(esbuild)은 동작한다 | 같은 스파이크 |
 
 ## 14. 미확인 (구현 중 확인할 것)
 
 | 항목 | 확인 시점 |
 | --- | --- |
 | `.npmrc`의 `${NODE_AUTH_TOKEN}` 치환으로 GitHub Packages 설치가 되는가, 공개 저장소에 연결된 패키지의 공개 범위 | 10/12 `v0.0.1` |
-| 패키지 안의 Storybook 설정을 `node_modules`에서 띄우고 프로젝트 파일을 읽을 수 있는가 (Vite `server.fs.allow`) | 10/12 스파이크 |
-| Vite 개발 서버 미들웨어로 요청 파일을 저장할 수 있는가 | 10/12 스파이크 |
+| Vite 개발 서버 미들웨어로 요청 파일을 저장할 수 있는가. POST 미들웨어 응답까지는 확인했다(13장) | Task 17 테스트 |
+| `node_modules`의 `.storybook`에서 `preview.ts`·`manager.ts`(manager 번들러), `../lib/*.ts` import, 정적 빌드(`storybook build`, `milvus storybook --build`)도 되는가. Task 3 스파이크는 `main.ts`·형제 `.ts`·스토리·addon만 쟀다 | Task 17 후 tgz 리허설 |
 | 피드백 색 hook을 util.css로 바꾸면 LEX 표준 화면에도 반영되는가 | 10/12 org 프로브 |
 | VF에서 `milvusVf.css` + `milvusBrand`가 SLDS 2·팔레트·util.css를 함께 적용하는가 | 10/12 org 프로브 |
 | `loadStyle`로 넣은 클래스 규칙(예: `.slds-button { border-radius: 0 }`)이 LEX의 `lightning-button` 안까지 닿는가. 10/8 프로브는 hook 두 개만 쟀다. `milvusBridge`·`milvusOverride`의 전제다 | 10/12 org 프로브 |

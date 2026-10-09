@@ -1,15 +1,40 @@
 {
-  "name": "milvus-design-system",
-  "private": true,
-  "version": "1.0.0",
+  "name": "@a40418a/milvus-design-system",
+  "version": "0.0.1",
   "description": "밀버스 디자인 시스템 (SFDX + LWC + Storybook)",
+  "type": "module",
+  "bin": {
+    "milvus": "dist/cli/index.js"
+  },
+  "files": [
+    "dist/cli",
+    "dist/lib",
+    "dist/hooks-index.json",
+    "templates",
+    "force-app/main/default/lwc/milvus*/*",
+    "!force-app/**/__tests__",
+    "audit/report.json",
+    "tsconfig.lwc.base.json",
+    "stories"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/a40418a/learndoshare.git",
+    "directory": "learndoshare_1"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "scripts": {
     "lint": "eslint \"force-app/**/lwc/**/*.js\"",
     "test": "pnpm test:unit && pnpm test:palette && pnpm test:brands",
     "test:unit": "sfdx-lwc-jest",
+    "test:node": "node --test \"tests/**/*.test.ts\"",
     "test:unit:watch": "sfdx-lwc-jest --watch",
     "test:unit:debug": "sfdx-lwc-jest --debug",
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
+    "build:cli": "tsc -p tsconfig.build.json",
+    "prepack": "pnpm build:cli",
     "build:lwc": "node scripts/generate-slds-catalog.mjs && rollup -c rollup.lwc.config.mjs",
     "dev:lwc": "rollup -c rollup.lwc.config.mjs -w",
     "storybook": "pnpm build:lwc && storybook dev -p 6006",
@@ -22,35 +47,40 @@
     "test:palette": "node scripts/palette.mjs",
     "test:brands": "node scripts/check-brands.mjs"
   },
-  "devDependencies": {
+  "dependencies": {
     "@lwc/engine-dom": "9.4.3",
-    "@lwc/eslint-plugin-lwc": "^3.1.0",
     "@lwc/rollup-plugin": "9.4.3",
     "@lwc/synthetic-shadow": "9.4.3",
     "@lwc/wire-service": "9.4.3",
-    "@prettier/plugin-xml": "^3.4.1",
     "@rollup/plugin-node-resolve": "16.0.3",
     "@rollup/plugin-replace": "6.0.3",
     "@salesforce-ux/design-system-2": "2.264.2",
+    "@storybook/addon-a11y": "10.6.0",
+    "@storybook/addon-docs": "10.6.0",
+    "@storybook/web-components-vite": "10.6.0",
+    "lightning-base-components": "1.28.19-alpha",
+    "lwc": "9.4.3",
+    "postcss": "^8.5.29",
+    "rollup": "4.63.5",
+    "storybook": "10.6.0",
+    "vite": "^7.3.6"
+  },
+  "devDependencies": {
+    "@lwc/eslint-plugin-lwc": "^3.1.0",
+    "@prettier/plugin-xml": "^3.4.1",
     "@salesforce/eslint-config-lwc": "^4.0.0",
     "@salesforce/eslint-plugin-aura": "^3.0.0",
     "@salesforce/eslint-plugin-lightning": "^2.0.0",
     "@salesforce/sfdx-lwc-jest": "^7.0.2",
-    "@storybook/addon-a11y": "10.6.0",
-    "@storybook/addon-docs": "10.6.0",
-    "@storybook/web-components-vite": "10.6.0",
+    "@types/node": "^22.20.5",
     "eslint": "^9.29.0",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-jest": "^28.14.0",
     "husky": "^9.1.7",
-    "lightning-base-components": "1.28.19-alpha",
     "lint-staged": "^16.1.2",
-    "lwc": "9.4.3",
     "prettier": "^3.5.3",
     "prettier-plugin-apex": "^2.2.6",
-    "rollup": "4.63.5",
-    "storybook": "10.6.0",
-    "vite": "^7.3.6"
+    "typescript": "~5.9.3"
   },
   "lint-staged": {
     "**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}": [
@@ -65,7 +95,7 @@
   },
   "packageManager": "pnpm@10.13.1",
   "engines": {
-    "node": ">=22"
+    "node": "^22.18.0 || >=23.6.0"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
