@@ -27,13 +27,15 @@
   },
   "scripts": {
     "lint": "eslint \"force-app/**/lwc/**/*.js\"",
-    "test": "pnpm test:unit && pnpm test:palette && pnpm test:brands",
+    "test": "pnpm typecheck && pnpm test:unit && pnpm test:node && pnpm test:brands && pnpm test:learn",
     "test:unit": "sfdx-lwc-jest",
     "test:node": "node --test \"tests/**/*.test.ts\"",
+    "test:learn": "node scripts/check-learn.ts",
     "test:unit:watch": "sfdx-lwc-jest --watch",
     "test:unit:debug": "sfdx-lwc-jest --debug",
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
     "build:cli": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "prepack": "pnpm build:cli",
     "build:lwc": "node scripts/generate-slds-catalog.mjs && rollup -c rollup.lwc.config.mjs",
     "dev:lwc": "rollup -c rollup.lwc.config.mjs -w",
@@ -44,7 +46,6 @@
     "prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "prepare": "husky || true",
     "precommit": "lint-staged",
-    "test:palette": "node scripts/palette.mjs",
     "test:brands": "node scripts/check-brands.mjs"
   },
   "dependencies": {
@@ -63,6 +64,7 @@
     "postcss": "^8.5.29",
     "rollup": "4.63.5",
     "storybook": "10.6.0",
+    "typescript": "~5.9.3",
     "vite": "^7.3.6"
   },
   "devDependencies": {
@@ -79,8 +81,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "prettier": "^3.5.3",
-    "prettier-plugin-apex": "^2.2.6",
-    "typescript": "~5.9.3"
+    "prettier-plugin-apex": "^2.2.6"
   },
   "lint-staged": {
     "**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}": [

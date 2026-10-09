@@ -202,7 +202,7 @@ node hk.cjs --slds-s-button-radius-border</code></pre>
   <ul>
     <li><b>색과 로고의 원본은 <code>BrandingSet</code> 하나다.</b> util.css에서 accent·brand 계열을 바꾸지 않는다(설계 5.1, 5.2)</li>
     <li><b>org 실측(2026-10-08):</b> <code>BrandingSet</code>과 <code>LightningExperienceTheme</code>은 배포로 만들어진다. 활성 테마 이름 한 필드만 담은 설정을 배포하면 그 필드만 바뀐다. 테마를 지우면 그 테마의 <code>BrandingSet</code>도 지워진다</li>
-    <li><b>팔레트 규칙(실측으로 역산, 2026-10-05):</b> 단계마다 CIELAB 명도 L*가 고정이고(95→96, 90→91, 50→49, 40→39, 30→29, 20→19, 10→8), 색상각은 유지한다. 그래서 원본 브랜드 색은 그대로 들어가지 않는다. 예: <code>#0176D3</code> → 50단계 <code>#2976ca</code> (README 3장, <code>scripts/palette.mjs</code>)</li>
+    <li><b>팔레트 규칙(실측으로 역산, 2026-10-05):</b> 단계마다 CIELAB 명도 L*가 고정이고(95→96, 90→91, 50→49, 40→39, 30→29, 20→19, 10→8), 색상각은 유지한다. 그래서 원본 브랜드 색은 그대로 들어가지 않는다. 예: <code>#0176D3</code> → 50단계 <code>#2976ca</code> (README 3장, <code>lib/palette.ts</code>)</li>
     <li>org에서 <code>BRAND_COLOR</code> <code>#2E7D32</code>를 활성화했더니 LEX accent가 <code>#468244</code>였고, 우리 규칙의 50단계와 같았다</li>
     <li>50단계는 L* 49라서 흰 글자 대비가 모든 색에서 4.62~4.68:1이다. 그래서 브랜드 색을 막지 않고, 입력한 색·실제 버튼 색(50)·링크 색(40)을 함께 보여 준다(설계 5.4)</li>
     <li>밀버스는 지금 <code>BRAND_COLOR</code>와 <code>BRAND_IMAGE</code>만 다룬다(설계 5.1). SLDS 2 전용 <code>ACCENT_COLOR_*</code> 속성을 쓸지는 설계 15장에 <span class="tag warn">미정</span>으로 올라 있다 (2026-10-09 갱신)</li>

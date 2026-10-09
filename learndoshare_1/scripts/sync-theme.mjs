@@ -12,7 +12,7 @@
  */
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
-import { brandPalette } from "./palette.mjs";
+import { brandPalette } from "../lib/palette.ts";
 
 const org = process.env.SF_ORG ?? "learndoshare_1";
 const API = "v67.0";
@@ -121,7 +121,7 @@ for (const theme of themes) {
     brandColor: values.BRAND_COLOR ?? null,
     headerBackgroundColor: values.HEADER_BACKGROUND_COLOR ?? null,
     logo,
-    // org는 팔레트를 저장하지 않고 실행 시점에 계산한다. 같은 규칙으로 계산해 둔다 (scripts/palette.mjs)
+    // org는 팔레트를 저장하지 않고 실행 시점에 계산한다. 같은 규칙으로 계산해 둔다 (lib/palette.ts)
     palette: values.BRAND_COLOR ? brandPalette(values.BRAND_COLOR) : null
   };
   writeFileSync(`${dir}/theme.json`, `${JSON.stringify(json, null, 2)}\n`);

@@ -133,7 +133,7 @@
     <tr><td><code>BRAND_IMAGE_DARK_MODE</code>, <code>GROUP_IMAGE</code>, <code>GROUPS_BANNER_IMAGE</code>, <code>PROFILE_BANNER_IMAGE</code>, <code>USER_IMAGE</code></td><td><code>null</code></td><td>사용 안 함. <code>BRAND_IMAGE_DARK_MODE</code>는 Metadata API 문서의 속성 표에 없다(2026-10-09 확인)</td></tr>
   </table></div>
   <p>SLDS 2 전용 <code>ACCENT_COLOR_*</code>, <code>CONTAINER_ACCENT_COLOR_*</code> 속성은 저장되어 있지 않았다. Help 문서는 이 고급 accent 색이 브랜드 색에서 자동으로 만들어지고, 덮어쓰지 말 것을 강하게 권한다고 적는다.</p>
-  <div class="callout key"><strong>가장 중요한 발견 (2026-10-09 갱신)</strong>읽히는 색은 사실상 <code>BRAND_COLOR</code> <b>하나</b>다. Salesforce는 브랜드 색으로 접근성(WCAG)을 맞춘 팔레트를 자동으로 만들지만, <b>파생 색은 API로 읽히지 않았다</b>. 그래서 Storybook은 원본 색 하나로 팔레트를 직접 계산한다(<code>scripts/palette.mjs</code>). 2026-10-08 프로브에서 브랜드 색 <code>#2E7D32</code>를 활성화했을 때 LEX의 accent 색은 <code>#468244</code>였고, 우리 계산의 50단계와 같았다. LEX 화면에서 직접 잰 단계는 이 50단계 하나다.</div>
+  <div class="callout key"><strong>가장 중요한 발견 (2026-10-09 갱신)</strong>읽히는 색은 사실상 <code>BRAND_COLOR</code> <b>하나</b>다. Salesforce는 브랜드 색으로 접근성(WCAG)을 맞춘 팔레트를 자동으로 만들지만, <b>파생 색은 API로 읽히지 않았다</b>. 그래서 Storybook은 원본 색 하나로 팔레트를 직접 계산한다(<code>lib/palette.ts</code>). 2026-10-08 프로브에서 브랜드 색 <code>#2E7D32</code>를 활성화했을 때 LEX의 accent 색은 <code>#468244</code>였고, 우리 계산의 50단계와 같았다. LEX 화면에서 직접 잰 단계는 이 50단계 하나다.</div>
   <p class="sources">출처: <a href="https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_brandingset.htm">Metadata API: BrandingSet</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.brand_custom_configurations.htm&amp;type=5">Help: Manage Custom Configurations for Themes</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.lex_themes_and_branding_considerations.htm&amp;type=5">Help: Considerations for Themes and Branding</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (2026-10-08)</a> (확인 2026-10-09) · <a href="../README.md">README 3장 "테마 레코드", "읽히는 값" (2026-09-26 조회)</a> (확인 2026-10-09)</p>
 </section>
 
@@ -192,7 +192,7 @@
   <p>실제 파일에는 테마 이름 고르기, 로고 다운로드, 오류 처리가 더 있다.</p>
 <pre data-file="scripts/sync-theme.mjs"><code>import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { brandPalette } from './palette.mjs';
+import { brandPalette } from '../lib/palette.ts';
 
 const org = process.env.SF_ORG ?? 'learndoshare_1';
 
