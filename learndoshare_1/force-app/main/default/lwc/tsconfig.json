@@ -1,0 +1,12 @@
+{
+  "extends": "../../../../tsconfig.lwc.base.json",
+  "compilerOptions": {
+    "paths": {
+      "c/milvusBadge": ["./milvusBadge/milvusBadge"],
+      "c/milvusButton": ["./milvusButton/milvusButton"],
+      "c/milvusMultiSelect": ["./milvusMultiSelect/milvusMultiSelect"],
+      "c/milvusScript": ["./milvusScript/milvusScript"]
+    }
+  },
+  "include": ["**/*.ts"]
+}

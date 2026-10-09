@@ -23,7 +23,7 @@ const SLDS_S = new Set(
 
 const MILVUS = new Set(
   readdirSync("force-app", { recursive: true })
-    .filter((f) => /\.(css|js)$/.test(f) && !f.includes("__tests__"))
+    .filter((f) => /\.(css|js|ts)$/.test(f) && !f.includes("__tests__"))
     .flatMap(
       (f) =>
         readFileSync(`force-app/${f}`, "utf8").match(/--milvus-[\w-]+/g) ?? []
