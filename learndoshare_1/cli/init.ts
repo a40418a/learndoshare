@@ -3,12 +3,12 @@
 // applyOps는 모든 결과를 먼저 만든 뒤에 쓴다
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, extname, join } from "node:path";
+import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
 import { isValidBrandName, readBranding, writeBrandingSet, writeContentAssetMeta, writeTheme } from "../lib/branding.ts";
 import { managedFiles, sha256 } from "../lib/managed.ts";
 import { addKeyIfMissing, appendLines, mergeSettings } from "../lib/merge.ts";
-import { findProject, packageInfo, runSf, writeConfig, type SfRunner } from "./context.ts";
+import { findProject, packageInfo, readConfig, runSf, writeConfig, type SfRunner } from "./context.ts";
 
 export type Op = {
   kind: "copy" | "create" | "merge-json" | "append-lines" | "add-key";
@@ -28,7 +28,8 @@ const USAGE = "사용법: pnpm milvus init --target-org <별칭> (--brand <이�
 
 /**
  * 프로젝트에 놓을 파일과 병합할 내용(설계 3장). root·targetOrg는 쓰지 않는다(경로는 루트 기준 상대 경로, 대상 org는 writeConfig가 기록).
- * orgBrand는 --from-org가 org에서 받아 검증한 테마·BrandingSet XML이다. 없으면 브랜드 이름과 기본색으로 만든다
+ * orgBrand는 --from-org가 org에서 받아 검증한 테마·BrandingSet XML과 로고(자산 이름, 받은 파일, 메타 XML)다. 없으면 브랜드 이름과 기본색으로 만든다.
+ * logoFile은 사용자가 준 새 로고이고 contentassets/<이름>Logo.asset으로 둔다
  */
 export function planInit(o: {
   root: string;
@@ -37,7 +38,7 @@ export function planInit(o: {
   brand: string;
   vf: boolean;
   logoFile?: string;
-  orgBrand?: { brandingSet: string; theme: string };
+  orgBrand?: { brandingSet: string; theme: string; logo?: { asset: string; file: string; meta: string } };
 }): Op[] {
   const b = o.brand;
   const ops: Op[] = managedFiles(o.pkgRoot, { vf: o.vf }).flatMap((f) => (f.src ? [{ kind: "copy" as const, dest: f.dest, src: f.src }] : []));
@@ -60,6 +61,14 @@ export function planInit(o: {
     ops.push(
       { kind: "copy", dest: `${FA}/contentassets/${b}Logo.asset`, src: o.logoFile },
       { kind: "create", dest: `${FA}/contentassets/${b}Logo.asset-meta.xml`, content: writeContentAssetMeta(b, o.logoFile) },
+    );
+  }
+  const orgLogo = o.orgBrand?.logo;
+  if (orgLogo) {
+    // R26: org 로고는 자산 이름과 메타를 그대로 둔다. BRAND_IMAGE가 같은 자산을 가리키므로 배포해도 org에 자산이 하나 더 생기지 않는다
+    ops.push(
+      { kind: "copy", dest: `${FA}/contentassets/${orgLogo.asset}.asset`, src: orgLogo.file },
+      { kind: "create", dest: `${FA}/contentassets/${orgLogo.asset}.asset-meta.xml`, content: orgLogo.meta },
     );
   }
   return ops;
@@ -97,8 +106,10 @@ export function applyOps(root: string, ops: Op[]): { written: string[]; skipped:
     } else {
       const before = text === undefined ? {} : readJsonObject(text, op.dest);
       const after = op.kind === "merge-json" ? mergeSettings(before, op.value as Record<string, unknown>) : addKeyIfMissing(before, op.key!, op.value);
-      // ponytail: 바뀌면 2칸 들여쓰기로 다시 쓴다(package.json·settings.json의 일반 형식). 다른 들여쓰기는 유지하지 않는다
-      next = text !== undefined && JSON.stringify(after) === JSON.stringify(before) ? text : `${JSON.stringify(after, null, 2)}\n`;
+      // 바뀌면 기존 들여쓰기(첫 키 줄의 공백 또는 탭)로 다시 쓴다. 새 파일은 2칸
+      // ponytail: 한 줄로 압축된 JSON은 들여쓰기를 알 수 없어 2칸으로 펼친다. CRLF·끝 줄바꿈 유무는 지키지 않는다
+      const indent = /^[ \t]+(?=")/m.exec(text ?? "")?.[0] ?? 2;
+      next = text !== undefined && JSON.stringify(after) === JSON.stringify(before) ? text : `${JSON.stringify(after, null, indent)}\n`;
     }
     if (next !== text) writes.push({ dest: op.dest, data: next });
   }
@@ -127,13 +138,13 @@ function sfMessage(r: { stdout: string; stderr: string }): string {
 
 /**
  * --from-org: 활성 테마 이름을 읽고, 그 테마·BrandingSet·로고만 임시 폴더(tmp)로 받아 검증한다(설계 4.1의 4).
- * 프로젝트에는 쓰지 않는다. 로고가 있으면 BRAND_IMAGE를 /file-asset/<이름>Logo?v=1로 바꾸고, 로고 파일을 원래 확장자로 tmp에 둔다
+ * 프로젝트에는 쓰지 않는다. 받은 파일은 바꾸지 않는다(R26: 로고 자산 이름과 BRAND_IMAGE도 org 그대로). 로고 내용은 tmp에 파일로 둔다
  */
 async function fetchOrgBrand(
   sf: SfRunner,
   org: string,
   tmp: string,
-): Promise<{ name: string; orgBrand: { brandingSet: string; theme: string }; logoFile?: string }> {
+): Promise<{ name: string; orgBrand: { brandingSet: string; theme: string; logo?: { asset: string; file: string; meta: string } } }> {
   const retrieve = async (step: string, members: string[]) => {
     const out = join(tmp, step);
     const args = ["project", "retrieve", "start", ...members.flatMap((m) => ["--metadata", m]), "--target-org", org];
@@ -152,12 +163,16 @@ async function fetchOrgBrand(
 
   const got = await retrieve("theme", [`LightningExperienceTheme:${name}`, `BrandingSet:LEXTHEMING${name}`]);
   const theme = got(`lightningExperienceThemes/${name}.lightningExperienceTheme`)?.toString("utf8");
-  let brandingSet = got(`brandingSets/LEXTHEMING${name}.brandingSet`)?.toString("utf8");
+  const brandingSet = got(`brandingSets/LEXTHEMING${name}.brandingSet`)?.toString("utf8");
   if (!theme || !brandingSet) {
     throw new Error(`활성 테마 ${name}의 커스텀 테마(LightningExperienceTheme·BrandingSet LEXTHEMING${name})를 org에서 받지 못했습니다. 기본 테마가 활성이면 --brand <이름>으로 실행하세요`);
   }
   if (!theme.includes(`<defaultBrandingSet>LEXTHEMING${name}</defaultBrandingSet>`)) {
     throw new Error(`테마 ${name}의 defaultBrandingSet이 LEXTHEMING${name}이 아닙니다. --brand <이름>으로 실행하세요`);
+  }
+  // 10/9 결정: SLDS 2 org 기준(설계 1장). SLDS 1 테마는 범위 밖이라 받지 않는다
+  if (!theme.includes("<designSystemVersion>SLDS_v2</designSystemVersion>")) {
+    throw new Error(`밀버스는 SLDS 2 테마를 기준으로 합니다. SLDS 1 테마 지원은 #22에서 검토 중입니다(활성 테마: ${name})`);
   }
   const { brandImage } = readBranding(brandingSet); // BRAND_COLOR가 없거나 #rrggbb가 아니면 던진다
   if (!brandImage) return { name, orgBrand: { brandingSet, theme } };
@@ -168,15 +183,10 @@ async function fetchOrgBrand(
   const gotLogo = await retrieve("logo", [`ContentAsset:${asset}`]);
   const content = gotLogo(`contentassets/${asset}.asset`);
   const meta = gotLogo(`contentassets/${asset}.asset-meta.xml`)?.toString("utf8");
-  const ext = extname(/<pathOnClient>([^<]*)<\/pathOnClient>/.exec(meta ?? "")?.[1] ?? "");
-  if (!content || !ext) throw new Error(`로고 ContentAsset ${asset}를 org에서 받지 못했거나 원래 파일 확장자(pathOnClient)가 없습니다`);
-  const logoFile = join(tmp, `logo${ext}`);
-  writeFileSync(logoFile, content);
-  brandingSet = brandingSet.replace(
-    /(<propertyName>\s*BRAND_IMAGE\s*<\/propertyName>\s*<propertyValue>)[^<]*(<\/propertyValue>)/,
-    `$1/file-asset/${name}Logo?v=1$2`,
-  );
-  return { name, orgBrand: { brandingSet, theme }, logoFile };
+  if (!content || !meta) throw new Error(`로고 ContentAsset ${asset}(파일과 메타)를 org에서 받지 못했습니다`);
+  const file = join(tmp, `${asset}.asset`);
+  writeFileSync(file, content);
+  return { name, orgBrand: { brandingSet, theme, logo: { asset, file, meta } } };
 }
 
 function parseOptions(argv: string[]) {
@@ -210,6 +220,20 @@ export async function runInit(argv: string[], deps: { sf?: SfRunner; nodeVersion
     if (defaultPackageDir !== "force-app") {
       throw new Error(`sfdx-project.json의 기본 패키지 폴더가 force-app이어야 합니다. 지금: ${defaultPackageDir}`);
     }
+    // 로컬 파일 점검은 sf 조회(수 초)보다 먼저 한다(설계 4.1의 1). applyOps도 병합 전에 다시 읽는다
+    const settingsFile = join(root, ".claude/settings.json");
+    if (existsSync(settingsFile)) readJsonObject(readFileSync(settingsFile, "utf8"), ".claude/settings.json");
+    const pkg = packageInfo();
+    let configVersion: string | undefined;
+    try {
+      configVersion = readConfig(root)?.version;
+    } catch {
+      // 깨진 milvus.config.json은 init이 다시 쓴다(readConfig의 안내가 init 재실행이다)
+    }
+    // 다른 버전의 [관리] 파일 위에 init을 다시 하면 건너뛴 파일과 config의 sha256이 어긋난다
+    if (configVersion !== undefined && configVersion !== pkg.version) {
+      throw new Error(`milvus.config.json의 버전(${configVersion})이 설치된 패키지 버전(${pkg.version})과 다릅니다. init을 다시 실행하지 말고 pnpm milvus update를 쓰세요`);
+    }
 
     // sf는 프로젝트 밖 임시 폴더에서 실행한다. 조회 결과도 여기에 받아 검증 전에는 프로젝트에 쓰지 않는다
     tmp = mkdtempSync(join(tmpdir(), "milvus-init-"));
@@ -222,8 +246,7 @@ export async function runInit(argv: string[], deps: { sf?: SfRunner; nodeVersion
     const brand = org?.name ?? values.brand!;
     const vf = !values["no-vf"];
 
-    const pkg = packageInfo();
-    const ops = planInit({ root, pkgRoot: pkg.root, targetOrg, brand, vf, logoFile: org?.logoFile, orgBrand: org?.orgBrand });
+    const ops = planInit({ root, pkgRoot: pkg.root, targetOrg, brand, vf, orgBrand: org?.orgBrand });
     const { written, skipped } = applyOps(root, ops);
     // [관리] 파일은 패키지 원본의 sha256을 기록한다. 이미 있어 건너뛴 파일을 고쳐 두었으면 check가 잡는다
     const managed = Object.fromEntries(

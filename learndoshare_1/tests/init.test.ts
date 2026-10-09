@@ -13,6 +13,7 @@ const pkgRoot = fileURLToPath(new URL("..", import.meta.url));
 const version = JSON.parse(readFileSync(join(pkgRoot, "package.json"), "utf8")).version;
 const FA = "force-app/main/default";
 const BRAND = ["--target-org", "dev", "--brand", "Acme"];
+const FROM = ["--target-org", "dev", "--from-org"];
 const NPMRC = ["@a40418a:registry=https://npm.pkg.github.com", "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}"];
 
 // 임시 SFDX 프로젝트. 폴더 이름에 공백과 한글을 넣는다(리뷰 중점 5)
@@ -45,6 +46,7 @@ const plan = (root: string, o: { vf?: boolean } = {}) =>
 
 // 가짜 sf. 로그인 확인(org …)은 login 코드를, retrieve는 --target-metadata-dir/unpackaged 아래에 org 파일을 쓴다(실제 sf와 같은 배치)
 type OrgFiles = Record<string, Record<string, string | Buffer>>;
+const metadataOf = (args: string[]) => args.filter((_, i) => args[i - 1] === "--metadata");
 function fakeSf(org: OrgFiles = {}, codes: { login?: number; retrieve?: number } = {}) {
   const calls: { args: string[]; cwd: string }[] = [];
   const sf: SfRunner = async (args, cwd) => {
@@ -52,8 +54,7 @@ function fakeSf(org: OrgFiles = {}, codes: { login?: number; retrieve?: number }
     if (args[0] === "org") return { code: codes.login ?? 0, stdout: "{}", stderr: codes.login ? "로그인 안 됨(가짜)" : "" };
     if (codes.retrieve) return { code: codes.retrieve, stdout: JSON.stringify({ status: 1, message: "조회 실패(가짜)" }), stderr: "" };
     const out = join(args[args.indexOf("--target-metadata-dir") + 1], "unpackaged");
-    const members = args.filter((_, i) => args[i - 1] === "--metadata");
-    for (const [rel, data] of members.flatMap((m) => Object.entries(org[m] ?? {}))) {
+    for (const [rel, data] of metadataOf(args).flatMap((m) => Object.entries(org[m] ?? {}))) {
       mkdirSync(dirname(join(out, rel)), { recursive: true });
       writeFileSync(join(out, rel), data);
     }
@@ -82,18 +83,16 @@ const ORG_BRANDING = xml(
     prop("BRAND_IMAGE_DARK_MODE", "") + "    <masterLabel>에이크미 테마</masterLabel>\n",
 );
 const LOGO = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x49, 0x46]);
+const ORG_LOGO_META = xml(
+  "ContentAsset",
+  "    <language>ko</language>\n    <masterLabel>acme_logo_1</masterLabel>\n    <versions>\n        <version>\n            <number>1</number>\n" +
+    "            <pathOnClient>회사 로고.JPG</pathOnClient>\n        </version>\n    </versions>\n",
+);
 const ORG: OrgFiles = {
   "Settings:LightningExperience": { "settings/LightningExperience.settings": settingsXml("Acme_Org") },
   "LightningExperienceTheme:Acme_Org": { "lightningExperienceThemes/Acme_Org.lightningExperienceTheme": ORG_THEME },
   "BrandingSet:LEXTHEMINGAcme_Org": { "brandingSets/LEXTHEMINGAcme_Org.brandingSet": ORG_BRANDING },
-  "ContentAsset:acme_logo_1": {
-    "contentassets/acme_logo_1.asset": LOGO,
-    "contentassets/acme_logo_1.asset-meta.xml": xml(
-      "ContentAsset",
-      "    <language>ko</language>\n    <masterLabel>acme_logo_1</masterLabel>\n    <versions>\n        <version>\n            <number>1</number>\n" +
-        "            <pathOnClient>회사 로고.JPG</pathOnClient>\n        </version>\n    </versions>\n",
-    ),
-  },
+  "ContentAsset:acme_logo_1": { "contentassets/acme_logo_1.asset": LOGO, "contentassets/acme_logo_1.asset-meta.xml": ORG_LOGO_META },
 };
 
 // cwd에서 runInit을 실행하고 stdout·stderr를 모은다. 바꿔 둔 cwd와 write는 끝나면 되돌린다
@@ -182,8 +181,10 @@ test(".npmrc 범위 두 줄이 없을 때만 추가한다", async () => {
     applyOps(root, plan(root));
     applyOps(root, plan(root));
     assert.equal(read(root, ".npmrc"), `auto-install-peers=true\n${NPMRC[0]}\n${NPMRC[1]}\n`);
+    assert.equal(read(root, ".forceignore"), "**/jsconfig.json\n**/__tests__/**\n");
   });
-  await withProject({}, (root) => {
+  // .forceignore에 줄이 없으면 끝에 붙인다
+  await withProject({ ".forceignore": "**/jsconfig.json\n" }, (root) => {
     applyOps(root, plan(root));
     assert.equal(read(root, ".npmrc"), `${NPMRC.join("\n")}\n`);
     assert.equal(read(root, ".gitignore"), ".milvus/\n");
@@ -205,7 +206,7 @@ test("이미 있는 milvusBrand.css는 건너뛰고 skipped에 넣는다", async
 
 test("LightningExperience.settings는 만들지 않는다", async () => {
   await withProject({}, async (root) => {
-    const r = await init(root, ["--target-org", "dev", "--from-org"], { sf: fakeSf(ORG) });
+    const r = await init(root, FROM, { sf: fakeSf(ORG) });
     assert.equal(r.code, 0, r.stderr);
     assert.deepEqual(Object.keys(snapshot(root)).filter((p) => p.includes("LightningExperience.settings")), []);
   });
@@ -254,26 +255,86 @@ test("milvusOverride.css를 설명 주석만 있는 상태로 만들고, 이미 
   });
 });
 
-test("--from-org는 활성 테마 이름을 브랜드로 쓰고, org 파일을 검증한 뒤 복사한다. 로고는 <이름>Logo로 둔다", async () => {
+test("--from-org는 활성 테마 이름을 브랜드로 쓰고, org 파일을 검증한 뒤 그대로 복사한다. 로고 자산 이름과 BRAND_IMAGE도 org 그대로다(R26)", async () => {
   await withProject({}, async (root) => {
     const sf = fakeSf(ORG);
-    const r = await init(root, ["--target-org", "dev", "--from-org"], { sf });
+    const r = await init(root, FROM, { sf });
     assert.equal(r.code, 0, r.stderr);
     assert.equal(readConfig(root)!.brand, "Acme_Org");
     assert.equal(read(root, `${FA}/lightningExperienceThemes/Acme_Org.lightningExperienceTheme-meta.xml`), ORG_THEME);
-    const bs = read(root, `${FA}/brandingSets/LEXTHEMINGAcme_Org.brandingSet-meta.xml`);
-    assert.deepEqual(readBranding(bs), { brandColor: "#2E7D32", brandImage: "/file-asset/Acme_OrgLogo?v=1" });
-    // BRAND_IMAGE 말고는 org 파일 그대로(다른 속성을 잃지 않는다)
-    assert.equal(bs, ORG_BRANDING.replace("/file-asset/acme_logo_1?v=3", "/file-asset/Acme_OrgLogo?v=1"));
-    assert.ok(readFileSync(join(root, `${FA}/contentassets/Acme_OrgLogo.asset`)).equals(LOGO));
-    assert.match(read(root, `${FA}/contentassets/Acme_OrgLogo.asset-meta.xml`), /<pathOnClient>Acme_OrgLogo\.jpg<\/pathOnClient>/);
+    // BrandingSet은 다른 속성과 BRAND_IMAGE까지 org 파일 그대로다(배포해도 org에 로고 자산이 하나 더 생기지 않는다)
+    assert.equal(read(root, `${FA}/brandingSets/LEXTHEMINGAcme_Org.brandingSet-meta.xml`), ORG_BRANDING);
+    assert.ok(readFileSync(join(root, `${FA}/contentassets/acme_logo_1.asset`)).equals(LOGO));
+    assert.equal(read(root, `${FA}/contentassets/acme_logo_1.asset-meta.xml`), ORG_LOGO_META);
+    assert.deepEqual(Object.keys(snapshot(root)).filter((p) => p.includes("contentassets/")), [
+      `${FA}/contentassets/acme_logo_1.asset`,
+      `${FA}/contentassets/acme_logo_1.asset-meta.xml`,
+    ]);
+    // 로그인 확인 → 활성 테마 이름(Settings)을 먼저 → 그 테마·BrandingSet → 로고
+    assert.deepEqual(
+      sf.calls.map((c) => (c.args[0] === "org" ? c.args.slice(0, 3) : metadataOf(c.args))),
+      [["org", "list", "limits"], ["Settings:LightningExperience"], ["LightningExperienceTheme:Acme_Org", "BrandingSet:LEXTHEMINGAcme_Org"], ["ContentAsset:acme_logo_1"]],
+    );
     // sf는 인자 배열로, 프로젝트 밖 임시 폴더에서 실행하고, 끝나면 임시 폴더를 지운다
-    assert.ok(sf.calls.length >= 4);
     for (const c of sf.calls) {
       assert.ok(relative(root, c.cwd).startsWith(".."), c.cwd);
       assert.ok(!existsSync(c.cwd), c.cwd);
       assert.equal(c.args[c.args.indexOf("--target-org") + 1], "dev");
     }
+  });
+});
+
+test("--from-org인데 BrandingSet에 BRAND_IMAGE가 없으면 로고 없이 org 파일을 복사한다", async () => {
+  const noImage = ORG_BRANDING.replace(prop("BRAND_IMAGE", "/file-asset/acme_logo_1?v=3"), "");
+  const sf = fakeSf({ ...ORG, "BrandingSet:LEXTHEMINGAcme_Org": { "brandingSets/LEXTHEMINGAcme_Org.brandingSet": noImage } });
+  await withProject({}, async (root) => {
+    const r = await init(root, FROM, { sf });
+    assert.equal(r.code, 0, r.stderr);
+    assert.equal(read(root, `${FA}/brandingSets/LEXTHEMINGAcme_Org.brandingSet-meta.xml`), noImage);
+    assert.deepEqual(Object.keys(snapshot(root)).filter((p) => p.includes("contentassets")), []);
+    assert.equal(sf.calls.length, 3);
+  });
+});
+
+test("init은 .claude/settings.json의 사용자 항목을 지우거나 바꾸지 않고 밀버스 항목을 더한다", async () => {
+  const mine = {
+    model: "opus",
+    permissions: { allow: ["Bash(ls)"], deny: ["Read(.env)"] },
+    hooks: { PostToolUse: [{ matcher: "Write", hooks: [{ type: "command", command: "echo mine" }] }] },
+  };
+  await withProject({ ".claude/settings.json": JSON.stringify(mine, null, 2) + "\n" }, async (root) => {
+    assert.equal((await init(root, BRAND)).code, 0);
+    const s = JSON.parse(read(root, ".claude/settings.json"));
+    assert.equal(s.model, "opus");
+    assert.deepEqual(s.permissions.allow, ["Bash(ls)"]);
+    assert.equal(s.permissions.deny[0], "Read(.env)");
+    assert.ok(s.permissions.deny.includes("Bash(sf org display)"));
+    assert.deepEqual(s.hooks.PostToolUse[0], mine.hooks.PostToolUse[0]);
+    assert.match(JSON.stringify(s.hooks.PostToolUse.slice(1)), /milvus-check\.mjs/);
+  });
+});
+
+test("JSON 파일을 고칠 때 기존 들여쓰기(공백 수, 탭)를 지키고, 새로 만들면 2칸이다", async () => {
+  const pkg = { name: "customer-app", scripts: { test: "sfdx-lwc-jest" } };
+  const files = { "package.json": JSON.stringify(pkg, null, 4) + "\n", ".claude/settings.json": JSON.stringify({ model: "opus" }, null, "\t") + "\n" };
+  await withProject(files, async (root) => {
+    assert.equal((await init(root, BRAND)).code, 0);
+    assert.equal(read(root, "package.json"), JSON.stringify({ ...pkg, scripts: { ...pkg.scripts, storybook: "milvus storybook" } }, null, 4) + "\n");
+    const s = read(root, ".claude/settings.json");
+    assert.equal(s, JSON.stringify(JSON.parse(s), null, "\t") + "\n");
+  });
+  await withProject({}, async (root) => {
+    assert.equal((await init(root, BRAND)).code, 0);
+    const s = read(root, ".claude/settings.json");
+    assert.equal(s, JSON.stringify(JSON.parse(s), null, 2) + "\n");
+  });
+});
+
+test("milvus.config.json이 깨졌으면 init이 다시 쓴다", async () => {
+  await withProject({ "milvus.config.json": "{" }, async (root) => {
+    const r = await init(root, BRAND);
+    assert.equal(r.code, 0, r.stderr);
+    assert.equal(readConfig(root)!.version, version);
   });
 });
 
@@ -284,7 +345,19 @@ test("Node 22.17", async () => {
 });
 
 test("깨진 .claude/settings.json", async () => {
-  await assertFails(BRAND, { files: { ".claude/settings.json": '{ "permissions": ' }, message: /\.claude\/settings\.json.*JSON/ });
+  // 사전 점검(설계 4.1의 1)이라 sf를 한 번도 부르지 않는다
+  const sf = fakeSf(ORG);
+  const files = { ".claude/settings.json": '{ "permissions": ' };
+  await assertFails(BRAND, { files, sf, message: /\.claude\/settings\.json.*JSON/ });
+  await assertFails(FROM, { files, sf, message: /\.claude\/settings\.json.*JSON/ });
+  assert.equal(sf.calls.length, 0);
+});
+
+test("milvus.config.json의 버전이 설치된 패키지 버전과 다르면 update를 안내한다", async () => {
+  const sf = fakeSf();
+  const old = JSON.stringify({ version: "0.0.0-old", targetOrg: "dev", brand: "Acme", vf: true, managed: {} }, null, 2) + "\n";
+  await assertFails(BRAND, { files: { "milvus.config.json": old }, sf, message: /0\.0\.0-old[\s\S]*pnpm milvus update/ });
+  assert.equal(sf.calls.length, 0);
 });
 
 test("--brand와 --from-org를 함께 / 둘 다 없음", async () => {
@@ -308,7 +381,6 @@ test("sf 없음 또는 org 로그인 안 됨 (가짜 SfRunner)", async () => {
 });
 
 test("--from-org인데 커스텀 테마가 없거나 조회 실패 (가짜 SfRunner)", async () => {
-  const FROM = ["--target-org", "dev", "--from-org"];
   const noActive = { ...ORG, "Settings:LightningExperience": { "settings/LightningExperience.settings": settingsXml() } };
   await assertFails(FROM, { sf: fakeSf(noActive), message: /활성 테마를 읽지 못했습니다/ });
   const standard = { ...ORG, "Settings:LightningExperience": { "settings/LightningExperience.settings": settingsXml("LightningBlue") } };
@@ -316,6 +388,13 @@ test("--from-org인데 커스텀 테마가 없거나 조회 실패 (가짜 SfRun
   const { "ContentAsset:acme_logo_1": _, ...noLogo } = ORG;
   await assertFails(FROM, { sf: fakeSf(noLogo), message: /로고 ContentAsset/ });
   await assertFails(FROM, { sf: fakeSf(ORG, { retrieve: 1 }), message: /조회에 실패/ });
+});
+
+test("--from-org인데 활성 테마가 SLDS 2가 아님", async () => {
+  const SLDS2 = /밀버스는 SLDS 2 테마를 기준으로 합니다\. SLDS 1 테마 지원은 #22에서 검토 중입니다/;
+  const withTheme = (text: string) => fakeSf({ ...ORG, "LightningExperienceTheme:Acme_Org": { "lightningExperienceThemes/Acme_Org.lightningExperienceTheme": text } });
+  await assertFails(FROM, { sf: withTheme(ORG_THEME.replace("SLDS_v2", "SLDS_v1")), message: SLDS2 });
+  await assertFails(FROM, { sf: withTheme(ORG_THEME.replace("    <designSystemVersion>SLDS_v2</designSystemVersion>\n", "")), message: SLDS2 });
 });
 
 test("runSf는 sf를 찾지 못하면 127을 돌려준다", async () => {
