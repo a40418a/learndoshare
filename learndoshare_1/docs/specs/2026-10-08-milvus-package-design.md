@@ -450,7 +450,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 ### 9.2 native 전환 대비
 
 **감지**
-1. org에서: 기본 컴포넌트는 synthetic이 아닐 때 호스트에 `data-render-mode="shadow"`를 붙인다(123개 폴더). `loadBrand`가 자기 템플릿 안의 `lightning-*` 호스트에서 이 속성을 확인하고, 있으면 개발 콘솔에 경고한다
+1. org에서: 기본 컴포넌트는 synthetic이 아닐 때 호스트에 `data-render-mode="shadow"`를 붙인다(123개 폴더). 밀버스 컴포넌트가 첫 렌더 뒤 `milvusScript`의 `detectNativeShadow(this.template)`로 자기 템플릿 안의 `lightning-*` 호스트에서 이 속성을 확인하고, 있으면 개발 콘솔에 경고한다(2026-10-09 Task 6 구현. `loadBrand`가 아니라 각 컴포넌트가 부른다)
 2. 패키지 갱신 때: SLDS 2나 기본 컴포넌트 버전을 올리면 9.6의 정적 검사가 native 지원 목록, 새 하드코딩, hook 이름 변화를 기준 파일과 비교해 실패시킨다
 3. Salesforce 릴리스(연 3회)마다 릴리스 노트의 native shadow 항목을 사람이 확인한다
 
