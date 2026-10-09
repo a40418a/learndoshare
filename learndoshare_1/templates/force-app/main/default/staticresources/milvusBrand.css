@@ -1,0 +1,8 @@
+/*
+ * 밀버스 브랜드 util.css (프로젝트 소유)
+ * - 비어 있으면 Salesforce 기본 모양이다. 브랜드 색과 로고는 org 테마(BrandingSet)가 바꾼다
+ * - 브랜드 요청이 있을 때만 :root 블록 하나에 허용된 hook과 --milvus-* 변수 값을 적는다(설계 5.2)
+ * - 클래스 규칙은 쓰지 않는다. 고친 뒤에는 pnpm milvus check --style이 규칙을 검사한다
+ */
+:root {
+}

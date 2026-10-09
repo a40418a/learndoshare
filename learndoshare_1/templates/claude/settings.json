@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "ask": [
+      "Bash(pnpm milvus deploy *)",
+      "Bash(pnpm exec milvus deploy *)",
+      "Bash(milvus deploy *)",
+      "Bash(./node_modules/.bin/milvus deploy *)",
+      "Bash(sf project deploy *)",
+      "Bash(sf data create *)",
+      "Bash(sf data delete *)",
+      "Bash(sf data update *)",
+      "Bash(sf data upsert *)",
+      "Bash(sf apex run *)"
+    ],
+    "deny": [
+      "Bash(sf org display)",
+      "Bash(sf org display *)",
+      "Bash(sf org open --url-only *)",
+      "Edit(/force-app/main/default/lwc/milvus*/**)",
+      "Edit(/force-app/main/default/lwc/tsconfig.json)",
+      "Edit(/force-app/main/default/classes/utils/design/**)",
+      "Edit(/force-app/main/default/components/milvusHead.component*)",
+      "Edit(/force-app/main/default/staticresources/milvusVf.*)",
+      "Edit(/force-app/main/default/staticresources/milvusBridge.*)",
+      "Edit(/milvus-design.md)",
+      "Edit(/milvus.config.json)",
+      "Edit(/.claude/skills/milvus-brand/**)",
+      "Edit(/.claude/hooks/milvus-check.mjs)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [{ "type": "command", "command": "node \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/milvus-check.mjs" }]
+      }
+    ]
+  }
+}

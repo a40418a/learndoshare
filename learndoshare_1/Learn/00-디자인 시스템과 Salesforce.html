@@ -159,9 +159,9 @@
   <h3>밀버스에서는</h3>
   <ul>
     <li><b>컴포넌트 CSS</b>는 hook을 읽기만 하고 fallback을 반드시 둔다 (CLAUDE.md 3장)</li>
-    <li><b>util.css</b>는 공식 권고 밖이라는 것을 알고 택한 예외다. 지금 규칙(PR #19 이후, <code>pnpm test</code>의 <code>scripts/check-brands.mjs</code>가 검사): <code>:root</code> 블록 하나에 <code>--slds-g-*</code>(브랜드 색 계열 제외), 이름에 color가 없고 SLDS 2 CSS가 정의하는 <code>--slds-s-*</code>, 밀버스 컴포넌트가 읽는 <code>--milvus-*</code>만 쓴다. 클래스 규칙, <code>--slds-c-*</code>, <code>--sds-c-*</code>, 브랜드 색(accent·brand) 재정의는 금지다</li>
+    <li><b>util.css</b>는 공식 권고 밖이라는 것을 알고 택한 예외다. 지금 규칙(2026-10-09 갱신, 설계 5.2·5.3. 구현 <code>lib/rules.ts</code>, 검사 <code>pnpm test:brands</code>의 <code>scripts/check-brands.ts</code>): <code>:root</code> 블록 하나에 이름에 color가 없는 <code>--slds-g-*</code>(글꼴 제외), 포커스 그림자, 중립 색(<code>light-dark()</code>), 피드백 색, SLDS 2·기본 컴포넌트 CSS가 <code>var()</code>로 읽는 <code>--slds-s-*</code>(색은 hover·선택 바탕 6개만), 밀버스가 읽는 <code>--milvus-*</code>, <code>letter-spacing</code>만 쓴다. 클래스 규칙, <code>@font-face</code>, <code>--slds-c-*</code>, <code>--sds-c-*</code>, 브랜드 색(accent·brand) 재정의, 읽는 곳이 없는 이름은 금지다. 전체 표는 <a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html#button">01 SLDS</a>에 있다. 예전 <code>scripts/check-brands.mjs</code>(PR #19 규칙)는 지웠다</li>
     <li><b><code>--slds-s-*</code> 허용(#18, PR #19):</b> 공식 권고 밖이고 native 전환 때 효과가 사라질 수 있다는 것을 알고 허용했다(README 2장, 설계 1장). 위의 private 분류는 2026-10-09에 확인했고, 설계 15장에 "허용 유지 여부 <span class="tag warn">미정</span>"으로 올렸다. 기본 우선에서는 util.css를 브랜드 요청이 있을 때만 쓰므로 당장 바꾸지 않는다. 01 문서도 같은 내용이다 (2026-10-09 갱신)</li>
-    <li><span class="tag info">계획</span> 전 컴포넌트 분석(7절)에 따라 규칙을 다시 맞춘다(설계 5.2): 중립 색은 <code>light-dark()</code>로, 포커스 링 그림자는 색을 브랜드 hook으로만, 색 s hook은 6개만, 상속 속성은 <code>letter-spacing</code>만, 글꼴 hook은 금지. 10/12에 검사 스크립트·CLAUDE.md·설계 5.2를 하나로 맞춘다</li>
+    <li><b>규칙 통합 (2026-10-09 구현):</b> 전 컴포넌트 분석(7절)에 따라 위 규칙으로 넓혔고, 서로 달랐던 검사 스크립트·CLAUDE.md·설계 5.2를 하나로 맞췄다(Task 7)</li>
     <li><b>기본 우선</b>(2026-10-09 결정): 기본 상태에서는 util.css가 비어 있다. 브랜드 요청이 있을 때만 쓴다 (8절)</li>
   </ul>
   <h3>직접 확인하기</h3>
@@ -202,7 +202,7 @@ node hk.cjs --slds-s-button-radius-border</code></pre>
   <ul>
     <li><b>색과 로고의 원본은 <code>BrandingSet</code> 하나다.</b> util.css에서 accent·brand 계열을 바꾸지 않는다(설계 5.1, 5.2)</li>
     <li><b>org 실측(2026-10-08):</b> <code>BrandingSet</code>과 <code>LightningExperienceTheme</code>은 배포로 만들어진다. 활성 테마 이름 한 필드만 담은 설정을 배포하면 그 필드만 바뀐다. 테마를 지우면 그 테마의 <code>BrandingSet</code>도 지워진다</li>
-    <li><b>팔레트 규칙(실측으로 역산, 2026-10-05):</b> 단계마다 CIELAB 명도 L*가 고정이고(95→96, 90→91, 50→49, 40→39, 30→29, 20→19, 10→8), 색상각은 유지한다. 그래서 원본 브랜드 색은 그대로 들어가지 않는다. 예: <code>#0176D3</code> → 50단계 <code>#2976ca</code> (README 3장, <code>scripts/palette.mjs</code>)</li>
+    <li><b>팔레트 규칙(실측으로 역산, 2026-10-05):</b> 단계마다 CIELAB 명도 L*가 고정이고(95→96, 90→91, 50→49, 40→39, 30→29, 20→19, 10→8), 색상각은 유지한다. 그래서 원본 브랜드 색은 그대로 들어가지 않는다. 예: <code>#0176D3</code> → 50단계 <code>#2976ca</code> (README 3장, <code>lib/palette.ts</code>)</li>
     <li>org에서 <code>BRAND_COLOR</code> <code>#2E7D32</code>를 활성화했더니 LEX accent가 <code>#468244</code>였고, 우리 규칙의 50단계와 같았다</li>
     <li>50단계는 L* 49라서 흰 글자 대비가 모든 색에서 4.62~4.68:1이다. 그래서 브랜드 색을 막지 않고, 입력한 색·실제 버튼 색(50)·링크 색(40)을 함께 보여 준다(설계 5.4)</li>
     <li>밀버스는 지금 <code>BRAND_COLOR</code>와 <code>BRAND_IMAGE</code>만 다룬다(설계 5.1). SLDS 2 전용 <code>ACCENT_COLOR_*</code> 속성을 쓸지는 설계 15장에 <span class="tag warn">미정</span>으로 올라 있다 (2026-10-09 갱신)</li>
@@ -239,7 +239,7 @@ node hk.cjs --slds-s-button-radius-border</code></pre>
     <li><b>org 실측(2026-10-07, #16):</b> LEX는 기본 컴포넌트를 synthetic으로 그린다. 홈, 계정 목록, 새 계정 화면에서 쟀고 native는 내부 primitive 3개뿐이었다. Storybook도 org와 같게 전부 synthetic으로 그린다(README 3장)</li>
     <li><b>org 실측(2026-10-08):</b> LEX에서 <code>loadStyle</code>로 넣은 CSS는 문서 head에 들어가, 프로브 컴포넌트뿐 아니라 같은 페이지의 표준 헤더 버튼과 <code>document.body</code>에 붙는 <code>LightningAlert</code> 모달까지 바꿨다. 컴포넌트 hook <code>--slds-s-input-radius-border</code>도 닿았다</li>
     <li><b>native 전환 위험:</b> 전환되면 클래스 규칙(<code>milvusBridge.css</code>)은 사라지고 hook으로 바꿀 수 있는 비율도 떨어진다(7절의 "native" 열). 소스 분석상 "native에서는 <code>--slds-s-*</code>가 닿지 않는다"는 지나친 서술이고, 기본 컴포넌트의 native CSS가 직접 읽는 s 이름에는 닿을 가능성이 높다 <span class="tag warn">추정, 실측 필요</span></li>
-    <li><span class="tag info">계획</span> 감지: 기본 컴포넌트는 synthetic이 아닐 때 호스트에 <code>data-render-mode="shadow"</code>를 붙인다(LBC 소스). <code>loadBrand</code>가 이것을 보고 개발 콘솔에 경고한다(설계 9.2)</li>
+    <li><b>감지 (2026-10-09 구현):</b> 기본 컴포넌트는 synthetic이 아닐 때 호스트에 <code>data-render-mode="shadow"</code>를 붙인다(LBC 소스). 밀버스 컴포넌트가 첫 렌더 뒤 <code>c/milvusScript</code>의 <code>detectNativeShadow</code>로 자기 템플릿 안의 <code>lightning-*</code> 호스트에서 이것을 찾아 개발 콘솔에 경고한다(설계 9.2, <a href="02-LWC%20%EA%B8%B0%EC%B4%88.html#shared">02 LWC</a>). org에서 울리는지는 아직 보지 않았다</li>
   </ul>
   <h3>직접 확인하기</h3>
   <ul>
@@ -343,9 +343,9 @@ node hk.cjs --slds-g-duration-quickly   <span class="c"># 정의 수와 읽는 �
   <div class="table-wrap"><table>
     <tr><th>층</th><th>원본</th><th>무엇을 바꾸나</th><th>공식 여부</th><th>상태</th></tr>
     <tr><td>1. org 테마</td><td><code>BrandingSet</code> (<code>BRAND_COLOR</code>, <code>BRAND_IMAGE</code>)</td><td>브랜드 색, 로고. LEX, Setup, VF에 반영</td><td>공식 기능</td><td>org에 있음. 배포·활성화는 실측함. 자동화(<code>init</code>, <code>deploy</code>)는 <span class="tag info">계획</span></td></tr>
-    <tr><td>2. util.css (<code>milvusBrand.css</code>)</td><td><code>:root</code> 블록 하나</td><td>모양, 피드백 색, 밀버스 변수 값. 브랜드 요청이 있을 때만</td><td>권고 밖(알고 택함)</td><td>저장소의 <code>brands/&lt;브랜드&gt;/util.css</code>로 구현됨. 정적 리소스 이름 <code>milvusBrand</code>와 <code>loadBrand</code> 연결은 <span class="tag info">계획</span></td></tr>
-    <tr><td>3. <code>milvusBridge.css</code></td><td>패키지 제공 클래스 규칙</td><td>hook이 없는 항목(움직임, 컨트롤 높이, 자간 등)만. 값은 <code>--milvus-*</code>를 읽고 기본값은 Salesforce 원래 값</td><td>권고 밖, native에서 사라짐</td><td><span class="tag info">계획</span></td></tr>
-    <tr><td>4. <code>milvusOverride.css</code> (opt-in)</td><td>프로젝트 소유 클래스 규칙. 처음엔 비어 있다</td><td>hook·브리지로 안 되는 기존 컴포넌트의 모양. 마지막 수단이라 가장 나중에 싣는다</td><td>권고 밖(지원하지 않음), native 전환·업데이트에 약함</td><td><span class="tag info">계획</span> (2026-10-09 결정)</td></tr>
+    <tr><td>2. util.css (<code>milvusBrand.css</code>)</td><td><code>:root</code> 블록 하나</td><td>모양, 피드백 색, 밀버스 변수 값. 브랜드 요청이 있을 때만</td><td>권고 밖(알고 택함)</td><td>저장소의 <code>brands/&lt;브랜드&gt;/util.css</code>로 구현됨. 규칙은 <code>lib/rules.ts</code>(2026-10-09). <code>loadBrand</code>(<code>c/milvusScript</code>)와 정적 리소스 틀(<code>templates/</code>의 빈 <code>milvusBrand.css</code>)도 2026-10-09 구현. org에서의 <code>loadBrand</code> 동작과 <code>init</code>은 <span class="tag info">계획</span></td></tr>
+    <tr><td>3. <code>milvusBridge.css</code></td><td>패키지 제공 클래스 규칙</td><td>hook이 없는 항목(움직임, 컨트롤 높이, 자간 등)만. 값은 <code>--milvus-*</code>를 읽고 기본값은 Salesforce 원래 값</td><td>권고 밖, native에서 사라짐</td><td><span class="tag info">계획</span> 변수 이름(<code>lib/bridge-vars.ts</code>)과 빈 틀만 있다(2026-10-09). 규칙 생성기는 구현 전</td></tr>
+    <tr><td>4. <code>milvusOverride.css</code> (opt-in)</td><td>프로젝트 소유 클래스 규칙. 처음엔 비어 있다</td><td>hook·브리지로 안 되는 기존 컴포넌트의 모양. 마지막 수단이라 가장 나중에 싣는다</td><td>권고 밖(지원하지 않음), native 전환·업데이트에 약함</td><td>틀(설명 주석만)과 검사 함수 <code>checkOverrideCss</code>는 2026-10-09 구현. 프로젝트에 넣는 <code>init</code>은 <span class="tag info">계획</span></td></tr>
     <tr><td>5. 밀버스 컴포넌트</td><td><code>lwc/milvus*</code></td><td>SLDS에 없는 기능. 모양만 바꾸려고 만들지 않는다</td><td>공식 방식(hook 읽기)</td><td><code>milvusBadge</code>, <code>milvusButton</code>, <code>milvusMultiSelect</code> 구현됨(파일럿)</td></tr>
   </table></div>
   <div class="callout project"><strong>기본 우선 (2026-10-09 결정)</strong>기본 상태는 Salesforce 기본 모양에 브랜드 색·로고(<code>BrandingSet</code>, 공식 기능)만 바꾼 것이다. <code>init</code> 직후 util.css는 비어 있고, 브랜드 요청이 있을 때만 util.css와 브리지 변수로 모양을 바꾼다. VF는 모양을 바꾸지 않아도 SLDS 2로 LEX와 맞춘다. 설계는 <code>milvusVf</code>다. 6절의 공식 경로(VF 설정 + SLDS 2 테마)로 SLDS 2와 팔레트가 들어오면 <code>milvusVf</code>는 필요 없거나 util.css가 있을 때만 필요하다. 10/12 org 프로브에서 확인한다 <span class="tag warn">미확인</span> (2026-10-09 갱신). 요청이 오면 org 테마 → util.css의 global hook(전체 모양) → util.css의 컴포넌트 hook(특정 컴포넌트) → 브리지 변수(hook이 없는 항목) → <code>milvusOverride.css</code>(마지막 수단, 공식 권고 밖) 순으로 제안한다. override를 쓸 때는 native 전환·업데이트에 약하다는 것을 알린다. 모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다 (2026-10-09 갱신). 권하지 않는 이유와 실험은 <a href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html">09 override와 공식 권고</a>에 있다.</div>

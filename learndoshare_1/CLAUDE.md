@@ -54,7 +54,7 @@
 - 입력 검증(`@api` 값), 에러 처리, 데이터 손실 방지
 - 접근성: SLDS 블루프린트의 `aria-*`, 키보드 조작, 대비. `milvusButton` 같은 블루프린트 기반 컴포넌트는 `lightning-*`이 해 주던 접근성을 직접 맞춘다
 - 보안: 인증 정보·org ID를 코드와 문서에 넣지 않는다
-- `var()` fallback, 컴포넌트마다 스토리와 Jest 테스트
+- `var()` fallback, 컴포넌트마다 스토리. LWC Jest 테스트(`__tests__`)는 굳이 새로 만들지 않는다(2026-10-09 사용자 결정. 이미 있는 테스트는 유지하고 `pnpm test:unit`으로 계속 돌린다)
 
 ### 의도적 단순화는 기록한다
 
@@ -69,10 +69,11 @@
 | 위치 | 해도 되는 것 | 하면 안 되는 것 |
 | --- | --- | --- |
 | 컴포넌트 CSS | `var(--slds-g-*, fallback)`, `var(--slds-s-*, fallback)`, `var(--milvus-*, fallback)` 읽기 | hex 색, 브랜드 값, `--slds-c-*`, `--slds-g-*` 재정의, `.slds-*` 클래스 덮어쓰기 |
-| `brands/<브랜드>/util.css` | `:root`의 `--slds-g-*` global hook (반경, 글꼴, 간격 등)과 `--slds-s-*` 컴포넌트 hook (버튼만, 입력창만 등. 영향 지도 참고). 이 파일 하나로 모든 컴포넌트가 바뀐다. 밀버스 컴포넌트가 읽는 `--milvus-*` | 클래스 규칙, `--slds-c-*`·`--sds-c-*`, 색 컴포넌트 hook(`--slds-s-*color*`), 브랜드 색(accent) 재정의 |
+| `brands/<브랜드>/util.css` | `:root` 블록 하나에: 이름에 color가 없는 `--slds-g-*`(반경, 간격, 크기, 글자, 그림자), 포커스 그림자 `--slds-g-shadow-*focus*`(값의 색은 `var(--slds-g-color-brand-base-15)`·`var(--slds-g-color-neutral-base-100)`만), 중립 색(`surface*`, `on-surface*`, `border-1/2`, `neutral-base-*`, `disabled*`, `*inverse*` 등. `light-dark()`로, 글자·면 4.5:1 이상), 피드백 색(설계 5.3 표의 이름만, 글자색은 배경·흰색 위 4.5:1 이상), 기본 컴포넌트만 읽는 g 이름 5개, SLDS 2 CSS나 기본 컴포넌트 CSS가 읽는 `--slds-s-*`(버튼만, 입력창만 등. 영향 지도 참고), 색 s hook 6개(hover·선택 바탕, 값은 중립 g hook 하나), 밀버스 컴포넌트나 `milvusBridge.css`가 읽는 `--milvus-*`, `letter-spacing`. 이 파일 하나로 모든 컴포넌트가 바뀐다 | 클래스 규칙, `@font-face`, 글꼴 `--slds-g-font-family*`, 브랜드 색 계열(`accent`·`on-accent`·`border-accent`·`brand-base`·`--slds-r-color-brand*`), 그 밖의 색 hook, `--slds-c-*`·`--sds-c-*`, 읽는 곳이 없는 이름(오타), 다른 일반 속성. `--slds-g-shadow-4`만 바꾸고 포커스에 쓰이는 `-5`·`-6`을 비워 두기 |
 | `brands/<브랜드>/theme.json`, `logo.*` | 없음 (`pnpm sync:theme`만 생성) | 직접 편집 |
 
-- 패키지 설계에서는 hook으로 안 되는 모양을 위한 opt-in `staticresources/milvusOverride.css`(클래스 규칙, 처음엔 비어 있음)가 생긴다(계획 Task 8). 지금 저장소의 `brands/<브랜드>/util.css` 규칙은 위 표 그대로다
+- util.css 규칙의 원본은 설계 5.2·5.3이고 `lib/rules.ts`가 구현한다. 저장소의 `brands/<브랜드>/util.css`는 `pnpm test:brands`(`scripts/check-brands.ts`)가 검사한다
+- 패키지 설계에서는 hook으로 안 되는 모양을 위한 opt-in `staticresources/milvusOverride.css`(클래스 규칙, 처음엔 비어 있음)가 생긴다(계획 Task 8). 이 파일은 hex 색, `!important`, `.slds-*`가 아닌 선택자, 브랜드 색 hook 재정의를 경고만 하고 `@font-face`·`@import`만 막는다(설계 5.1)
 - 브랜드 요구가 들어오면 org 테마(색·로고) → `util.css`의 global hook(전체 모양) → `util.css`의 컴포넌트 hook(특정 컴포넌트) → 브리지 변수(hook이 없는 항목) → `milvusOverride.css`(마지막 수단, 공식 권고 밖) 순으로 제안한다. override를 쓸 때는 native 전환·Salesforce 업데이트에 약하다는 것을 알린다. 모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다(설계 5.1)
 - 커스텀 변수 접두사는 `--milvus-`만 쓴다
 

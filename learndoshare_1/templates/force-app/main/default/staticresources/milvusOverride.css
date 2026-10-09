@@ -1,0 +1,8 @@
+/*
+ * 밀버스 override (프로젝트 소유, opt-in, 마지막 수단)
+ * - hook(milvusBrand.css)과 브리지 변수로 바꿀 수 없는 기존 컴포넌트의 모양만 .slds-* 클래스 규칙으로 바꾼다
+ * - Salesforce 공식 권고 밖이다. 기본 컴포넌트가 native shadow로 바뀌거나 Salesforce가 마크업을 바꾸면 깨질 수 있다
+ * - milvusBridge, milvusBrand 다음 마지막에 로드된다. check --style은 hex 색, !important, .slds-*가 아닌 선택자, 브랜드 색 hook을 경고하고 @font-face·@import는 막는다
+ * - 왜 권고 밖인지와 실험: Learn 09 "override와 공식 권고"
+ *   https://github.com/a40418a/learndoshare/blob/main/learndoshare_1/Learn/09-override와%20공식%20권고.html
+ */

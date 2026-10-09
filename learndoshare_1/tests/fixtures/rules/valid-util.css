@@ -1,0 +1,38 @@
+/* 허용 규칙을 한 번씩 쓴 util.css. 주석, 줄바꿈, light-dark(), var() 체인을 섞었다 */
+:root {
+  /* 모양 */
+  --slds-g-radius-border-2: 0.25rem;
+  --slds-g-radius-border-pill: var(--slds-g-radius-border-1);
+
+  /* 그림자를 없애도 포커스 표시에 쓰이는 shadow-5·-6은 기본값을 따로 적는다 */
+  --slds-g-shadow-4: none;
+  --slds-g-shadow-5: 0px 0px 10px 0px light-dark(#0000001f, #0000003d);
+  --slds-g-shadow-6: 0px 0px 10px 0px light-dark(#0000001f, #0000003d);
+  --slds-g-shadow-outset-focus-1:
+    0 0 0 2px var(--slds-g-color-neutral-base-100),
+    0 0 0 4px var(--slds-g-color-brand-base-15);
+
+  /* 중립 색: 의미 hook과 neutral-base 단계를 함께 */
+  --slds-g-color-neutral-base-10: light-dark(#1c1b19, #e5e5e5);
+  --slds-g-color-on-surface-3: /* 제목·본문 */ light-dark(
+    var(--slds-g-color-neutral-base-10),
+    #e5e5e5
+  );
+  --slds-g-color-surface-2: light-dark(#f5f3ef, #181818);
+  --slds-g-color-border-base-1: light-dark(#d9d6d0, #444444);
+
+  /* 피드백 색 (설계 5.3) */
+  --slds-g-color-success-1: light-dark(#056764, #01c3b3);
+  --slds-g-color-on-success-1: light-dark(#056764, #acf3e4);
+  --slds-g-color-success-container-1: light-dark(#acf3e4, #024d4c);
+  --slds-g-color-border-success-1: #056764;
+  --slds-g-color-success-container-2: #96d5c8;
+
+  /* 컴포넌트 hook */
+  --slds-s-label-spacing: 0.25rem;
+  --slds-s-pill-color-background-hover: var(--slds-g-color-surface-container-2);
+
+  /* 밀버스 변수와 자간 */
+  --milvus-button-font-weight: var(--slds-g-font-weight-7);
+  letter-spacing: -0.01em;
+}

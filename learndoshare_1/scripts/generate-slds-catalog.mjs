@@ -4,11 +4,16 @@
  * Storybook "컴포넌트/기본" 섹션으로 만든다. 예제를 직접 쓰지 않고 공식 예제를 그대로 컴파일한다.
  *
  * 만드는 것 (stories/slds-catalog/, 커밋하지 않음):
- *   examples.json      Rollup alias 목록 (rollup.lwc.config.mjs가 읽는다)
- *   entry.js           Rollup 진입 파일 → dist/lwc/catalog.js
+ *   examples.json      Rollup alias 목록 { name, rel } (scripts/build-lwc.ts가 읽는다)
+ *   entry.js           Rollup 진입 파일 → @milvus/lwc/catalog.js
  *   <Name>.stories.js  컴포넌트마다 스토리 파일 (예제 하나 = 스토리 하나, Show code = 예제 HTML 원본)
  *
- * 사용: pnpm build:lwc 가 먼저 실행한다.
+ * 결과에는 개발자 PC의 절대 경로와 node_modules/ 경로를 넣지 않는다. 패키지에 넣어 다른 프로젝트에서도 쓴다
+ *   rel                lightning-base-components/src/lightning 기준 상대 경로. 빌드할 때 절대 경로로 바꾼다
+ *   ?raw import        bare specifier (lightning-base-components/src/lightning/...)
+ *   LWC 번들           @milvus/lwc (Storybook alias)
+ *
+ * 사용: pnpm build:lwc 가 먼저 실행한다. 인자로 출력 폴더를 바꿀 수 있다(기본 stories/slds-catalog, 테스트용).
  */
 import {
   existsSync,
@@ -17,10 +22,9 @@ import {
   rmSync,
   writeFileSync
 } from "node:fs";
-import { resolve } from "node:path";
 
 const SRC = "node_modules/lightning-base-components/src/lightning";
-const OUT = "stories/slds-catalog";
+const OUT = process.argv[2] ?? "stories/slds-catalog";
 
 const kebab = (s) => s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
 const title = (s) =>
@@ -96,8 +100,8 @@ for (const comp of readdirSync(SRC).sort()) {
       module: `${ns}/${ex.name}`,
       tag: `${ns}-${kebab(ex.name)}`,
       exportName: `${name}`,
-      path: resolve(dir, ex.name, `${ex.name}.js`),
-      html: `${dir}/${ex.name}/${ex.name}.html`,
+      rel: `${comp}/__examples__/${ex.name}/${ex.name}.js`,
+      html: `${comp}/__examples__/${ex.name}/${ex.name}.html`,
       // html이 없는 예제(context/provider 등)는 다른 예제가 import하는 보조 모듈이다. 별칭만 등록하고 스토리는 만들지 않는다
       story: existsSync(`${dir}/${ex.name}/${ex.name}.html`)
     });
@@ -109,7 +113,7 @@ mkdirSync(OUT, { recursive: true });
 writeFileSync(
   `${OUT}/examples.json`,
   JSON.stringify(
-    examples.map(({ module, path }) => ({ name: module, path })),
+    examples.map(({ module, rel }) => ({ name: module, rel })),
     null,
     2
   )
@@ -129,9 +133,12 @@ for (const [comp, list] of Object.entries(byComp)) {
   const tagName = `lightning-${kebab(comp)}`;
   const lines = [
     `// 자동 생성 파일: scripts/generate-slds-catalog.mjs. 직접 고치지 않는다.`,
-    `import { createElement } from "../../dist/lwc/index.js";`,
-    `import * as ex from "../../dist/lwc/catalog.js";`,
-    ...list.map((e, i) => `import html${i} from "../../${e.html}?raw";`),
+    `import { createElement } from "@milvus/lwc/index.js";`,
+    `import * as ex from "@milvus/lwc/catalog.js";`,
+    ...list.map(
+      (e, i) =>
+        `import html${i} from "lightning-base-components/src/lightning/${e.html}?raw";`
+    ),
     ``,
     `export default {`,
     `  title: "컴포넌트/기본/${title(comp)}",`,

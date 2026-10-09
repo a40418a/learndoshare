@@ -18,6 +18,7 @@
  *
  * 정확도 (Setup 실측 대비, ΔE = OKLab 거리 × 100. 사람 눈의 구분 한계는 약 2):
  *   학습 24색 평균 0.02 / 최대 0.46, 학습에 쓰지 않은 검증 20색 평균 0.13 / 최대 0.64
+ * 검사: tests/palette.test.ts (pnpm test:node)
  *
  * ponytail: 4번의 t 값은 실측에 맞춘 경험식이다. Salesforce의 실제 식은 공개돼 있지 않다.
  *           어긋나는 색이 나오면 palette.measured.json에 실측을 추가하고 t를 다시 맞춘다.
@@ -25,8 +26,10 @@
  *           55~85단계는 채도 상한도 모른다. 라이트 모드 accent hook은 50·40·30단계만 쓰므로 영향이 작다.
  */
 
+type Vec3 = [number, number, number];
+
 // 단계 → [L*, 채도 상한]
-const LEVELS = {
+const LEVELS: Record<number, [L: number, cap?: number]> = {
   5: [1],
   10: [8],
   15: [14],
@@ -43,7 +46,7 @@ const LEVELS = {
   80: [81],
   85: [86],
   90: [91, 25],
-  95: [96, 10]
+  95: [96, 10],
 };
 
 export const STEPS = Object.keys(LEVELS).map(Number);
@@ -54,41 +57,37 @@ export const SETUP_STEPS = [95, 90, 50, 40, 30, 20, 10];
 const T_DARK = 0.4725;
 const T_LIGHT = 0.4275;
 
-const WHITE = [0.95047, 1, 1.08883]; // D65
+const WHITE: Vec3 = [0.95047, 1, 1.08883]; // D65
 const EPSILON = 216 / 24389;
 const KAPPA = 24389 / 27;
 
-const toLinear = (c) =>
-  c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-const toGamma = (c) =>
-  c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055;
-const f = (t) => (t > EPSILON ? Math.cbrt(t) : (KAPPA * t + 16) / 116);
-const fInverse = (t) => (t ** 3 > EPSILON ? t ** 3 : (116 * t - 16) / KAPPA);
+const toLinear = (c: number) => (c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4);
+const toGamma = (c: number) => (c <= 0.0031308 ? 12.92 * c : 1.055 * c ** (1 / 2.4) - 0.055);
+const f = (t: number) => (t > EPSILON ? Math.cbrt(t) : (KAPPA * t + 16) / 116);
+const fInverse = (t: number) => (t ** 3 > EPSILON ? t ** 3 : (116 * t - 16) / KAPPA);
 
-function assertHex(hex) {
+/** #rrggbb → 선형 sRGB [r, g, b] (0~1). 형식이 다르면 던진다 */
+export function hexToLinear(hex: string): Vec3 {
+  // .mjs 스크립트도 부르므로 타입과 별개로 실행 시점에 확인한다
   if (typeof hex !== "string" || !/^#[0-9a-f]{6}$/i.test(hex)) {
-    throw new Error(`브랜드 색 형식이 아닙니다 (#rrggbb): ${hex}`);
+    throw new Error(`색 형식이 아닙니다 (#rrggbb): ${hex}`);
   }
+  const [r, g, b] = [1, 3, 5].map((i) => toLinear(parseInt(hex.slice(i, i + 2), 16) / 255));
+  return [r, g, b];
 }
 
-function lch(hex) {
-  const [r, g, b] = [1, 3, 5].map((i) =>
-    toLinear(parseInt(hex.slice(i, i + 2), 16) / 255)
-  );
+function lch(hex: string): Vec3 {
+  const [r, g, b] = hexToLinear(hex);
   const x = 0.4124564 * r + 0.3575761 * g + 0.1804375 * b;
   const y = 0.2126729 * r + 0.7151522 * g + 0.072175 * b;
   const z = 0.0193339 * r + 0.119192 * g + 0.9503041 * b;
   const [fx, fy, fz] = [x / WHITE[0], y, z / WHITE[2]].map(f);
   const a = 500 * (fx - fy);
   const bb = 200 * (fy - fz);
-  return [
-    116 * fy - 16,
-    Math.hypot(a, bb),
-    ((Math.atan2(bb, a) * 180) / Math.PI + 360) % 360
-  ];
+  return [116 * fy - 16, Math.hypot(a, bb), ((Math.atan2(bb, a) * 180) / Math.PI + 360) % 360];
 }
 
-function linearRgb(L, C, h) {
+function linearRgb(L: number, C: number, h: number): Vec3 {
   const a = C * Math.cos((h * Math.PI) / 180);
   const b = C * Math.sin((h * Math.PI) / 180);
   const fy = (L + 16) / 116;
@@ -98,15 +97,14 @@ function linearRgb(L, C, h) {
   return [
     3.2404542 * x - 1.5371385 * y - 0.4985314 * z,
     -0.969266 * x + 1.8760108 * y + 0.041556 * z,
-    0.0556434 * x - 0.2040259 * y + 1.0572252 * z
+    0.0556434 * x - 0.2040259 * y + 1.0572252 * z,
   ];
 }
 
-const inGamut = (L, C, h) =>
-  linearRgb(L, C, h).every((c) => c >= -1e-6 && c <= 1 + 1e-6);
+const inGamut = (L: number, C: number, h: number) => linearRgb(L, C, h).every((c) => c >= -1e-6 && c <= 1 + 1e-6);
 
 // 명도 L, 색상각 h에서 sRGB로 낼 수 있는 최대 채도
-function maxChroma(L, h) {
+function maxChroma(L: number, h: number): number {
   let lo = 0;
   let hi = 200;
   for (let i = 0; i < 40; i++) {
@@ -118,88 +116,36 @@ function maxChroma(L, h) {
 }
 
 // 색상각 h에서 모든 명도를 통틀어 낼 수 있는 최대 채도
-function cuspChroma(h) {
+function cuspChroma(h: number): number {
   let max = 0;
   for (let i = 10; i < 1000; i++) max = Math.max(max, maxChroma(i / 10, h));
   return max;
 }
 
-const toHex = (L, C, h) =>
+const toHex = (L: number, C: number, h: number) =>
   "#" +
   linearRgb(L, C, h)
     .map((c) =>
       Math.round(toGamma(Math.min(1, Math.max(0, c))) * 255)
         .toString(16)
-        .padStart(2, "0")
+        .padStart(2, "0"),
     )
     .join("");
 
-/** CIELAB 명도 L* */
-export function toneOf(hex) {
-  assertHex(hex);
-  return lch(hex)[0];
-}
-
-export function brandPalette(brandColor) {
-  assertHex(brandColor);
+/** 브랜드 색(#rrggbb) → 단계(5~95)별 색. 값은 소문자 #rrggbb */
+export function brandPalette(brandColor: string): Record<number, string> {
   const [L, C, rawHue] = lch(brandColor);
   const hue = Math.round(rawHue) % 360;
   const gray = Math.round(C) === 0; // 흰색·회색·검정은 모두 같은 무채색 팔레트가 된다
   const x = gray ? 0 : C / cuspChroma(rawHue);
-  const rel = gray
-    ? 0
-    : Math.min(1, Math.round(C) / maxChroma(Math.round(L), hue));
+  const rel = gray ? 0 : Math.min(1, Math.round(C) / maxChroma(Math.round(L), hue));
 
-  const palette = {};
-  for (const [step, [Lk, cap = Infinity]] of Object.entries(LEVELS)) {
+  const palette: Record<number, string> = {};
+  for (const step of STEPS) {
+    const [Lk, cap = Infinity] = LEVELS[step];
     const r = x + (Lk > 50 ? T_LIGHT : T_DARK) * (rel - x);
     const M = Math.floor(maxChroma(Lk, hue));
     palette[step] = toHex(Lk, Math.min(Math.floor(r * M), M, cap), hue);
   }
   return palette;
-}
-
-// 직접 실행하면 Setup 실측값과 비교해 규칙이 깨지지 않았는지 확인한다: node scripts/palette.mjs
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const { readFileSync } = await import("node:fs");
-  const measured = JSON.parse(
-    readFileSync(new URL("./palette.measured.json", import.meta.url), "utf8")
-  );
-  const oklab = (hex) => {
-    const [r, g, b] = [1, 3, 5].map((i) =>
-      toLinear(parseInt(hex.slice(i, i + 2), 16) / 255)
-    );
-    const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
-    const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
-    const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
-    return [
-      0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
-      1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
-      0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s
-    ];
-  };
-  const deltaE = (p, q) => {
-    const [a, b] = [oklab(p), oklab(q)];
-    return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]) * 100;
-  };
-  const errors = [];
-  let exact = 0;
-  for (const [brand, real] of Object.entries(measured)) {
-    if (brand.startsWith("_")) continue;
-    const generated = brandPalette(brand);
-    for (const step of SETUP_STEPS) {
-      errors.push(deltaE(generated[step], real[step]));
-      if (generated[step] === real[step].toLowerCase()) exact++;
-    }
-  }
-  const mean = errors.reduce((a, b) => a + b, 0) / errors.length;
-  const max = Math.max(...errors);
-  if (mean > 0.15 || max > 1) {
-    throw new Error(
-      `Setup 실측과 차이가 큽니다: 평균 ΔE ${mean.toFixed(3)}, 최대 ${max.toFixed(3)} (기준 0.15 / 1.0)`
-    );
-  }
-  console.log(
-    `✓ palette 규칙 확인: Setup 실측 ${errors.length / 7}색 × 7칸 대비 평균 ΔE ${mean.toFixed(3)}, 최대 ${max.toFixed(3)}, 정확히 일치 ${exact}/${errors.length}`
-  );
 }

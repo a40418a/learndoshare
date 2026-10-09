@@ -1,6 +1,6 @@
 // Storybook에는 org가 없다. 이 파일은 org Themes and Branding이 하는 일을 흉내 낸다(시뮬레이션).
 // 팔레트 값은 여기서 계산하지 않는다. `pnpm sync:theme <브랜드명>`이 org 브랜드 색으로 계산해
-// brands/<브랜드>/theme.json의 palette에 저장한다 (규칙: scripts/palette.mjs).
+// brands/<브랜드>/theme.json의 palette에 저장한다 (규칙: lib/palette.ts).
 const themes = Object.values(
   import.meta.glob("../brands/*/theme.json", { eager: true, import: "default" })
 );

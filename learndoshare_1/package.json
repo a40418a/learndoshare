@@ -15,6 +15,7 @@
     "!force-app/**/__tests__",
     "audit/report.json",
     "tsconfig.lwc.base.json",
+    "lwc-platform.d.ts",
     "stories"
   ],
   "repository": {
@@ -26,17 +27,18 @@
     "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
-    "lint": "eslint \"force-app/**/lwc/**/*.js\"",
-    "test": "pnpm test:unit && pnpm test:palette && pnpm test:brands",
+    "lint": "eslint \"force-app/**/lwc/**/*.{js,ts}\"",
+    "test": "pnpm typecheck && pnpm test:unit && pnpm test:node && pnpm test:brands && pnpm test:learn",
     "test:unit": "sfdx-lwc-jest",
     "test:node": "node --test \"tests/**/*.test.ts\"",
+    "test:learn": "node scripts/check-learn.ts",
     "test:unit:watch": "sfdx-lwc-jest --watch",
     "test:unit:debug": "sfdx-lwc-jest --debug",
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
     "build:cli": "tsc -p tsconfig.build.json",
-    "prepack": "pnpm build:cli",
-    "build:lwc": "node scripts/generate-slds-catalog.mjs && rollup -c rollup.lwc.config.mjs",
-    "dev:lwc": "rollup -c rollup.lwc.config.mjs -w",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p force-app/main/default/lwc/tsconfig.json",
+    "prepack": "pnpm build:cli && node scripts/build-hooks-index.ts",
+    "build:lwc": "node scripts/generate-slds-catalog.mjs && node scripts/build-lwc.ts",
     "storybook": "pnpm build:lwc && storybook dev -p 6006",
     "build-storybook": "pnpm build:lwc && storybook build -o storybook-static",
     "sync:theme": "node scripts/sync-theme.mjs",
@@ -44,8 +46,7 @@
     "prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "prepare": "husky || true",
     "precommit": "lint-staged",
-    "test:palette": "node scripts/palette.mjs",
-    "test:brands": "node scripts/check-brands.mjs"
+    "test:brands": "node scripts/check-brands.ts"
   },
   "dependencies": {
     "@lwc/engine-dom": "9.4.3",
@@ -63,6 +64,7 @@
     "postcss": "^8.5.29",
     "rollup": "4.63.5",
     "storybook": "10.6.0",
+    "typescript": "~5.9.3",
     "vite": "^7.3.6"
   },
   "devDependencies": {
@@ -72,6 +74,7 @@
     "@salesforce/eslint-plugin-aura": "^3.0.0",
     "@salesforce/eslint-plugin-lightning": "^2.0.0",
     "@salesforce/sfdx-lwc-jest": "^7.0.2",
+    "@types/jest": "^29.5.14",
     "@types/node": "^22.20.5",
     "eslint": "^9.29.0",
     "eslint-plugin-import": "^2.31.0",
@@ -79,14 +82,13 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "prettier": "^3.5.3",
-    "prettier-plugin-apex": "^2.2.6",
-    "typescript": "~5.9.3"
+    "prettier-plugin-apex": "^2.2.6"
   },
   "lint-staged": {
     "**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}": [
       "prettier --write"
     ],
-    "**/{aura,lwc}/**/*.js": [
+    "**/{aura,lwc}/**/*.{js,ts}": [
       "eslint"
     ],
     "**/lwc/**": [

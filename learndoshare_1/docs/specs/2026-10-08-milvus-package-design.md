@@ -53,7 +53,8 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 | 10/7 | 브랜드 모양은 util.css 파일 하나로 관리한다 (#11) | 이 파일만 고치면 `lightning-*`까지 바뀐다 |
 | 10/8 | Storybook은 org처럼 모든 LWC를 synthetic shadow로 그린다 (#16) | org 실측: 기본 컴포넌트가 전부 synthetic이다 |
 | 10/8 | util.css에서 컴포넌트 hook(`--slds-s-*`) 중 색이 아닌 것을 허용한다 (#18, PR #19) | 지금 org에서 닿는다. native로 바뀌면 효과가 사라질 수 있다는 것을 알고 택했다 |
-| 10/8 | 패키지는 GitHub Packages에 비공개로 발행하고, CLI·템플릿·LWC·Storybook을 패키지 하나에 담는다 | 프로젝트에 추가되는 의존성은 하나다 |
+| 10/8 | 패키지는 GitHub Packages에 발행하고, CLI·템플릿·LWC·Storybook을 패키지 하나에 담는다 | 프로젝트에 추가되는 의존성은 하나다 |
+| 10/9 | 패키지 공개 범위는 **공개**로 둔다 | `v0.0.1`이 Actions(`GITHUB_TOKEN`)로 공개 저장소에서 발행되어 공개로 생겼다(문서상 기본은 비공개, 원인 미확인). 내용은 공개 저장소와 같고 org ID·인증 정보가 없다. 설치에는 여전히 토큰이 필요하다. 공개 → 비공개 전환은 문서상 불가할 수 있다. 회사 조직으로 옮길 때 다시 정한다(사용자 선택) |
 | 10/8 | 밀버스 LWC는 하위 폴더 없이 `force-app/main/default/lwc/milvus*`에 둔다. Apex는 `classes/utils/design/`에 둔다 | `lwc/utils/<번들>`처럼 폴더를 한 단계 더 두면 변환할 때 번들 이름이 `utils`로 잡혀 배포할 수 없다(로컬 변환으로 확인). 실제 프로젝트의 공용 컴포넌트(`utilScript` 등)도 `lwc/` 바로 아래에 두고 배포한다 |
 | 10/8 | 브랜드 색은 메타데이터(`BrandingSet`)로 관리하고 배포로 적용한다 | org 실측: 테마 생성, 활성화, 복구가 모두 배포로 된다 |
 | 10/8 | Storybook, CLI, 스크립트, LWC를 TypeScript로 쓴다 | 사용자 요청. LWC `.ts` 직접 배포를 org에서 확인했다 |
@@ -85,7 +86,7 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 | `.storybook/`, `stories/`, 미리 만든 카탈로그 | 프로젝트 모드 Storybook |
 
 - `prepack`이 `tsc`(dist)와 SLDS 카탈로그 생성을 실행한다
-- 의존성: Storybook, Vite, Rollup, `@lwc/*`, `lwc`, `lightning-base-components`, `@salesforce-ux/design-system-2`, `@salesforce/lightning-types`, `typescript`는 `dependencies`다. ESLint, Jest, husky는 `devDependencies`다
+- 의존성: Storybook, Vite, Rollup, `@lwc/*`, `lwc`, `lightning-base-components`, `@salesforce-ux/design-system-2`, `typescript`는 `dependencies`다. ESLint, Jest, husky는 `devDependencies`다
 - 발행: 태그 `v*`를 붙이면 GitHub Actions가 `GITHUB_TOKEN`(`packages: write`)으로 발행한다. 발행은 **두 번만** 한다. 10/12의 `v0.0.1`은 설치 경로 확인용이고, 10/16에 최종 버전을 발행한다. 그 사이 리허설은 `pnpm pack`으로 만든 tgz를 `pnpm add -D <tgz>`로 설치해 반복한다
 - 디자인 시스템 저장소의 `brands/`(밀버스, Sample_Forest)는 저장소 Storybook의 다중 브랜드 데모용으로 남긴다
 
@@ -223,7 +224,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | `--slds-c-*`, `--sds-c-*` | SLDS 2 지원이 미확인이고 `:root`에 두면 모든 변형을 덮는다. native에서만 메울 수 있는 c hook 목록은 9.2에 준비만 해 둔다 |
 | 읽는 곳이 없는 이름, 오타 | 아무 효과 없이 지나간다 |
 
-PR #19의 검사 스크립트, CLAUDE.md 3장, 이 표가 지금 서로 다르다. 10/12에 셋을 이 표로 맞춘다.
+이 표가 원본이다. 검사 스크립트(`lib/rules.ts`, `scripts/check-brands.ts`)와 CLAUDE.md 3장은 2026-10-09 Task 7에서 이 표로 맞췄다.
 
 ### 5.3 피드백 색 (성공·경고·오류·정보)
 
@@ -414,7 +415,7 @@ PR #19의 검사 스크립트, CLAUDE.md 3장, 이 표가 지금 서로 다르�
 | 밀버스 LWC와 테스트 | `.ts`, `.test.ts`. org에 `.ts`를 그대로 배포한다 |
 
 - `tsconfig` 핵심: `target: ESNext`(데코레이터를 그대로 둔다), `experimentalDecorators: false`, `strict`. CLI용은 `erasableSyntaxOnly`, `allowImportingTsExtensions`, `rewriteRelativeImportExtensions`
-- 타입: `lwc` 패키지 타입을 쓰면 `@api`에 `// @ts-ignore`가 필요 없다(로컬 확인). 기본 컴포넌트 타입은 `@salesforce/lightning-types`
+- 타입: `lwc` 패키지 타입을 쓰면 `@api`에 `// @ts-ignore`가 필요 없다(로컬 확인). 플랫폼 모듈(`lightning/platformResourceLoader`, `@salesforce/resourceUrl/*` 등) 타입은 패키지의 `lwc-platform.d.ts`로 선언한다(2026-10-09 Task 6. `@salesforce/lightning-types`는 쓰지 않는다)
 - `sfdx-project.json`의 `"defaultLwcLanguage": "typescript"`로 VS Code가 TS 컴포넌트를 바로 만든다
 - `check`의 `--milvus-*` 수집 대상에 `.ts`를 넣는다(지금 스크립트는 `.css`·`.js`만 본다)
 - ESLint가 `.ts`를 검사하도록 10/12에 설정한다. 새 의존성이 필요하면 PR에 이유를 적는다
@@ -449,7 +450,7 @@ PR #19의 검사 스크립트, CLAUDE.md 3장, 이 표가 지금 서로 다르�
 ### 9.2 native 전환 대비
 
 **감지**
-1. org에서: 기본 컴포넌트는 synthetic이 아닐 때 호스트에 `data-render-mode="shadow"`를 붙인다(123개 폴더). `loadBrand`가 자기 템플릿 안의 `lightning-*` 호스트에서 이 속성을 확인하고, 있으면 개발 콘솔에 경고한다
+1. org에서: 기본 컴포넌트는 synthetic이 아닐 때 호스트에 `data-render-mode="shadow"`를 붙인다(123개 폴더). 밀버스 컴포넌트가 첫 렌더 뒤 `milvusScript`의 `detectNativeShadow(this.template)`로 자기 템플릿 안의 `lightning-*` 호스트에서 이 속성을 확인하고, 있으면 개발 콘솔에 경고한다(2026-10-09 Task 6 구현. `loadBrand`가 아니라 각 컴포넌트가 부른다)
 2. 패키지 갱신 때: SLDS 2나 기본 컴포넌트 버전을 올리면 9.6의 정적 검사가 native 지원 목록, 새 하드코딩, hook 이름 변화를 기준 파일과 비교해 실패시킨다
 3. Salesforce 릴리스(연 3회)마다 릴리스 노트의 native shadow 항목을 사람이 확인한다
 
@@ -550,7 +551,7 @@ PR #19의 검사 스크립트, CLAUDE.md 3장, 이 표가 지금 서로 다르�
   - `check`: 통과·실패 예시 파일(5.2, 5.3의 각 규칙)
   - `init`: 두 번 실행해도 같은 결과, `CLAUDE.md`에 추가된 줄이 정확히 `@milvus-design.md`인지
   - `update`: 로컬 수정 감지, 전부 반영 또는 아무것도 바꾸지 않음
-- LWC: Jest `.test.ts`
+- LWC: 이미 있는 Jest `.test.ts`는 유지한다. 새 LWC에는 Jest 테스트를 굳이 만들지 않는다(10/9 사용자 결정). 화면 확인은 Storybook 스토리로 한다
 - 타입 검사: `tsc --noEmit`
 - 전 컴포넌트 반영: 9.6의 정적 검사(CI, 기준 파일 비교)와 센티널 브랜드로 돌리는 동적 검사(Storybook, 처음에는 수동)
 - CI: lint, 타입 검사, 테스트, 정적 반영 검사, Storybook 빌드. 태그 `v*`이면 GitHub Packages 발행
@@ -604,19 +605,21 @@ PR #19의 검사 스크립트, CLAUDE.md 3장, 이 표가 지금 서로 다르�
 | Vite 플러그인의 `configureServer` 미들웨어가 Storybook 개발 서버 포트에서 응답한다(`POST /__milvus/ping` → `{"ok":true}`) | 같은 스파이크 |
 | Storybook 개발 서버는 기본으로 모든 네트워크 주소(`*:6007`)에서 듣는다. `--host localhost`를 주면 `[::1]`에서만 듣고, 이때 `127.0.0.1`로는 연결되지 않는다 | 같은 스파이크, `lsof` |
 | 설치할 때 pnpm 10.13.1이 `esbuild` 빌드 스크립트를 건너뛰었다고 경고한다. 그래도 Storybook의 `.ts` 설정 변환(esbuild)은 동작한다 | 같은 스파이크 |
+| 태그 `v0.0.1` push로 Actions가 GitHub Packages에 발행했다(`GITHUB_TOKEN`, 32초). 패키지는 **공개**로 생겼다(로그인 없이 패키지 페이지와 설치 명령이 보임). GitHub 문서는 새 패키지의 기본을 비공개로 적는다 — 이 경우 공개가 된 이유는 미확인 | Publish run(2026-10-09), 패키지 페이지 익명 접근 |
+| 프로젝트 `.npmrc` 두 줄(0장)과 셸 환경변수 `NODE_AUTH_TOKEN`(`read:packages` classic 토큰)으로 pnpm 10.13.1이 `${NODE_AUTH_TOKEN}`을 치환해 설치한다. `pnpm add -D @a40418a/milvus-design-system@0.0.1` → `pnpm milvus --version`이 `0.0.1` | `learndoshare_2`(2026-10-09) |
 
 ## 14. 미확인 (구현 중 확인할 것)
 
 | 항목 | 확인 시점 |
 | --- | --- |
-| `.npmrc`의 `${NODE_AUTH_TOKEN}` 치환으로 GitHub Packages 설치가 되는가, 공개 저장소에 연결된 패키지의 공개 범위 | 10/12 `v0.0.1` |
 | Vite 개발 서버 미들웨어로 요청 파일을 저장할 수 있는가. POST 미들웨어 응답까지는 확인했다(13장) | Task 17 테스트 |
 | `node_modules`의 `.storybook`에서 `preview.ts`·`manager.ts`(manager 번들러), `../lib/*.ts` import, 정적 빌드(`storybook build`, `milvus storybook --build`)도 되는가. Task 3 스파이크는 `main.ts`·형제 `.ts`·스토리·addon만 쟀다 | Task 17 후 tgz 리허설 |
 | 피드백 색 hook을 util.css로 바꾸면 LEX 표준 화면에도 반영되는가 | 10/12 org 프로브 |
 | VF에서 `milvusVf.css` + `milvusBrand`가 SLDS 2·팔레트·util.css를 함께 적용하는가 | 10/12 org 프로브 |
 | `loadStyle`로 넣은 클래스 규칙(예: `.slds-button { border-radius: 0 }`)이 LEX의 `lightning-button` 안까지 닿는가. 10/8 프로브는 hook 두 개만 쟀다. `milvusBridge`·`milvusOverride`의 전제다 | 10/12 org 프로브 |
 | **VF 공식 SLDS 2 경로:** Help "User Interface Settings"의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active" 설정과 `<apex:slds lightningStyleMode>`(API 65.0+, 기본 Auto)가 있다(2026-10-09 공식 문서 확인, Learn 00·01). 10/8 프로브는 API 67.0 페이지에서 SLDS 1로 그려졌고 그때 설정 상태는 기록이 없다. 설정을 켜면 org 테마 팔레트까지 들어오는가. 들어오면 `milvusVf`는 util.css가 있을 때만 필요하거나 아예 필요 없다(4.4, 5.5, Task 24 재검토) | 10/12 org 프로브(설정 읽기는 자유, 변경은 승인) |
-| pnpm 11.5.3 이후(10.x는 10.34.2 이후) 프로젝트 `.npmrc`의 `${…}` 치환을 하지 않는다는 pnpm.io 설명(Learn 07)과 0장·3장의 `.npmrc` 안내가 맞는가. 안 맞으면 토큰 줄은 `~/.npmrc`, 범위 레지스트리는 `pnpm-workspace.yaml`의 `registries`로 안내한다 | 10/12 `v0.0.1` 설치 확인 |
+| pnpm 11.5.3 이후(10.x는 10.34.2 이후) 프로젝트 `.npmrc`의 `${…}` 치환을 하지 않는다는 pnpm.io 설명(Learn 07). 10.13.1에서는 치환이 동작했다(13장). 고객 프로젝트가 더 새 pnpm을 쓰면 토큰 줄은 `~/.npmrc`, 범위 레지스트리는 `pnpm-workspace.yaml`의 `registries`로 안내해야 한다 — 그 버전에서 실제 확인 | Task 20(milvus-design.md 설치 안내) 전 |
+| 고객 프로젝트에서 pnpm이 `esbuild` 빌드 스크립트를 건너뛰는 것이 Storybook 정적 빌드·Vite에 영향을 주는가. 영향이 있으면 `init`이 `pnpm.onlyBuiltDependencies`에 `esbuild`를 더한다 | Task 11·18 |
 | `Bash(pnpm milvus deploy *)`가 인자 없는 명령에도 걸리는가 | 10/13 |
 | `sfdx-project.json`의 `defaultLwcLanguage` 키가 실제 스키마에 있고 VS Code가 따르는가 (설치된 `@salesforce/core` 스키마에서 확인함, VS Code 동작은 미확인) | 10/13 |
 | `Edit(...)` deny 규칙이 의도대로 막는가 | 10/13 |
