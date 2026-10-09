@@ -24,7 +24,7 @@ describe("c-milvus-multi-select", () => {
     }
   });
 
-  function render(props: Record<string, unknown> = {}) {
+  function render(props = {}) {
     const element = createElement("c-milvus-multi-select", {
       is: MilvusMultiSelect
     });
@@ -33,11 +33,10 @@ describe("c-milvus-multi-select", () => {
     return element;
   }
 
-  type Host = ReturnType<typeof render>;
-  const input = (element: Host) =>
-    element.shadowRoot!.querySelector("input")!;
-  const options = (element: Host) => [
-    ...element.shadowRoot!.querySelectorAll<HTMLElement>(
+  const input = (element) =>
+    element.shadowRoot.querySelector("input");
+  const options = (element) => [
+    ...element.shadowRoot.querySelectorAll(
       '[role="option"][data-value]'
     )
   ];
@@ -59,7 +58,7 @@ describe("c-milvus-multi-select", () => {
     options(element)[1].dispatchEvent(new CustomEvent("mousedown"));
     await flush();
     expect(handler.mock.calls[0][0].detail.value).toEqual(["busan"]);
-    expect(element.shadowRoot!.querySelectorAll("lightning-pill")).toHaveLength(
+    expect(element.shadowRoot.querySelectorAll("lightning-pill")).toHaveLength(
       1
     );
   });
@@ -95,7 +94,7 @@ describe("c-milvus-multi-select", () => {
 
   it("pill의 remove 이벤트로 선택을 지운다", async () => {
     const element = render({ value: ["daegu"] });
-    const pill = element.shadowRoot!.querySelector("lightning-pill")!;
+    const pill = element.shadowRoot.querySelector("lightning-pill");
     pill.dispatchEvent(new CustomEvent("remove"));
     await flush();
     expect(element.value).toEqual([]);

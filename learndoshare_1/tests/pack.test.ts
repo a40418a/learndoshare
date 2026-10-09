@@ -32,6 +32,13 @@ test("pack 결과에 dist/cli/index.js가 있고 __tests__가 없으며, 텍스�
   assert.deepEqual(checked.filter((e) => read(e).includes("/Users/")), []);
 });
 
+test("pack 결과에 tsconfig.lwc.base.json·lwc-platform.d.ts와 force-app 아래 .ts가 없고 milvusBrandLoader.js가 있다", () => {
+  assert.ok(!entries.includes("package/tsconfig.lwc.base.json"));
+  assert.ok(!entries.includes("package/lwc-platform.d.ts"));
+  assert.deepEqual(entries.filter((e) => e.startsWith("package/force-app/") && e.endsWith(".ts")), []);
+  assert.ok(entries.includes("package/force-app/main/default/lwc/milvusBrandLoader/milvusBrandLoader.js"), entries.join("\n"));
+});
+
 test("실행 파일 dist/cli/index.js는 shebang으로 시작하고, 빌드된 채로 --version에 버전을 출력한다", () => {
   assert.ok(read("package/dist/cli/index.js").startsWith("#!/usr/bin/env node\n"));
   const run = spawnSync(process.execPath, ["dist/cli/index.js", "--version"], { cwd: root, encoding: "utf8" });

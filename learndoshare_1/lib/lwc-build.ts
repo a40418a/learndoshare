@@ -4,7 +4,6 @@ import lwc from "@lwc/rollup-plugin";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import replacePlugin from "@rollup/plugin-replace";
 import { rollup, type OutputOptions, type Plugin, type RollupOptions } from "rollup";
-import ts from "typescript";
 
 type LwcModule = { name: string; path: string };
 
@@ -34,22 +33,6 @@ const platformModules: Plugin = {
   load: (id) => (id.startsWith(PREFIX) ? platformModule(id.slice(PREFIX.length)) : null)
 };
 
-// LWC 컴파일러는 TS 문법을 읽지 못한다. 타입만 지우고 데코레이터(@api 등)는 그대로 둔다(target ESNext)
-const stripTypes: Plugin = {
-  name: "milvus-strip-types",
-  transform(code, id) {
-    if (!id.split("?")[0].endsWith(".ts")) return null;
-    const compilerOptions = { target: ts.ScriptTarget.ESNext, module: ts.ModuleKind.ESNext, experimentalDecorators: false };
-    // ponytail: map을 만들지 않는다. 다음 단계인 LWC 플러그인도 sourcemap을 만들지 않으므로(sourcemap 기본 false)
-    // 컴포넌트 줄 위치는 원래도 정확하지 않다. 디버깅에 필요해지면 둘 다 켠다
-    const { outputText, diagnostics } = ts.transpileModule(code, { fileName: id, reportDiagnostics: true, compilerOptions });
-    // 문법 오류가 있어도 결과는 나온다(복구하며 코드 일부를 버린다). 문법 진단이 있으면 빌드를 멈춘다
-    const d = diagnostics?.[0];
-    if (d) this.error(ts.flattenDiagnosticMessageText(d.messageText, "\n"), d.start);
-    return { code: outputText, map: null };
-  }
-};
-
 export function lwcRollupOptions(o: { out: string; entries: Record<string, string>; modules: LwcModule[] }): RollupOptions {
   return {
     // 모든 컴포넌트를 한 번에 빌드해 LWC 엔진이 한 벌만 들어가게 한다
@@ -69,10 +52,9 @@ export function lwcRollupOptions(o: { out: string; entries: Record<string, strin
       if (warning.code === "UNRESOLVED_IMPORT") throw new Error(warning.message);
       warn(warning);
     },
-    // 대체 모듈과 타입 제거는 LWC 플러그인보다 앞에 둔다
+    // 대체 모듈은 LWC 플러그인보다 앞에 둔다
     plugins: [
       platformModules,
-      stripTypes,
       replace({ preventAssignment: true, values: { "process.env.NODE_ENV": JSON.stringify("development") } }),
       lwc({
         // npm 모듈(lightning-base-components, @lwc/*)을 찾는 기준 폴더. 지정하지 않으면 첫 진입 파일의 폴더를 쓰고 경고한다
@@ -99,7 +81,8 @@ export async function buildLwc(o: Parameters<typeof lwcRollupOptions>[0]): Promi
 }
 
 // @lwc/module-resolver의 dir 레코드에는 namespace 옵션이 없다.
-// SFDX 경로(lwc/<이름>/<이름>.js)를 c/<이름>으로 쓰려면 컴포넌트마다 alias를 등록해야 한다
+// SFDX 경로(lwc/<이름>/<이름>.js)를 c/<이름>으로 쓰려면 컴포넌트마다 alias를 등록해야 한다.
+// .ts는 찾지 않는다. org에 올라가는 것은 .js다(10/9 D1. 공식 문서도 LWC TypeScript를 배포 전에 .js로 변환하라고 한다)
 export function sfdxLwcModules(projectRoot: string): LwcModule[] {
   const { packageDirectories } = JSON.parse(readFileSync(join(projectRoot, "sfdx-project.json"), "utf8")) as {
     packageDirectories: { path: string }[];
@@ -108,9 +91,8 @@ export function sfdxLwcModules(projectRoot: string): LwcModule[] {
   for (const { path } of packageDirectories) {
     const base = resolve(projectRoot, path);
     for (const file of readdirSync(base, { recursive: true, encoding: "utf8" })) {
-      const [, name, ext] = /(?:^|[\\/])lwc[\\/]([^\\/]+)[\\/]\1\.(ts|js)$/.exec(file) ?? [];
-      // 같은 폴더에 둘 다 있으면 원본인 .ts를 쓴다
-      if (name && (ext === "ts" || !found.has(`c/${name}`))) found.set(`c/${name}`, join(base, file));
+      const [, name] = /(?:^|[\\/])lwc[\\/]([^\\/]+)[\\/]\1\.js$/.exec(file) ?? [];
+      if (name && !found.has(`c/${name}`)) found.set(`c/${name}`, join(base, file));
     }
   }
   return [...found].map(([name, path]) => ({ name, path }));

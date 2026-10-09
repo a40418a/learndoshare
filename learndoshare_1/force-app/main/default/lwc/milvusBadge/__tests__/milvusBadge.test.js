@@ -16,15 +16,15 @@ describe("c-milvus-badge", () => {
     }
   });
 
-  function create(props: Record<string, unknown>) {
+  function create(props) {
     const element = createElement("c-milvus-badge", { is: MilvusBadge });
     Object.assign(element, props);
     document.body.appendChild(element);
     return element;
   }
 
-  function render(props: Record<string, unknown>) {
-    return create(props).shadowRoot!.querySelector("lightning-badge") as HTMLElement & Record<string, unknown>;
+  function render(props) {
+    return create(props).shadowRoot.querySelector("lightning-badge");
   }
 
   it.each([

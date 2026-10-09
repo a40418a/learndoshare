@@ -166,7 +166,7 @@ force-app/main/default/
 - `.storybook/main.ts`는 `server.fs.allow`에 `searchForWorkspaceRoot(root)`와 프로젝트 폴더를 함께 넣는다(`allow`를 직접 주면 Vite 기본값이 빠진다)
 - 브랜드: `milvus.config.json`의 브랜드 이름으로 `brandingSets/LEXTHEMING<이름>`을 읽는다. `BRAND_COLOR` → 팔레트 계산 → `--slds-r-color-brand-*`. `milvusBrand.css`는 문서에 넣는다. 로고는 사이드바에 쓴다. 비교용으로 "SLDS 기본" 브랜드도 함께 고를 수 있다
 - 내용: SLDS 컴포넌트 카탈로그(공식 예제, 73개 컴포넌트, 패키지에 미리 만들어 넣음), 밀버스 컴포넌트(프로젝트 사본으로 그림), 브랜드 명세 페이지(6장), Foundations(색, 영향 지도), 컴포넌트별 "Salesforce 원본과 읽는 hook" 보기(9.5), 반영 검사 페이지(9.6)
-- LWC 빌드: 밀버스 LWC는 `.js`라 그대로 Rollup에 넣는다(10/9 D1). `.ts` 타입 제거 플러그인(`typescript.transpileModule`)은 고객 프로젝트 자체 `.ts` LWC에만 의미가 있어, 남길지는 계획 Task 30에서 정한다. npm에 없는 플랫폼 모듈은 대신하는 모듈로 바꾼다: `lightning/platformResourceLoader`의 `loadStyle`은 바로 끝나는 함수, `@salesforce/resourceUrl/*`은 경로 문자열. 결과는 `.milvus/`에 둔다
+- LWC 빌드: 밀버스 LWC는 `.js`라 그대로 Rollup에 넣는다(10/9 D1). `.ts` 타입 제거 플러그인(`typescript.transpileModule`)은 Task 30에서 지웠다. 남는 사용처가 고객 프로젝트 자체 `.ts` LWC뿐인데, Storybook은 밀버스 컴포넌트와 카탈로그만 그려 그 컴포넌트를 import하지 않는다. `sfdxLwcModules`도 `<이름>.js`만 찾는다(org에 올라가는 것은 `.js`다. 공식 문서도 TS LWC를 배포 전에 JS로 변환하라고 한다). npm에 없는 플랫폼 모듈은 대신하는 모듈로 바꾼다: `lightning/platformResourceLoader`의 `loadStyle`은 바로 끝나는 함수, `@salesforce/resourceUrl/*`은 경로 문자열. 결과는 `.milvus/`에 둔다
 - 브랜드 메타데이터가 없거나 util.css가 규칙을 어기면 SLDS 기본 브랜드로 띄우고 화면 위에 오류를 보여 준다
 - 대체 경로: `node_modules` 안의 설정으로 띄우는 것이 안 되면 `init`이 `.storybook/`을 프로젝트에 복사한다. Task 3 스파이크에서는 필요하지 않았다. 14장의 남은 확인 항목이 실패할 때만 쓴다
 
@@ -433,6 +433,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 - `init`은 고객 `sfdx-project.json`의 `defaultLwcLanguage`를 바꾸지 않는다. 고객 프로젝트의 기본 LWC 언어는 고객 설정 그대로다
 - `check`의 `--milvus-*` 수집 대상은 밀버스 LWC의 `.css`·`.js`다(Task 30에서 `.ts`를 `.js`로 바꾼다)
 - ESLint는 LWC에 `@salesforce/eslint-config-lwc/recommended`(JS)를 쓴다. `.ts` LWC 블록은 Task 30에서 지운다
+- Rollup의 `.ts` 타입 제거 플러그인과 `sfdxLwcModules`의 `.ts` 우선 규칙은 Task 30에서 지웠다. 쓰는 곳이 없어서다(4.2)
 - 이전 설계(10/8~10/9 Task 6): 밀버스 LWC `.ts`, `tsconfig.lwc.base.json`, `lwc-platform.d.ts`, 고객 `lwc/tsconfig.json`, `"defaultLwcLanguage": "typescript"`. Task 30에서 모두 지운다
 
 ---

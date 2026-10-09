@@ -43,7 +43,7 @@ export function hooksIndexFromSource(pkgRoot: string): HooksIndex {
 const filesUnder = (dir: string): string[] =>
   existsSync(dir) ? readdirSync(dir, { recursive: true, encoding: "utf8" }).map((f) => join(dir, f)) : [];
 
-// CSS의 var(--milvus-*)와 TS의 문자열 "--milvus-*"(getPropertyValue 등)
+// CSS의 var(--milvus-*)와 JS의 문자열 "--milvus-*"(getPropertyValue 등)
 function milvusReads(text: string): string[] {
   return [...text.replace(COMMENT, "").matchAll(/var\(\s*(--milvus-[\w-]+)|["'`](--milvus-[\w-]+)["'`]/g)].map((m) => m[1] ?? m[2]);
 }
@@ -51,7 +51,7 @@ function milvusReads(text: string): string[] {
 /**
  * util.css 검사 문맥.
  * - hook 색인: pkgRoot의 dist/hooks-index.json이 있으면(설치된 패키지) 읽고, 없으면(저장소) 원본에서 계산한다
- * - milvusVars: 밀버스 컴포넌트(lwc/milvus*의 .css·.ts, __tests__ 제외)와 milvusBridge.css가 읽는 --milvus-* 이름.
+ * - milvusVars: 밀버스 컴포넌트(lwc/milvus*의 .css·.js, __tests__ 제외)와 milvusBridge.css가 읽는 --milvus-* 이름.
  *   projectRoot가 있으면 프로젝트의 사본을, 없으면 저장소의 lwc와 templates/**\/milvusBridge.css를 본다
  */
 export function loadRuleContext(o: { pkgRoot: string; projectRoot?: string }): RuleContext {
@@ -63,7 +63,7 @@ export function loadRuleContext(o: { pkgRoot: string; projectRoot?: string }): R
   const lwc = join(o.projectRoot ?? o.pkgRoot, "force-app/main/default/lwc");
   const components = filesUnder(lwc).filter((f) => {
     const parts = relative(lwc, f).split(sep);
-    return parts[0].startsWith("milvus") && !parts.includes("__tests__") && /\.(css|ts)$/.test(f);
+    return parts[0].startsWith("milvus") && !parts.includes("__tests__") && /\.(css|js)$/.test(f);
   });
   const bridges = o.projectRoot
     ? [join(o.projectRoot, "force-app/main/default/staticresources/milvusBridge.css")].filter((f) => existsSync(f))

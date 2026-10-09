@@ -17,7 +17,6 @@
       "Bash(sf org display *)",
       "Bash(sf org open --url-only *)",
       "Edit(/force-app/main/default/lwc/milvus*/**)",
-      "Edit(/force-app/main/default/lwc/tsconfig.json)",
       "Edit(/force-app/main/default/classes/utils/design/**)",
       "Edit(/force-app/main/default/components/milvusHead.component*)",
       "Edit(/force-app/main/default/staticresources/milvusVf.*)",

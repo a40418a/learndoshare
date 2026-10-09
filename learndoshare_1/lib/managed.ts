@@ -40,7 +40,6 @@ export function managedFiles(pkgRoot: string, o: { vf: boolean }): ManagedFile[]
     copy(".claude/skills/milvus-brand/SKILL.md", "managed", tpl("claude/skills/milvus-brand/SKILL.md")),
     copy(".claude/hooks/milvus-check.mjs", "managed", tpl("claude/hooks/milvus-check.mjs")),
     { dest: "milvus.config.json", kind: "generated" },
-    copy(`${FA}/lwc/tsconfig.json`, "managed"),
     ...bundles.flatMap((b) => fromPackage(`${FA}/lwc/${b}`)),
     ...fromPackage(`${FA}/classes/utils/design`),
     copy(`${RES}/milvusBridge.css`, "managed"),
