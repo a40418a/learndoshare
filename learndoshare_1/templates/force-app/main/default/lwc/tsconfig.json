@@ -1,0 +1,4 @@
+{
+  "extends": "@a40418a/milvus-design-system/tsconfig.lwc.base.json",
+  "include": ["**/*.ts"]
+}
