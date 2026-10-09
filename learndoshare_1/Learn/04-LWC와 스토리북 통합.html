@@ -32,6 +32,7 @@
     <li><a href="#lbc">lightning-base-components</a></li>
     <li><a href="#ce">요소 만들기: createElement와 CustomElementConstructor</a></li>
     <li><a href="#arch">현재 빌드 구조와 shadow 모드</a></li>
+    <li><a href="#plugins">TypeScript와 플랫폼 모듈</a></li>
     <li><a href="#code">저장소 코드</a></li>
     <li><a href="#risks">위험 요소</a></li>
     <li><a href="#branch">분기점 판정 기준과 결과</a></li>
@@ -91,7 +92,7 @@
   <h3>주요 옵션 (9.4.3 README)</h3>
   <div class="table-wrap"><table>
     <tr><th>옵션</th><th>의미</th><th>저장소</th></tr>
-    <tr><td><code>rootDir</code></td><td>LWC 루트 모듈 디렉터리. 기본값은 Rollup <code>input</code>이 있는 디렉터리</td><td>쓰지 않음 (alias 경로를 절대 경로로 줌)</td></tr>
+    <tr><td><code>rootDir</code></td><td>LWC 루트 모듈 디렉터리. 기본값은 Rollup <code>input</code>이 있는 디렉터리</td><td>첫 진입 파일의 폴더를 준다. npm 모듈을 찾는 기준 폴더다. alias 경로는 절대 경로로 주므로 이 값과 상관없다 (2026-10-09 갱신)</td></tr>
     <tr><td><code>modules</code></td><td><code>ModuleRecord[]</code>. <code>@lwc/module-resolver</code>에 넘기는 모듈 해석 규칙</td><td>SFDX alias + 공식 예제 alias + <code>{ npm: 'lightning-base-components' }</code></td></tr>
     <tr><td><code>disableSyntheticShadowSupport</code></td><td>synthetic shadow 지원 코드를 빼서 결과를 줄이는 옵션</td><td><b>켜지 않음</b>. 우리는 synthetic을 쓴다</td></tr>
     <tr><td><code>enableDynamicComponents</code></td><td>템플릿 컴파일러의 동적 컴포넌트(<code>lwc:is</code>)를 켠다</td><td><b>켬</b>. 공식 예제 <code>multiColumnSortingModal</code>이 <code>lwc:is</code>를 쓴다</td></tr>
@@ -119,8 +120,8 @@
     <tr><td>컴포넌트마다 alias 레코드</td><td><span class="tag ok">동작</span> <code>c/milvusBadge</code>로 해석된다. 저장소가 쓰는 방식</td></tr>
     <tr><td>폴더 하나에 심볼릭 링크 <code>c</code> → <code>force-app/main/default/lwc</code> 두고 그 폴더를 <code>dir</code>로</td><td><span class="tag warn">미확인</span> 이론상 가능. 시험하지 않았다</td></tr>
   </table></div>
-<pre data-file="alias 레코드 예"><code>{ "name": "c/milvusBadge", "path": "force-app/main/default/lwc/milvusBadge/milvusBadge.js" }</code></pre>
-  <p>컴포넌트가 늘 때마다 손으로 추가할 수는 없으므로, <code>rollup.lwc.config.mjs</code>가 <code>lwc</code> 폴더를 읽어 alias 목록을 <b>자동 생성</b>한다 (<a href="#code">저장소 코드</a>).</p>
+<pre data-file="alias 레코드 예"><code>{ "name": "c/milvusBadge", "path": "force-app/main/default/lwc/milvusBadge/milvusBadge.ts" }</code></pre>
+  <p>컴포넌트가 늘 때마다 손으로 추가할 수는 없으므로, <code>lib/lwc-build.ts</code>의 <code>sfdxLwcModules()</code>가 alias 목록을 <b>자동 생성</b>한다 (<a href="#code">저장소 코드</a>). 2026-10-09 갱신: <code>sfdx-project.json</code>의 모든 패키지 폴더에서 <code>lwc/&lt;이름&gt;/&lt;이름&gt;.ts</code> 또는 <code>.js</code>를 찾고, 같은 폴더에 둘 다 있으면 원본인 <code>.ts</code>를 쓴다. 예전 설정 파일(<code>rollup.lwc.config.mjs</code>)은 <code>force-app/main/default/lwc</code> 한 곳의 <code>.js</code>만 봤다.</p>
   <div class="callout warn"><strong>인터넷 예제 주의</strong><span class="tag warn">미확인</span> 일부 설정 예제에 <code>{ dir, namespace: 'c' }</code> 형태가 보인다. 그 예제가 어떤 해석기를 쓰는지는 확인하지 않았다. 일반 <code>@lwc/module-resolver</code> 9.4.3에서는 위 표처럼 동작하지 않는다.</div>
   <p class="sources">출처: <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/module-resolver">@lwc/module-resolver README (dir 레코드, NO_LWC_MODULE_FOUND)</a> (확인 2026-10-09) · <a href="https://lwc.dev/guide/es_modules">lwc.dev — ES Modules</a> (확인 2026-10-09) · <a href="../README.md">README 3장 "SFDX 경로 모듈 해석" (2026-09-26 실험)</a> (확인 2026-10-09)</p>
 </section>
@@ -165,14 +166,15 @@ const element = createElement('lightning-hello', { is: LightningHello });</code>
   <h2>현재 빌드 구조와 shadow 모드</h2>
   <p>2026-10-09 갱신: 이 절은 원래 "확장 아키텍처 (계획)"이었다. 지금은 아래 구조로 동작한다.</p>
   <div class="flow">
-    <div class="step"><b>1. Rollup 빌드</b>진입 둘(<code>index</code>: <code>stories/lwc-entry.js</code>, <code>catalog</code>: 공식 예제)을 <b>한 번의 빌드</b>로</div>
+    <div class="step"><b>1. Rollup 빌드</b><code>node scripts/build-lwc.ts</code>가 <code>lib/lwc-build.ts</code>의 <code>buildLwc()</code>로 진입 둘(<code>index</code>: <code>stories/lwc-entry.js</code>, <code>catalog</code>: 공식 예제)을 <b>한 번의 빌드</b>로</div>
     <div class="arrow">→</div>
     <div class="step"><b>2. dist/lwc</b><code>index.js</code>, <code>catalog.js</code>, <code>synthetic-shadow</code> chunk, 엔진이 든 공통 chunk</div>
     <div class="arrow">→</div>
     <div class="step"><b>3. preview.js</b>SLDS 2 CSS 전역 로드, 브랜드 decorator</div>
     <div class="arrow">→</div>
-    <div class="step"><b>4. 스토리</b><code>helpers.js</code>가 <code>dist/lwc/index.js</code>를 읽고 <code>createElement</code>로 요소를 만든다</div>
+    <div class="step"><b>4. 스토리</b><code>helpers.js</code>가 alias <code>@milvus/lwc</code>(= <code>dist/lwc</code>)의 <code>index.js</code>를 읽고 <code>createElement</code>로 요소를 만든다</div>
   </div>
+  <p class="c">2026-10-09 갱신: 빌드 설정 파일 <code>rollup.lwc.config.mjs</code>와 Rollup CLI 대신, 패키지에서도 다시 쓸 수 있게 함수(<code>lib/lwc-build.ts</code>)와 실행 스크립트(<code>scripts/build-lwc.ts</code>)로 나눴다. 스크립트는 Rollup JavaScript API(<code>rollup()</code> → <code>bundle.write()</code> → <code>bundle.close()</code>)를 쓰고, Node가 <code>.ts</code>를 그대로 실행한다(타입 지우기, Node 22.18+·23.6+ 기본). 스토리는 <code>dist/lwc</code>를 상대 경로가 아니라 Vite alias <code>@milvus/lwc</code>로 읽는다(<code>.storybook/main.mjs</code>).</p>
   <h3>왜 한 번의 빌드인가</h3>
   <p>컴포넌트마다 따로 빌드하면 각 결과물에 LWC 엔진이 하나씩 들어간다. 엔진이 페이지에 여러 벌 있으면 컴포넌트끼리 서로를 모르는 상태가 될 수 있다. 입력을 여러 개 준 한 번의 Rollup 빌드는 공통 코드를 공유 chunk로 뽑아내므로 엔진이 한 벌만 로드된다. <code>lightning-base-components</code> 안의 동적 import 때문에 chunk는 여러 개 생긴다. <span class="tag warn">미확인</span> 엔진 중복 시 실제 증상은 재현하지 않았다.</p>
   <h3>synthetic shadow를 먼저 실행하기</h3>
@@ -185,139 +187,267 @@ const element = createElement('lightning-hello', { is: LightningHello });</code>
   </ul>
   <div class="callout key"><strong>기능 게이트 하나만 닫는다</strong>npm 패키지는 <code>@salesforce/gate/*</code>를 모두 열린 것으로 연결한다. 그중 <code>bc.260.enableComboboxElementInternals</code>가 열려 있으면 <code>baseCombobox</code>가 생성자에서 <code>attachInternals()</code>를 부르고, LWC 엔진은 synthetic shadow에서 "attachInternals API is not supported in synthetic shadow." 오류를 낸다. org에서는 같은 컴포넌트가 synthetic으로 동작하므로 이 게이트가 닫혀 있다고 보고(추정), 저장소 빌드는 <b>이 게이트 하나만</b> 닫는다. 나머지 게이트는 패키지 stub대로 열려 있다.</div>
   <h3>개발 루프</h3>
-  <p><code>pnpm dev:lwc</code>(<code>rollup -w</code>, 감시 모드)와 <code>pnpm exec storybook dev -p 6006</code>을 <b>터미널 두 개</b>에서 띄운다. 컴포넌트를 저장하면 Rollup이 dist를 다시 쓰고, Storybook(Vite)이 바뀐 파일을 다시 읽는다. 상태를 유지하는 HMR이 아니라 <b>다시 빌드 후 새로 고침</b>이다. <span class="tag warn">미확인</span> 저장 후 반영까지 걸리는 시간은 측정 기록이 없다.</p>
+  <p>2026-10-09 갱신: 감시 모드 스크립트 <code>pnpm dev:lwc</code>(<code>rollup -w</code>)는 빌드를 <code>lib/lwc-build.ts</code>로 옮기면서 지웠다. <code>pnpm storybook</code>은 시작할 때 <code>pnpm build:lwc</code>를 한 번 실행한다. 컴포넌트를 고친 뒤에는 다른 터미널에서 <code>pnpm build:lwc</code>를 다시 실행해 <code>dist/lwc</code>를 새로 만든다. 상태를 유지하는 HMR이 아니라 <b>다시 빌드 후 새로 고침</b>이다. <span class="tag warn">미확인</span> 실행 중인 Storybook이 새로 만든 <code>dist/lwc</code>를 자동으로 다시 읽는지, 반영까지 걸리는 시간은 측정 기록이 없다.</p>
   <div class="callout project"><strong>SLDS 2 CSS (2026-10-09 갱신)</strong>전역 CSS는 <code>@salesforce-ux/design-system-2</code> 2.264.2의 <code>dist/css/bundled/slds2.cosmos.css</code>다. preview.js에서 import한다. <code>@salesforce-ux/design-system</code>(2.264.1)은 SLDS 1 빌드라서 브랜드 색이 버튼에 반영되지 않았다 (#3 실측).</div>
-  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM (LEX·Experience Cloud는 synthetic)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-light-dom.html">LWC Developer Guide — Light DOM</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/blob/master/packages/%40lwc/engine-core/src/framework/base-lightning-element.ts">LWC 엔진 소스 (attachInternals 오류)</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/attachInternals">MDN — attachInternals()</a> (확인 2026-10-09) · <a href="https://rollupjs.org/configuration-options/">Rollup — Configuration options (input, manualChunks)</a> (확인 2026-10-09) · <a href="https://rollupjs.org/command-line-interface/">Rollup — CLI (-w)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">@salesforce-ux/design-system-2 (npm)</a> (확인 2026-10-09) · <a href="../README.md">README 3장 "LWC shadow 모드", "SLDS 2 CSS 패키지" (2026-10-07 org 실측, #3 실측)</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM (LEX·Experience Cloud는 synthetic)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-light-dom.html">LWC Developer Guide — Light DOM</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/blob/master/packages/%40lwc/engine-core/src/framework/base-lightning-element.ts">LWC 엔진 소스 (attachInternals 오류)</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/attachInternals">MDN — attachInternals()</a> (확인 2026-10-09) · <a href="https://rollupjs.org/configuration-options/">Rollup — Configuration options (input, manualChunks)</a> (확인 2026-10-09) · <a href="https://rollupjs.org/javascript-api/">Rollup — JavaScript API (rollup, bundle.write, bundle.close)</a> (확인 2026-10-09) · <a href="https://nodejs.org/api/typescript.html">Node.js — Modules: TypeScript (타입 지우기 기본 사용, 22.18.0·23.6.0)</a> (확인 2026-10-09) · <a href="https://vite.dev/config/shared-options.html#resolve-alias">Vite — resolve.alias</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">@salesforce-ux/design-system-2 (npm)</a> (확인 2026-10-09) · <a href="../README.md">README 3장 "LWC shadow 모드", "SLDS 2 CSS 패키지" (2026-10-07 org 실측, #3 실측)</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="plugins">
+  <h2>TypeScript와 플랫폼 모듈</h2>
+  <p>2026-10-09 추가. 밀버스 컴포넌트가 TypeScript가 되고(<a href="02-LWC%20%EA%B8%B0%EC%B4%88.html#ts">02 LWC</a>) <code>lightning/platformResourceLoader</code>·<code>@salesforce/resourceUrl/*</code>를 import하게 되면서, <code>lib/lwc-build.ts</code>는 LWC 플러그인 <b>앞에</b> 플러그인 두 개를 둔다. Rollup은 플러그인 훅을 사용자가 적은 순서대로 부르므로, 앞에 둔 플러그인이 먼저 모듈을 가로채고 바꾼다.</p>
+  <div class="flow">
+    <div class="step"><b>1. milvus-platform-modules</b>npm에 없는 플랫폼 모듈을 대체 모듈로 (<code>resolveId</code>, <code>load</code>)</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>2. milvus-strip-types</b><code>.ts</code>의 타입만 지움 (<code>transform</code>)</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>3. replace</b><code>process.env.NODE_ENV</code></div>
+    <div class="arrow">→</div>
+    <div class="step"><b>4. @lwc/rollup-plugin</b>템플릿·CSS·JS 컴파일, 모듈 해석</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>5. node-resolve</b></div>
+  </div>
+  <h3>플랫폼 모듈 대체</h3>
+  <p><code>resolveId</code>가 아래 이름을 <code>\0milvus-platform:</code>을 붙인 가상 모듈 ID로 바꾸고, <code>load</code>가 그 내용을 돌려준다. <code>\0</code>을 붙이면 다른 플러그인이 그 모듈을 처리하지 않는다(Rollup 문서의 관례). 해당하지 않는 이름은 <code>null</code>을 돌려 다음 플러그인에 넘긴다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>import</th><th>Storybook 빌드에서 돌려주는 것</th><th>이유</th></tr>
+    <tr><td><code>@salesforce/gate/bc.260.enableComboboxElementInternals</code></td><td><code>export default { isOpen: () =&gt; false };</code></td><td>이 게이트가 열려 있으면 synthetic shadow에서 오류가 난다(<a href="#arch">위 절</a>). 예전 <code>closedGates</code> 플러그인을 합쳤다</td></tr>
+    <tr><td><code>lightning/platformResourceLoader</code></td><td><code>loadStyle = () =&gt; Promise.resolve()</code>, <code>loadScript</code>도 같음</td><td>npm 패키지에 없다. Storybook은 SLDS 2 CSS를 <code>preview.js</code>에서, 브랜드 util.css를 <code>.storybook/brand.js</code>가 문서 head에 직접 넣으므로 <code>loadBrand</code>가 실을 것이 없다</td></tr>
+    <tr><td><code>@salesforce/resourceUrl/&lt;이름&gt;</code></td><td><code>export default "/milvus-resource/&lt;이름&gt;";</code></td><td>org에서는 정적 리소스 주소다. Storybook에서는 위 <code>loadStyle</code>이 아무것도 하지 않으므로 경로 문자열만 있으면 된다</td></tr>
+  </table></div>
+  <h3>TypeScript 타입 제거</h3>
+  <p>LWC 컴파일러는 TypeScript를 읽지 못한다(LWC 개발자 가이드). 그래서 <code>transform</code> 훅이 <code>.ts</code> 파일만 골라 <code>typescript.transpileModule()</code>로 타입을 지운다. 설정은 <code>target: ESNext</code>, <code>module: ESNext</code>, <code>experimentalDecorators: false</code>다. 이렇게 하면 <code>@api</code> 같은 데코레이터는 그대로 남고, 다음 단계인 LWC 플러그인이 그것을 공개 속성으로 등록한다(로컬 확인, 설계 13장).</p>
+  <ul>
+    <li><b>타입 검사는 하지 않는다.</b> TypeScript 문서는 <code>ts.transpileModule</code>이 파일 하나씩만 변환해서 전체 타입 정보에 기대는 변환을 할 수 없다고 적는다. 타입 검사는 따로 <code>pnpm typecheck</code>(<code>tsc --noEmit</code>)가 한다</li>
+    <li><b>문법 오류는 빌드를 멈춘다.</b> <code>transpileModule</code>은 문법 오류가 있어도 코드 일부를 버리고 결과를 낸다. 그대로 넘기면 깨진 컴포넌트가 조용히 빌드되므로, 문법 진단이 하나라도 있으면 <code>this.error()</code>로 실패시킨다(Task 5 리뷰 반영. 코드를 버린 결과가 나오는 것은 저장소 테스트로 확인했다)</li>
+    <li><b>source map은 만들지 않는다.</b> 다음 단계인 LWC 플러그인도 source map을 만들지 않아서 컴포넌트 줄 위치는 원래도 정확하지 않다. 디버깅에 필요해지면 둘 다 켠다(저장소 주석의 <code>ponytail:</code> 기록)</li>
+  </ul>
+  <h3>확인하는 테스트</h3>
+  <p><code>tests/lwc-build.test.ts</code>(<code>pnpm test:node</code>)가 픽스처로 빌드해 확인한다: <code>.ts</code> 컴포넌트의 <code>@api</code>가 <code>publicProps</code>로 등록되는가, 플랫폼 모듈을 import해도 빌드되고 값이 위 표와 같은가, <code>.ts</code> 문법 오류면 빌드가 실패하는가, <code>synthetic-shadow</code> chunk가 <code>index.js</code>의 첫 import인가, combobox 게이트가 닫혔는가, 카탈로그 생성 결과에 절대 경로와 <code>node_modules/</code> 경로가 없는가.</p>
+  <p class="sources">출처: <a href="https://rollupjs.org/plugin-development/">Rollup — Plugin development (transform, resolveId·load, \0 가상 모듈, 훅 순서)</a> (확인 2026-10-09) · <a href="https://www.typescriptlang.org/tsconfig/#isolatedModules">TypeScript — TSConfig Reference: isolatedModules (ts.transpileModule은 파일 하나씩 변환)</a> (확인 2026-10-09) · <a href="https://www.typescriptlang.org/tsconfig/#experimentalDecorators">TypeScript — TSConfig Reference: experimentalDecorators</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/ts.html">LWC Developer Guide — TypeScript (Developer Preview): LWC 컴파일러는 TS를 컴파일하지 않음</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-platform-resource-loader.html">Lightning Component Reference — Platform Resource Loader</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-resources.html">LWC Developer Guide — Access Static Resources</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 8장 (TypeScript), 13장 (tsc ESNext는 @api를 그대로 둠, 로컬)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="code">
   <h2>저장소 코드</h2>
-  <div class="callout key"><strong>실제 파일에서 줄인 것 (2026-10-09 갱신)</strong>이 절은 원래 "예시 코드 (검증 전)"였다. 지금은 저장소의 <code>rollup.lwc.config.mjs</code>, <code>stories/lwc-entry.js</code>, <code>stories/helpers.js</code>, <code>package.json</code>에서 줄여 옮겼다. 전체는 각 파일을 본다.</div>
+  <div class="callout key"><strong>실제 파일에서 줄인 것 (2026-10-09 갱신)</strong>이 절의 코드는 저장소의 <code>lib/lwc-build.ts</code>, <code>scripts/build-lwc.ts</code>, <code>stories/lwc-entry.js</code>, <code>package.json</code>, <code>.storybook/main.mjs</code>, <code>stories/helpers.js</code>, 스토리 파일에서 옮겼다. 줄인 곳은 <code>…</code>로 표시했고 나머지 줄은 파일과 같다. 예전 발췌의 <code>rollup.lwc.config.mjs</code>는 지웠다(Task 5).</div>
 
-  <h3>Rollup 설정</h3>
-<pre data-file="rollup.lwc.config.mjs (줄임)"><code>import { existsSync, readFileSync, readdirSync, rmSync } from 'node:fs';
-import { resolve } from 'node:path';
-import lwc from '@lwc/rollup-plugin';
-import nodeResolve from '@rollup/plugin-node-resolve';
-import replace from '@rollup/plugin-replace';
-
-const LWC_DIR = 'force-app/main/default/lwc';
-
-<span class="c">// dir 레코드에는 namespace 옵션이 없다 → 폴더를 읽어 c/&lt;이름&gt; alias를 만든다</span>
-const sfdxModules = readdirSync(LWC_DIR, { withFileTypes: true })
-  .filter((e) =&gt; e.isDirectory() &amp;&amp; existsSync(`${LWC_DIR}/${e.name}/${e.name}.js`))
-  .map((e) =&gt; ({ name: `c/${e.name}`, path: resolve(LWC_DIR, e.name, `${e.name}.js`) }));
-
-<span class="c">// 해시가 붙은 이전 chunk가 쌓이지 않게 먼저 지운다</span>
-rmSync('dist/lwc', { recursive: true, force: true });
-
-<span class="c">// Salesforce 공식 예제 alias 목록 (scripts/generate-slds-catalog.mjs가 만든다)</span>
-const catalog = JSON.parse(readFileSync('stories/slds-catalog/examples.json', 'utf8'));
-
-<span class="c">// combobox의 ElementInternals 게이트 하나만 닫는다</span>
-const CLOSED_GATES = new Set(['@salesforce/gate/bc.260.enableComboboxElementInternals']);
-const closedGates = {
-  name: 'milvus-closed-gates',
-  resolveId: (id) =&gt; (CLOSED_GATES.has(id) ? '\0milvus-closed-gate' : null),
-  load: (id) =&gt; (id === '\0milvus-closed-gate' ? 'export default { isOpen: () =&gt; false };' : null),
+  <h3>빌드 함수</h3>
+<pre data-file="lib/lwc-build.ts (줄임)"><code>import { readFileSync, readdirSync, rmSync } from "node:fs";
+import { dirname, join, resolve } from "node:path";
+import lwc from "@lwc/rollup-plugin";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
+import replacePlugin from "@rollup/plugin-replace";
+import { rollup, type OutputOptions, type Plugin, type RollupOptions } from "rollup";
+import ts from "typescript";
+…
+const CLOSED_GATES = new Set(["@salesforce/gate/bc.260.enableComboboxElementInternals"]);
+const RESOURCE_URL = "@salesforce/resourceUrl/";
+const PREFIX = "\0milvus-platform:";
+const platformModule = (id: string) =&gt;
+  CLOSED_GATES.has(id)
+    ? "export default { isOpen: () =&gt; false };"
+    : id === "lightning/platformResourceLoader"
+      ? "export const loadStyle = () =&gt; Promise.resolve(); export const loadScript = loadStyle;"
+      : id.startsWith(RESOURCE_URL)
+        ? `export default ${JSON.stringify(`/milvus-resource/${id.slice(RESOURCE_URL.length)}`)};`
+        : null;
+const platformModules: Plugin = {
+  name: "milvus-platform-modules",
+  resolveId: (id) =&gt; (platformModule(id) === null ? null : PREFIX + id),
+  load: (id) =&gt; (id.startsWith(PREFIX) ? platformModule(id.slice(PREFIX.length)) : null)
 };
 
-export default {
-  <span class="c">// 진입 여러 개, 빌드 한 번 → 엔진은 공통 chunk 한 벌</span>
-  input: { index: 'stories/lwc-entry.js', catalog: 'stories/slds-catalog/entry.js' },
-  output: {
-    dir: 'dist/lwc',
-    entryFileNames: '[name].js',
-    format: 'esm',
-    sourcemap: true,
-    <span class="c">// synthetic shadow를 별도 chunk로 빼서 엔진보다 먼저 실행되게 한다</span>
-    manualChunks: (id) =&gt; (id.includes('@lwc/synthetic-shadow') ? 'synthetic-shadow' : undefined),
-  },
-  <span class="c">// 해석하지 못한 import는 빌드 단계에서 실패시킨다</span>
-  onwarn(warning, warn) {
-    if (warning.code === 'UNRESOLVED_IMPORT') throw new Error(warning.message);
-    warn(warning);
-  },
-  plugins: [
-    closedGates,
-    replace({
-      preventAssignment: true,
-      values: { 'process.env.NODE_ENV': JSON.stringify('development') },
-    }),
-    lwc({
-      enableDynamicComponents: true,
-      modules: [...sfdxModules, ...catalog, { npm: 'lightning-base-components' }],
-    }),
-    nodeResolve(),
-  ],
-};</code></pre>
-  <p class="c"><code>@lwc/engine-dom</code> 9.4.3의 dist 파일에는 <code>process.env.NODE_ENV</code> 참조가 182곳 있다 (로컬 확인). <code>@rollup/plugin-replace</code> 문서는 바로 이 값을 치환하는 예를 보여 준다. <span class="tag warn">미확인</span> LWC 문서가 이 방식을 권장하는지는 찾지 못했다. alias 경로는 <code>resolve()</code>로 절대 경로를 주므로 <code>rootDir</code>과 상관없다. 컨테이너(org 전용) 컴포넌트는 진입 파일에서 export하지 않으면 빌드되지 않는다.</p>
+<span class="c">// LWC 컴파일러는 TS 문법을 읽지 못한다. 타입만 지우고 데코레이터(@api 등)는 그대로 둔다(target ESNext)</span>
+const stripTypes: Plugin = {
+  name: "milvus-strip-types",
+  transform(code, id) {
+    if (!id.split("?")[0].endsWith(".ts")) return null;
+    const compilerOptions = { target: ts.ScriptTarget.ESNext, module: ts.ModuleKind.ESNext, experimentalDecorators: false };
+    …
+    const { outputText, diagnostics } = ts.transpileModule(code, { fileName: id, reportDiagnostics: true, compilerOptions });
+    <span class="c">// 문법 오류가 있어도 결과는 나온다(복구하며 코드 일부를 버린다). 문법 진단이 있으면 빌드를 멈춘다</span>
+    const d = diagnostics?.[0];
+    if (d) this.error(ts.flattenDiagnosticMessageText(d.messageText, "\n"), d.start);
+    return { code: outputText, map: null };
+  }
+};
+
+export function lwcRollupOptions(o: { out: string; entries: Record&lt;string, string&gt;; modules: LwcModule[] }): RollupOptions {
+  return {
+    <span class="c">// 모든 컴포넌트를 한 번에 빌드해 LWC 엔진이 한 벌만 들어가게 한다</span>
+    input: o.entries,
+    …
+    output: {
+      dir: o.out,
+      entryFileNames: "[name].js",
+      format: "esm",
+      sourcemap: true,
+      …
+      manualChunks: (id) =&gt; (id.includes("@lwc/synthetic-shadow") ? "synthetic-shadow" : undefined)
+    },
+    <span class="c">// 해석하지 못한 import를 그대로 두면 Storybook에서 파일 전체가 깨진다. 빌드 단계에서 실패시킨다</span>
+    onwarn(warning, warn) {
+      if (warning.code === "UNRESOLVED_IMPORT") throw new Error(warning.message);
+      warn(warning);
+    },
+    <span class="c">// 대체 모듈과 타입 제거는 LWC 플러그인보다 앞에 둔다</span>
+    plugins: [
+      platformModules,
+      stripTypes,
+      replace({ preventAssignment: true, values: { "process.env.NODE_ENV": JSON.stringify("development") } }),
+      lwc({
+        <span class="c">// npm 모듈(lightning-base-components, @lwc/*)을 찾는 기준 폴더. 지정하지 않으면 첫 진입 파일의 폴더를 쓰고 경고한다</span>
+        rootDir: dirname(resolve(Object.values(o.entries)[0])),
+        <span class="c">// 일부 공식 컴포넌트(multiColumnSortingModal 등)가 lwc:is 동적 컴포넌트를 쓴다</span>
+        enableDynamicComponents: true,
+        modules: [...o.modules, { npm: "lightning-base-components" }]
+      }),
+      nodeResolve()
+    ]
+  };
+}
+
+export async function buildLwc(o: Parameters&lt;typeof lwcRollupOptions&gt;[0]): Promise&lt;void&gt; {
+  <span class="c">// Rollup은 출력 폴더를 비우지 않는다. 해시가 붙은 이전 chunk가 쌓이지 않게 먼저 지운다</span>
+  rmSync(o.out, { recursive: true, force: true });
+  const { output, ...input } = lwcRollupOptions(o);
+  const bundle = await rollup(input);
+  try {
+    await bundle.write(output as OutputOptions);
+  } finally {
+    await bundle.close();
+  }
+}
+
+<span class="c">// @lwc/module-resolver의 dir 레코드에는 namespace 옵션이 없다.</span>
+<span class="c">// SFDX 경로(lwc/&lt;이름&gt;/&lt;이름&gt;.js)를 c/&lt;이름&gt;으로 쓰려면 컴포넌트마다 alias를 등록해야 한다</span>
+export function sfdxLwcModules(projectRoot: string): LwcModule[] {
+  …
+}
+
+<span class="c">// 카탈로그 examples.json의 상대 경로(lightning-base-components/src/lightning 기준)를 실행 시점의 절대 경로로 바꾼다</span>
+export const catalogModules = (examples: { name: string; rel: string }[], lbcDir: string): LwcModule[] =&gt;
+  examples.map(({ name, rel }) =&gt; ({ name, path: resolve(lbcDir, rel) }));</code></pre>
+  <p class="c"><code>@lwc/engine-dom</code> 9.4.3의 dist 파일에는 <code>process.env.NODE_ENV</code> 참조가 182곳 있다 (로컬 확인). <code>@rollup/plugin-replace</code> 문서는 바로 이 값을 치환하는 예를 보여 준다. <span class="tag warn">미확인</span> LWC 문서가 이 방식을 권장하는지는 찾지 못했다. alias 경로는 절대 경로로 주므로 <code>rootDir</code>과 상관없다. 컨테이너(org 전용) 컴포넌트는 진입 파일에서 export하지 않으면 빌드되지 않는다. 카탈로그 alias 목록(<code>examples.json</code>)은 절대 경로 대신 <code>lightning-base-components/src/lightning</code> 기준 상대 경로를 저장하고, 빌드할 때 <code>catalogModules()</code>가 절대 경로로 바꾼다. 패키지로 다른 프로젝트에 설치해도 경로가 맞게 하기 위해서다 (2026-10-09 갱신).</p>
+
+  <h3>실행 스크립트</h3>
+<pre data-file="scripts/build-lwc.ts"><code>/**
+ * 저장소 Storybook용 LWC 번들을 dist/lwc에 만든다. Storybook은 @milvus/lwc alias로 읽는다.
+ * 사용: pnpm build:lwc (카탈로그 생성기가 먼저 stories/slds-catalog/를 만든다)
+ */
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { buildLwc, catalogModules, sfdxLwcModules } from "../lib/lwc-build.ts";
+
+<span class="c">// generate-slds-catalog.mjs의 SRC와 같은 폴더. examples.json의 rel은 이 폴더 기준이다</span>
+const lbcDir = resolve("node_modules/lightning-base-components/src/lightning");
+const examples = JSON.parse(readFileSync("stories/slds-catalog/examples.json", "utf8"));
+
+await buildLwc({
+  out: "dist/lwc",
+  entries: { index: "stories/lwc-entry.js", catalog: "stories/slds-catalog/entry.js" },
+  modules: [...sfdxLwcModules("."), ...catalogModules(examples, lbcDir)]
+});
+console.log("✓ LWC 빌드: dist/lwc/");</code></pre>
 
   <h3>진입 파일</h3>
 <pre data-file="stories/lwc-entry.js"><code><span class="c">// synthetic shadow는 LWC 엔진보다 먼저 로드해야 한다 (Salesforce 플랫폼과 같은 shadow 모드)</span>
-import '@lwc/synthetic-shadow';
+import "@lwc/synthetic-shadow";
 
-export { createElement } from 'lwc';
+export { createElement } from "lwc";
 
 <span class="c">// 밀버스 추가. Salesforce 기본 컴포넌트는 공식 예제 카탈로그(catalog.js)에서 렌더한다</span>
-export { default as MilvusBadge } from 'c/milvusBadge';
-export { default as MilvusButton } from 'c/milvusButton';
-export { default as MilvusMultiSelect } from 'c/milvusMultiSelect';</code></pre>
+export { default as MilvusBadge } from "c/milvusBadge";
+export { default as MilvusButton } from "c/milvusButton";
+export { default as MilvusMultiSelect } from "c/milvusMultiSelect";</code></pre>
 
-<pre data-file="package.json (scripts 일부)"><code>"scripts": {
-  "build:lwc": "node scripts/generate-slds-catalog.mjs &amp;&amp; rollup -c rollup.lwc.config.mjs",
-  "dev:lwc": "rollup -c rollup.lwc.config.mjs -w",
-  "storybook": "pnpm build:lwc &amp;&amp; storybook dev -p 6006",
-  "build-storybook": "pnpm build:lwc &amp;&amp; storybook build -o storybook-static"
-}</code></pre>
+<pre data-file="package.json (scripts 일부)"><code>  "scripts": {
+    …
+    "build:lwc": "node scripts/generate-slds-catalog.mjs &amp;&amp; node scripts/build-lwc.ts",
+    "storybook": "pnpm build:lwc &amp;&amp; storybook dev -p 6006",
+    "build-storybook": "pnpm build:lwc &amp;&amp; storybook build -o storybook-static",
+    …
+  },</code></pre>
+
+  <h3>Storybook에서 번들 읽기</h3>
+<pre data-file=".storybook/main.mjs (일부)"><code>  <span class="c">// 스토리는 LWC 번들을 @milvus/lwc로 읽는다. 저장소에서는 pnpm build:lwc가 만든 dist/lwc다</span>
+  viteFinal: (config) =&gt;
+    mergeConfig(config, {
+      resolve: {
+        alias: {
+          "@milvus/lwc": fileURLToPath(new URL("../dist/lwc", import.meta.url))
+        }
+      }
+    }),</code></pre>
 
   <h3>요소 만들기 도우미</h3>
-<pre data-file="stories/helpers.js (줄임)"><code><span class="c">// Rollup으로 미리 컴파일한 LWC 번들 (pnpm build:lwc). Storybook(Vite)은 결과물만 읽는다</span>
-import { createElement } from '../dist/lwc/index.js';
-export * from '../dist/lwc/index.js';
+<pre data-file="stories/helpers.js (줄임)"><code><span class="c">// Rollup으로 미리 컴파일한 LWC 번들 (pnpm build:lwc). Storybook(Vite)은 결과물만 @milvus/lwc alias로 읽는다.</span>
+import { createElement } from "@milvus/lwc/index.js";
 
+export * from "@milvus/lwc/index.js";
+
+<span class="c">/**
+ * LWC 컴포넌트를 DOM 요소로 만든다.
+ * customElements.define 대신 createElement를 쓰면 태그 이름이 엔진 내부 등록과 충돌하지 않는다.
+ */</span>
 export function lwc(tag, Ctor, props = {}, events = {}) {
   const element = createElement(tag, { is: Ctor });
   for (const [key, value] of Object.entries(props)) {
-    if (value !== undefined) element[key] = value;       <span class="c">// @api 속성은 JS property로</span>
+    if (value !== undefined) element[key] = value;
   }
   for (const [name, handler] of Object.entries(events)) {
-    if (handler) element.addEventListener(name, (event) =&gt; handler(event.detail ?? event));
+    if (handler)
+      element.addEventListener(name, (event) =&gt; handler(event.detail ?? event));
   }
   return element;
 }</code></pre>
 
   <h3>스토리</h3>
-<pre data-file="stories/components/milvus/Badge.stories.js (줄임)"><code>import { MilvusBadge, lwc } from '../../helpers.js';
-
+<pre data-file="stories/components/milvus/Badge.stories.js (줄임)"><code>import {
+  MilvusBadge,
+  ORIGIN,
+  lwc,
+  row,
+  sourceFor,
+  sourceStory
+} from "../../helpers.js";
+…
 export default {
-  title: '컴포넌트/밀버스 추가/Badge',
-  render: (args) =&gt; lwc('c-milvus-badge', MilvusBadge, args),
-  args: { label: '완료', variant: 'success', iconName: '', iconPosition: 'start' },
-  argTypes: {
-    variant: { control: 'select', options: ['default', 'success', 'warning', 'error', 'info', 'inverse', 'lightest'] },
+  title: "컴포넌트/밀버스 추가/Badge",
+  render: (args) =&gt; lwc("c-milvus-badge", MilvusBadge, args),
+  args: {
+    label: "완료",
+    variant: "success",
+    iconName: "",
+    iconPosition: "start"
   },
+  argTypes: {
+    variant: { control: "select", options: VARIANTS, description: "의미색" },
+    …
+  },
+  …
 };
 
 export const 기본 = {};</code></pre>
   <p><code>lwc()</code>는 args를 <code>element[key] = value</code>로 넣는다. <code>@api</code> 속성은 camelCase 이름의 JS property로 노출되므로 이 방식이 맞다. 렌더러는 <code>render</code>가 돌려준 DOM 요소를 그대로 캔버스에 붙인다 (<a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html#why">03 Storybook</a>).</p>
-  <p class="sources">출처: <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/rollup-plugin">@lwc/rollup-plugin README</a> (확인 2026-10-09) · <a href="https://rollupjs.org/configuration-options/">Rollup — Configuration options (input, output.dir, manualChunks, onwarn)</a> (확인 2026-10-09) · <a href="https://rollupjs.org/plugin-development/">Rollup — Plugin development (resolveId, load, \0 가상 모듈)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@rollup/plugin-replace">@rollup/plugin-replace (npm)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/engine-dom">@lwc/engine-dom README (createElement)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/js-props-names.html">LWC Developer Guide — Property and Attribute Names</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/rollup-plugin">@lwc/rollup-plugin README (rootDir, modules, enableDynamicComponents)</a> (확인 2026-10-09) · <a href="https://rollupjs.org/configuration-options/">Rollup — Configuration options (input, output.dir, manualChunks, onwarn)</a> (확인 2026-10-09) · <a href="https://rollupjs.org/plugin-development/">Rollup — Plugin development (resolveId, load, transform, \0 가상 모듈)</a> (확인 2026-10-09) · <a href="https://rollupjs.org/javascript-api/">Rollup — JavaScript API (rollup, bundle.write, bundle.close)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@rollup/plugin-replace">@rollup/plugin-replace (npm)</a> (확인 2026-10-09) · <a href="https://www.typescriptlang.org/tsconfig/#isolatedModules">TypeScript — TSConfig Reference: isolatedModules (ts.transpileModule)</a> (확인 2026-10-09) · <a href="https://nodejs.org/api/typescript.html">Node.js — Modules: TypeScript (.ts 실행, import에 확장자)</a> (확인 2026-10-09) · <a href="https://vite.dev/config/shared-options.html#resolve-alias">Vite — resolve.alias</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/engine-dom">@lwc/engine-dom README (createElement)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/js-props-names.html">LWC Developer Guide — Property and Attribute Names</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="risks">
   <h2>위험 요소</h2>
   <div class="table-wrap"><table>
     <tr><th>위험</th><th>영향</th><th>대응</th></tr>
-    <tr><td>synthetic vs native shadow 차이</td><td>2026-10-09 갱신: Salesforce가 기본 컴포넌트를 native로 바꾸면 문서의 SLDS CSS(<code>.slds-*</code>)와 클래스 규칙이 컴포넌트 안에 닿지 않는다. hook은 g·s 구분 없이 shadow 경계를 넘어 상속되지만, 기본 컴포넌트의 native CSS가 직접 읽는 이름에만 효과가 있다 (추정, 실측 필요). 그래서 global hook을 포함해 hook으로 바꿀 수 있는 컴포넌트 비율도 떨어진다. 소스 분석으로는 모양 73% → 32%(LBC에만 있는 s hook까지 쓰면 54%), 포커스 링 모양 69% → 8%, 아이콘 71% → 29%다</td><td>지금은 org와 같게 전부 synthetic(PR #17). 전환 감지(<code>loadBrand</code>의 경고)는 설계 9.2의 계획이고, native 빌드는 발표 뒤로 미뤘다</td></tr>
+    <tr><td>synthetic vs native shadow 차이</td><td>2026-10-09 갱신: Salesforce가 기본 컴포넌트를 native로 바꾸면 문서의 SLDS CSS(<code>.slds-*</code>)와 클래스 규칙이 컴포넌트 안에 닿지 않는다. hook은 g·s 구분 없이 shadow 경계를 넘어 상속되지만, 기본 컴포넌트의 native CSS가 직접 읽는 이름에만 효과가 있다 (추정, 실측 필요). 그래서 global hook을 포함해 hook으로 바꿀 수 있는 컴포넌트 비율도 떨어진다. 소스 분석으로는 모양 73% → 32%(LBC에만 있는 s hook까지 쓰면 54%), 포커스 링 모양 69% → 8%, 아이콘 71% → 29%다</td><td>지금은 org와 같게 전부 synthetic(PR #17). 전환 감지는 2026-10-09에 구현했다: 밀버스 컴포넌트가 첫 렌더 뒤 <code>detectNativeShadow</code>로 <code>data-render-mode="shadow"</code>인 <code>lightning-*</code>를 찾아 콘솔에 경고한다(설계 9.2, <a href="02-LWC%20%EA%B8%B0%EC%B4%88.html#shared">02 LWC</a>). org에서 울리는지는 아직 보지 않았다. native 빌드는 발표 뒤로 미뤘다</td></tr>
     <tr><td>기능 게이트</td><td>npm 패키지는 게이트를 모두 열어 둔다. org와 다른 코드 경로를 탈 수 있다</td><td>synthetic에서 오류가 나는 combobox ElementInternals 게이트만 닫는다. <span class="tag warn">미확인</span> 다른 게이트가 org와 같은 상태인지는 확인하지 않았다</td></tr>
     <tr><td>루트 요소 slot 한계</td><td>slot을 받는 컴포넌트가 스토리에서 비어 보인다</td><td>스토리 전용 래퍼 LWC로 감싼다 (lwc#2029)</td></tr>
     <tr><td><code>@salesforce/*</code> stub</td><td>우리 컴포넌트의 label, i18n 등 import가 빌드 실패</td><td>alias 레코드로 stub 파일 연결. 표현 컴포넌트는 가능한 한 쓰지 않는다. 해석 못 한 import는 <code>onwarn</code>이 빌드를 실패시킨다</td></tr>
     <tr><td>alpha 패키지</td><td><code>lightning-base-components</code> 업데이트가 예고 없이 깨질 수 있다</td><td><code>pnpm add -D -E</code>로 정확한 버전 고정. 올릴 때는 명시적으로</td></tr>
     <tr><td>pnpm hoisting</td><td>플러그인이나 패키지가 선언하지 않은 의존성을 찾다가 실패</td><td><code>@lwc/engine-dom</code>·<code>@lwc/wire-service</code>는 직접 선언했다(#3). 그 밖에는 07 pnpm의 순서대로: 직접 선언 → <code>publicHoistPattern</code> → 최후 수단</td></tr>
-    <tr><td>HMR 없음</td><td>저장 후 반영까지 Rollup 재빌드 시간이 든다</td><td>감시 모드(<code>pnpm dev:lwc</code>) 병렬 실행</td></tr>
-    <tr><td>Storybook 10은 ESM 전용</td><td>CommonJS 설정 파일(<code>require</code>)이 동작하지 않는다</td><td>Rollup 설정(<code>.mjs</code>)과 <code>.storybook/*</code>를 모두 ESM으로 쓴다</td></tr>
+    <tr><td>HMR 없음</td><td>저장 후 반영까지 Rollup 재빌드 시간이 든다</td><td>2026-10-09 갱신: 감시 모드(<code>pnpm dev:lwc</code>)는 지웠다. 고친 뒤 <code>pnpm build:lwc</code>를 다시 실행한다</td></tr>
+    <tr><td>Storybook 10은 ESM 전용</td><td>CommonJS 설정 파일(<code>require</code>)이 동작하지 않는다</td><td><code>package.json</code>이 <code>"type": "module"</code>이고, 빌드 스크립트(<code>.ts</code>)와 <code>.storybook/*</code>를 모두 ESM으로 쓴다 (2026-10-09 갱신)</td></tr>
+    <tr><td>TypeScript 문법 오류</td><td><code>transpileModule</code>은 오류가 있어도 코드 일부를 버린 결과를 낸다. 그대로 두면 깨진 컴포넌트가 조용히 빌드된다</td><td>문법 진단이 있으면 빌드를 실패시킨다. 타입 오류는 빌드가 아니라 <code>pnpm typecheck</code>가 잡는다 (<a href="#plugins">TypeScript와 플랫폼 모듈</a>)</td></tr>
+    <tr><td>플랫폼 모듈 대체</td><td>Storybook의 <code>loadStyle</code>은 아무것도 싣지 않는다. org에서 <code>loadBrand</code>가 싣는 순서·경로는 Storybook에서 재현되지 않는다</td><td>Storybook은 브랜드 util.css를 <code>.storybook/brand.js</code>가 문서 head에 직접 넣는다. org의 <code>loadBrand</code> 동작은 10/12 org 프로브에서 확인한다(설계 14장)</td></tr>
   </table></div>
-  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="https://www.w3.org/TR/css-scoping-1/">W3C — CSS Scoping (shadow 트리 상속)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/issues/2029">salesforce/lwc#2029</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/releases/migration-guide">Storybook — Migration guide (ESM 전용)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (0장 3·5번: native 전환 시 도달 비율, g·s 상속)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 9.2 (native 전환 감지·대비), 12장 (native 빌드는 발표 뒤)</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="https://www.w3.org/TR/css-scoping-1/">W3C — CSS Scoping (shadow 트리 상속)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/issues/2029">salesforce/lwc#2029</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/releases/migration-guide">Storybook — Migration guide (ESM 전용)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (0장 3·5번: native 전환 시 도달 비율, g·s 상속)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 9.2 (native 전환 감지·대비), 12장 (native 빌드는 발표 뒤), 14장 (10/12 org 프로브)</a> (확인 2026-10-09) · <a href="https://www.typescriptlang.org/tsconfig/#isolatedModules">TypeScript — TSConfig Reference: isolatedModules (ts.transpileModule)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-platform-resource-loader.html">Lightning Component Reference — Platform Resource Loader</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="branch">
@@ -349,20 +479,18 @@ export const 기본 = {};</code></pre>
       <li>표현 컴포넌트 3개(<code>milvusBadge</code>, <code>milvusButton</code>, <code>milvusMultiSelect</code>)가 <code>force-app/main/default/lwc/</code>에 있고, <code>stories/lwc-entry.js</code>가 export한다</li>
       <li>Salesforce 기본 컴포넌트는 <code>lightning-base-components</code>의 공식 예제(<code>__examples__</code>)를 그대로 컴파일한 카탈로그로 보여 준다 (<code>scripts/generate-slds-catalog.mjs</code>)</li>
       <li>컨테이너(<code>@wire</code>, Apex, LDS를 쓰는 컴포넌트)는 빌드 입력에 넣지 않는다. <code>lightning/uiRecordApi</code>가 패키지에 없으므로 빌드되지 않는 것이 정상이다. 지금 저장소에는 컨테이너 컴포넌트가 없다</li>
-      <li><b>지금 규칙</b>(#11, #18, PR #19): 브랜드 모양은 <code>brands/&lt;브랜드&gt;/util.css</code>의 <code>:root</code>에 <code>--slds-g-*</code>, 색이 아닌 <code>--slds-s-*</code>, <code>--milvus-*</code>만 쓴다. 클래스 규칙, <code>--slds-c-*</code>, 브랜드 색(accent) 재정의는 금지다. 기본은 util.css 없이 Salesforce 기본 모양이다 (기본 우선, 2026-10-09 결정)</li>
-      <li><span class="tag info">계획</span> (Task 7, 설계 5.2, 2026-10-09 갱신): 전 컴포넌트 분석에 따라 허용 범위를 넓힌다. 중립 색 <code>--slds-g-color-*</code>(<code>light-dark()</code> 값), 조건부 포커스 그림자, SLDS 2·기본 컴포넌트 CSS가 실제로 읽는 비색 s hook, 색 s hook 6개 화이트리스트(hover·선택 바탕 등), 상속 속성 <code>letter-spacing</code>이다. 대신 글꼴(<code>--slds-g-font-family*</code>)은 막는다. 검사 스크립트, CLAUDE.md, 설계 5.2가 지금 서로 달라서 이때 하나로 맞춘다. 아직 구현 전이다</li>
+      <li>밀버스 컴포넌트는 TypeScript(<code>.ts</code>)다. 빌드가 LWC 컴파일러 앞에서 타입만 지우고, npm에 없는 플랫폼 모듈(<code>lightning/platformResourceLoader</code>, <code>@salesforce/resourceUrl/*</code>)은 대체 모듈로 바꾼다 (<a href="#plugins">TypeScript와 플랫폼 모듈</a>, 2026-10-09 구현)</li>
+      <li><b>util.css 규칙</b>(2026-10-09, 설계 5.2·5.3으로 통합): 브랜드 모양은 <code>brands/&lt;브랜드&gt;/util.css</code>의 <code>:root</code> 블록 하나에 쓴다. 색이 아닌 <code>--slds-g-*</code>(글꼴 제외), 포커스 그림자, 중립 색(<code>light-dark()</code> 값), 피드백 색, SLDS 2·기본 컴포넌트 CSS가 실제로 읽는 <code>--slds-s-*</code>(색 s hook은 hover·선택 바탕 6개만), 밀버스가 읽는 <code>--milvus-*</code>, 상속 속성 <code>letter-spacing</code>만 허용한다. 클래스 규칙, <code>--slds-c-*</code>, 브랜드 색(accent) 재정의는 금지다. 규칙은 <code>lib/rules.ts</code>, 검사는 <code>pnpm test:brands</code>(<code>scripts/check-brands.ts</code>)다. 자세한 표는 <a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html#button">01 SLDS</a>에 있다. 기본은 util.css 없이 Salesforce 기본 모양이다 (기본 우선, 2026-10-09 결정)</li>
     </ul>
   </div>
   <p class="c">2026-10-09 갱신: 이전 문장 "SLDS global hook(<code>--slds-g-*</code>)은 읽기만 한다. 브랜드 전환은 <code>--milvus-*</code>로만 한다"는 #11·#18 결정으로 바뀌었다. 자세한 규칙은 <a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html#globals">03 Storybook</a>과 <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>에 있다.</p>
   <h3>다음 단계 <span class="tag info">계획</span></h3>
   <ul>
-    <li>패키지를 설치한 프로젝트에서 <code>pnpm milvus storybook</code>이 패키지 안의 설정으로 Storybook을 띄운다. 빌드 결과는 <code>.milvus/</code>에 둔다</li>
-    <li>밀버스 LWC를 TypeScript로 바꾼다. LWC 컴파일러가 TS를 직접 읽지 못하므로 Rollup 앞에서 <code>typescript.transpileModule</code>로 타입만 지운다</li>
-    <li>npm에 없는 플랫폼 모듈은 대신하는 모듈로 바꾼다: <code>lightning/platformResourceLoader</code>의 <code>loadStyle</code>, <code>@salesforce/resourceUrl/*</code></li>
+    <li>패키지를 설치한 프로젝트에서 <code>pnpm milvus storybook</code>이 패키지 안의 설정으로 Storybook을 띄운다. 빌드 결과는 <code>.milvus/</code>에 둔다. 빌드 함수를 <code>lib/lwc-build.ts</code>로 옮기고 카탈로그 경로를 상대 경로로 바꾼 것(2026-10-09)이 그 준비다</li>
     <li>native 전환 대비용 두 번째 빌드(native)는 발표 뒤로 미룬다</li>
   </ul>
-  <p>근거는 <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서</a> 4.2·9.2·13장이다. 아직 구현 전이다.</p>
-  <p class="sources">출처: <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="../README.md">README 2장 (지금 util.css 규칙, #11·#18)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (기본 우선), 4.2·9.2·13장, 5.2 (util.css 확장 규칙, 계획)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (2.1 규칙 세 곳 불일치)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (loadStyle, .ts LWC 배포)</a> (확인 2026-10-09)</p>
+  <p>근거는 <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서</a> 4.2·9.2·13장이다. 위 두 항목은 아직 구현 전이다. TypeScript 타입 제거와 플랫폼 모듈 대체는 2026-10-09에 구현해 이 목록에서 뺐다.</p>
+  <p class="sources">출처: <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="../README.md">README 2장 (util.css 규칙, #11·#18, 2026-10-09 설계 5.2로 통합)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (기본 우선), 4.2·9.2·13장, 5.2·5.3 (util.css 규칙, 2026-10-09 구현)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/ts.html">LWC Developer Guide — TypeScript (Developer Preview)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (2.1 규칙 세 곳 불일치)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (loadStyle, .ts LWC 배포)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="quiz" class="quiz">
@@ -379,12 +507,16 @@ export const 기본 = {};</code></pre>
     <p>org(LEX)가 기본 컴포넌트를 synthetic으로 그리기 때문이다 (공식 문서, 2026-10-07 실측). Storybook은 org와 같은 모습을 보여 줘야 하므로 그 목록을 쓰지 않는다.</p></details>
   <details><summary>Q6. 기능 게이트를 전부 닫지 않고 combobox 게이트 하나만 닫는 이유는?</summary>
     <p>그 게이트가 열려 있으면 <code>attachInternals()</code>를 불러 synthetic shadow에서 엔진 오류가 나기 때문이다. 다른 게이트는 오류가 없어서 패키지 stub대로 둔다. org에서 각 게이트가 열려 있는지는 확인하지 않았다.</p></details>
-  <p class="sources">출처: <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/rollup-plugin">@lwc/rollup-plugin README</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/module-resolver">@lwc/module-resolver README</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/issues/2029">salesforce/lwc#2029</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/blob/master/packages/%40lwc/engine-core/src/framework/base-lightning-element.ts">LWC 엔진 소스 (attachInternals)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="../README.md">README 3장 "LWC shadow 모드" (2026-10-07 실측)</a> (확인 2026-10-09)</p>
+  <details><summary>Q7. <code>.ts</code> 컴포넌트를 Storybook용으로 빌드할 때 <code>tsc</code>로 타입 검사까지 하지 않고 <code>transpileModule</code>로 타입만 지우는 이유는? 그러면 타입 오류는 어디서 잡나?</summary>
+    <p>LWC 컴파일러가 TS를 읽지 못하므로 그 앞에서 타입만 지우면 된다. <code>transpileModule</code>은 파일 하나씩 변환해 빠르지만 전체 타입 정보를 쓰지 않는다. 타입 오류는 <code>pnpm typecheck</code>(<code>tsc --noEmit</code>, <code>pnpm test</code>에 포함)가 잡는다. 문법 오류만은 빌드가 실패시킨다 (2026-10-09 갱신).</p></details>
+  <details><summary>Q8. Storybook에서 <code>loadBrand</code>가 부르는 <code>loadStyle</code>은 아무것도 하지 않는다. 그런데 브랜드 모양은 어떻게 보이나?</summary>
+    <p><code>lightning/platformResourceLoader</code>는 npm에 없어서 빌드가 <code>Promise.resolve()</code>만 하는 대체 모듈로 바꾼다. 브랜드 util.css는 Storybook의 <code>.storybook/brand.js</code>가 툴바에서 고른 브랜드에 맞춰 문서 head에 직접 넣는다. org에서 <code>loadBrand</code>가 싣는 동작은 Storybook으로 확인할 수 없어 10/12 org 프로브에서 본다 (2026-10-09 갱신).</p></details>
+  <p class="sources">출처: <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/rollup-plugin">@lwc/rollup-plugin README</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/module-resolver">@lwc/module-resolver README</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/issues/2029">salesforce/lwc#2029</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/blob/master/packages/%40lwc/engine-core/src/framework/base-lightning-element.ts">LWC 엔진 소스 (attachInternals)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="../README.md">README 3장 "LWC shadow 모드" (2026-10-07 실측)</a> (확인 2026-10-09) · <a href="https://www.typescriptlang.org/tsconfig/#isolatedModules">TypeScript — TSConfig Reference: isolatedModules (Q7)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-platform-resource-loader.html">Lightning Component Reference — Platform Resource Loader (Q8)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 14장 (Q8, 10/12 org 프로브)</a> (확인 2026-10-09)</p>
 </section>
 
 <footer class="doc-foot">
   <span>밀버스 디자인 시스템 · Learn 04</span>
-  <span>2026-09-26 작성, 2026-10-09 갱신 (출처 확인, 빌드 구조·shadow 모드·저장소 코드를 지금 저장소에 맞춤). 모듈 해석 결과는 <code>@lwc/module-resolver</code> 실험, 패키지 내용은 설치된 패키지로 확인함</span>
+  <span>2026-09-26 작성, 2026-10-09 갱신 (출처 확인, 빌드 구조·shadow 모드·저장소 코드를 지금 저장소에 맞춤. M2: 빌드를 <code>lib/lwc-build.ts</code>로 옮김, TypeScript 타입 제거, 플랫폼 모듈 대체). 모듈 해석 결과는 <code>@lwc/module-resolver</code> 실험, 패키지 내용은 설치된 패키지로 확인함</span>
 </footer>
 </main>
 </div>
