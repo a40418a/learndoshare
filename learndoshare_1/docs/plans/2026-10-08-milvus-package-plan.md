@@ -242,7 +242,7 @@ test("pack 결과에 dist/cli/index.js가 있고 __tests__가 없으며, 텍스�
     - `publishConfig`: `{ "registry": "https://npm.pkg.github.com" }`
     - `repository`: `{ "type": "git", "url": "https://github.com/a40418a/learndoshare.git", "directory": "learndoshare_1" }`
     - `engines.node`: `"^22.18.0 || >=23.6.0"`
-    - `files`: `"dist/cli"`, `"dist/lib"`, `"dist/hooks-index.json"`, `"templates"`, `"force-app/main/default/lwc/milvus*"`, `"!force-app/**/__tests__"`, `"audit/report.json"`, `"tsconfig.lwc.base.json"`, `"stories"`. Storybook 설정 경로는 Task 17에서 추가한다
+    - `files`: `"dist/cli"`, `"dist/lib"`, `"dist/hooks-index.json"`, `"templates"`, `"force-app/main/default/lwc/milvus*/*"`(pnpm 10.13.1은 `milvus*`로 쓰면 아래 부정 패턴을 적용하지 못해 `__tests__`가 들어간다, Task 1 실측), `"!force-app/**/__tests__"`, `"audit/report.json"`, `"tsconfig.lwc.base.json"`, `"stories"`. Storybook 설정 경로는 Task 17에서 추가한다
   - **`tsconfig.build.json`**
     - `module`·`moduleResolution`: `NodeNext`, `rewriteRelativeImportExtensions`
     - 대상은 `cli/**`, `lib/**`, 출력은 `dist/`

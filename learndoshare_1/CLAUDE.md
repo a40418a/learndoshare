@@ -42,7 +42,7 @@
 
 아래는 README에서 이미 결정한 것이다. Ponytail이 "필요 없다"고 판단해도 **빼지 않는다.**
 
-- `milvusButton`: 버튼만 다르게 하는 것은 지금 util.css의 컴포넌트 hook(`--slds-s-button-*`)으로도 되지만, 기본 컴포넌트가 native shadow로 바뀌면 효과가 사라진다. 그때도 동작하고 hook이 없는 모양까지 바꿀 수 있게 구현한다
+- `milvusButton`: 비교 예시로 유지한다(2026-10-09, 설계 1장). 모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다. hook·브리지로 안 되는 모양은 opt-in `milvusOverride.css`(마지막 수단, 공식 권고 밖)로 바꾸고, 밀버스 컴포넌트는 SLDS에 기능이 없을 때만 만든다
 - `util.css`의 global hook·컴포넌트 hook 재정의: 공식 권고 밖이고 컴포넌트 hook은 native 전환 때 효과가 사라질 수 있다는 것을 알고 택했다 (README 2장, #18)
 - `pnpm sync:theme`, `create-project.mjs`, hook H1~H8, `milvus.config.json`
 - 표현/컨테이너 분리: 표현 컴포넌트에는 `@wire`, Apex, LDS를 넣지 않는다. 한 파일로 합치는 편이 짧더라도 합치지 않는다
@@ -72,7 +72,8 @@
 | `brands/<브랜드>/util.css` | `:root`의 `--slds-g-*` global hook (반경, 글꼴, 간격 등)과 `--slds-s-*` 컴포넌트 hook (버튼만, 입력창만 등. 영향 지도 참고). 이 파일 하나로 모든 컴포넌트가 바뀐다. 밀버스 컴포넌트가 읽는 `--milvus-*` | 클래스 규칙, `--slds-c-*`·`--sds-c-*`, 색 컴포넌트 hook(`--slds-s-*color*`), 브랜드 색(accent) 재정의 |
 | `brands/<브랜드>/theme.json`, `logo.*` | 없음 (`pnpm sync:theme`만 생성) | 직접 편집 |
 
-- 브랜드 요구가 들어오면 org 테마(색·로고) → `util.css`의 global hook(전체 모양) → `util.css`의 컴포넌트 hook(특정 컴포넌트 묶음) → 밀버스 컴포넌트(hook으로 안 되거나 native 전환에도 유지해야 할 때) 순으로 제안한다
+- 패키지 설계에서는 hook으로 안 되는 모양을 위한 opt-in `staticresources/milvusOverride.css`(클래스 규칙, 처음엔 비어 있음)가 생긴다(계획 Task 8). 지금 저장소의 `brands/<브랜드>/util.css` 규칙은 위 표 그대로다
+- 브랜드 요구가 들어오면 org 테마(색·로고) → `util.css`의 global hook(전체 모양) → `util.css`의 컴포넌트 hook(특정 컴포넌트) → 브리지 변수(hook이 없는 항목) → `milvusOverride.css`(마지막 수단, 공식 권고 밖) 순으로 제안한다. override를 쓸 때는 native 전환·Salesforce 업데이트에 약하다는 것을 알린다. 모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다(설계 5.1)
 - 커스텀 변수 접두사는 `--milvus-`만 쓴다
 
 ## 4. 검증 명령

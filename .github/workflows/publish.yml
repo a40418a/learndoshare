@@ -18,7 +18,10 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+      # 발행 권한 토큰을 git 설정에 남기지 않는다. 설치·테스트 단계의 의존성 코드가 읽지 못하게 한다
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
 
       # pnpm 버전은 learndoshare_1/package.json의 packageManager를 따른다
       - uses: pnpm/action-setup@v6

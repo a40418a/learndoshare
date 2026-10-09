@@ -80,7 +80,7 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 | --- | --- |
 | `dist/` | CLI와 Storybook용 스크립트를 JS로 빌드한 것. Node는 `node_modules` 안의 `.ts` 실행을 거부한다. `bin: { "milvus": "dist/cli/index.js" }` |
 | `templates/` | 프로젝트에 복사할 원본(3장의 밀버스 관리 파일과 틀). VF 관련 파일은 "선택 항목"으로 표시한다 |
-| `force-app/main/default/lwc/milvus*/` | 밀버스 LWC (`.ts`). `__tests__`는 넣지 않는다 |
+| `force-app/main/default/lwc/milvus*/` | 밀버스 LWC (`.ts`). `__tests__`는 넣지 않는다. `files`에는 `force-app/main/default/lwc/milvus*/*`와 `!force-app/**/__tests__`로 쓴다(`milvus*`로 쓰면 pnpm 10.13.1이 부정 패턴을 적용하지 못한다, 10/9 실측) |
 | `force-app/main/default/classes/utils/design/` | 밀버스 Apex (생기면) |
 | `.storybook/`, `stories/`, 미리 만든 카탈로그 | 프로젝트 모드 Storybook |
 
