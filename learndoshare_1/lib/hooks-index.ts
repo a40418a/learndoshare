@@ -8,7 +8,7 @@ import { basename, dirname, join, relative, sep } from "node:path";
 export type HooksIndex = { readSHooks: string[]; readGHooks: string[] };
 export type RuleContext = { readSHooks: Set<string>; readGHooks: Set<string>; milvusVars: Set<string> };
 
-const COMMENT = /\/\*[\s\S]*?\*\//g;
+export const COMMENT = /\/\*[\s\S]*?\*\//g;
 
 /** var(--slds-g-*), var(--slds-s-*)로 읽히는 이름만 모은다. fallback 안의 var()도 읽기다. 정의만 있는 이름과 주석은 뺀다 */
 export function buildHooksIndex(src: { sldsCss: string; lbcCss: string[] }): HooksIndex {

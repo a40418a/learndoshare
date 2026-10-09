@@ -165,6 +165,16 @@ test("주석 안의 선언은 무시한다", () => {
   );
 });
 
+test("값에 공백 없이 붙은 주석도 무시한다(대비 검사, 포커스 그림자)", () => {
+  // postcss는 공백 없이 붙은 주석을 decl.value에 남긴다. 주석 때문에 2.57:1을 놓치면 안 된다
+  assert.deepEqual(
+    rulesOf("--slds-g-color-on-surface-3: light-dark(#999999/*라이트*/, #e5e5e5); --slds-g-color-surface-2: light-dark(/*x*/#f3f3f3, #181818);"),
+    ["contrast"],
+  );
+  // 주석 안의 #fff는 리터럴 색이 아니다(값 끝의 주석은 postcss가 지우므로 가운데에 둔다)
+  assert.deepEqual(rulesOf("--slds-g-shadow-outline-focus-1: 0 0 0 3px/*#fff*/var(--slds-g-color-brand-base-15);"), []);
+});
+
 test("letter-spacing은 허용, color 같은 다른 일반 속성은 거부", () => {
   assert.deepEqual(rulesOf("letter-spacing: -0.02em;"), []);
   assert.deepEqual(rulesOf("color: #333333;"), ["plain-prop"]);

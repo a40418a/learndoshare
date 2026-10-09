@@ -4,7 +4,7 @@
 // hook 이름은 SLDS 2 2.264.2(slds2.cosmos.css)와 lightning-base-components 1.28.19-alpha 원본에서 확인했다(2026-10-10)
 import postcss, { CssSyntaxError, type AtRule, type Root } from "postcss";
 import { contrastRatio, suggestPassingText } from "./contrast.ts";
-import type { RuleContext } from "./hooks-index.ts";
+import { COMMENT, type RuleContext } from "./hooks-index.ts";
 
 export type Issue = { file: string; rule: string; message: string; fix?: string };
 
@@ -253,12 +253,13 @@ export function checkUtilCss(css: string, file: string, ctx: RuleContext): Issue
     if (r.selector.trim() !== ":root" || r.parent?.type !== "root") add("root-only", `"${r.selector}": ${ROOT_ONLY}`);
   });
 
-  // 최상위 :root의 선언. postcss가 주석을 노드로 떼어 내므로 주석 안의 선언은 여기 오지 않는다
+  // 최상위 :root의 선언. postcss가 주석을 노드로 떼어 내므로 주석 안의 선언은 여기 오지 않는다.
+  // 값에 공백 없이 붙은 주석(#999/*x*/)은 postcss가 value에 남기므로 지운다. CSS에서 주석은 토큰을 가르므로 공백으로 바꾼다
   const decls = new Map<string, string>();
   for (const node of root.nodes) {
     if (node.type !== "rule" || node.selector.trim() !== ":root") continue;
     node.each((d) => {
-      if (d.type === "decl") decls.set(d.prop, d.value);
+      if (d.type === "decl") decls.set(d.prop, d.value.replace(COMMENT, " ").trim());
     });
   }
   for (const [name, value] of decls) {
