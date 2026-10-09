@@ -271,7 +271,7 @@ test("pack 결과에 dist/cli/index.js가 있고 __tests__가 없으며, 텍스�
 - [ ] **Step 3: 승인을 요청한다.**
   - `main` 최신 커밋에 `git tag v0.0.1`을 붙인다
   - `git push origin v0.0.1`을 보여 주고, 승인을 받은 뒤 push한다
-  - `gh run watch`로 발행 성공을 확인하고, 패키지 공개 범위가 비공개인지 확인한다
+  - `gh run watch`로 발행 성공을 확인하고, 패키지 공개 범위를 확인한다(10/9: 공개로 생김, 공개로 두기로 함 — 설계 1장)
 - [ ] **Step 4: 설치를 확인한다.**
   - 상위 저장소에 `learndoshare_2/`를 만든다(`sf project generate --name learndoshare_2`)
   - 사용자가 `read:packages` classic 토큰을 `NODE_AUTH_TOKEN`에 넣고, `.npmrc`에 설계 0장의 두 줄을 넣는다
@@ -337,7 +337,7 @@ test("contrastRatio('#000000','#ffffff')는 21", ...);
 - [ ] **Step 3: 구현.** 계산부를 옮기고 타입만 더한다
 - [ ] **Step 4: 통과를 확인한다.**
   - `pnpm test`
-  - `node -e "import('./scripts/sync-theme.mjs')"`가 import 오류 없이 시작되어야 한다. 인자가 없으니 org 목록 안내까지만 나오면 된다
+  - `sync-theme.mjs`가 `lib/palette.ts`를 import하는지 부작용 없이 확인한다. 인자 없이 실행하면 org의 모든 테마를 동기화하므로 쓰지 않는다. 없는 별칭(`SF_ORG`)이나 없는 테마 이름으로 실행해 import 뒤 단계까지 가는지 본다(2026-10-09 Task 4)
 - [ ] **Step 5: 커밋.** `[Refactor] TypeScript 기반과 팔레트·대비 함수를 lib으로 이동 (#N)`
 
 ### Task 5: LWC 빌드를 lib으로, TS·플랫폼 모듈 지원, 카탈로그 경로 이식성
@@ -410,7 +410,7 @@ test("생성된 examples.json과 카탈로그 스토리에 절대 경로와 'nod
 - 세 컴포넌트는 `connectedCallback`에서 `loadBrand(this)`를 부른다. 첫 `renderedCallback`에서 `detectNativeShadow` 결과가 있으면 `console.warn("[milvus] native shadow로 그려지는 기본 컴포넌트: ...")`를 낸다
 - `tsconfig.lwc.base.json`
   - `target`·`module`: `ESNext`, `moduleResolution`: `Bundler`
-  - `experimentalDecorators: false`, `strict: true`, `types: ["jest"]`, `include: ["**/*.ts"]`
+  - `experimentalDecorators: false`, `strict: true`, `types: ["jest"]`. `include`와 `paths`(`c/<이름>`마다 한 줄)는 상대 경로가 그 파일 기준으로 풀리므로 `force-app/main/default/lwc/tsconfig.json`에 둔다(2026-10-09 Task 6)
 
 - [ ] **Step 1: 실패하는 테스트.** `milvusScript.test.ts`에 쓴다. sfdx-lwc-jest의 기본 stub을 쓴다
 ```ts

@@ -1,7 +1,7 @@
 // 브랜드 스타일 파일 규칙. 원본은 설계 5.1(override), 5.2(util.css), 5.3(피드백 색)이다
 // - util.css(milvusBrand.css, brands/<브랜드>/util.css): :root 블록 하나에 허용된 이름만 둔다. 위반은 check --style을 실패시킨다
 // - milvusOverride.css: 공식 권고 밖인 opt-in 파일이라 경고만 낸다. 글꼴·외부 CSS를 들이는 @font-face·@import만 실패시킨다
-// hook 이름은 SLDS 2 2.264.2(slds2.cosmos.css)와 lightning-base-components 1.28.19-alpha 원본에서 확인했다(2026-10-10)
+// hook 이름은 SLDS 2 2.264.2(slds2.cosmos.css)와 lightning-base-components 1.28.19-alpha 원본에서 확인했다(2026-10-09)
 import postcss, { CssSyntaxError, type AtRule, type Root } from "postcss";
 import { contrastRatio, suggestPassingText } from "./contrast.ts";
 import { COMMENT, type RuleContext } from "./hooks-index.ts";
