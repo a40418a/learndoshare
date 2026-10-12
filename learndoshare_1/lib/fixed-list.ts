@@ -166,18 +166,35 @@ export const FIXED_ITEMS: FixedItem[] = [
   // 2026-10-12 사용자 합의(남은 빈틈 묶음, native). 라벨이 native 전체를 가리키면 속성(+ 값)만, 대상이 정해져 있으면 선택자도 맞춘다
   { id: "native-spacing", label: "native 간격", mode: "native", match: { property: SPACING } },
   { id: "native-tab-line-height", label: "native 탭 줄 간격", mode: "native", match: { selector: /\[role='tab'\]|tab-overflow/, property: "line-height" } },
-  { id: "native-control-icon-size", label: "native 컨트롤 안 아이콘 크기", mode: "native", match: { selector: /\.slds-input__icon/, property: ["width", "height"] } },
+  // 입력 안 아이콘과 진행 링 안 상태 아이콘 (2026-10-12 결정으로 진행 링 넓힘)
+  {
+    id: "native-control-icon-size",
+    label: "native 컨트롤·진행 링 안 아이콘 크기",
+    mode: "native",
+    match: { selector: /\.slds-input__icon|\.slds-progress-ring[\w-]* \.slds-icon/, property: ["width", "height"] },
+  },
   { id: "native-modal-width", label: "native 모달 너비", mode: "native", match: { selector: /\.slds-modal__container/, property: ["width", "max-width", "min-width"] } },
-  // 반경 자리에서 두께(sizing-border)·간격(spacing) hook을 읽어 모서리 설정이 닿지 않는다
-  { id: "native-radius", label: "native 반경(두께·간격 hook 사용)", mode: "native", match: { property: RADIUS, value: /var\(\s*--slds-g-(sizing-border|spacing)-/ } },
+  // 반경 자리에서 두께(sizing-border)·간격(spacing) hook을 읽어 모서리 설정이 닿지 않는다. 리터럴은 툴팁(꼬리 포함)과 진행 링 원만 (2026-10-12 결정으로 넓힘)
+  {
+    id: "native-radius",
+    label: "native 반경(두께·간격 hook이나 리터럴, 툴팁·진행 링 포함)",
+    mode: "native",
+    match: [
+      { property: RADIUS, value: /var\(\s*--slds-g-(sizing-border|spacing)-/ },
+      { selector: /tooltip|bubble|\.slds-progress-ring/i, property: RADIUS },
+    ],
+  },
   { id: "native-shadow", label: "native 그림자", mode: "native", match: { property: ["box-shadow", "text-shadow"] } },
   { id: "native-cursor-underline", label: "native 커서·링크 밑줄", mode: "native", match: { property: ["cursor", "text-decoration"], value: /^(default|not-allowed)$|underline/ } },
-  // 목록 옵션 머리글 700, 쌓인 표의 머리글(th::before) 대문자·자간
+  // 목록 옵션 머리글 700, 쌓인 표의 머리글(th::before) 대문자·자간, 모달 제목 크기(c hook --slds-c-modalheader-heading-font-size, 2026-10-12 결정으로 넓힘)
   {
     id: "native-typography",
-    label: "native 글자(목록·표 머리글 굵기·대문자·자간)",
+    label: "native 글자(목록·표 머리글 굵기·대문자·자간, 모달 제목 크기)",
     mode: "native",
-    match: { selector: /listbox__option-header|table_stacked[\w-]* t[hd]::before/, property: ["font-weight", "text-transform", "letter-spacing"] },
+    match: [
+      { selector: /listbox__option-header|table_stacked[\w-]* t[hd]::before/, property: ["font-weight", "text-transform", "letter-spacing"] },
+      { selector: /\.slds-modal__title/, property: "font-size" },
+    ],
   },
   // --slds-c-pill-sizing-border는 설계 9.2 c hook 후보
   { id: "native-pill-border", label: "native pill 두께", mode: "native", match: { selector: /\.slds-pill/, property: "border-width" } },

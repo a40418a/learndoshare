@@ -3841,7 +3841,7 @@
       },
       "typography": {
         "now": "fixed",
-        "native": "gap"
+        "native": "fixed"
       },
       "component": {
         "now": "n/a",
@@ -4457,7 +4457,7 @@
       },
       "typography": {
         "now": "n/a",
-        "native": "gap"
+        "native": "fixed"
       },
       "surface": {
         "now": "n/a",
@@ -5279,7 +5279,7 @@
     "primitiveBubble": {
       "radius": {
         "now": "n/a",
-        "native": "gap"
+        "native": "fixed"
       },
       "density": {
         "now": "n/a",
@@ -6483,7 +6483,7 @@
     "progressRing": {
       "radius": {
         "now": "n/a",
-        "native": "gap"
+        "native": "fixed"
       },
       "feedback": {
         "now": "n/a",
@@ -6507,7 +6507,7 @@
       },
       "icon-size": {
         "now": "n/a",
-        "native": "gap"
+        "native": "fixed"
       }
     },
     "progressStep": {
@@ -9363,111 +9363,5 @@
       }
     }
   },
-  "gaps": [
-    {
-      "comp": "interactiveDialogBase",
-      "item": "typography",
-      "selector": ":host([data-render-mode=\"shadow\"]) .slds-modal__title",
-      "prop": "font-size",
-      "value": "var(--slds-c-modalheader-heading-font-size, 1.25rem)"
-    },
-    {
-      "comp": "modalHeader",
-      "item": "typography",
-      "selector": ":host([data-render-mode=\"shadow\"]) .slds-modal__title",
-      "prop": "font-size",
-      "value": "var(--slds-c-modalheader-heading-font-size, 1.25rem)"
-    },
-    {
-      "comp": "primitiveBubble",
-      "item": "radius",
-      "selector": ":host([data-render-mode=\"shadow\"]) [part~='overlay']",
-      "prop": "border-radius",
-      "value": "0.25rem"
-    },
-    {
-      "comp": "primitiveBubble",
-      "item": "radius",
-      "selector": ":host([data-render-mode=\"shadow\"]) .slds-nubbin_top-left-corner",
-      "prop": "border-radius",
-      "value": "0.125rem 0.25rem 0.25rem 0.25rem"
-    },
-    {
-      "comp": "primitiveBubble",
-      "item": "radius",
-      "selector": ":host([data-render-mode=\"shadow\"]) .slds-nubbin_bottom-left-corner",
-      "prop": "border-radius",
-      "value": "0.25rem 0.25rem 0.25rem 0.125rem"
-    },
-    {
-      "comp": "primitiveBubble",
-      "item": "radius",
-      "selector": ":host([data-render-mode=\"shadow\"]) .slds-nubbin_top-right-corner",
-      "prop": "border-radius",
-      "value": "0.25rem 0.125rem 0.25rem 0.25rem"
-    },
-    {
-      "comp": "primitiveBubble",
-      "item": "radius",
-      "selector": ":host([data-render-mode=\"shadow\"]) .slds-nubbin_bottom-right-corner",
-      "prop": "border-radius",
-      "value": "0.25rem 0.25rem 0.125rem 0.25rem"
-    },
-    {
-      "comp": "primitiveBubble",
-      "item": "radius",
-      "selector": ":host([data-render-mode=\"shadow\"]) .slds-nubbin_left-top-corner",
-      "prop": "border-radius",
-      "value": "0.125rem 0.25rem 0.25rem 0.25rem"
-    },
-    {
-      "comp": "primitiveBubble",
-      "item": "radius",
-      "selector": ":host([data-render-mode=\"shadow\"]) .slds-nubbin_right-top-corner",
-      "prop": "border-radius",
-      "value": "0.25rem 0.125rem 0.25rem 0.25rem"
-    },
-    {
-      "comp": "primitiveBubble",
-      "item": "radius",
-      "selector": ":host([data-render-mode=\"shadow\"]) .slds-nubbin_left-bottom-corner",
-      "prop": "border-radius",
-      "value": "0.25rem 0.25rem 0.25rem 0.125rem"
-    },
-    {
-      "comp": "primitiveBubble",
-      "item": "radius",
-      "selector": ":host([data-render-mode=\"shadow\"]) .slds-nubbin_right-bottom-corner",
-      "prop": "border-radius",
-      "value": "0.25rem 0.25rem 0.125rem 0.25rem"
-    },
-    {
-      "comp": "progressRing",
-      "item": "radius",
-      "selector": ":host([data-render-mode=\"shadow\"]) .slds-progress-ring",
-      "prop": "border-radius",
-      "value": "1.5rem"
-    },
-    {
-      "comp": "progressRing",
-      "item": "radius",
-      "selector": ":host([data-render-mode=\"shadow\"]) .slds-progress-ring__content",
-      "prop": "border-radius",
-      "value": "1.5rem"
-    },
-    {
-      "comp": "progressRing",
-      "item": "icon-size",
-      "selector": ":host([data-render-mode=\"shadow\"]) .slds-progress-ring__content .slds-icon",
-      "prop": "width",
-      "value": "0.75rem"
-    },
-    {
-      "comp": "progressRing",
-      "item": "icon-size",
-      "selector": ":host([data-render-mode=\"shadow\"]) .slds-progress-ring_large .slds-icon",
-      "prop": "width",
-      "value": "1rem"
-    }
-  ]
+  "gaps": []
 }

@@ -26,7 +26,7 @@
   },
   "scripts": {
     "lint": "eslint \"force-app/**/lwc/**/*.js\"",
-    "test": "pnpm typecheck && pnpm test:unit && pnpm test:node && pnpm test:brands && pnpm test:learn",
+    "test": "pnpm typecheck && pnpm test:unit && pnpm test:node && pnpm test:brands && pnpm test:learn && pnpm audit:brand",
     "test:unit": "sfdx-lwc-jest",
     "test:node": "node --test \"tests/**/*.test.ts\"",
     "test:learn": "node scripts/check-learn.ts",

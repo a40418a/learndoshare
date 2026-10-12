@@ -250,6 +250,26 @@ test("2026-10-12 합의 고정 항목은 그 묶음만 흡수하고 비슷한 �
     },
     { comp: "modalBase", file: "lightning-base-components/src/lightning/modalBase/modalBase.css", css: ".slds-modal__container__reflow_resize { margin-left: 0.1rem; }" },
     { comp: "button", file: "lightning-base-components/src/lightning/button/button.css", css: ".fix-slds-button { margin: 1rem; }" },
+    // native 라벨 넓힘(2026-10-12 결정): 모달 제목 크기, 툴팁·진행 링 리터럴 반경, 진행 링 안 아이콘
+    {
+      comp: "modalHeader",
+      file: "lightning-base-components/src/lightning/modalHeader/modal-header.slds.css",
+      css: `:host([data-render-mode="shadow"]) .slds-modal__title { font-size: var(--slds-c-modalheader-heading-font-size, 1.25rem); }`,
+    },
+    {
+      comp: "primitiveBubble",
+      file: "lightning-base-components/src/lightning/primitiveBubble/tooltip.slds.css",
+      css: `:host([data-render-mode="shadow"]) [part~='overlay'] { border-radius: 0.25rem; }
+        :host([data-render-mode="shadow"]) .slds-nubbin_top-left-corner { border-radius: 0.125rem 0.25rem 0.25rem 0.25rem; }`,
+    },
+    {
+      comp: "progressRing",
+      file: "lightning-base-components/src/lightning/progressRing/progress-ring.slds.css",
+      css: `:host([data-render-mode="shadow"]) .slds-progress-ring { border-radius: 1.5rem; }
+        :host([data-render-mode="shadow"]) .slds-progress-ring__content .slds-icon { width: 0.75rem; }`,
+    },
+    // 툴팁·진행 링이 아닌 native 리터럴 반경은 빈틈으로 남는다
+    { comp: "card", file: "lightning-base-components/src/lightning/card/card.slds.css", css: `:host([data-render-mode="shadow"]) .slds-card { border-radius: 0.5rem; }` },
   ];
   const { byComponent, gaps } = buildReport(classify({ sldsCss, lbcFiles }), SPEC_ITEMS, "", FIXED_ITEMS);
   assert.deepEqual(gaps.map((g) => `${g.selector} { ${g.prop}: ${g.value} } ${g.item}`), [
@@ -264,8 +284,12 @@ test("2026-10-12 합의 고정 항목은 그 묶음만 흡수하고 비슷한 �
     ".slds-listbox_inline { margin-inline-end: 0.25rem } density",
     ".slds-card__body { padding: 0.75rem } density",
     ".fix-slds-button { margin: 1rem } density",
+    ':host([data-render-mode="shadow"]) .slds-card { border-radius: 0.5rem } radius',
   ]);
   assert.deepEqual(byComponent.baseCombobox["icon-size"], { now: "n/a", native: "fixed" });
+  assert.deepEqual(byComponent.modalHeader.typography, { now: "n/a", native: "fixed" });
+  assert.deepEqual(byComponent.primitiveBubble.radius, { now: "n/a", native: "fixed" });
+  assert.deepEqual(byComponent.progressRing, { radius: { now: "n/a", native: "fixed" }, "icon-size": { now: "n/a", native: "fixed" } });
   assert.deepEqual(byComponent.modalBase.density, { now: "fixed", native: "fixed" });
   assert.deepEqual(byComponent.toast["motion-speed"], { now: "fixed", native: "n/a" });
 });
