@@ -712,7 +712,7 @@ test("isValidBrandName: 'Milvus_DS' 참, '밀버스'·'A__B'·'Ab_'·'1A' 거짓
   - `type SfRunner = (args: string[], cwd: string) => Promise<{ code: number; stdout: string; stderr: string }>`. 기본 구현 `runSf`는 `spawn("sf", args)`를 쓴다(인자 배열)
 - Produces (`cli/init.ts`):
   - `type Op = { kind: "copy" | "create" | "merge-json" | "append-lines" | "add-key"; dest: string; src?: string; content?: string; lines?: string[]; key?: string; value?: unknown }`
-  - `planInit(o: { root: string; pkgRoot: string; targetOrg: string; brand: string; vf: boolean; logoFile?: string }): Op[]`
+  - `planInit(o: { root: string; pkgRoot: string; targetOrg: string; brand: string; vf: boolean; logoFile?: string; orgBrand?: { brandingSet: string; theme: string; logo?: { asset: string; file: string; meta: string } } }): Op[]` (`orgBrand`는 `--from-org`가 org XML과 로고를 그대로 넘길 때, 10/9 Task 11)
     - 로고 메타는 `writeContentAssetMeta(brand, logoFile)`로 만든다(Task 10. 두 번째 인자의 확장자가 `pathOnClient`에 들어간다)
   - `applyOps(root: string, ops: Op[]): { written: string[]; skipped: string[] }`
   - `runInit(argv: string[], deps?: { sf?: SfRunner; nodeVersion?: string }): Promise<number>`. 옵션은 `--target-org`, `--brand`, `--from-org`, `--no-vf`다. 기본은 VF를 포함한다
@@ -751,7 +751,7 @@ test("--from-org인데 커스텀 테마가 없거나 조회 실패 (가짜 SfRun
 
 **Interfaces:**
 - Consumes: `loadRuleContext`, `checkUtilCss`(Task 7), `readConfig`, `findProject`(Task 11), `managedFiles`, `sha256`(Task 8)
-- Produces (`cli/check.ts`): `runCheck(o: { root: string; style: boolean }): Promise<{ code: 0 | 1 | 2; issues: Issue[]; regenerated: string[] }>`
+- Produces (`cli/check.ts`): `runCheck(o: { root: string; style: boolean; pkgRoot?: string }): Promise<{ code: 0 | 1 | 2; issues: Issue[]; regenerated: string[] }>` (`pkgRoot`는 테스트에서 색인만 둔 패키지 폴더를 넘길 때, 10/9 Task 12)
   - `style: true`: util.css 규칙과 대비, `milvusOverride.css`의 `checkOverrideCss`를 본다. `dist/hooks-index.json`만 읽는다. util.css 위반이나 override 오류면 2, override 경고만 있으면 stderr에 경고를 내고 0
   - `style: false`: 전체를 본다. 규칙, 밀버스 관리 파일 sha256. 실패하면 1. VF 처리는 Task 24에서 붙인다. 밀버스 LWC는 JS라 타입 검사는 하지 않는다(10/9 D1)
 - hook(`milvus-check.mjs`, ESM): stdin의 `tool_input.file_path`가 `staticresources/milvusBrand.css`, `staticresources/milvusOverride.css`, `brandingSets/`일 때만 `pnpm milvus check --style`을 실행한다. 종료 코드와 stderr를 그대로 전달한다

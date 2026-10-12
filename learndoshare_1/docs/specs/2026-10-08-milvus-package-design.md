@@ -15,7 +15,7 @@
 | hook H7 (관리 파일 직접 수정 차단) | `permissions.deny` |
 | hook H2 (sf 데이터 변경·`apex run` 차단) | `permissions.ask` |
 | hook H8 (세션 시작 안내) | 두지 않는다. `CLAUDE.md`가 불러오는 `milvus-design.md`가 같은 안내를 한다 |
-| hook H4 (스타일 린트, 편집마다) | hook 1개: `pnpm milvus check --style` (정규식 수준, 0.2초 안) |
+| hook H4 (스타일 린트, 편집마다) | hook 1개: 패키지 CLI의 `check --style`을 node로 직접 실행(pnpm 거치지 않음). 검사 자체는 0.2초 안 |
 
 CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 첫 PR에서 이 표에 맞게 고친다.
 
@@ -152,7 +152,8 @@ force-app/main/default/
    - `--brand`와 `--from-org` 중 정확히 하나만 있다
 2. `<이름>` 규칙: `^[A-Za-z][A-Za-z0-9_]*$`, `__`를 쓰지 않고 `_`로 끝나지 않는다. 한글은 쓸 수 없다
 3. `--brand`: 3장의 브랜드 파일을 Salesforce 기본색(`#0176D3`)으로 만든다
-4. `--from-org`: `Settings:LightningExperience`로 활성 테마 이름을 먼저 읽는다. 그 테마의 `LightningExperienceTheme`, `BrandingSet`, 로고 `ContentAsset`만 임시 폴더로 받아 검증한 뒤 프로젝트에 복사하고 그 이름을 그대로 쓴다. 커스텀 테마가 없거나 조회가 실패하면 아무것도 쓰지 않고 멈춘다
+4. `--from-org`: `Settings:LightningExperience`로 활성 테마 이름을 먼저 읽는다. 그 테마의 `LightningExperienceTheme`, `BrandingSet`, 로고 `ContentAsset`만 임시 폴더로 받아 검증한 뒤 프로젝트에 복사하고 그 이름을 그대로 쓴다. 로고 자산 이름과 `BRAND_IMAGE`도 org 값 그대로 둔다(`<이름>Logo` 규칙은 사용자가 새 로고를 줄 때만, 10/9 판정). 활성 테마가 `SLDS_v2`가 아니면 멈춘다(#22). 커스텀 테마가 없거나 조회가 실패하면 아무것도 쓰지 않고 멈춘다
+   - 이미 `milvus.config.json`이 있고 그 버전이 설치된 패키지 버전과 다르면 아무것도 쓰지 않고 `pnpm milvus update`를 안내한다
    - `--no-vf`면 VF 파일(`milvusHead`, `milvusVf`)을 만들지 않는다. 기본은 포함한다(`milvus.config.json`의 `vf`)
 5. 3장의 나머지 파일을 만들고, `milvus.config.json`에 대상 org, 브랜드, 밀버스 관리 파일 목록과 sha256을 기록한다
    - 밀버스 LWC는 `.js` 그대로 복사한다. `lwc/tsconfig.json`을 만들지 않고 `sfdx-project.json`(`defaultLwcLanguage`)을 바꾸지 않는다(10/9 D1)
@@ -171,7 +172,7 @@ force-app/main/default/
 - 대체 경로: `node_modules` 안의 설정으로 띄우는 것이 안 되면 `init`이 `.storybook/`을 프로젝트에 복사한다. Task 3 스파이크에서는 필요하지 않았다. 14장의 남은 확인 항목이 실패할 때만 쓴다
 
 ### 4.3 `check [--style]`
-- `--style`(hook이 실행): util.css 규칙(5.2)과 피드백 색 대비(5.3)만 본다. 정규식 수준이라 빠르다. 실패하면 종료 코드 2와 함께 고칠 값을 stderr로 낸다. `milvusOverride.css`는 5.1의 경고만 내고(종료 코드 0) `@font-face`·`@import`만 실패시킨다
+- `--style`(hook이 실행): util.css 규칙(5.2)과 피드백 색 대비(5.3), `milvus.config.json` 브랜드의 `LEXTHEMING<브랜드>` BrandingSet의 `BRAND_COLOR` 형식(`#RRGGBB`)만 본다. 다른 BrandingSet(Experience Cloud 사이트 등)은 보지 않는다. 정규식 수준이라 빠르다. 실패하면 종료 코드 2와 함께 고칠 값을 stderr로 낸다. `milvusOverride.css`는 5.1의 경고만 내고(종료 코드 0) `@font-face`·`@import`만 실패시킨다
 - 전체(deploy와 CI가 실행): `--style` 항목 + `milvusVf.css`(팔레트)를 지금 `BRAND_COLOR`로 다시 만듦(VF 사용 시) + 밀버스 관리 파일 sha256 비교. 밀버스 LWC가 JS라 타입 검사는 하지 않는다(10/9 D1)
 - sha256이 다르면 `pnpm milvus update --force`로 되돌리라고 안내한다
 
@@ -410,7 +411,8 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 
 - `Edit(...)` 규칙 하나가 파일을 고치는 모든 내장 도구를 막는다. 경로 앞의 `/`는 프로젝트 루트 기준이라는 뜻이다(공식 문서)
 - `ask`는 auto 모드에서도 실행 전에 묻는다. 규칙 순서는 deny → ask → allow다(공식 문서)
-- hook은 바뀐 파일이 `milvusBrand.css`, `milvusOverride.css`, 브랜드 메타데이터일 때만 `pnpm milvus check --style`을 실행한다
+- hook은 바뀐 파일이 `milvusBrand.css`, `milvusOverride.css`, `brandingSets/`일 때만 `check --style`을 실행한다. 프로젝트에서 패키지를 찾아 `dist/cli/index.js`를 node로 직접 실행한다(pnpm 기동 0.3초를 없애고 Windows의 shell 경고를 피한다, 10/9 판정)
+- 결과 전달(공식 문서 code.claude.com/docs/en/hooks, 2026-10-09 확인: PostToolUse가 0으로 끝나면 stderr는 디버그 로그로만 가고 Claude는 보지 못한다): 2로 끝나면 stderr를 그대로 넘겨 Claude가 고칠 값을 본다. 0인데 override 경고가 있으면 stdout에 `{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"…"}}`를 써서 Claude에게 알린다
 - 저장소 hook H2의 2·3층(개인정보 필드·`FIELDS(ALL)` 조회, 토큰을 출력하는 명령)도 프로젝트에 가져간다(10/9 판정). 토큰을 출력하는 `sf org display`와 `sf org open --url-only`는 `deny`로 막는다. 개인정보 필드와 `FIELDS(ALL)`는 명령 패턴으로 막을 수 없어 `milvus-design.md`의 규칙 문장으로 둔다
 - 커밋된 설정의 hook은 팀원에게 별도 동의 없이 실행되므로 hook은 하나만 두고 `milvus-design.md`에 적는다
 
@@ -432,9 +434,9 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 - `tsconfig` 핵심(CLI·`lib`·스크립트): `target: ESNext`, `strict`, `erasableSyntaxOnly`, `allowImportingTsExtensions`, `rewriteRelativeImportExtensions`
 - `init`은 고객 `sfdx-project.json`의 `defaultLwcLanguage`를 바꾸지 않는다. 고객 프로젝트의 기본 LWC 언어는 고객 설정 그대로다
 - `check`의 `--milvus-*` 수집 대상은 밀버스 LWC의 `.css`·`.js`다(Task 30에서 `.ts`를 `.js`로 바꾼다)
-- ESLint는 LWC에 `@salesforce/eslint-config-lwc/recommended`(JS)를 쓴다. `.ts` LWC 블록은 Task 30에서 지운다
+- ESLint는 LWC에 `@salesforce/eslint-config-lwc/recommended`(JS)를 쓴다. `.ts` LWC 블록은 Task 30에서 지웠다
 - Rollup의 `.ts` 타입 제거 플러그인과 `sfdxLwcModules`의 `.ts` 우선 규칙은 Task 30에서 지웠다. 쓰는 곳이 없어서다(4.2)
-- 이전 설계(10/8~10/9 Task 6): 밀버스 LWC `.ts`, `tsconfig.lwc.base.json`, `lwc-platform.d.ts`, 고객 `lwc/tsconfig.json`, `"defaultLwcLanguage": "typescript"`. Task 30에서 모두 지운다
+- 이전 설계(10/8~10/9 Task 6): 밀버스 LWC `.ts`, `tsconfig.lwc.base.json`, `lwc-platform.d.ts`, 고객 `lwc/tsconfig.json`, `"defaultLwcLanguage": "typescript"`. Task 30에서 모두 지웠다
 
 ---
 
