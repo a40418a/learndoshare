@@ -534,7 +534,8 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     id: "object-icon-color",
     group: "아이콘",
     label: "개체 아이콘 색",
-    description: "브리지가 클래스마다 아이콘 배경 hook을 다시 정의한다(원래 색이 기본값)",
+    description:
+      "브리지가 클래스마다 아이콘 배경 hook을 다시 정의한다(원래 색이 기본값). 전체는 --milvus-icon-color-all, 개체 하나는 --milvus-icon-<종류>-<이름>(예: --milvus-icon-standard-account)",
     examples: ["Account 아이콘을 브랜드 남색으로"],
     hooks: [],
     bridgeVars: [B["icon-color-all"]],

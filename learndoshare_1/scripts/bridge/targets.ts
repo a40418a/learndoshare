@@ -1,11 +1,11 @@
-// 브리지 대상 (설계 5.6 표에서 개체 아이콘을 뺀 것. 개체 아이콘은 Task 16).
+// 브리지 대상 (설계 5.6 표).
 // 선택자는 SLDS 2 CSS 규칙의 선택자 목록을 그대로 쓴다(부분마다 공백을 하나로 줄여 ", "로 잇는다).
-// 선언이 많은 항목(움직임 217선언, 비활성 커서, 링크 hover 밑줄, 팝오버 꼬리 그림자)은 설치된 SLDS 2 CSS에서 모으고, 나머지는 손으로 적는다
+// 선언이 많은 항목(움직임 217선언, 비활성 커서, 링크 hover 밑줄, 팝오버 꼬리 그림자, 개체 아이콘 색 973규칙)은 설치된 SLDS 2 CSS에서 모으고, 나머지는 손으로 적는다
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { list } from "postcss";
+import { list, parse, type Rule } from "postcss";
 import { BRIDGE_VARS } from "../../lib/bridge-vars.ts";
 import { classify } from "../audit/classify.ts";
 
@@ -165,4 +165,26 @@ function collect(sldsCss: string): BridgeTarget[] {
   });
 }
 
-export const BRIDGE_TARGETS: BridgeTarget[] = [...LISTED, ...collect(readSlds2Css())];
+/**
+ * 개체 아이콘 배경색: SLDS 2가 클래스마다 정한 --slds-c-icon-color-background.
+ * 같은 규칙을 전체 변수, 개체 변수 순으로 감싸 var(--milvus-icon-<종류>-<이름>, var(--milvus-icon-color-all, <원래 값>))이 된다.
+ * 개체 변수 이름은 규칙의 첫 클래스(lightning-icon이 붙이는 이름)에서 온다. 별칭(.slds-icon-custom-110)은 같은 변수를 따른다
+ */
+function objectIcons(sldsCss: string): BridgeTarget[] {
+  const property = "--slds-c-icon-color-background";
+  const rules: Rule[] = [];
+  parse(sldsCss).walkRules((r) => {
+    if (r.selectors.every((s) => /^\.slds-icon-(standard|custom|action)-[\w-]+$/.test(s)) && r.some((d) => d.type === "decl" && d.prop === property)) rules.push(r);
+  });
+  const key = (r: Rule) => selectorKey(r.selector);
+  return [
+    T("icon-color-all", rules.map(key), property),
+    ...rules.map((r) => {
+      const id = r.selectors[0].slice(".slds-".length);
+      return { id, selectors: [key(r)], property, varName: `--milvus-${id}` };
+    }),
+  ];
+}
+
+const slds2 = readSlds2Css();
+export const BRIDGE_TARGETS: BridgeTarget[] = [...LISTED, ...collect(slds2), ...objectIcons(slds2)];
