@@ -49,8 +49,21 @@ test("generated가 아니면 src가 있고 패키지에 그 파일이 있다. LW
     assert.ok(!f.dest.includes("__tests__"), f.dest);
   }
   const dests = managedFiles(root, { vf: true }).map((f) => f.dest);
-  assert.ok(dests.includes("force-app/main/default/lwc/milvusScript/milvusScript.ts"));
   assert.ok(dests.includes("force-app/main/default/staticresources/milvusOverride.css"));
+});
+
+test("managedFiles에 lwc/tsconfig.json이 없고 milvusScript.js와 milvusBrandLoader의 .js·.html·.js-meta.xml이 있다", () => {
+  const lwc = "force-app/main/default/lwc";
+  const kinds = new Map(managedFiles(root, { vf: false }).map((f) => [f.dest, f.kind]));
+  assert.ok(!kinds.has(`${lwc}/tsconfig.json`));
+  for (const dest of [
+    `${lwc}/milvusScript/milvusScript.js`,
+    `${lwc}/milvusBrandLoader/milvusBrandLoader.js`,
+    `${lwc}/milvusBrandLoader/milvusBrandLoader.html`,
+    `${lwc}/milvusBrandLoader/milvusBrandLoader.js-meta.xml`
+  ]) {
+    assert.equal(kinds.get(dest), "managed", dest);
+  }
 });
 
 test("vf:false면 milvusHead와 milvusVf가 목록에 없다", () => {

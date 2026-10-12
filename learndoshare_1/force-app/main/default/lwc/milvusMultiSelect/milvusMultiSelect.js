@@ -1,42 +1,40 @@
 import { LightningElement, api } from "lwc";
 import { detectNativeShadow, loadBrand } from "c/milvusScript";
 
-type Option = { label: string; value: unknown };
-
 const OPTION_CLASS =
   "slds-media slds-listbox__option slds-listbox__option_plain slds-media_small";
 
 export default class MilvusMultiSelect extends LightningElement {
-  @api label?: string;
+  @api label;
   @api placeholder = "검색";
   @api noResultsText = "검색 결과가 없습니다";
   @api disabled = false;
   @api required = false;
 
-  _options: Option[] = [];
-  _value: unknown[] = [];
+  _options = [];
+  _value = [];
   searchTerm = "";
   isOpen = false;
   activeIndex = -1;
   nativeChecked = false;
 
-  connectedCallback(): void {
+  connectedCallback() {
     loadBrand(this);
   }
 
-  renderedCallback(): void {
+  renderedCallback() {
     if (this.nativeChecked) return;
     this.nativeChecked = true;
-    const native = detectNativeShadow(this.template!);
+    const native = detectNativeShadow(this.template);
     if (native.length) console.warn(`[milvus] native shadow로 그려지는 기본 컴포넌트: ${native.join(", ")}`);
   }
 
   /** [{ label, value }] — value가 없는 항목은 버린다 */
   @api
-  get options(): Option[] {
+  get options() {
     return this._options;
   }
-  set options(options: unknown) {
+  set options(options) {
     this._options = Array.isArray(options)
       ? options.filter((option) => option?.value != null)
       : [];
@@ -44,10 +42,10 @@ export default class MilvusMultiSelect extends LightningElement {
 
   /** 선택된 value 배열 */
   @api
-  get value(): unknown[] {
+  get value() {
     return this._value;
   }
-  set value(value: unknown) {
+  set value(value) {
     this._value = Array.isArray(value) ? [...value] : [];
   }
 
@@ -110,22 +108,22 @@ export default class MilvusMultiSelect extends LightningElement {
     return `${this.label ?? ""} 선택 항목`;
   }
 
-  handleInput(event: Event): void {
-    this.searchTerm = (event.target as HTMLInputElement).value;
+  handleInput(event) {
+    this.searchTerm = event.target.value;
     this.isOpen = true;
     this.activeIndex = this.filteredOptions.length ? 0 : -1;
   }
 
-  handleFocus(): void {
+  handleFocus() {
     this.isOpen = true;
   }
 
-  handleBlur(): void {
+  handleBlur() {
     this.isOpen = false;
     this.activeIndex = -1;
   }
 
-  handleKeyDown(event: KeyboardEvent): void {
+  handleKeyDown(event) {
     const count = this.filteredOptions.length;
     switch (event.key) {
       case "ArrowDown":
@@ -156,36 +154,36 @@ export default class MilvusMultiSelect extends LightningElement {
     }
   }
 
-  handleOptionMouseDown(event: MouseEvent): void {
+  handleOptionMouseDown(event) {
     // 클릭해도 입력창 포커스를 잃지 않게 한다 (blur로 목록이 닫히는 것을 막음)
     event.preventDefault();
     const value = this._options.find(
-      (option) => String(option.value) === (event.currentTarget as HTMLElement).dataset.value
+      (option) => String(option.value) === event.currentTarget.dataset.value
     )?.value;
     if (value !== undefined) this.toggle(value);
   }
 
-  handleRemove(event: Event): void {
+  handleRemove(event) {
     this.remove(
-      this._options.find((option) => String(option.value) === (event.target as unknown as Record<"name", string>).name)
+      this._options.find((option) => String(option.value) === event.target.name)
         ?.value
     );
   }
 
-  toggle(value: unknown): void {
+  toggle(value) {
     this._value = this._value.includes(value)
       ? this._value.filter((item) => item !== value)
       : [...this._value, value];
     this.notify();
   }
 
-  remove(value: unknown): void {
+  remove(value) {
     if (!this._value.includes(value)) return;
     this._value = this._value.filter((item) => item !== value);
     this.notify();
   }
 
-  notify(): void {
+  notify() {
     this.dispatchEvent(
       new CustomEvent("change", { detail: { value: [...this._value] } })
     );

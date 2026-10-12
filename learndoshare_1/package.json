@@ -14,8 +14,6 @@
     "force-app/main/default/lwc/milvus*/*",
     "!force-app/**/__tests__",
     "audit/report.json",
-    "tsconfig.lwc.base.json",
-    "lwc-platform.d.ts",
     "stories"
   ],
   "repository": {
@@ -27,7 +25,7 @@
     "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
-    "lint": "eslint \"force-app/**/lwc/**/*.{js,ts}\"",
+    "lint": "eslint \"force-app/**/lwc/**/*.js\"",
     "test": "pnpm typecheck && pnpm test:unit && pnpm test:node && pnpm test:brands && pnpm test:learn",
     "test:unit": "sfdx-lwc-jest",
     "test:node": "node --test \"tests/**/*.test.ts\"",
@@ -36,9 +34,9 @@
     "test:unit:debug": "sfdx-lwc-jest --debug",
     "test:unit:coverage": "sfdx-lwc-jest --coverage",
     "build:cli": "tsc -p tsconfig.build.json",
-    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p force-app/main/default/lwc/tsconfig.json",
-    "prepack": "pnpm build:cli && node scripts/build-hooks-index.ts",
-    "build:lwc": "node scripts/generate-slds-catalog.mjs && node scripts/build-lwc.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "prepack": "pnpm build:cli && node scripts/build-hooks-index.ts && node scripts/generate-slds-catalog.ts",
+    "build:lwc": "node scripts/generate-slds-catalog.ts && node scripts/build-lwc.ts",
     "storybook": "pnpm build:lwc && storybook dev -p 6006",
     "build-storybook": "pnpm build:lwc && storybook build -o storybook-static",
     "sync:theme": "node scripts/sync-theme.mjs",
@@ -74,7 +72,6 @@
     "@salesforce/eslint-plugin-aura": "^3.0.0",
     "@salesforce/eslint-plugin-lightning": "^2.0.0",
     "@salesforce/sfdx-lwc-jest": "^7.0.2",
-    "@types/jest": "^29.5.14",
     "@types/node": "^22.20.5",
     "eslint": "^9.29.0",
     "eslint-plugin-import": "^2.31.0",
@@ -88,7 +85,7 @@
     "**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}": [
       "prettier --write"
     ],
-    "**/{aura,lwc}/**/*.{js,ts}": [
+    "**/{aura,lwc}/**/*.js": [
       "eslint"
     ],
     "**/lwc/**": [

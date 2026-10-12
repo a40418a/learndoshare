@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <isExposed>true</isExposed>
+    <masterLabel>Milvus Brand Loader</masterLabel>
+    <description
+  >앱 유틸리티 바에 두고 "앱이 열릴 때 백그라운드로 로드"를 켜면 그 앱의 모든 페이지에 브랜드 CSS를 넣는다 (화면 없음)</description>
+    <targets>
+        <target>lightning__UtilityBar</target>
+    </targets>
+</LightningComponentBundle>

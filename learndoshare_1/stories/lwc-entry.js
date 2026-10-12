@@ -7,3 +7,4 @@ export { createElement } from "lwc";
 export { default as MilvusBadge } from "c/milvusBadge";
 export { default as MilvusButton } from "c/milvusButton";
 export { default as MilvusMultiSelect } from "c/milvusMultiSelect";
+export { default as MilvusBrandLoader } from "c/milvusBrandLoader";

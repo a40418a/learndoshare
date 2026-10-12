@@ -7,20 +7,17 @@ jest.mock("c/milvusScript", () => ({
   detectNativeShadow: jest.fn(() => [])
 }));
 
-type Lightning = HTMLElement & Record<string, unknown>;
-
-function render(props: Record<string, unknown>, custom: boolean) {
+function render(props, custom) {
   jest
     .spyOn(window, "getComputedStyle")
-    .mockReturnValue({ getPropertyValue: () => (custom ? " on" : "") } as unknown as CSSStyleDeclaration);
+    .mockReturnValue({ getPropertyValue: () => (custom ? " on" : "") });
   const element = createElement("c-milvus-button", { is: MilvusButton });
   Object.assign(element, props);
   document.body.appendChild(element);
   return element;
 }
 
-const query = <T extends Element = Lightning>(element: HTMLElement, selector: string) =>
-  element.shadowRoot!.querySelector(selector) as T;
+const query = (element, selector) => element.shadowRoot.querySelector(selector);
 
 describe("c-milvus-button", () => {
   afterEach(() => {
@@ -43,11 +40,11 @@ describe("c-milvus-button", () => {
       { label: "저장", variant: "brand", disabled: true },
       true
     );
-    const button = query<HTMLButtonElement>(element, "button");
+    const button = query(element, "button");
     expect(button.className).toBe(
       "slds-button slds-button_brand milvus-button"
     );
-    expect(button.textContent!.trim()).toBe("저장");
+    expect(button.textContent.trim()).toBe("저장");
     expect(button.disabled).toBe(true);
     expect(button.type).toBe("button");
   });

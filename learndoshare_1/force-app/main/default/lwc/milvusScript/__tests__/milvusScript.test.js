@@ -1,4 +1,3 @@
-import type { LightningElement } from "lwc";
 import { loadStyle } from "lightning/platformResourceLoader";
 import bridgeUrl from "@salesforce/resourceUrl/milvusBridge";
 import brandUrl from "@salesforce/resourceUrl/milvusBrand";
@@ -7,7 +6,7 @@ import { detectNativeShadow, loadBrand } from "c/milvusScript";
 
 // loadStyle은 sfdx-lwc-jest의 기본 stub(jest.fn, resolve)이다
 const loadStyleMock = jest.mocked(loadStyle);
-const el = {} as LightningElement;
+const el = {};
 
 describe("c/milvusScript", () => {
   afterEach(() => {
@@ -22,7 +21,7 @@ describe("c/milvusScript", () => {
   });
 
   it("data-render-mode=shadow인 lightning-* 이름을 돌려준다", () => {
-    const host = (tag: string, native: boolean) => {
+    const host = (tag, native) => {
       const node = document.createElement(tag);
       if (native) node.dataset.renderMode = "shadow";
       return node;

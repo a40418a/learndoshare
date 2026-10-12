@@ -27,9 +27,17 @@ const read = (entry: string) => readFileSync(join(dir, entry), "utf8");
 test("pack 결과에 dist/cli/index.js가 있고 __tests__가 없으며, 텍스트 파일에 '/Users/'가 없다", () => {
   assert.ok(entries.includes("package/dist/cli/index.js"), entries.join("\n"));
   assert.deepEqual(entries.filter((e) => e.includes("__tests__")), []);
-  // 판정 R1: 개발자 PC 경로 검사는 dist/ 아래와 package.json만 한다 (카탈로그는 Task 5·13·23에서 잡는다)
-  const checked = entries.filter((e) => e.startsWith("package/dist/") || e === "package/package.json");
+  // 판정 R1: 개발자 PC 경로 검사는 dist/, prepack이 만든 카탈로그, package.json만 한다
+  assert.ok(entries.includes("package/stories/slds-catalog/examples.json"), entries.join("\n"));
+  const checked = entries.filter((e) => e.startsWith("package/dist/") || e.startsWith("package/stories/slds-catalog/") || e === "package/package.json");
   assert.deepEqual(checked.filter((e) => read(e).includes("/Users/")), []);
+});
+
+test("pack 결과에 tsconfig.lwc.base.json·lwc-platform.d.ts와 force-app 아래 .ts가 없고 milvusBrandLoader.js가 있다", () => {
+  assert.ok(!entries.includes("package/tsconfig.lwc.base.json"));
+  assert.ok(!entries.includes("package/lwc-platform.d.ts"));
+  assert.deepEqual(entries.filter((e) => e.startsWith("package/force-app/") && e.endsWith(".ts")), []);
+  assert.ok(entries.includes("package/force-app/main/default/lwc/milvusBrandLoader/milvusBrandLoader.js"), entries.join("\n"));
 });
 
 test("실행 파일 dist/cli/index.js는 shebang으로 시작하고, 빌드된 채로 --version에 버전을 출력한다", () => {

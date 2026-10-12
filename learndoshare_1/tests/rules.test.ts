@@ -228,7 +228,7 @@ test("buildHooksIndex는 var()로 읽히는 이름만 모은다(정의만 있는
   assert.deepEqual(built, { readSHooks: ["--slds-s-label-spacing"], readGHooks: ["--slds-g-color-x", "--slds-g-color-y"] });
 });
 
-test("loadRuleContext: dist/hooks-index.json을 읽고, milvusVars는 저장소의 lwc/milvus*와 templates의 milvusBridge.css에서 모은다", () => {
+test("loadRuleContext: milvusVars는 lwc/milvus*의 .css·.js에서 모은다 (dist/hooks-index.json, templates·프로젝트의 milvusBridge.css 포함)", () => {
   const pkg = mkdtempSync(join(tmpdir(), "milvus 규칙 "));
   const write = (rel: string, text: string) => {
     mkdirSync(dirname(join(pkg, rel)), { recursive: true });
@@ -237,8 +237,10 @@ test("loadRuleContext: dist/hooks-index.json을 읽고, milvusVars는 저장소�
   try {
     write("dist/hooks-index.json", JSON.stringify({ readSHooks: ["--slds-s-a"], readGHooks: ["--slds-g-b"] }));
     write("force-app/main/default/lwc/milvusFoo/milvusFoo.css", ".x { width: var(\n  --milvus-foo-width, 1px); }");
-    write("force-app/main/default/lwc/milvusFoo/milvusFoo.ts", 'getComputedStyle(h).getPropertyValue("--milvus-foo-on"); /* "--milvus-commented" */');
-    write("force-app/main/default/lwc/milvusFoo/__tests__/milvusFoo.test.ts", '"--milvus-test-only"');
+    write("force-app/main/default/lwc/milvusFoo/milvusFoo.js", 'getComputedStyle(h).getPropertyValue("--milvus-foo-on"); /* "--milvus-commented" */');
+    // 밀버스 LWC는 .js다(10/9 D1). .ts는 org에 배포되지 않으므로 읽지 않는다
+    write("force-app/main/default/lwc/milvusFoo/stale.ts", '"--milvus-ts-only"');
+    write("force-app/main/default/lwc/milvusFoo/__tests__/milvusFoo.test.js", '"--milvus-test-only"');
     write("force-app/main/default/lwc/other/other.css", ".x { width: var(--milvus-other); }");
     write("templates/force-app/main/default/staticresources/milvusBridge.css", ".slds-button { transition-duration: var(--milvus-motion-duration-fast, 0.1s); }");
     const repo = loadRuleContext({ pkgRoot: pkg });
