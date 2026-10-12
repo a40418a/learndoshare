@@ -645,8 +645,8 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | `node_modules`의 `.storybook`에서 `preview.ts`·`manager.ts`(manager 번들러), `../lib/*.ts` import, 정적 빌드(`storybook build`, `milvus storybook --build`)도 되는가. Task 3 스파이크는 `main.ts`·형제 `.ts`·스토리·addon만 쟀다 | Task 17 후 tgz 리허설 |
 | pnpm 11.5.3 이후(10.x는 10.34.2 이후) 프로젝트 `.npmrc`의 `${…}` 치환을 하지 않는다는 pnpm.io 설명(Learn 07). 10.13.1에서는 치환이 동작했다(13장). 고객 프로젝트가 더 새 pnpm을 쓰면 토큰 줄은 `~/.npmrc`, 범위 레지스트리는 `pnpm-workspace.yaml`의 `registries`로 안내해야 한다 — 그 버전에서 실제 확인 | Task 20(milvus-design.md 설치 안내) 전 |
 | 고객 프로젝트에서 pnpm이 `esbuild` 빌드 스크립트를 건너뛰는 것이 Storybook 정적 빌드·Vite에 영향을 주는가. 영향이 있으면 `init`이 `pnpm.onlyBuiltDependencies`에 `esbuild`를 더한다 | Task 11·18 |
-| `Bash(pnpm milvus deploy *)`가 인자 없는 명령에도 걸리는가 | 10/13 |
-| `Edit(...)` deny 규칙이 의도대로 막는가 | 10/13 |
+| `Bash(pnpm milvus deploy *)`가 인자 없는 명령에도 걸리는가 | Task 23 리허설(10/12 판정: 고객 프로젝트에서 Claude Code를 직접 띄워야 해서 M3 마무리에서 옮김) |
+| `Edit(...)` deny 규칙이 의도대로 막는가 | Task 23 리허설(같은 이유) |
 | App Manager의 유틸리티 항목 속성 "앱이 열릴 때 백그라운드로 로드"(Load in background when app opens) 체크가 10/9 프로브에서 쓴 FlexiPage decorator `eager` = `true`와 같은 설정인가. `milvus-design.md`가 App Manager 경로로 안내하므로 화면에서 체크한 뒤 `milvusBrandLoader`가 동작하는지 본다(9.7) | Task 23 리허설 |
 | VF `milvusHead` 컴포넌트 안의 `<apex:slds/>`도 Visualforce Settings SLDS 2 설정의 대상("pages that include `<apex:slds>`")이 되는가. 10/9 프로브는 페이지에 직접 둔 `<apex:slds/>`만 쟀다(5.5) | Task 24 Step 4 |
 | SLDS 2(`slds-plus.css`)에서도 VF 본문에 `slds-scope` 래퍼가 필요한가. 프로브 페이지는 래퍼가 있었다. 필요하면 5.5·7.1에 적는다 | Task 24 Step 4 (래퍼 있는 페이지와 없는 페이지) |

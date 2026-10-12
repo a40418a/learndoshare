@@ -754,7 +754,7 @@ test("--from-org인데 커스텀 테마가 없거나 조회 실패 (가짜 SfRun
 - Produces (`cli/check.ts`): `runCheck(o: { root: string; style: boolean; pkgRoot?: string }): Promise<{ code: 0 | 1 | 2; issues: Issue[]; regenerated: string[] }>` (`pkgRoot`는 테스트에서 색인만 둔 패키지 폴더를 넘길 때, 10/9 Task 12)
   - `style: true`: util.css 규칙과 대비, `milvusOverride.css`의 `checkOverrideCss`를 본다. `dist/hooks-index.json`만 읽는다. util.css 위반이나 override 오류면 2, override 경고만 있으면 stderr에 경고를 내고 0
   - `style: false`: 전체를 본다. 규칙, 밀버스 관리 파일 sha256. 실패하면 1. VF 처리는 Task 24에서 붙인다. 밀버스 LWC는 JS라 타입 검사는 하지 않는다(10/9 D1)
-- hook(`milvus-check.mjs`, ESM): stdin의 `tool_input.file_path`가 `staticresources/milvusBrand.css`, `staticresources/milvusOverride.css`, `brandingSets/`일 때만 `pnpm milvus check --style`을 실행한다. 종료 코드와 stderr를 그대로 전달한다
+- hook(`milvus-check.mjs`, ESM): stdin의 `tool_input.file_path`가 `staticresources/milvusBrand.css`, `staticresources/milvusOverride.css`, `brandingSets/`일 때만 프로젝트에서 패키지를 찾아 `dist/cli/index.js check --style`을 node로 직접 실행한다(pnpm 거치지 않음). 2로 끝나면 stderr와 종료 코드를 그대로 전달하고, 0인데 override 경고가 있으면 stdout에 `hookSpecificOutput.additionalContext` JSON을 쓴다(10/9 판정 R24·R25, 설계 7.2)
 
 - [ ] **Step 1: 실패하는 테스트**
 ```ts
@@ -793,7 +793,7 @@ test("hook은 다른 파일 수정에는 check를 실행하지 않는다", ...);
 
 ### M3 마무리: 수동 확인과 학습 자료 갱신
 
-- [ ] **Step 1: 수동 확인.** `pnpm pack` tgz를 `learndoshare_2`에 설치하고 `init`을 실행한 뒤 확인한다. 결과는 설계 13·14장에 옮긴다
+- [ ] **Step 1: 수동 확인.** (10/12 판정 R28: 고객 프로젝트에서 Claude Code를 직접 띄워야 해서 Task 23 리허설 Step 2 뒤로 옮겼다) `pnpm pack` tgz를 `learndoshare_2`에 설치하고 `init`을 실행한 뒤 확인한다. 결과는 설계 13·14장에 옮긴다
   - Claude Code에 `lwc/milvusBadge/milvusBadge.js`를 고치게 하면 거부되는가(`Edit` deny)
   - 인자 없는 `pnpm milvus deploy`를 실행하게 하면 확인을 묻는가(`ask`)
 - [ ] **Step 2:** 다음 문서를 고친다
@@ -1141,6 +1141,7 @@ test("출력에 --url-only와 액세스 토큰 형식 문자열이 없다", ...)
   - `tar -tzf`로 확인한다. `dist/cli/index.js`, `dist/hooks-index.json`, `audit/report.json`, `templates/`, `stories/slds-catalog/`가 있어야 하고 `__tests__`는 없어야 한다
   - `learndoshare_2`에서 `pnpm add -D <tgz>`
 - [ ] **Step 2:** `pnpm milvus init --target-org learndoshare_1 --brand Rehearsal --no-vf`를 두 번 실행해 결과가 같은지 확인한다
+- [ ] **Step 2-1 (M3 마무리 Step 1에서 옮김):** `learndoshare_2`에서 Claude Code를 띄워 (가) `lwc/milvusBadge/milvusBadge.js`를 고치게 하면 거부되는가(`Edit` deny), (나) 인자 없는 `pnpm milvus deploy`를 실행하게 하면 확인을 묻는가(`ask`)를 확인한다. 결과를 설계 13·14장에 옮긴다
 - [ ] **Step 3:** `pnpm milvus storybook`을 띄운다. 명세 페이지에서 요청을 입력·저장하고, Claude Code에 "브랜드 요청 반영해줘"를 요청한 뒤 화면이 바뀌는지 확인한다
 - [ ] **Step 4:** `pnpm milvus deploy`로 계획을 확인한다. 사용자 승인을 받은 뒤 `--yes`로 실행한다(활성 테마 변경은 org 전체 화면에 적용됨)
 - [ ] **Step 5:** LEX를 측정한다(밀버스 컴포넌트가 있는 페이지, 표준 화면). 앱 전체 브랜드는 사용자가 App Manager에서 한 앱의 유틸리티 바에 `milvusBrandLoader`를 추가하고 "앱이 열릴 때 백그라운드로 로드"를 체크한 뒤, 그 앱의 표준 화면을 새로 불러와 milvus link가 들어오는지 본다(설계 14장의 App Manager 항목). 끝나면 사용자가 그 항목을 지운다. 활성 테마를 되돌리는 배포도 승인을 받아 실행한다
