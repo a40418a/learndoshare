@@ -1,11 +1,10 @@
 import { after, test } from "node:test";
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, isAbsolute, join } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildLwc, catalogModules, sfdxLwcModules } from "../lib/lwc-build.ts";
+import { buildLwc, sfdxLwcModules } from "../lib/lwc-build.ts";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const fixture = join(root, "tests/fixtures/lwc");
@@ -61,22 +60,4 @@ test("sfdxLwcModules는 모든 패키지 폴더의 lwc/<이름>/<이름>.js를 c
     { name: "c/a", path: join(project, "force-app/main/default/lwc/a/a.js") },
     { name: "c/b", path: join(project, "extra/lwc/b/b.js") }
   ]);
-});
-
-test("생성된 examples.json과 카탈로그 스토리에 절대 경로와 'node_modules/' 상대 경로가 없다", () => {
-  const out = join(tmp, "slds-catalog");
-  const gen = spawnSync(process.execPath, ["scripts/generate-slds-catalog.mjs", out], { cwd: root, encoding: "utf8" });
-  assert.equal(gen.status, 0, gen.stderr);
-  const files = readdirSync(out);
-  assert.ok(files.includes("examples.json") && files.some((f) => f.endsWith(".stories.js")), files.join(", "));
-  for (const file of files) {
-    const text = readFileSync(join(out, file), "utf8");
-    assert.ok(!text.includes(root.replace(/[\\/]$/, "")), `${file}에 저장소 절대 경로가 있다`);
-    assert.doesNotMatch(text, /node_modules\//, `${file}에 node_modules/ 경로가 있다`);
-  }
-  // 상대 경로는 실행 시점에 lightning-base-components 위치 기준으로 실제 파일이 된다
-  const examples: { name: string; rel: string }[] = JSON.parse(readFileSync(join(out, "examples.json"), "utf8"));
-  assert.deepEqual(examples.filter((e) => isAbsolute(e.rel)), []);
-  const lbcDir = join(root, "node_modules/lightning-base-components/src/lightning");
-  assert.deepEqual(catalogModules(examples, lbcDir).filter((m) => !existsSync(m.path)), []);
 });

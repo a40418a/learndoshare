@@ -1,4 +1,5 @@
 import { readFileSync, readdirSync, rmSync } from "node:fs";
+import { createRequire } from "node:module";
 import { dirname, join, resolve } from "node:path";
 import lwc from "@lwc/rollup-plugin";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
@@ -101,3 +102,7 @@ export function sfdxLwcModules(projectRoot: string): LwcModule[] {
 // 카탈로그 examples.json의 상대 경로(lightning-base-components/src/lightning 기준)를 실행 시점의 절대 경로로 바꾼다
 export const catalogModules = (examples: { name: string; rel: string }[], lbcDir: string): LwcModule[] =>
   examples.map(({ name, rel }) => ({ name, path: resolve(lbcDir, rel) }));
+
+// lightning-base-components의 컴포넌트 폴더(src/lightning). 설치된 패키지에서 찾으므로 저장소와 고객 프로젝트 모두 같다
+export const lightningBaseComponentsDir = (): string =>
+  join(dirname(createRequire(import.meta.url).resolve("lightning-base-components/package.json")), "src/lightning");

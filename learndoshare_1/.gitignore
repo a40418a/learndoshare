@@ -59,5 +59,8 @@ yarn.lock
 # 개인 개발 서버 설정 (로컬 경로 포함)
 .claude/launch.json
 
-# 자동 생성 (scripts/generate-slds-catalog.mjs)
+# 자동 생성 (scripts/generate-slds-catalog.ts)
 stories/slds-catalog/
+
+# 고객 프로젝트 모드 Storybook이 만드는 폴더 (패키지 설계 3장)
+.milvus/
