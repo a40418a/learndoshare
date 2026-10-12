@@ -26,47 +26,85 @@ const GEOMETRY = /^(-|0(px|rem|em)?$)|\*\s*-1|%|^1px$|env\(/;
 // CSS 곡선 값(easing function)
 const EASING = /\b(ease(-in|-out|-in-out)?|linear|step-start|step-end)\b|\b(cubic-bezier|steps)\(/;
 
+// 브랜드 항목이 아닌 선언 (2026-10-12 사용자 결정, 설계 9.6의 4). 항목에서 빼면 배정되는 항목이 없어 세지 않는다
+// - 간격: em만 쓴 들여쓰기(글자 크기 배수), auto가 든 margin(가운데·오른쪽 정렬), revert 기본값
+const EM_ONLY = /^\d*\.?\d+em( \d*\.?\d+em)*$/;
+// - 컨트롤 높이: 숨긴 입력(선택자 끝이 [type='checkbox'|'radio'])과 트리 표 버튼
+const HIDDEN_INPUT = /\[type=['"]?(checkbox|radio)['"]?\]$/;
+// - hover·눌림: 뒤집기(rotate), 가운데 맞춤(translate -50%), 확대(scale). 떠오름(translateY(-2px) 등)은 남는다
+const SHAPE_MOTION = /rotate|scale|translate[XY]?\(\s*-50%/;
+// - 글자 크기: 상대 크기(em·%). var() 기본값도 본다
+const RELATIVE_SIZE = /^\d*\.?\d+(em|%)$/;
+// - 색: 이미지(url(), 이름에 image가 든 변수), 색이 없는 값(transparent·currentColor·시스템 색·color-mix·0 0, 색을 적지 않은 border)
+const IMAGE = /url\(|var\(\s*--[\w-]*image/;
+const COLORLESS_TOKEN =
+  /^(transparent|currentcolor|-?\d*\.?\d+(px|rem|em|%|deg)?|solid|dotted|dashed|double|none|linear-gradient|color-mix|in|srgb|oklab|to|top|bottom|left|right|highlight|highlighttext|buttontext|buttonface|buttonborder|canvas|canvastext|linktext|visitedtext|activetext|graytext|field|fieldtext|mark|marktext|selecteditem|selecteditemtext|accentcolor|accentcolortext)$/i;
+// var(--x, 기본값)은 기본값만 남긴다. 기본값 없는 var()는 색을 알 수 없어 그대로 둔다(토큰 var가 남아 색으로 본다)
+const fallbackOnly = (v: string) => v.replace(/var\(\s*--[\w-]+\s*,\s*/g, "");
+const colorless = (v: string) => fallbackOnly(v).split(/[\s,()/]+/).every((t) => !t || COLORLESS_TOKEN.test(t));
+// - 비활성: :not() 안의 disabled는 활성 상태다
+const outsideNot = (sel: string) => sel.replace(/:not\((?:[^()]|\([^()]*\))*\)/g, "");
+
+/**
+ * border로 그린 삼각형: ::before·::after이고, 같은 규칙에서 너비·높이가 0이거나 테두리가 transparent인데 한 변에만 색이 있다.
+ * 투명 테두리 위에 그라데이션을 깐 테두리(Agentforce 입력창)는 변 색이 없어 삼각형이 아니다
+ */
+const isTriangle = (d: Decl, sameRule: Decl[]) =>
+  list.comma(d.selector).every((p) => /::?(before|after)$/.test(p)) &&
+  (sameRule.some((s) => /^(width|height)$/.test(s.prop) && s.value === "0") ||
+    (sameRule.some((s) => /^border.*color$/.test(s.prop) && /transparent/.test(s.value)) &&
+      sameRule.some((s) => /^border-.+-color$/.test(s.prop) && !/transparent/.test(s.value))));
+
 // ponytail: 명세 항목 hook을 읽지 않는 선언을 속성과 선택자로 항목 하나에 넣는 1차 규칙이다(곡선이 든 움직임 shorthand는 buildReport가 곡선 항목에도 넣는다).
 // 항목에 없는 값(일반 폭, 배치)은 세지 않는다.
 // 빈틈 목록이 실제와 어긋나면 이 표를 고친다
-function ruleItem(d: Decl): string | null {
+function ruleItem(d: Decl, sameRule: Decl[]): string | null {
   const sel = d.selector;
   const hoverOrActive = /:hover|:active/.test(sel);
+  const disabled = /disabled/.test(outsideNot(sel));
   switch (d.cat) {
     case "motion":
       if (/timing-function$/.test(d.prop)) return "motion-easing";
-      return /^(transition|animation)(-duration|-delay)?$/.test(d.prop) ? "motion-speed" : null;
+      // 속도는 지속 시간이다. 지연(*-delay)은 세지 않는다
+      return /^(transition|animation)(-duration)?$/.test(d.prop) ? "motion-speed" : null;
     case "cursor":
-      return /disabled/.test(sel) ? "cursor-underline" : null;
+      return disabled ? "cursor-underline" : null;
     case "focusOutline":
       return "focus-ring";
     case "shadow":
       return /:focus/.test(sel) ? "focus-ring" : hoverOrActive ? "hover-press" : "shadow";
     case "transform":
-      return hoverOrActive ? "hover-press" : null;
+      return hoverOrActive && !SHAPE_MOTION.test(d.value) ? "hover-press" : null;
     case "zIndex":
     case "opacity":
       return "fixed";
     case "radius":
-      return "radius";
+      // 크기 hook(두께가 아닌 sizing)으로 만든 원
+      return /var\(\s*--slds-g-sizing-(?!border)/.test(d.value) ? null : "radius";
     case "borderWidth":
-      return d.prop.startsWith("outline") ? "focus-ring" : "border-width";
+      // outline-offset은 링 위치(배치값)다
+      if (d.prop === "outline-offset") return null;
+      return d.prop.startsWith("outline") ? "focus-ring" : isTriangle(d, sameRule) ? null : "border-width";
     case "sizing":
       if (/icon/i.test(sel)) return "icon-size";
-      if (CONTROLS.test(sel) && /height/.test(d.prop)) return "control-height";
+      if (CONTROLS.test(sel) && /height/.test(d.prop))
+        return list.comma(sel).every((p) => HIDDEN_INPUT.test(p)) || /\.slds-tree__item/.test(sel) ? null : "control-height";
       return /modal__container/.test(sel) && /width/.test(d.prop) ? "component" : null;
     case "spacing":
-      return /^(padding|margin|gap|row-gap|column-gap)/.test(d.prop) && !GEOMETRY.test(d.value) ? "density" : null;
+      if (!/^(padding|margin|gap|row-gap|column-gap)/.test(d.prop) || GEOMETRY.test(d.value)) return null;
+      return EM_ONLY.test(d.value) || (d.prop.startsWith("margin") && /\bauto\b/.test(d.value)) || /\brevert\b/.test(d.value) ? null : "density";
     case "typography":
       if (d.prop === "line-height") return CONTROLS.test(sel) ? "control-height" : "line-height";
       if (d.prop === "letter-spacing") return "letter-spacing";
       if (d.prop === "text-transform") return "text-case";
       if (d.prop.startsWith("text-decoration")) return /:hover/.test(sel) ? "cursor-underline" : null;
+      if (d.prop === "font-size" && RELATIVE_SIZE.test(fallbackOnly(d.value).replace(/\)+$/, ""))) return null;
       return d.prop === "font-family" ? null : "typography";
     case "color":
+      if (IMAGE.test(d.value) || colorless(d.value) || (d.prop.startsWith("border") && isTriangle(d, sameRule))) return null;
       if (/backdrop/.test(sel)) return "backdrop";
       if (/(^|[\s,>+~(])mark(?![\w-])/.test(sel)) return "highlight";
-      if (/disabled/.test(sel)) return "disabled";
+      if (disabled) return "disabled";
       if (/inverse|tooltip|bubble/.test(sel)) return "inverse";
       if (/:hover|:active|selected|is-active/.test(sel)) return "hover-selected";
       if (/^(border|outline)/.test(d.prop)) return "border-color";
@@ -113,21 +151,24 @@ function covers(bridgeProp: string, d: Decl, item: string): boolean {
 const bridged = (d: Decl, item: string, rules: BridgeRule[]) =>
   list.comma(d.selector).every((part) => rules.some((r) => r.parts.has(part) && covers(r.prop, d, item)));
 
-// FIXED_ITEMS.match 계약(lib/fixed-list.ts): 주어진 조건을 모두 만족하면 맞는다. js 출처는 CSS 선언과 맞추지 않는다
-const isFixed = (d: Decl, mode: Mode, fixed: FixedItem[]) =>
-  fixed.some(({ mode: m, match }) =>
-    (mode === "native" || m === "both") &&
-    match.source !== "js" &&
-    (!match.selector || match.selector.test(`${d.comp} ${d.selector}`)) &&
-    (!match.property || [match.property].flat().some((p) => d.prop === p || d.prop.startsWith(`${p}-`))) &&
-    (!match.value || match.value.test(d.value)),
+// FIXED_ITEMS.match 계약(lib/fixed-list.ts): 주어진 조건을 모두 만족하면 맞는다. 매처가 여러 개면 하나라도 맞으면 된다. js 출처는 CSS 선언과 맞추지 않는다
+const matchesFixed = (d: Decl, item: FixedItem) =>
+  [item.match].flat().some(
+    (m) =>
+      m.source !== "js" &&
+      (!m.selector || m.selector.test(`${d.comp} ${d.selector}`)) &&
+      (!m.property || [m.property].flat().some((p) => d.prop === p || d.prop.startsWith(`${p}-`))) &&
+      (!m.value || m.value.test(d.value)),
   );
+const isFixed = (d: Decl, mode: Mode, fixed: FixedItem[]) => fixed.some((f) => (mode === "native" || f.mode === "both") && matchesFixed(d, f));
 
 export function buildReport(decls: Decl[], items: SpecItem[], bridgeCss: string, fixed: FixedItem[]): Report {
   const ids = new Set(items.map((i) => i.id));
   const itemsOfHook = new Map<string, string[]>();
   for (const i of items) for (const h of i.hooks) itemsOfHook.set(h, [...(itemsOfHook.get(h) ?? []), i.id]);
   const bridge = bridgeRules(bridgeCss);
+  // ponytail: 같은 규칙을 파일·선택자로 묶는다. 같은 선택자가 다른 @media에 또 있으면 한 규칙으로 본다(삼각형 판정에만 쓴다)
+  const rules = Map.groupBy(decls, (d) => `${d.file} ${d.selector}`);
 
   const status = new Map<string, Map<string, Record<Mode, Status>>>();
   const gaps = new Map<string, Gap>();
@@ -136,7 +177,7 @@ export function buildReport(decls: Decl[], items: SpecItem[], bridgeCss: string,
     const hook = (d.kind === "g" || d.kind === "s") && !offFamily(d);
     // hook 선언은 그 hook을 가진 명세 항목 모두에 넣는다. 그런 항목이 없거나 hook이 아니면 규칙 표로 항목 하나를 고른다
     const byHook = hook ? [...d.value.matchAll(/var\(\s*(--slds-[gs]-[\w-]+)/g)].flatMap(([, n]) => itemsOfHook.get(n) ?? []) : [];
-    const byRule = ruleItem(d);
+    const byRule = ruleItem(d, rules.get(`${d.file} ${d.selector}`) ?? []);
     // 곡선이 든 transition·animation shorthand는 시간과 곡선 두 항목에 넣는다
     const ruled = byRule === "motion-speed" && /^(transition|animation)$/.test(d.prop) && EASING.test(d.value) ? [byRule, "motion-easing"] : byRule ? [byRule] : [];
     const targets = new Set(byHook.length ? byHook : ruled.filter((i) => ids.has(i)));
