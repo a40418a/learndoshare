@@ -34,6 +34,7 @@
     <li><a href="#pin">버전 고정과 lockfile</a></li>
     <li><a href="#husky">husky와 pnpm</a></li>
     <li><a href="#registry">GitHub Packages에서 설치</a></li>
+    <li><a href="#milvus">밀버스 설치 준비와 pnpm milvus</a></li>
     <li><a href="#quiz">스스로 점검</a></li>
     <li><a href="#refs">참고</a></li>
   </ol>
@@ -226,6 +227,34 @@ security add-generic-password -a "$USER" -s milvus-npm-token -w</code></pre>
   <p class="sources">출처: <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09) · <a href="https://pnpm.io/npmrc">pnpm — Auth &amp; Registry Settings (.npmrc, 11.5.3 제한, ~/.npmrc)</a> (확인 2026-10-09) · <a href="https://pnpm.io/10.x/npmrc">pnpm 10.x — .npmrc (${NAME} 치환, 10.34.2 제한)</a> (확인 2026-10-09) · <a href="https://pnpm.io/settings/dependency-resolution">pnpm — Dependency Resolution Settings (registries)</a> (확인 2026-10-09) · <a href="https://pnpm.io/registries">pnpm — Registries (인증 값은 .npmrc)</a> (확인 2026-10-09) · <a href="https://pnpm.io/migration">pnpm — Migrating from v10 (v11은 .npmrc에서 인증·레지스트리를 읽음)</a> (확인 2026-10-09) · <a href="https://pnpm.io/blog/releases/11.0">pnpm 11.0 release (registries가 @scope:registry= 대체)</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/learn-github-packages/configuring-a-packages-access-control-and-visibility">GitHub Docs — Configuring a package's access control and visibility (기본 비공개, 공개 후 비공개 불가)</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/managing-github-packages-using-github-actions-workflows/publishing-and-installing-a-package-with-github-actions">GitHub Docs — Publishing and installing a package with GitHub Actions (Default permissions and access settings for packages modified through workflows: 저장소 공개 범위를 물려받음)</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/learn-github-packages/about-permissions-for-github-packages">GitHub Docs — About permissions for GitHub Packages (npm 레지스트리는 granular permissions)</a> (확인 2026-10-09) ·<a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens">GitHub Docs — Managing your personal access tokens (비밀번호처럼 다루기, 만료일)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (1장 공개 범위 결정, 2장 패키지, 13장 v0.0.1 발행·설치 확인, 14장 미확인)</a> (확인 2026-10-09)</p>
 </section>
 
+<section id="milvus">
+  <h2>밀버스 설치 준비와 <code>pnpm milvus</code></h2>
+  <p>2026-10-12 추가. 고객 프로젝트에서 밀버스 패키지를 설치하고 CLI를 실행하는 방법이다(<a href="../docs/specs/2026-10-08-milvus-package-design.md">설계</a> 0장·2장·4장).</p>
+  <h3>준비 (개발자마다 한 번)</h3>
+  <ol>
+    <li>Node 22.18 이상(23.x는 23.6 이상). 패키지의 <code>engines.node</code>가 <code>^22.18.0 || &gt;=23.6.0</code>이고, <code>init</code>도 사전 점검에서 확인한다</li>
+    <li>GitHub에서 <code>read:packages</code> 권한의 classic 토큰을 만들어 셸 환경 변수 <code>NODE_AUTH_TOKEN</code>에 넣는다(<a href="#registry">위 절</a>, 키체인 예)</li>
+    <li><code>.npmrc</code>에 범위 레지스트리 줄과 토큰 줄 두 줄을 둔다(<a href="#registry">위 절</a>의 예와 같은 내용)</li>
+    <li>sf CLI를 설치하고 대상 org에 로그인해 둔다. <code>init</code>이 로그인을 확인한다</li>
+  </ol>
+<pre data-file="터미널 (SFDX 프로젝트 루트)"><code>pnpm add -D @a40418a/milvus-design-system
+pnpm milvus --version
+pnpm milvus init --target-org &lt;별칭&gt; --brand &lt;이름&gt;</code></pre>
+  <p>발행은 두 번(설치 경로 확인용 <code>v0.0.1</code>, 10/16 최종)만 하고, 그 사이 리허설은 <code>pnpm pack</code>으로 만든 tgz를 <code>pnpm add -D &lt;tgz&gt;</code>로 설치한다(설계 2장).</p>
+  <h3><code>pnpm milvus</code>는 어떻게 실행되나</h3>
+  <ul>
+    <li>패키지의 <code>package.json</code>에 <code>"bin": { "milvus": "dist/cli/index.js" }</code>가 있다. pnpm은 설치할 때 프로젝트의 <code>node_modules/.bin/milvus</code>를 만든다</li>
+    <li><code>milvus</code>는 pnpm 명령이 아니다. pnpm 문서는 알 수 없는 명령을 받으면 먼저 같은 이름의 스크립트를 찾고, 없으면 그 명령을 셸 명령으로 실행한다고 적는다(<code>pnpm exec</code>와 같은 방식). 그래서 <code>package.json</code>에 스크립트가 없어도 <code>pnpm milvus &lt;명령&gt;</code>이 설치된 CLI를 실행한다. <code>pnpm exec milvus &lt;명령&gt;</code>도 같다</li>
+    <li>pnpm이 만든 <code>milvus</code> 실행 파일은 실제 경로의 <code>dist/cli/index.js</code>를 실행한다(설계 13장, 2026-10-09 스파이크). Node는 <code>node_modules</code> 안의 <code>.ts</code>를 실행하지 않으므로 CLI는 <code>dist/</code>에 JS로 빌드해 발행한다(설계 2장)</li>
+    <li>지금 있는 명령은 <code>--version</code>, <code>init</code>, <code>check [--style]</code>이다(Task 10~12). <code>storybook</code>, <code>deploy</code>, <code>update</code>는 <span class="tag info">계획</span>이다. <code>init</code>이 <code>package.json</code>에 <code>"storybook": "milvus storybook"</code>을 더하므로, <code>storybook</code> 명령이 생기면 <code>pnpm storybook</code>으로도 띄운다</li>
+    <li>예외: Claude Code hook은 pnpm을 거치지 않고 패키지의 <code>dist/cli/index.js</code>를 node로 직접 실행한다. pnpm 기동 시간을 줄이고 Windows에서 셸이 필요한 문제를 피하려는 것이다(<a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html#runbook">08 Claude Code</a>)</li>
+  </ul>
+  <h3><code>init</code>이 프로젝트 <code>.npmrc</code>에 더하는 두 줄</h3>
+  <p><code>init</code>은 프로젝트 <code>.npmrc</code>에 위 두 줄이 없으면 더한다. 팀원도 같은 준비를 하게 하려는 것이다(설계 3장). 토큰 값이 아니라 환경 변수 이름 <code>${NODE_AUTH_TOKEN}</code>만 쓴다. 이 저장소의 pnpm 10.13.1은 프로젝트 <code>.npmrc</code>의 이 이름을 치환해 설치했다(설계 13장). 다만 <a href="#registry">위 절</a>대로 pnpm 11.5.3부터(10.x는 10.34.2부터)는 프로젝트 <code>.npmrc</code>의 인증 값에 있는 <code>${...}</code>를 풀지 않는다. 고객 프로젝트가 더 새 pnpm을 쓰면 토큰 줄을 <code>~/.npmrc</code>로 옮겨야 한다. 그 버전에서 실제로 어떻게 되는지는 <span class="tag warn">미확인</span>이다(설계 14장, <code>milvus-design.md</code> 설치 안내를 쓰기 전에 확인).</p>
+  <div class="callout warn"><strong><code>esbuild</code> 빌드 스크립트 경고</strong>설치할 때 pnpm 10.13.1이 <code>esbuild</code> 빌드 스크립트를 건너뛰었다고 경고한다(<a href="#builds">빌드 스크립트 승인</a>). Storybook의 <code>.ts</code> 설정 변환은 동작했다(설계 13장). 정적 빌드에 영향이 있는지는 <span class="tag warn">미확인</span>이고(설계 14장), 영향이 있으면 <code>init</code>이 <code>pnpm.onlyBuiltDependencies</code>에 <code>esbuild</code>를 더한다.</div>
+  <p class="sources">출처: <a href="https://pnpm.io/10.x/pnpm-cli">pnpm 10.x — pnpm CLI (알 수 없는 명령: 스크립트를 찾고, 없으면 셸 명령으로 실행)</a> (확인 2026-10-12) · <a href="https://pnpm.io/cli/exec">pnpm exec</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09) · <a href="https://pnpm.io/10.x/npmrc">pnpm 10.x — .npmrc (${NAME} 치환, 10.34.2 제한)</a> (확인 2026-10-09) · <a href="https://pnpm.io/npmrc">pnpm — Auth &amp; Registry Settings (11.5.3 제한)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (0장 준비, 2장 bin·engines·발행, 3장 .npmrc, 4장 명령, 4.1 사전 점검, 13장 설치·실행 경로 확인, 14장 새 pnpm·esbuild 미확인)</a> (확인 2026-10-12)</p>
+</section>
+
 <section id="quiz" class="quiz">
   <h2>스스로 점검</h2>
   <details><summary>Q1. 블로그에 <code>npx storybook add @storybook/addon-a11y</code>라고 나온다. 어떻게 실행하나?</summary>
@@ -240,7 +269,9 @@ security add-generic-password -a "$USER" -s milvus-npm-token -w</code></pre>
     <p>걸리지 않는다. 차단 대상은 의존성의 스크립트이고, 루트 프로젝트 자신의 <code>prepare</code>는 실행된다.</p></details>
   <details><summary>Q6. 밀버스 패키지 설치가 GitHub Packages 인증 오류로 실패한다. 공개 저장소인데 토큰이 왜 필요한가?</summary>
     <p>GitHub Packages의 npm 레지스트리는 공개 패키지라도 설치에 토큰이 필요하다. <code>read:packages</code> 권한의 personal access token (classic)을 <code>NODE_AUTH_TOKEN</code>에 넣고, 토큰 줄은 <code>~/.npmrc</code>에 둔다.</p></details>
-  <p class="sources">출처: <a href="https://pnpm.io/cli/exec">pnpm exec</a> (확인 2026-10-09) · <a href="https://pnpm.io/cli/approve-builds">pnpm approve-builds</a> (확인 2026-10-09) · <a href="https://pnpm.io/settings/node-modules">pnpm — Node-Modules &amp; Hoisting Settings</a> (확인 2026-10-09) · <a href="https://pnpm.io/migration">pnpm — Migrating from v10 (Q4)</a> (확인 2026-10-09) · <a href="https://pnpm.io/blog/releases/11.0">pnpm 11.0 release (Q2, strictDepBuilds 기본값)</a> (확인 2026-10-09) · <a href="https://pnpm.io/supply-chain-security">pnpm — Mitigating supply chain attacks</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09)</p>
+  <details><summary>Q7. 프로젝트 <code>package.json</code>에 <code>milvus</code> 스크립트가 없는데 <code>pnpm milvus init</code>이 실행된다. 왜인가?</summary>
+    <p><code>milvus</code>는 pnpm 명령이 아니다. pnpm은 알 수 없는 명령을 받으면 같은 이름의 스크립트를 먼저 찾고, 없으면 셸 명령으로 실행한다. 패키지의 <code>bin</code>이 <code>node_modules/.bin/milvus</code>를 만들었으므로 그 CLI가 실행된다. <code>pnpm exec milvus init</code>과 같다 (2026-10-12 추가).</p></details>
+  <p class="sources">출처: <a href="https://pnpm.io/cli/exec">pnpm exec</a> (확인 2026-10-09) · <a href="https://pnpm.io/cli/approve-builds">pnpm approve-builds</a> (확인 2026-10-09) · <a href="https://pnpm.io/settings/node-modules">pnpm — Node-Modules &amp; Hoisting Settings</a> (확인 2026-10-09) · <a href="https://pnpm.io/migration">pnpm — Migrating from v10 (Q4)</a> (확인 2026-10-09) · <a href="https://pnpm.io/blog/releases/11.0">pnpm 11.0 release (Q2, strictDepBuilds 기본값)</a> (확인 2026-10-09) · <a href="https://pnpm.io/supply-chain-security">pnpm — Mitigating supply chain attacks</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09) · <a href="https://pnpm.io/10.x/pnpm-cli">pnpm 10.x — pnpm CLI (Q7)</a> (확인 2026-10-12)</p>
 </section>
 
 <section id="refs">
@@ -257,7 +288,7 @@ security add-generic-password -a "$USER" -s milvus-npm-token -w</code></pre>
 
 <footer class="doc-foot">
   <span>밀버스 디자인 시스템 · Learn 07</span>
-  <span>2026-10-09 갱신. 버전 정보는 <code>pnpm view</code>와 공식 문서로 확인함</span>
+  <span>2026-10-09 갱신, 2026-10-12 갱신 (M3: 밀버스 설치 준비와 <code>pnpm milvus</code>). 버전 정보는 <code>pnpm view</code>와 공식 문서로 확인함</span>
 </footer>
 </main>
 </div>
