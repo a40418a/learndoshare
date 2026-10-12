@@ -204,7 +204,7 @@ const element = createElement('lightning-hello', { is: LightningHello });</code>
     <div class="arrow">→</div>
     <div class="step"><b>4. node-resolve</b></div>
   </div>
-  <h3>플랫폼 모듈 대체</h3>
+  <h3>대체 모듈 목록</h3>
   <p><code>resolveId</code>가 아래 이름을 <code>\0milvus-platform:</code>을 붙인 가상 모듈 ID로 바꾸고, <code>load</code>가 그 내용을 돌려준다. <code>\0</code>을 붙이면 다른 플러그인이 그 모듈을 처리하지 않는다(Rollup 문서의 관례). 해당하지 않는 이름은 <code>null</code>을 돌려 다음 플러그인에 넘긴다.</p>
   <div class="table-wrap"><table>
     <tr><th>import</th><th>Storybook 빌드에서 돌려주는 것</th><th>이유</th></tr>
@@ -313,7 +313,7 @@ export const catalogModules = (examples: { name: string; rel: string }[], lbcDir
 <span class="c">// lightning-base-components의 컴포넌트 폴더(src/lightning). 설치된 패키지에서 찾으므로 저장소와 고객 프로젝트 모두 같다</span>
 export const lightningBaseComponentsDir = (): string =&gt;
   join(dirname(createRequire(import.meta.url).resolve("lightning-base-components/package.json")), "src/lightning");</code></pre>
-  <p class="c">2026-10-12 갱신: <code>lightning-base-components</code> 폴더는 <code>lightningBaseComponentsDir()</code>가 정한다. Node의 <code>module.createRequire(filename)</code>는 주어진 파일 위치를 기준으로 해석하는 <code>require</code> 함수를 만든다. 여기서는 이 파일(<code>lib/lwc-build.ts</code>) 위치에서 <code>lightning-base-components/package.json</code>을 찾는다. 예전처럼 작업 폴더 기준의 <code>resolve("node_modules/...")</code>를 쓰지 않으므로, 밀버스 패키지를 설치한 고객 프로젝트에서도 패키지가 쓰는 <code>lightning-base-components</code>를 찾는다. pnpm은 패키지의 의존성을 프로젝트 <code>node_modules</code> 바로 아래에 두지 않는다(<a href="07-pnpm.html#layout">07 pnpm</a>, 설계 13장). 카탈로그 생성기와 빌드 스크립트가 모두 이 함수를 쓴다.</p>
+  <p class="c">2026-10-12 갱신: <code>lightning-base-components</code> 폴더는 <code>lightningBaseComponentsDir()</code>가 정한다. Node의 <code>module.createRequire(filename)</code>는 주어진 파일 이름으로 <code>require</code> 함수를 만든다. Node 문서의 예시처럼 <code>import.meta.url</code>을 넘겨, 이 파일(<code>lib/lwc-build.ts</code>)을 기준으로 <code>lightning-base-components/package.json</code>을 찾는다. 예전처럼 작업 폴더 기준의 <code>resolve("node_modules/...")</code>를 쓰지 않으므로, 밀버스 패키지를 설치한 고객 프로젝트에서도 패키지가 쓰는 <code>lightning-base-components</code>를 찾는다. pnpm은 패키지의 의존성을 프로젝트 <code>node_modules</code> 바로 아래에 두지 않는다(<a href="07-pnpm.html#layout">07 pnpm</a>, 설계 13장). 카탈로그 생성기와 빌드 스크립트가 모두 이 함수를 쓴다.</p>
   <p class="c"><code>@lwc/engine-dom</code> 9.4.3의 dist 파일에는 <code>process.env.NODE_ENV</code> 참조가 182곳 있다 (로컬 확인). <code>@rollup/plugin-replace</code> 문서는 바로 이 값을 치환하는 예를 보여 준다. <span class="tag warn">미확인</span> LWC 문서가 이 방식을 권장하는지는 찾지 못했다. alias 경로는 절대 경로로 주므로 <code>rootDir</code>과 상관없다. 컨테이너(org 전용) 컴포넌트는 진입 파일에서 export하지 않으면 빌드되지 않는다. 카탈로그 alias 목록(<code>examples.json</code>)은 절대 경로 대신 <code>lightning-base-components/src/lightning</code> 기준 상대 경로를 저장하고, 빌드할 때 <code>catalogModules()</code>가 절대 경로로 바꾼다. 패키지로 다른 프로젝트에 설치해도 경로가 맞게 하기 위해서다 (2026-10-09 갱신).</p>
 
   <h3>실행 스크립트</h3>
