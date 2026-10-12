@@ -134,15 +134,47 @@ test("밀버스 관리 파일을 고치면 전체 check가 1이고 'pnpm milvus 
   });
 });
 
-test("--style은 BrandingSet의 BRAND_COLOR가 #RRGGBB가 아니면 2와 고칠 값", async () => {
+test("--style은 config 브랜드의 BrandingSet BRAND_COLOR가 #RRGGBB가 아니면 2와 고칠 값", async () => {
   await withProject(async (root) => {
     const file = `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`;
+    const original = readFileSync(join(root, file), "utf8");
     assert.equal((await check(root, true)).result.code, 0); // init이 만든 BrandingSet(#0176D3)은 통과
-    write(root, file, readFileSync(join(root, file), "utf8").replace("#0176D3", "#abc"));
+    write(root, file, original.replace("#0176D3", "#abc"));
     const r = await check(root, true);
     assert.equal(r.result.code, 2, r.stderr);
     assert.deepEqual(r.result.issues.map((i) => [i.file, i.rule]), [[file, "brand-color"]]);
     assert.ok(r.stderr.includes("#abc") && r.stderr.includes("고칠 값: #RRGGBB"), r.stderr);
+
+    // BRAND_COLOR가 아예 없어도 실패다
+    write(root, file, original.replace(/<propertyName>BRAND_COLOR<\/propertyName>/, "<propertyName>OTHER</propertyName>"));
+    const none = await check(root, true);
+    assert.equal(none.result.code, 2, none.stderr);
+    assert.deepEqual(none.result.issues.map((i) => [i.file, i.rule]), [[file, "brand-color"]]);
+  });
+});
+
+test("--style은 config 브랜드의 BrandingSet이 없으면 2이고 init 재실행을 안내한다", async () => {
+  await withProject(async (root) => {
+    const file = `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`;
+    rmSync(join(root, file));
+    const r = await check(root, true);
+    assert.equal(r.result.code, 2, r.stderr);
+    assert.deepEqual(r.result.issues.map((i) => [i.file, i.rule]), [[file, "brand-color"]]);
+    assert.match(r.stderr, /브랜드 메타데이터가 없습니다\. pnpm milvus init을 다시 실행하거나 파일을 복구하세요/);
+  });
+});
+
+test("--style은 config 브랜드가 아닌 BrandingSet(BRAND_COLOR 없음 포함)은 검사하지 않는다", async () => {
+  await withProject(async (root) => {
+    // Experience Cloud 사이트의 BrandingSet처럼 BRAND_COLOR가 없거나 형식이 다른 파일
+    const site = (name: string, body: string) =>
+      write(root, `${FA}/brandingSets/${name}.brandingSet-meta.xml`, `<?xml version="1.0" encoding="UTF-8" ?>\n<BrandingSet xmlns="http://soap.sforce.com/2006/04/metadata">\n${body}    <masterLabel>${name}</masterLabel>\n</BrandingSet>\n`);
+    site("SiteTheme", "    <brandingSetProperty>\n        <propertyName>HEADER_BACKGROUND_COLOR</propertyName>\n        <propertyValue>rgb(1,2,3)</propertyValue>\n    </brandingSetProperty>\n");
+    site("EmptyTheme", "");
+    const r = await check(root, true);
+    assert.equal(r.result.code, 0, r.stderr);
+    assert.deepEqual(r.result.issues, []);
+    assert.equal((await check(root, false)).result.code, 0); // 전체 check도 같다
   });
 });
 
@@ -177,9 +209,10 @@ function installPackage(root: string) {
   writeFileSync(join(root, PKG, "dist/cli/index.js"), `import { main } from ${main};\nprocess.exitCode = await main(process.argv.slice(2));\n`);
 }
 
-// Claude Code처럼 hook을 실행한다. PATH를 비워 pnpm 없이 도는지 본다. 패키지는 CLAUDE_PROJECT_DIR(없으면 입력의 cwd)에서 찾는다
+// Claude Code처럼 hook을 실행한다. PATH를 비워 pnpm 없이 도는지 본다. 패키지는 CLAUDE_PROJECT_DIR(없으면 입력의 cwd)에서 찾는다.
+// NODE_NO_WARNINGS=1: Node 버전에 따라 type stripping ExperimentalWarning이 stderr에 섞여도 단정이 흔들리지 않게 한다(테스트에서만)
 function runHook(input: unknown, projectDir?: string) {
-  const env: NodeJS.ProcessEnv = { ...process.env, PATH: "" };
+  const env: NodeJS.ProcessEnv = { ...process.env, PATH: "", NODE_NO_WARNINGS: "1" };
   delete env.CLAUDE_PROJECT_DIR;
   if (projectDir) env.CLAUDE_PROJECT_DIR = projectDir;
   return spawnSync(process.execPath, [hook], { input: typeof input === "string" ? input : JSON.stringify(input), encoding: "utf8", env });

@@ -1,10 +1,10 @@
 // milvus check (설계 4.3, 10장)
 // - --style: hook이 milvusBrand.css·milvusOverride.css·brandingSets/를 고칠 때마다 실행한다. util.css 규칙·대비(5.2, 5.3),
-//   milvusOverride.css(5.1), BrandingSet의 BRAND_COLOR 형식만 보고, hook 이름은 설치된 패키지의 dist/hooks-index.json에서
+//   milvusOverride.css(5.1), config 브랜드 BrandingSet의 BRAND_COLOR 형식만 보고, hook 이름은 설치된 패키지의 dist/hooks-index.json에서
 //   읽는다(lib/hooks-index.ts). 실패하면 2(Claude Code가 stderr를 Claude에게 보여 준다)
 // - 전체: deploy와 CI가 실행한다. --style 항목 + 밀버스 관리 파일 sha256(milvus.config.json). 실패하면 1.
 //   밀버스 LWC는 JS라 타입 검사는 하지 않는다(10/9 D1). milvusVf.css 다시 만들기는 Task 24에서 붙인다
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { readBranding } from "../lib/branding.ts";
@@ -38,20 +38,27 @@ function managedIssues(root: string): Issue[] {
   });
 }
 
-// brandingSets/*.brandingSet-meta.xml의 BRAND_COLOR가 #RRGGBB인지(readBranding이 없거나 틀리면 던진다)
+// milvus.config.json의 brand에 해당하는 brandingSets/LEXTHEMING<brand>.brandingSet-meta.xml 하나만 본다(판정 R27).
+// 없거나 BRAND_COLOR가 없거나 #RRGGBB가 아니면 issue. 다른 BrandingSet(Experience Cloud 사이트 등)은 밀버스 것이 아니라 보지 않는다.
+// config가 없거나 깨졌으면 어느 파일인지 알 수 없어 건너뛴다(전체 check의 managedIssues가 config 문제로 실패시킨다)
 function brandingIssues(root: string): Issue[] {
-  const dir = join(root, BRANDING_SETS);
-  if (!existsSync(dir)) return [];
-  return readdirSync(dir)
-    .filter((f) => f.endsWith(".brandingSet-meta.xml"))
-    .flatMap((f): Issue[] => {
-      try {
-        readBranding(readFileSync(join(dir, f), "utf8"));
-        return [];
-      } catch (e) {
-        return [{ file: `${BRANDING_SETS}/${f}`, rule: "brand-color", message: (e as Error).message, fix: "#RRGGBB 형식의 색(예: #0176D3)" }];
-      }
-    });
+  let brand: string | undefined;
+  try {
+    brand = readConfig(root)?.brand;
+  } catch {
+    return [];
+  }
+  if (brand === undefined) return [];
+  const file = `${BRANDING_SETS}/LEXTHEMING${brand}.brandingSet-meta.xml`;
+  if (!existsSync(join(root, file))) {
+    return [{ file, rule: "brand-color", message: "브랜드 메타데이터가 없습니다. pnpm milvus init을 다시 실행하거나 파일을 복구하세요" }];
+  }
+  try {
+    readBranding(readFileSync(join(root, file), "utf8"));
+    return [];
+  } catch (e) {
+    return [{ file, rule: "brand-color", message: (e as Error).message, fix: "#RRGGBB 형식의 색(예: #0176D3)" }];
+  }
 }
 
 /**
