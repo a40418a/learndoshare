@@ -120,6 +120,7 @@ export function generateBridge(sldsCss: string, targets: BridgeTarget[]): string
       const found = byKey.get(key);
       if (!found) throw new Error(`SLDS 2 CSS에 규칙이 없다: ${key} (${t.id})`);
       let hit = false;
+      let changed = false;
       for (const r of found) {
         r.nodes.forEach((d, index) => {
           if (d.type !== "decl" || (d.prop !== t.property && d.prop !== base)) return;
@@ -129,17 +130,24 @@ export function generateBridge(sldsCss: string, targets: BridgeTarget[]): string
           if (value === current) return;
           put(r, index, t.property, value);
           seeds.add(r);
+          changed = true;
         });
       }
       if (!hit && t.initial === undefined) throw new Error(`SLDS 2 CSS의 ${key}에 ${t.property}가 없다 (${t.id})`);
       if (!hit) {
         put(found[0], found[0].nodes.length, t.property, wrap(t, t.initial!));
         seeds.add(found[0]);
+      } else if (!changed) {
+        // 선언은 있지만 바꿀 값(token, 묶음 안 시간, 매끄러운 곡선)이 없다. 넘어가면 그 컨트롤에서만 브랜드 값이 빠진다
+        throw new Error(`SLDS 2 CSS의 ${key} { ${t.property} }에 바꿀 값${t.token ? ` ${t.token}` : ""}이 없다 (${t.id})`);
       }
     }
   }
 
-  // 원래 이기던 같은 우선순위 규칙을 다시 넣는다. 문서 순서대로 지나가며, 이미 넣은 규칙과 우선순위가 같은 뒤 규칙을 더한다
+  // 원래 이기던 같은 우선순위 규칙을 다시 넣는다. 문서 순서대로 지나가며, 이미 넣은 규칙과 우선순위가 같은 뒤 규칙을 더한다.
+  // ponytail: 같은 요소에 맞는지 알 수 없어 우선순위만 본다(1천여 규칙). synthetic에서 loadStyle은 문서 전역이라 이 선택자에 맞는
+  // LEX 요소 전체가 npm SLDS 2 값을 받는다(org SLDS 값이 다르거나 브리지 앞의 같은 우선순위 고객 CSS가 있으면 이 값이 이긴다).
+  // 문제가 보이면 다시 넣은 규칙의 주어에 :where(<대상 선택자 목록>)을 붙여 대상 요소로 좁힌다(가상 요소는 따로 처리해야 한다)
   for (const { family, seeds } of families.values()) {
     const included = new Set<string>();
     for (const r of rules) {

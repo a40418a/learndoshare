@@ -13,11 +13,18 @@ export const BRIDGE_VARS: Record<string, string> = {
   "input-border-width": "--milvus-input-border-width",
   "path-end-radius": "--milvus-path-end-radius",
   "control-icon-size": "--milvus-control-icon-size",
+  "sort-icon-size": "--milvus-sort-icon-size",
+  // 모달 너비: base는 크기 클래스가 없는 모달, 나머지는 slds-modal_<크기>(lightning-modal size). min-width는 모든 크기의 최소 너비
+  "modal-width-base": "--milvus-modal-width-base",
+  "modal-width-small": "--milvus-modal-width-small",
   "modal-width-medium": "--milvus-modal-width-medium",
   "modal-width-large": "--milvus-modal-width-large",
+  "modal-width-full": "--milvus-modal-width-full",
+  "modal-min-width": "--milvus-modal-min-width",
   // 글자
   "letter-spacing": "--milvus-letter-spacing",
   "caps-transform": "--milvus-caps-transform",
+  "caps-letter-spacing": "--milvus-caps-letter-spacing",
   "choice-label-weight": "--milvus-choice-label-weight",
   // 커서·밑줄·그림자
   "cursor-disabled": "--milvus-cursor-disabled",

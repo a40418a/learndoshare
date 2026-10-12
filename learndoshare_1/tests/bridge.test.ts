@@ -92,6 +92,8 @@ test("모달·토스트 시간은 max(..., 0.01ms)로 감싼다", () => {
   assert.ok(durations.length > 0);
   // 모달·배경막·토스트를 고르지 않고 시간 변수를 모두 감싼다. 0과 0.01ms는 눈으로 같다
   for (const [m, max, min] of durations) assert.ok(max && min, m);
+  // SLDS 2 CSS에는 토스트 움직임이 없어 알림(.slds-notification)을 본다. lightning 토스트의 0.4s는 기본 컴포넌트
+  // 합성 CSS(toast.lbc.synthetic.css)에 있고 생성기 입력(SLDS 2 CSS) 밖이다
   for (const selector of [".slds-modal", ".slds-backdrop_open, .slds-backdrop--open", ".slds-notification"]) {
     const rule = parse(bridgeCss).nodes.find((n): n is Rule => n.type === "rule" && n.selectors.join(", ") === selector);
     assert.match(rule?.toString() ?? "", /transition-duration: max\(var\(--milvus-motion-duration-(fast|slow), [\d.]+s\), 0\.01ms\)/, selector);
@@ -121,6 +123,32 @@ test("SPEC_ITEMS의 모든 bridgeVars(개체 아이콘 제외)가 생성된 CSS�
   const wanted = new Set(SPEC_ITEMS.flatMap((i) => i.bridgeVars).filter((v) => v !== BRIDGE_VARS["icon-color-all"]));
   const read = new Set([...bridgeCss.matchAll(/var\((--milvus-[\w-]+)/g)].map((m) => m[1]));
   assert.deepEqual([...wanted].filter((v) => !read.has(v)), []);
+
+  // 리뷰·사용자 결정으로 더한 대상(2026-10-12): 선택자·맥락·속성마다 이 변수를 읽는다
+  const byRule = declsByRule(bridgeCss);
+  const reads = (key: string, prop: string, varName: string) => (byRule.get(key) ?? []).some((d) => d.prop === prop && d.value.includes(`var(${varName},`));
+  const MODAL = (size: string) => `@media (min-width: 48em) | .slds-modal_${size} .slds-modal__container, .slds-modal--${size} .slds-modal__container`;
+  const expected: [string, string, string][] = [
+    // lightning-combobox는 slds-input 대신 slds-input_faux만 붙인다
+    [" | .slds-input_faux, .slds-input--faux", "border", BRIDGE_VARS["input-border-width"]],
+    [" | .slds-input_height, .slds-input--height", "min-height", BRIDGE_VARS["control-height"]],
+    [" | .slds-checkbox_toggle .slds-form-element__label, .slds-checkbox--toggle .slds-form-element__label", "font-weight", BRIDGE_VARS["choice-label-weight"]],
+    ["@media (min-width: 48em) | .slds-modal__container", "width", BRIDGE_VARS["modal-width-base"]],
+    ["@media (min-width: 48em) | .slds-modal__container", "max-width", BRIDGE_VARS["modal-width-base"]],
+    ["@media (min-width: 48em) | .slds-modal__container", "min-width", BRIDGE_VARS["modal-min-width"]],
+    [MODAL("small"), "width", BRIDGE_VARS["modal-width-small"]],
+    [MODAL("small"), "max-width", BRIDGE_VARS["modal-width-small"]],
+    [MODAL("full"), "width", BRIDGE_VARS["modal-width-full"]],
+    ...["small", "medium", "large", "full"].map((size): [string, string, string] => [MODAL(size), "min-width", BRIDGE_VARS["modal-min-width"]]),
+    [" | .slds-text-title_caps, .slds-text-title--caps", "letter-spacing", BRIDGE_VARS["caps-letter-spacing"]],
+    [" | .slds-section-title_divider, .slds-section-title--divider", "letter-spacing", BRIDGE_VARS["caps-letter-spacing"]],
+    [" | .slds-is-sortable__icon", "width", BRIDGE_VARS["sort-icon-size"]],
+    [" | .slds-is-sortable__icon", "height", BRIDGE_VARS["sort-icon-size"]],
+  ];
+  assert.deepEqual(expected.filter(([key, prop, v]) => !reads(key, prop, v)), []);
+  // 작은 화면의 full 모달(100%·최소 0)은 전체 화면이라 바꾸지 않는다
+  const mobileFull = byRule.get("@media (max-width: 30em) | .slds-modal_full .slds-modal__container, .slds-modal--full .slds-modal__container") ?? [];
+  assert.deepEqual(mobileFull.filter((d) => /--milvus-/.test(d.value)), []);
 });
 
 test("생성된 --milvus-* 이름이 loadRuleContext의 milvusVars에 잡힌다", () => {
@@ -140,7 +168,7 @@ test("생성된 --milvus-* 이름이 loadRuleContext의 milvusVars에 잡힌다"
 
 test("shorthand는 longhand로 잇고 묶음 밖 시간·곡선은 원래 값, 원본 맥락(@media·@supports)을 지킨다", () => {
   const css = `.slds-a { transition: opacity 0.1s linear, transform 0.2s ease-in, color 0.12s; }
-    @media (min-width: 48em) { @supports (display: grid) { .slds-b { animation: spin 0.3s steps(4) 2s; } } }`;
+    @media (min-width: 48em) { @supports (display: grid) { .slds-b { animation: spin 0.3s steps(4) 2s, pulse 0.4s ease-out; } } }`;
   const T = (id: string, selector: string, property: string): BridgeTarget => ({
     id,
     selectors: [selector],
@@ -168,7 +196,10 @@ test("shorthand는 longhand로 잇고 묶음 밖 시간·곡선은 원래 값, �
   // steps()는 프레임 애니메이션이라 곡선을 바꾸지 않는다. 2s는 지연이다
   assert.deepEqual(
     rules.get("@media (min-width: 48em) > @supports (display: grid) | .slds-b")?.map((d) => `${d.prop}: ${d.value}`),
-    ["animation-duration: max(var(--milvus-motion-duration-slow, 0.3s), 0.01ms)"],
+    [
+      "animation-duration: max(var(--milvus-motion-duration-slow, 0.3s), 0.01ms), max(var(--milvus-motion-duration-slow, 0.4s), 0.01ms)",
+      "animation-timing-function: steps(4), var(--milvus-motion-easing, ease-out)",
+    ],
   );
 });
 
@@ -202,4 +233,10 @@ test("원본에서 대상 선택자나 속성을 찾지 못하면 실패한다(S
   const letter: BridgeTarget = { id: "letter-spacing", selectors: ["button, input"], property: "letter-spacing", varName: BRIDGE_VARS["letter-spacing"], initial: "normal" };
   assert.match(generateBridge("button, input { font: inherit; }", [letter]), /button, input \{\n {2}letter-spacing: var\(--milvus-letter-spacing, normal\);\n\}/);
   assert.throws(() => generateBridge("button, input { font: inherit; }", [{ ...letter, initial: undefined }]), /letter-spacing/);
+  // 선언은 있어도 바꿀 값(token, 묶음 안 시간 등)이 사라졌으면 실패한다. 조용히 넘어가면 그 컨트롤에서만 브랜드 값이 빠진다
+  const height: BridgeTarget = { id: "control-height", selectors: [".slds-select"], property: "height", varName: BRIDGE_VARS["control-height"], token: "1.875rem" };
+  assert.match(generateBridge(".slds-select { height: calc(1.875rem + 2px); }", [height]), /calc\(var\(--milvus-control-height, 1\.875rem\) \+ 2px\)/);
+  assert.throws(() => generateBridge(".slds-select { height: calc(2rem + 2px); }", [height]), /1\.875rem/);
+  const border: BridgeTarget = { id: "input-border-width", selectors: [".slds-input"], property: "border", varName: BRIDGE_VARS["input-border-width"], token: "1px" };
+  assert.throws(() => generateBridge(".slds-input { border: var(--slds-g-sizing-border-1) solid red; }", [border]), /1px/);
 });

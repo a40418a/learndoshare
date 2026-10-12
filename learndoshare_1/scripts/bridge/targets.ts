@@ -85,23 +85,47 @@ const LISTED: BridgeTarget[] = [
     "line-height",
   ),
   T("control-height", [".slds-select"], "height", { token: "1.875rem" }),
-  T("control-height", [".slds-select[size], .slds-select[multiple]"], "min-height", { token: "1.875rem" }),
-  T("input-border-width", [".slds-input", ".slds-textarea"], "border", { token: "1px" }),
+  T("control-height", [".slds-select[size], .slds-select[multiple]", ".slds-input_height, .slds-input--height"], "min-height", { token: "1.875rem" }),
+  // lightning-combobox(선택형)는 slds-input 대신 slds-input_faux만 붙인다
+  T("input-border-width", [".slds-input", ".slds-input_faux, .slds-input--faux", ".slds-textarea"], "border", { token: "1px" }),
   T("path-end-radius", [".slds-path__item:first-child"], "border-start-start-radius"),
   T("path-end-radius", [".slds-path__item:first-child"], "border-end-start-radius"),
   T("path-end-radius", [".slds-path__item:last-child"], "border-start-end-radius"),
   T("path-end-radius", [".slds-path__item:last-child"], "border-end-end-radius"),
   T("control-icon-size", [".slds-button__icon, .slds-button__icon_stateful, .slds-button__icon--stateful", ".slds-input-has-icon .slds-input__icon"], "width"),
   T("control-icon-size", [".slds-button__icon, .slds-button__icon_stateful, .slds-button__icon--stateful", ".slds-input-has-icon .slds-input__icon"], "height"),
-  // lightning-modal의 size medium(기본)·large. 너비와 최대 너비를 같은 변수로 잇는다(브랜드 값이 그대로 너비가 된다)
+  // 표 머리글 정렬 아이콘(0.75rem). 컨트롤 안 아이콘(0.875rem)과 크기가 달라 따로 둔다
+  T("sort-icon-size", [".slds-is-sortable__icon"], "width"),
+  T("sort-icon-size", [".slds-is-sortable__icon"], "height"),
+  // 모달 너비(@media (min-width: 48em) 안). 너비와 최대 너비를 같은 변수로 잇는다(브랜드 값이 그대로 너비가 된다).
+  // base는 크기 클래스가 없는 모달, medium은 lightning-modal 기본 크기
+  T("modal-width-base", [".slds-modal__container"], "width"),
+  T("modal-width-base", [".slds-modal__container"], "max-width"),
+  T("modal-width-small", [modal("small")], "width"),
+  T("modal-width-small", [modal("small")], "max-width"),
   T("modal-width-medium", [modal("medium")], "width"),
   T("modal-width-medium", [modal("medium")], "max-width"),
   T("modal-width-large", [modal("large")], "width"),
   T("modal-width-large", [modal("large")], "max-width"),
+  // full은 90%만 바꾼다. 작은 화면(@media (max-width: 30em))의 100%·최소 0은 전체 화면이라 그대로 둔다. 최대 너비는 none이다
+  T("modal-width-full", [modal("full")], "width", { token: "90%" }),
+  T("modal-min-width", [".slds-modal__container"], "min-width"),
+  T("modal-min-width", ["small", "medium", "large", "full"].map(modal), "min-width", { token: "40rem" }),
   // 폼 컨트롤은 브라우저 기본 스타일이 letter-spacing을 normal로 다시 정해 :root의 자간이 상속되지 않는다(SLDS 2에는 선언이 없다)
   T("letter-spacing", ["button, input, optgroup, select, textarea"], "letter-spacing", { initial: "normal" }),
+  // 대문자 제목은 넓은 자간(0.0625rem)이 있어 브랜드 자간과 따로 둔다
   T("caps-transform", [".slds-text-title_caps, .slds-text-title--caps", ".slds-section-title_divider, .slds-section-title--divider"], "text-transform"),
-  T("choice-label-weight", [".slds-radio .slds-form-element__label", ".slds-checkbox .slds-checkbox__label .slds-form-element__label"], "font-weight"),
+  T("caps-letter-spacing", [".slds-text-title_caps, .slds-text-title--caps", ".slds-section-title_divider, .slds-section-title--divider"], "letter-spacing"),
+  T(
+    "choice-label-weight",
+    [
+      ".slds-radio .slds-form-element__label",
+      ".slds-checkbox .slds-checkbox__label .slds-form-element__label",
+      // lightning-input type=toggle의 라벨
+      ".slds-checkbox_toggle .slds-form-element__label, .slds-checkbox--toggle .slds-form-element__label",
+    ],
+    "font-weight",
+  ),
 ];
 
 // 바꾸지 않는 움직임: 스피너(점별 지연이 1000ms 기준), Agentforce 영역(고정 목록)

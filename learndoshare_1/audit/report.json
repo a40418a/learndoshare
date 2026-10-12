@@ -3998,7 +3998,7 @@
         "native": "n/a"
       },
       "icon-size": {
-        "now": "gap",
+        "now": "bridge",
         "native": "n/a"
       }
     },
@@ -4348,7 +4348,7 @@
         "native": "n/a"
       },
       "component": {
-        "now": "gap",
+        "now": "bridge",
         "native": "n/a"
       },
       "surface": {
@@ -7102,7 +7102,7 @@
         "native": "n/a"
       },
       "letter-spacing": {
-        "now": "gap",
+        "now": "bridge",
         "native": "n/a"
       },
       "text-case": {
@@ -8054,7 +8054,7 @@
         "native": "n/a"
       },
       "letter-spacing": {
-        "now": "gap",
+        "now": "bridge",
         "native": "n/a"
       },
       "text-case": {
@@ -9176,7 +9176,7 @@
     },
     "component": {
       "now": {
-        "reached": 25,
+        "reached": 26,
         "total": 26
       },
       "native": {
@@ -9366,7 +9366,7 @@
     },
     "icon-size": {
       "now": {
-        "reached": 14,
+        "reached": 15,
         "total": 25
       },
       "native": {
@@ -9386,7 +9386,7 @@
     },
     "letter-spacing": {
       "now": {
-        "reached": 0,
+        "reached": 2,
         "total": 2
       },
       "native": {
@@ -10393,69 +10393,6 @@
       "value": "1.5"
     },
     {
-      "comp": "modal",
-      "item": "component",
-      "selector": ".slds-modal__container",
-      "prop": "max-width",
-      "value": "40rem"
-    },
-    {
-      "comp": "modal",
-      "item": "component",
-      "selector": ".slds-modal__container",
-      "prop": "min-width",
-      "value": "20rem"
-    },
-    {
-      "comp": "modal",
-      "item": "component",
-      "selector": ".slds-modal_small .slds-modal__container,.slds-modal--small .slds-modal__container",
-      "prop": "width",
-      "value": "60%"
-    },
-    {
-      "comp": "modal",
-      "item": "component",
-      "selector": ".slds-modal_small .slds-modal__container,.slds-modal--small .slds-modal__container",
-      "prop": "max-width",
-      "value": "52.0625rem"
-    },
-    {
-      "comp": "modal",
-      "item": "component",
-      "selector": ".slds-modal_small .slds-modal__container,.slds-modal--small .slds-modal__container",
-      "prop": "min-width",
-      "value": "40rem"
-    },
-    {
-      "comp": "modal",
-      "item": "component",
-      "selector": ".slds-modal_medium .slds-modal__container,.slds-modal--medium .slds-modal__container",
-      "prop": "min-width",
-      "value": "40rem"
-    },
-    {
-      "comp": "modal",
-      "item": "component",
-      "selector": ".slds-modal_large .slds-modal__container,.slds-modal--large .slds-modal__container",
-      "prop": "min-width",
-      "value": "40rem"
-    },
-    {
-      "comp": "modal",
-      "item": "component",
-      "selector": ".slds-modal_full .slds-modal__container,.slds-modal--full .slds-modal__container",
-      "prop": "width",
-      "value": "90%"
-    },
-    {
-      "comp": "modal",
-      "item": "component",
-      "selector": ".slds-modal_full .slds-modal__container,.slds-modal--full .slds-modal__container",
-      "prop": "min-width",
-      "value": "40rem"
-    },
-    {
       "comp": "visual-picker",
       "item": "cursor-underline",
       "selector": ".slds-visual-picker input:not(:disabled) ~ label:hover .slds-visual-picker__figure",
@@ -11107,20 +11044,6 @@
       "value": "0 auto"
     },
     {
-      "comp": "is-sortable",
-      "item": "icon-size",
-      "selector": ".slds-is-sortable__icon",
-      "prop": "width",
-      "value": "0.75rem"
-    },
-    {
-      "comp": "is-sortable",
-      "item": "icon-size",
-      "selector": ".slds-is-sortable__icon",
-      "prop": "height",
-      "value": "0.75rem"
-    },
-    {
       "comp": "truncate",
       "item": "hover-selected",
       "selector": "[class*='slds-table_column-'] tr:hover td .slds-truncate::after,[class*='slds-table--column-'] tr:hover td .slds-truncate::after",
@@ -11175,13 +11098,6 @@
       "selector": ".slds-section__title",
       "prop": "line-height",
       "value": "1.875rem"
-    },
-    {
-      "comp": "section-title",
-      "item": "letter-spacing",
-      "selector": ".slds-section-title_divider,.slds-section-title--divider",
-      "prop": "letter-spacing",
-      "value": "0.0625rem"
     },
     {
       "comp": "welcome-mat",
@@ -11329,13 +11245,6 @@
       "selector": ".slds-theme_error a:not(.slds-button_neutral)[disabled],.slds-theme--error a:not(.slds-button--neutral)[disabled]",
       "prop": "color",
       "value": "rgb(255, 255, 255, 0.15)"
-    },
-    {
-      "comp": "text-title",
-      "item": "letter-spacing",
-      "selector": ".slds-text-title_caps,.slds-text-title--caps",
-      "prop": "letter-spacing",
-      "value": "0.0625rem"
     },
     {
       "comp": "text-longform",
