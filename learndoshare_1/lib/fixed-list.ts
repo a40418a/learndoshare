@@ -29,8 +29,8 @@ export const FIXED_ITEMS: FixedItem[] = [
   { id: "spinner", label: "스피너 모양", mode: "both", match: { selector: /spinner/i, property: ["animation", "transition", "transform", "inset", "width", "height", "margin"] } },
   { id: "color-picker-hue", label: "색 선택기 색상환", mode: "both", match: { selector: /hue/i, property: "background" } },
   { id: "agentforce", label: "Agentforce 영역", mode: "both", match: { selector: /\.slds-subtheme-agentic/, property: ["background", "border", "transition", "transform", "padding"] } },
-  // scrim(제목 뒤 그라데이션)과 overlay·hover 때 이미지를 덮는 반투명 막
-  { id: "image-scrim", label: "이미지 위 어둡게 처리", mode: "both", match: { selector: /_scrim|--scrim|(image|file)(_|--)overlay|file__figure:hover/, property: "background" } },
+  // scrim(제목 뒤 그라데이션)과 overlay·hover 때 이미지를 덮는 반투명 막. 값은 색이나 그라데이션만(같은 선택자의 아이콘 url은 아니다)
+  { id: "image-scrim", label: "이미지 위 어둡게 처리", mode: "both", match: { selector: /_scrim|--scrim|(image|file)(_|--)overlay|file__figure:hover/, property: "background", value: /^(rgba?|linear-gradient)\(/ } },
   { id: "destructive-success-text", label: "파괴·성공 버튼의 흰 글자", mode: "both", match: { selector: /button(_|--)(destructive|success)/, property: "color" } },
   { id: "global-header", label: "LEX 전역 헤더(org 테마가 원본)", mode: "both", match: { selector: /\.slds-global-header/, property: "background" } },
 

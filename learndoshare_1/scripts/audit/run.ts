@@ -8,7 +8,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { list } from "postcss";
+import { parse } from "postcss";
 import { FIXED_ITEMS } from "../../lib/fixed-list.ts";
 import { buildHooksIndex } from "../../lib/hooks-index.ts";
 import { SPEC_ITEMS } from "../../lib/spec-items.ts";
@@ -101,7 +101,11 @@ export function runAudit(argv: string[], src: Sources, dir: string): { code: num
   } else {
     changes.push("기준 파일 audit/baseline.json이 없다");
   }
-  const sourceSelectors = new Set(decls.flatMap((d) => list.comma(d.selector)));
+  // 원본의 모든 규칙의 선택자. custom property만 정의하는 규칙(개체 아이콘 색)도 넣는다. Decl에는 그런 규칙이 없다
+  const sourceSelectors = new Set<string>();
+  for (const css of [src.sldsCss, ...src.lbcFiles.map((f) => f.css)]) {
+    parse(css).walkRules((r) => r.selectors.forEach((s) => sourceSelectors.add(s.replace(/\s+/g, " ").trim())));
+  }
   changes.push(...bridgeSelectors(src.bridgeCss).filter((s) => !sourceSelectors.has(s)).map((s) => `브리지 선택자 소실: ${s}`));
 
   if (!gaps.length && !changes.length) return { code: 0, message: "✓ 정적 반영 검사: 빈틈 0개, 기준과 같음" };

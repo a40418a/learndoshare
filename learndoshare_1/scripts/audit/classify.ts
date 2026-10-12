@@ -72,7 +72,7 @@ function kindOf(value: string, defs: Defs): Kind {
   const resolved = value + chain(value, defs);
   if (/var\(\s*--slds-g-/.test(resolved)) return "g";
   if (/var\(\s*--slds-s-/.test(resolved)) return "s";
-  // 변수 이름을 지우고 남은 값(기본값·정의)이 키워드뿐이면 하드코딩이 아니다
+  // 지시서 표와 달리 c·otherVar보다 먼저 본다(R29 승인): 변수 이름을 지우고 남은 기본값·정의가 키워드뿐이면(정의 없으면 unset) keyword. 실측 거짓 빈틈 약 230개를 막는다
   if (resolved.replace(VAR_NAME, " ").split(/[\s,()]+/).every((t) => !t || KEYWORD.test(t))) return "keyword";
   if (/var\(\s*--(slds|sds)-c-/.test(value)) return "c";
   if (/var\(\s*--slds-r-/.test(value)) return "r";

@@ -49,6 +49,10 @@
         "now": "gap",
         "native": "n/a"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
+      },
       "focus-ring": {
         "now": "reached",
         "native": "n/a"
@@ -265,6 +269,10 @@
         "now": "gap",
         "native": "n/a"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
+      },
       "fixed": {
         "now": "fixed",
         "native": "n/a"
@@ -378,6 +386,10 @@
         "native": "fixed"
       },
       "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "n/a",
         "native": "fixed"
       },
@@ -521,6 +533,10 @@
         "now": "gap",
         "native": "n/a"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
+      },
       "focus-ring": {
         "now": "reached",
         "native": "n/a"
@@ -622,6 +638,10 @@
         "native": "n/a"
       },
       "motion-speed": {
+        "now": "gap",
+        "native": "n/a"
+      },
+      "motion-easing": {
         "now": "gap",
         "native": "n/a"
       },
@@ -837,6 +857,10 @@
         "now": "n/a",
         "native": "fixed"
       },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
       "cursor-underline": {
         "now": "n/a",
         "native": "gap"
@@ -942,6 +966,10 @@
         "native": "fixed"
       },
       "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "n/a",
         "native": "fixed"
       },
@@ -1096,6 +1124,10 @@
         "native": "reached"
       },
       "motion-speed": {
+        "now": "gap",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "gap",
         "native": "fixed"
       },
@@ -1347,6 +1379,10 @@
         "now": "gap",
         "native": "n/a"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
+      },
       "focus-ring": {
         "now": "gap",
         "native": "n/a"
@@ -1448,6 +1484,10 @@
         "native": "reached"
       },
       "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "n/a",
         "native": "fixed"
       }
@@ -1719,6 +1759,10 @@
         "now": "gap",
         "native": "n/a"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
+      },
       "focus-ring": {
         "now": "reached",
         "native": "n/a"
@@ -1946,6 +1990,10 @@
         "native": "reached"
       },
       "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "n/a",
         "native": "fixed"
       },
@@ -2325,6 +2373,10 @@
         "now": "gap",
         "native": "n/a"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
+      },
       "focus-ring": {
         "now": "reached",
         "native": "n/a"
@@ -2344,6 +2396,10 @@
         "native": "n/a"
       },
       "motion-speed": {
+        "now": "gap",
+        "native": "n/a"
+      },
+      "motion-easing": {
         "now": "gap",
         "native": "n/a"
       }
@@ -2494,6 +2550,10 @@
       "motion-speed": {
         "now": "n/a",
         "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
       }
     },
     "einstein-header": {
@@ -2574,10 +2634,18 @@
       "motion-speed": {
         "now": "gap",
         "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
       }
     },
     "fall-into-ground": {
       "motion-speed": {
+        "now": "gap",
+        "native": "n/a"
+      },
+      "motion-easing": {
         "now": "gap",
         "native": "n/a"
       }
@@ -2816,6 +2884,10 @@
         "native": "n/a"
       },
       "motion-speed": {
+        "now": "gap",
+        "native": "n/a"
+      },
+      "motion-easing": {
         "now": "gap",
         "native": "n/a"
       },
@@ -3268,6 +3340,10 @@
       "motion-speed": {
         "now": "gap",
         "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
       }
     },
     "icon-eq": {
@@ -3280,6 +3356,10 @@
         "native": "n/a"
       },
       "motion-speed": {
+        "now": "gap",
+        "native": "n/a"
+      },
+      "motion-easing": {
         "now": "gap",
         "native": "n/a"
       }
@@ -3300,6 +3380,10 @@
       "motion-speed": {
         "now": "gap",
         "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
       }
     },
     "icon-score": {
@@ -3312,6 +3396,10 @@
         "native": "n/a"
       },
       "motion-speed": {
+        "now": "gap",
+        "native": "n/a"
+      },
+      "motion-easing": {
         "now": "gap",
         "native": "n/a"
       }
@@ -3330,6 +3418,10 @@
         "native": "n/a"
       },
       "motion-speed": {
+        "now": "gap",
+        "native": "n/a"
+      },
+      "motion-easing": {
         "now": "gap",
         "native": "n/a"
       }
@@ -3356,6 +3448,10 @@
       "motion-speed": {
         "now": "gap",
         "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
       }
     },
     "icon-typing": {
@@ -3372,6 +3468,10 @@
         "native": "n/a"
       },
       "motion-speed": {
+        "now": "gap",
+        "native": "n/a"
+      },
+      "motion-easing": {
         "now": "gap",
         "native": "n/a"
       }
@@ -3446,7 +3546,7 @@
         "native": "n/a"
       },
       "hover-selected": {
-        "now": "fixed",
+        "now": "gap",
         "native": "n/a"
       },
       "border-width": {
@@ -3832,6 +3932,10 @@
         "native": "gap"
       },
       "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "n/a",
         "native": "fixed"
       },
@@ -4279,6 +4383,10 @@
         "now": "gap",
         "native": "n/a"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
+      },
       "focus-ring": {
         "now": "reached",
         "native": "n/a"
@@ -4322,6 +4430,10 @@
         "native": "reached"
       },
       "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "n/a",
         "native": "fixed"
       },
@@ -4598,6 +4710,10 @@
       "motion-speed": {
         "now": "gap",
         "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
       }
     },
     "notification-container": {
@@ -4803,6 +4919,10 @@
         "now": "gap",
         "native": "n/a"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
+      },
       "fixed": {
         "now": "fixed",
         "native": "n/a"
@@ -4854,6 +4974,10 @@
         "native": "n/a"
       },
       "motion-speed": {
+        "now": "gap",
+        "native": "n/a"
+      },
+      "motion-easing": {
         "now": "gap",
         "native": "n/a"
       },
@@ -4922,6 +5046,10 @@
         "native": "n/a"
       },
       "motion-speed": {
+        "now": "gap",
+        "native": "n/a"
+      },
+      "motion-easing": {
         "now": "gap",
         "native": "n/a"
       },
@@ -5240,6 +5368,10 @@
       "motion-speed": {
         "now": "n/a",
         "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
       }
     },
     "primitiveCellCheckbox": {
@@ -5296,6 +5428,10 @@
         "native": "reached"
       },
       "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "n/a",
         "native": "fixed"
       },
@@ -5450,6 +5586,10 @@
         "native": "reached"
       },
       "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "n/a",
         "native": "fixed"
       },
@@ -5735,6 +5875,10 @@
         "now": "n/a",
         "native": "fixed"
       },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
       "fixed": {
         "now": "n/a",
         "native": "fixed"
@@ -5812,6 +5956,10 @@
         "native": "reached"
       },
       "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "n/a",
         "native": "fixed"
       },
@@ -5912,6 +6060,10 @@
         "native": "reached"
       },
       "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "n/a",
         "native": "fixed"
       }
@@ -6221,6 +6373,10 @@
         "now": "n/a",
         "native": "fixed"
       },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
       "cursor-underline": {
         "now": "n/a",
         "native": "gap"
@@ -6487,6 +6643,10 @@
         "now": "n/a",
         "native": "fixed"
       },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
       "focus-ring": {
         "now": "n/a",
         "native": "reached"
@@ -6649,6 +6809,10 @@
         "now": "gap",
         "native": "n/a"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
+      },
       "focus-ring": {
         "now": "gap",
         "native": "n/a"
@@ -6716,6 +6880,10 @@
         "native": "reached"
       },
       "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "n/a",
         "native": "fixed"
       },
@@ -6836,6 +7004,10 @@
     },
     "rise-from-ground": {
       "motion-speed": {
+        "now": "gap",
+        "native": "n/a"
+      },
+      "motion-easing": {
         "now": "gap",
         "native": "n/a"
       }
@@ -7003,6 +7175,10 @@
         "now": "gap",
         "native": "fixed"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "fixed"
+      },
       "focus-ring": {
         "now": "reached",
         "native": "reached"
@@ -7056,6 +7232,10 @@
         "native": "reached"
       },
       "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "n/a",
         "native": "fixed"
       },
@@ -7175,6 +7355,10 @@
         "now": "gap",
         "native": "fixed"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "fixed"
+      },
       "focus-ring": {
         "now": "reached",
         "native": "reached"
@@ -7220,6 +7404,10 @@
     },
     "slide-up-open": {
       "motion-speed": {
+        "now": "gap",
+        "native": "n/a"
+      },
+      "motion-easing": {
         "now": "gap",
         "native": "n/a"
       }
@@ -7281,6 +7469,10 @@
         "now": "gap",
         "native": "fixed"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "fixed"
+      },
       "focus-ring": {
         "now": "reached",
         "native": "reached"
@@ -7304,6 +7496,10 @@
         "native": "reached"
       },
       "motion-speed": {
+        "now": "fixed",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "fixed",
         "native": "fixed"
       },
@@ -7472,6 +7668,10 @@
         "native": "n/a"
       },
       "motion-speed": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-easing": {
         "now": "fixed",
         "native": "n/a"
       }
@@ -7703,6 +7903,10 @@
         "now": "gap",
         "native": "n/a"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
+      },
       "focus-ring": {
         "now": "gap",
         "native": "n/a"
@@ -7821,6 +8025,10 @@
         "now": "gap",
         "native": "n/a"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
+      },
       "cursor-underline": {
         "now": "gap",
         "native": "n/a"
@@ -7916,6 +8124,10 @@
         "native": "reached"
       },
       "motion-speed": {
+        "now": "gap",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "gap",
         "native": "fixed"
       },
@@ -8229,6 +8441,10 @@
         "now": "gap",
         "native": "n/a"
       },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
+      },
       "focus-ring": {
         "now": "reached",
         "native": "n/a"
@@ -8298,6 +8514,10 @@
         "native": "reached"
       },
       "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
         "now": "n/a",
         "native": "fixed"
       },
@@ -8886,6 +9106,10 @@
       "motion-speed": {
         "now": "gap",
         "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "gap",
+        "native": "n/a"
       }
     }
   },
@@ -9213,11 +9437,11 @@
     "motion-easing": {
       "now": {
         "reached": 0,
-        "total": 3
+        "total": 40
       },
       "native": {
         "reached": 0,
-        "total": 0
+        "total": 25
       }
     },
     "reduced-motion": {
@@ -9302,6 +9526,13 @@
     },
     {
       "comp": "(global)",
+      "item": "motion-easing",
+      "selector": "a",
+      "prop": "transition",
+      "value": "color 0.1s linear"
+    },
+    {
+      "comp": "(global)",
       "item": "cursor-underline",
       "selector": "a:hover, a:focus-visible",
       "prop": "text-decoration",
@@ -9344,6 +9575,13 @@
     },
     {
       "comp": "(global)",
+      "item": "motion-easing",
+      "selector": "[kx-scope='breadcrumbs-item'][kx-type='underline'] > a",
+      "prop": "transition",
+      "value": "transform calc(calc(1 * 1) * 250ms / 1) cubic-bezier(0, 0.3, 0.15, 1)"
+    },
+    {
+      "comp": "(global)",
       "item": "hover-press",
       "selector": "[kx-scope='breadcrumbs-item'][kx-type='underline'] > a:active",
       "prop": "transform",
@@ -9352,6 +9590,13 @@
     {
       "comp": "(global)",
       "item": "motion-speed",
+      "selector": "[kx-scope='breadcrumbs-item'][kx-type='underline'] > a::after",
+      "prop": "transition",
+      "value": "transform calc(calc(1 * 1) * 250ms / 1) cubic-bezier(0, 0.3, 0.15, 1)"
+    },
+    {
+      "comp": "(global)",
+      "item": "motion-easing",
       "selector": "[kx-scope='breadcrumbs-item'][kx-type='underline'] > a::after",
       "prop": "transition",
       "value": "transform calc(calc(1 * 1) * 250ms / 1) cubic-bezier(0, 0.3, 0.15, 1)"
@@ -9393,6 +9638,13 @@
     },
     {
       "comp": "button",
+      "item": "motion-easing",
+      "selector": ".slds-button:not([disabled])",
+      "prop": "transition",
+      "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
+    },
+    {
+      "comp": "button",
       "item": "hover-press",
       "selector": ".slds-button_inverse:hover,.slds-button--inverse:hover",
       "prop": "box-shadow",
@@ -9428,7 +9680,21 @@
     },
     {
       "comp": "button",
+      "item": "motion-easing",
+      "selector": ".slds-button_neutral:hover,.slds-button--neutral:hover, .slds-button_outline-brand:hover, .slds-button--outline-brand:hover, .slds-button_text-destructive:hover, .slds-button--text-destructive:hover",
+      "prop": "transition",
+      "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
+    },
+    {
+      "comp": "button",
       "item": "motion-speed",
+      "selector": ".slds-button_neutral:active,.slds-button--neutral:active, .slds-button_outline-brand:active, .slds-button--outline-brand:active, .slds-button_text-destructive:active, .slds-button--text-destructive:active",
+      "prop": "transition",
+      "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
+    },
+    {
+      "comp": "button",
+      "item": "motion-easing",
       "selector": ".slds-button_neutral:active,.slds-button--neutral:active, .slds-button_outline-brand:active, .slds-button--outline-brand:active, .slds-button_text-destructive:active, .slds-button--text-destructive:active",
       "prop": "transition",
       "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
@@ -9442,7 +9708,21 @@
     },
     {
       "comp": "button",
+      "item": "motion-easing",
+      "selector": ".slds-button_brand:not(:focus-visible):hover,.slds-button--brand:not(:focus-visible):hover, .slds-button_destructive:not(:focus-visible):hover, .slds-button--destructive:not(:focus-visible):hover, .slds-button_success:not(:focus-visible):hover, .slds-button--success:not(:focus-visible):hover, .slds-button_inverse:not(:focus-visible):hover, .slds-button--inverse:not(:focus-visible):hover",
+      "prop": "transition",
+      "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
+    },
+    {
+      "comp": "button",
       "item": "motion-speed",
+      "selector": ".slds-button_brand:not(:focus-visible):active,.slds-button--brand:not(:focus-visible):active, .slds-button_destructive:not(:focus-visible):active, .slds-button--destructive:not(:focus-visible):active, .slds-button_success:not(:focus-visible):active, .slds-button--success:not(:focus-visible):active, .slds-button_inverse:not(:focus-visible):active, .slds-button--inverse:not(:focus-visible):active",
+      "prop": "transition",
+      "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
+    },
+    {
+      "comp": "button",
+      "item": "motion-easing",
       "selector": ".slds-button_brand:not(:focus-visible):active,.slds-button--brand:not(:focus-visible):active, .slds-button_destructive:not(:focus-visible):active, .slds-button--destructive:not(:focus-visible):active, .slds-button_success:not(:focus-visible):active, .slds-button--success:not(:focus-visible):active, .slds-button_inverse:not(:focus-visible):active, .slds-button--inverse:not(:focus-visible):active",
       "prop": "transition",
       "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
@@ -9470,7 +9750,21 @@
     },
     {
       "comp": "button",
+      "item": "motion-easing",
+      "selector": ".slds-button_icon-border-filled,.slds-button--icon-border-filled, .slds-button_icon-border, .slds-button--icon-border",
+      "prop": "transition",
+      "value": "border 0.15s linear"
+    },
+    {
+      "comp": "button",
       "item": "motion-speed",
+      "selector": ".slds-button_icon-border-filled:hover,.slds-button--icon-border-filled:hover, .slds-button_icon-border:hover, .slds-button--icon-border:hover",
+      "prop": "transition",
+      "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
+    },
+    {
+      "comp": "button",
+      "item": "motion-easing",
       "selector": ".slds-button_icon-border-filled:hover,.slds-button--icon-border-filled:hover, .slds-button_icon-border:hover, .slds-button--icon-border:hover",
       "prop": "transition",
       "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
@@ -9484,7 +9778,21 @@
     },
     {
       "comp": "button",
+      "item": "motion-easing",
+      "selector": ".slds-button_icon-border-filled:active,.slds-button--icon-border-filled:active, .slds-button_icon-border:active, .slds-button--icon-border:active",
+      "prop": "transition",
+      "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
+    },
+    {
+      "comp": "button",
       "item": "motion-speed",
+      "selector": ".slds-button_icon-border-inverse,.slds-button--icon-border-inverse",
+      "prop": "transition",
+      "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
+    },
+    {
+      "comp": "button",
+      "item": "motion-easing",
       "selector": ".slds-button_icon-border-inverse,.slds-button--icon-border-inverse",
       "prop": "transition",
       "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
@@ -9505,7 +9813,21 @@
     },
     {
       "comp": "button",
+      "item": "motion-easing",
+      "selector": ".slds-button_icon-brand:hover,.slds-button--icon-brand:hover",
+      "prop": "transition",
+      "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
+    },
+    {
+      "comp": "button",
       "item": "motion-speed",
+      "selector": ".slds-button_icon-brand:active,.slds-button--icon-brand:active",
+      "prop": "transition",
+      "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
+    },
+    {
+      "comp": "button",
+      "item": "motion-easing",
       "selector": ".slds-button_icon-brand:active,.slds-button--icon-brand:active",
       "prop": "transition",
       "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
@@ -9582,7 +9904,21 @@
     },
     {
       "comp": "icon-ellie",
+      "item": "motion-easing",
+      "selector": ".slds-icon-ellie.slds-is-animated",
+      "prop": "animation",
+      "value": "slds-icon-ellie-pop 0.3s ease-in 2s 1 both"
+    },
+    {
+      "comp": "icon-ellie",
       "item": "motion-speed",
+      "selector": ".slds-icon-ellie.slds-is-animated svg",
+      "prop": "animation",
+      "value": "slds-icon-ellie 1.2s steps(20) 2.3s 2 alternate"
+    },
+    {
+      "comp": "icon-ellie",
+      "item": "motion-easing",
       "selector": ".slds-icon-ellie.slds-is-animated svg",
       "prop": "animation",
       "value": "slds-icon-ellie 1.2s steps(20) 2.3s 2 alternate"
@@ -9611,6 +9947,13 @@
     {
       "comp": "icon-eq",
       "item": "motion-speed",
+      "selector": ".slds-icon-eq.slds-is-animated .slds-icon-eq__bar",
+      "prop": "animation",
+      "value": "slds-icon-eq 0.25s ease-in-out infinite alternate"
+    },
+    {
+      "comp": "icon-eq",
+      "item": "motion-easing",
       "selector": ".slds-icon-eq.slds-is-animated .slds-icon-eq__bar",
       "prop": "animation",
       "value": "slds-icon-eq 0.25s ease-in-out infinite alternate"
@@ -9686,6 +10029,13 @@
       "value": "opacity 0.4s ease-in-out"
     },
     {
+      "comp": "icon-score",
+      "item": "motion-easing",
+      "selector": ".slds-icon-score__positive, .slds-icon-score__negative",
+      "prop": "transition",
+      "value": "opacity 0.4s ease-in-out"
+    },
+    {
       "comp": "icon-strength",
       "item": "icon-size",
       "selector": ".slds-icon-strength",
@@ -9708,7 +10058,21 @@
     },
     {
       "comp": "icon-strength",
+      "item": "motion-easing",
+      "selector": ".slds-icon-strength circle",
+      "prop": "transition",
+      "value": "fill 0.4s ease-in-out, stroke 0.4s ease-in-out"
+    },
+    {
+      "comp": "icon-strength",
       "item": "motion-speed",
+      "selector": ".slds-icon-strength.slds-is-animated circle",
+      "prop": "animation",
+      "value": "slds-icon-strength-positive-load 0.4s 1s ease-in-out alternate both paused"
+    },
+    {
+      "comp": "icon-strength",
+      "item": "motion-easing",
       "selector": ".slds-icon-strength.slds-is-animated circle",
       "prop": "animation",
       "value": "slds-icon-strength-positive-load 0.4s 1s ease-in-out alternate both paused"
@@ -9750,7 +10114,21 @@
     },
     {
       "comp": "icon-trend",
+      "item": "motion-easing",
+      "selector": ".slds-icon-trend.slds-is-animated .slds-icon-trend__arrow",
+      "prop": "animation",
+      "value": "slds-icon-trend-arrow 0.8s 0.4s ease-in-out both"
+    },
+    {
+      "comp": "icon-trend",
       "item": "motion-speed",
+      "selector": ".slds-icon-trend.slds-is-animated .slds-icon-trend__circle",
+      "prop": "animation",
+      "value": "slds-icon-trend-circle 0.8s ease-in-out both"
+    },
+    {
+      "comp": "icon-trend",
+      "item": "motion-easing",
       "selector": ".slds-icon-trend.slds-is-animated .slds-icon-trend__circle",
       "prop": "animation",
       "value": "slds-icon-trend-circle 0.8s ease-in-out both"
@@ -9918,6 +10296,13 @@
     },
     {
       "comp": "icon-help",
+      "item": "motion-easing",
+      "selector": ".slds-icon-help:focus",
+      "prop": "animation",
+      "value": "slds-click-global-action 80ms cubic-bezier(1, 1.9, 0.94, 0.98)"
+    },
+    {
+      "comp": "icon-help",
       "item": "motion-speed",
       "selector": ".slds-icon-help_hover,.slds-icon-help--hover",
       "prop": "transition",
@@ -9925,7 +10310,21 @@
     },
     {
       "comp": "icon-help",
+      "item": "motion-easing",
+      "selector": ".slds-icon-help_hover,.slds-icon-help--hover",
+      "prop": "transition",
+      "value": "all 200ms ease-out"
+    },
+    {
+      "comp": "icon-help",
       "item": "motion-speed",
+      "selector": ".slds-icon-help_focus,.slds-icon-help--focus",
+      "prop": "transition",
+      "value": "all 200ms ease-out"
+    },
+    {
+      "comp": "icon-help",
+      "item": "motion-easing",
       "selector": ".slds-icon-help_focus,.slds-icon-help--focus",
       "prop": "transition",
       "value": "all 200ms ease-out"
@@ -9947,6 +10346,13 @@
     {
       "comp": "icon-typing",
       "item": "motion-speed",
+      "selector": ".slds-icon-typing.slds-is-animated .slds-icon-typing__dot",
+      "prop": "animation",
+      "value": "slds-icon-typing__dot-first 1.2s infinite ease-in-out"
+    },
+    {
+      "comp": "icon-typing",
+      "item": "motion-easing",
       "selector": ".slds-icon-typing.slds-is-animated .slds-icon-typing__dot",
       "prop": "animation",
       "value": "slds-icon-typing__dot-first 1.2s infinite ease-in-out"
@@ -9975,6 +10381,13 @@
     {
       "comp": "carousel",
       "item": "motion-speed",
+      "selector": ".slds-carousel__panels",
+      "prop": "transition",
+      "value": "transform 250ms ease-in"
+    },
+    {
+      "comp": "carousel",
+      "item": "motion-easing",
       "selector": ".slds-carousel__panels",
       "prop": "transition",
       "value": "transform 250ms ease-in"
@@ -10051,6 +10464,13 @@
     },
     {
       "comp": "textarea",
+      "item": "motion-easing",
+      "selector": ".slds-textarea",
+      "prop": "transition",
+      "value": "background-color 0.1s linear"
+    },
+    {
+      "comp": "textarea",
       "item": "cursor-underline",
       "selector": ".slds-textarea[disabled], .slds-textarea.slds-is-disabled",
       "prop": "cursor",
@@ -10059,6 +10479,13 @@
     {
       "comp": "radio",
       "item": "motion-speed",
+      "selector": ".slds-radio .slds-radio_faux,.slds-radio .slds-radio--faux",
+      "prop": "transition",
+      "value": "border 0.1s linear, background-color 0.1s linear"
+    },
+    {
+      "comp": "radio",
+      "item": "motion-easing",
       "selector": ".slds-radio .slds-radio_faux,.slds-radio .slds-radio--faux",
       "prop": "transition",
       "value": "border 0.1s linear, background-color 0.1s linear"
@@ -10086,7 +10513,21 @@
     },
     {
       "comp": "radio",
+      "item": "motion-easing",
+      "selector": ".slds-radio_button [type='radio']:not([disabled]) + .slds-radio_button__label:hover,.slds-radio--button [type='radio']:not([disabled]) + .slds-radio--button__label:hover",
+      "prop": "transition",
+      "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
+    },
+    {
+      "comp": "radio",
       "item": "motion-speed",
+      "selector": ".slds-radio_button [type='radio']:not([disabled]):checked + .slds-radio_button__label:hover,.slds-radio--button [type='radio']:not([disabled]):checked + .slds-radio--button__label:hover",
+      "prop": "transition",
+      "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
+    },
+    {
+      "comp": "radio",
+      "item": "motion-easing",
       "selector": ".slds-radio_button [type='radio']:not([disabled]):checked + .slds-radio_button__label:hover,.slds-radio--button [type='radio']:not([disabled]):checked + .slds-radio--button__label:hover",
       "prop": "transition",
       "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
@@ -10114,6 +10555,13 @@
     },
     {
       "comp": "checkbox",
+      "item": "motion-easing",
+      "selector": ".slds-checkbox .slds-checkbox_faux,.slds-checkbox .slds-checkbox--faux",
+      "prop": "transition",
+      "value": "border 0.1s linear, background-color 0.1s linear"
+    },
+    {
+      "comp": "checkbox",
       "item": "cursor-underline",
       "selector": ".slds-checkbox:has([type='checkbox'][disabled]) .slds-checkbox__label, .slds-form-element:has(.slds-checkbox [type='checkbox'][disabled]) > .slds-form-element__label",
       "prop": "cursor",
@@ -10135,6 +10583,13 @@
     },
     {
       "comp": "checkbox",
+      "item": "motion-easing",
+      "selector": ".slds-checkbox_toggle .slds-checkbox_faux,.slds-checkbox--toggle .slds-checkbox--faux",
+      "prop": "transition",
+      "value": "background-color 0.2s cubic-bezier(0.75, 0, 0.08, 1)"
+    },
+    {
+      "comp": "checkbox",
       "item": "motion-speed",
       "selector": ".slds-checkbox_toggle [type='checkbox']:checked + .slds-checkbox_faux::before,.slds-checkbox--toggle [type='checkbox']:checked + .slds-checkbox--faux::before, .slds-checkbox_toggle [type='checkbox']:checked ~ .slds-checkbox_faux::before, .slds-checkbox--toggle [type='checkbox']:checked ~ .slds-checkbox--faux::before, .slds-checkbox_toggle [type='checkbox']:checked + .slds-checkbox_faux_container .slds-checkbox_faux::before, .slds-checkbox--toggle [type='checkbox']:checked + .slds-checkbox--faux_container .slds-checkbox--faux::before",
       "prop": "transition",
@@ -10142,7 +10597,21 @@
     },
     {
       "comp": "checkbox",
+      "item": "motion-easing",
+      "selector": ".slds-checkbox_toggle [type='checkbox']:checked + .slds-checkbox_faux::before,.slds-checkbox--toggle [type='checkbox']:checked + .slds-checkbox--faux::before, .slds-checkbox_toggle [type='checkbox']:checked ~ .slds-checkbox_faux::before, .slds-checkbox--toggle [type='checkbox']:checked ~ .slds-checkbox--faux::before, .slds-checkbox_toggle [type='checkbox']:checked + .slds-checkbox_faux_container .slds-checkbox_faux::before, .slds-checkbox--toggle [type='checkbox']:checked + .slds-checkbox--faux_container .slds-checkbox--faux::before",
+      "prop": "transition",
+      "value": "transform 0.2s cubic-bezier(0.75, 0, 0.08, 1)"
+    },
+    {
+      "comp": "checkbox",
       "item": "motion-speed",
+      "selector": ".slds-checkbox_add-button [type='checkbox']:not([disabled]) ~ .slds-checkbox_faux:hover,.slds-checkbox--add-button [type='checkbox']:not([disabled]) ~ .slds-checkbox--faux:hover, .slds-checkbox_add-button [type='checkbox']:not([disabled]) + .slds-checkbox_faux:hover, .slds-checkbox--add-button [type='checkbox']:not([disabled]) + .slds-checkbox--faux:hover",
+      "prop": "transition",
+      "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
+    },
+    {
+      "comp": "checkbox",
+      "item": "motion-easing",
       "selector": ".slds-checkbox_add-button [type='checkbox']:not([disabled]) ~ .slds-checkbox_faux:hover,.slds-checkbox--add-button [type='checkbox']:not([disabled]) ~ .slds-checkbox--faux:hover, .slds-checkbox_add-button [type='checkbox']:not([disabled]) + .slds-checkbox_faux:hover, .slds-checkbox--add-button [type='checkbox']:not([disabled]) + .slds-checkbox--faux:hover",
       "prop": "transition",
       "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
@@ -10177,6 +10646,13 @@
     },
     {
       "comp": "checkbox",
+      "item": "motion-easing",
+      "selector": ".slds-checkbox_button .slds-checkbox_faux,.slds-checkbox--button .slds-checkbox--faux",
+      "prop": "transition",
+      "value": "border 0.1s linear, background-color 0.1s linear"
+    },
+    {
+      "comp": "checkbox",
       "item": "control-height",
       "selector": ".slds-checkbox_button [type='checkbox'],.slds-checkbox--button [type='checkbox']",
       "prop": "height",
@@ -10185,6 +10661,13 @@
     {
       "comp": "checkbox",
       "item": "motion-speed",
+      "selector": ".slds-checkbox_button [type='checkbox']:not([disabled]) + .slds-checkbox_button__label:hover,.slds-checkbox--button [type='checkbox']:not([disabled]) + .slds-checkbox--button__label:hover",
+      "prop": "transition",
+      "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
+    },
+    {
+      "comp": "checkbox",
+      "item": "motion-easing",
       "selector": ".slds-checkbox_button [type='checkbox']:not([disabled]) + .slds-checkbox_button__label:hover,.slds-checkbox--button [type='checkbox']:not([disabled]) + .slds-checkbox--button__label:hover",
       "prop": "transition",
       "value": "transform 150ms ease-in-out, box-shadow 150ms ease-in-out"
@@ -10213,6 +10696,13 @@
     {
       "comp": "select",
       "item": "motion-speed",
+      "selector": ".slds-select",
+      "prop": "transition",
+      "value": "background-color 0.1s linear"
+    },
+    {
+      "comp": "select",
+      "item": "motion-easing",
       "selector": ".slds-select",
       "prop": "transition",
       "value": "background-color 0.1s linear"
@@ -10254,7 +10744,21 @@
     },
     {
       "comp": "slider",
+      "item": "motion-easing",
+      "selector": ".slds-slider__range::-webkit-slider-thumb",
+      "prop": "transition",
+      "value": "background 0.15s ease-in-out"
+    },
+    {
+      "comp": "slider",
       "item": "motion-speed",
+      "selector": ".slds-slider__range::-moz-range-thumb",
+      "prop": "transition",
+      "value": "background 0.15s ease-in-out"
+    },
+    {
+      "comp": "slider",
+      "item": "motion-easing",
       "selector": ".slds-slider__range::-moz-range-thumb",
       "prop": "transition",
       "value": "background 0.15s ease-in-out"
@@ -10304,6 +10808,13 @@
     {
       "comp": "panel",
       "item": "motion-speed",
+      "selector": ".slds-panel_animated,.slds-panel--animated",
+      "prop": "transition",
+      "value": "transform 300ms ease"
+    },
+    {
+      "comp": "panel",
+      "item": "motion-easing",
       "selector": ".slds-panel_animated,.slds-panel--animated",
       "prop": "transition",
       "value": "transform 300ms ease"
@@ -10575,8 +11086,22 @@
       "value": "opacity 0.1s linear, visibility 0.1s linear, transform 0.1s linear"
     },
     {
+      "comp": "rise-from-ground",
+      "item": "motion-easing",
+      "selector": ".slds-rise-from-ground",
+      "prop": "transition",
+      "value": "opacity 0.1s linear, visibility 0.1s linear, transform 0.1s linear"
+    },
+    {
       "comp": "fall-into-ground",
       "item": "motion-speed",
+      "selector": ".slds-fall-into-ground",
+      "prop": "transition",
+      "value": "opacity 0.1s linear, visibility 0.1s linear, transform 0.1s linear"
+    },
+    {
+      "comp": "fall-into-ground",
+      "item": "motion-easing",
       "selector": ".slds-fall-into-ground",
       "prop": "transition",
       "value": "opacity 0.1s linear, visibility 0.1s linear, transform 0.1s linear"
@@ -10590,7 +11115,21 @@
     },
     {
       "comp": "dropdown-trigger",
+      "item": "motion-easing",
+      "selector": ".slds-dropdown-trigger_hover .slds-dropdown,.slds-dropdown-trigger--hover .slds-dropdown",
+      "prop": "transition",
+      "value": "opacity 0.1s linear, visibility 0.1s linear"
+    },
+    {
+      "comp": "dropdown-trigger",
       "item": "motion-speed",
+      "selector": ".slds-dropdown-trigger_hover:hover .slds-dropdown,.slds-dropdown-trigger--hover:hover .slds-dropdown, .slds-dropdown-trigger_hover:focus .slds-dropdown, .slds-dropdown-trigger--hover:focus .slds-dropdown",
+      "prop": "transition",
+      "value": "opacity 0.1s linear, visibility 0.1s linear"
+    },
+    {
+      "comp": "dropdown-trigger",
+      "item": "motion-easing",
       "selector": ".slds-dropdown-trigger_hover:hover .slds-dropdown,.slds-dropdown-trigger--hover:hover .slds-dropdown, .slds-dropdown-trigger_hover:focus .slds-dropdown, .slds-dropdown-trigger--hover:focus .slds-dropdown",
       "prop": "transition",
       "value": "opacity 0.1s linear, visibility 0.1s linear"
@@ -10638,8 +11177,22 @@
       "value": "opacity 0.05s ease"
     },
     {
+      "comp": "dropdown",
+      "item": "motion-easing",
+      "selector": ".slds-dropdown__item .slds-icon_selected,.slds-dropdown__item .slds-icon--selected",
+      "prop": "transition",
+      "value": "opacity 0.05s ease"
+    },
+    {
       "comp": "picklist",
       "item": "motion-speed",
+      "selector": ".slds-picklist li .slds-icon_selected,.slds-picklist li .slds-icon--selected",
+      "prop": "transition",
+      "value": "opacity 0.05s ease"
+    },
+    {
+      "comp": "picklist",
+      "item": "motion-easing",
       "selector": ".slds-picklist li .slds-icon_selected,.slds-picklist li .slds-icon--selected",
       "prop": "transition",
       "value": "opacity 0.05s ease"
@@ -10703,6 +11256,13 @@
     {
       "comp": "combobox",
       "item": "motion-speed",
+      "selector": ".slds-combobox_object-switcher .slds-combobox__input,.slds-combobox--object-switcher .slds-combobox__input",
+      "prop": "transition",
+      "value": "width 80ms linear"
+    },
+    {
+      "comp": "combobox",
+      "item": "motion-easing",
       "selector": ".slds-combobox_object-switcher .slds-combobox__input,.slds-combobox--object-switcher .slds-combobox__input",
       "prop": "transition",
       "value": "width 80ms linear"
@@ -10814,7 +11374,21 @@
     },
     {
       "comp": "global-actions",
+      "item": "motion-easing",
+      "selector": ".slds-global-actions__item-action",
+      "prop": "transition",
+      "value": "color 200ms linear"
+    },
+    {
+      "comp": "global-actions",
       "item": "motion-speed",
+      "selector": ".slds-global-actions__item-action:active .slds-icon",
+      "prop": "animation",
+      "value": "click-icon 120ms cubic-bezier(1, 1.9, 0.94, 0.98)"
+    },
+    {
+      "comp": "global-actions",
+      "item": "motion-easing",
       "selector": ".slds-global-actions__item-action:active .slds-icon",
       "prop": "animation",
       "value": "click-icon 120ms cubic-bezier(1, 1.9, 0.94, 0.98)"
@@ -10828,7 +11402,21 @@
     },
     {
       "comp": "global-actions",
+      "item": "motion-easing",
+      "selector": ".slds-global-actions__avatar",
+      "prop": "transition",
+      "value": "transform 80ms ease-out, box-shadow 0.1s linear"
+    },
+    {
+      "comp": "global-actions",
       "item": "motion-speed",
+      "selector": ".slds-global-actions__favorites-action .slds-button__icon",
+      "prop": "transition",
+      "value": "transform 200ms ease-out"
+    },
+    {
+      "comp": "global-actions",
+      "item": "motion-easing",
       "selector": ".slds-global-actions__favorites-action .slds-button__icon",
       "prop": "transition",
       "value": "transform 200ms ease-out"
@@ -10849,7 +11437,21 @@
     },
     {
       "comp": "global-actions",
+      "item": "motion-easing",
+      "selector": ".slds-global-actions__favorites-action.slds-is-selected .slds-button__icon",
+      "prop": "animation",
+      "value": "click-favorites-icon 600ms cubic-bezier(0.46, 0.32, 0, 0.98)"
+    },
+    {
+      "comp": "global-actions",
       "item": "motion-speed",
+      "selector": ".slds-global-actions__notifications.slds-incoming-notification",
+      "prop": "animation",
+      "value": "bell 0.8s ease-in-out"
+    },
+    {
+      "comp": "global-actions",
+      "item": "motion-easing",
       "selector": ".slds-global-actions__notifications.slds-incoming-notification",
       "prop": "animation",
       "value": "bell 0.8s ease-in-out"
@@ -10870,6 +11472,13 @@
     },
     {
       "comp": "notification-badge",
+      "item": "motion-easing",
+      "selector": ".slds-notification-badge.slds-show-notification",
+      "prop": "animation",
+      "value": "ding 0.8s ease-out"
+    },
+    {
+      "comp": "notification-badge",
       "item": "motion-speed",
       "selector": ".slds-notification-badge.slds-show-notification",
       "prop": "transition-delay",
@@ -10878,6 +11487,13 @@
     {
       "comp": "context-bar",
       "item": "motion-speed",
+      "selector": ".slds-context-bar__item",
+      "prop": "transition",
+      "value": "background-color 0.25s cubic-bezier(0.39, 0.575, 0.565, 1)"
+    },
+    {
+      "comp": "context-bar",
+      "item": "motion-easing",
       "selector": ".slds-context-bar__item",
       "prop": "transition",
       "value": "background-color 0.25s cubic-bezier(0.39, 0.575, 0.565, 1)"
@@ -10898,7 +11514,21 @@
     },
     {
       "comp": "context-bar",
+      "item": "motion-easing",
+      "selector": ".slds-context-bar__item.slds-is-active",
+      "prop": "animation",
+      "value": "bkAnim 0.135s cubic-bezier(0.39, 0.575, 0.565, 1) both"
+    },
+    {
+      "comp": "context-bar",
       "item": "motion-speed",
+      "selector": ".slds-context-bar__item.slds-is-active::before",
+      "prop": "animation",
+      "value": "navBounceIn 0.15s cubic-bezier(0.39, 0.575, 0.565, 1) both"
+    },
+    {
+      "comp": "context-bar",
+      "item": "motion-easing",
       "selector": ".slds-context-bar__item.slds-is-active::before",
       "prop": "animation",
       "value": "navBounceIn 0.15s cubic-bezier(0.39, 0.575, 0.565, 1) both"
@@ -10933,6 +11563,13 @@
     },
     {
       "comp": "context-bar",
+      "item": "motion-easing",
+      "selector": ".slds-context-bar__item.slds-has-success::before",
+      "prop": "transition",
+      "value": "background-color 0.25s cubic-bezier(0.39, 0.575, 0.565, 1)"
+    },
+    {
+      "comp": "context-bar",
       "item": "motion-speed",
       "selector": ".slds-context-bar__item.slds-has-error::before",
       "prop": "animation-duration",
@@ -10961,6 +11598,13 @@
     },
     {
       "comp": "context-bar",
+      "item": "motion-easing",
+      "selector": ".slds-context-bar__item.slds-has-error::before",
+      "prop": "transition",
+      "value": "background-color 0.25s cubic-bezier(0.39, 0.575, 0.565, 1)"
+    },
+    {
+      "comp": "context-bar",
       "item": "motion-speed",
       "selector": ".slds-context-bar__item.slds-has-warning::before",
       "prop": "animation-duration",
@@ -10983,6 +11627,13 @@
     {
       "comp": "context-bar",
       "item": "motion-speed",
+      "selector": ".slds-context-bar__item.slds-has-warning::before",
+      "prop": "transition",
+      "value": "background-color 0.25s cubic-bezier(0.39, 0.575, 0.565, 1)"
+    },
+    {
+      "comp": "context-bar",
+      "item": "motion-easing",
       "selector": ".slds-context-bar__item.slds-has-warning::before",
       "prop": "transition",
       "value": "background-color 0.25s cubic-bezier(0.39, 0.575, 0.565, 1)"
@@ -11037,6 +11688,13 @@
       "value": "all 150ms linear"
     },
     {
+      "comp": "builder-header",
+      "item": "motion-easing",
+      "selector": ".slds-builder-header__item-action",
+      "prop": "transition",
+      "value": "all 150ms linear"
+    },
+    {
       "comp": "modal",
       "item": "motion-speed",
       "selector": ".slds-modal",
@@ -11045,7 +11703,21 @@
     },
     {
       "comp": "modal",
+      "item": "motion-easing",
+      "selector": ".slds-modal",
+      "prop": "transition",
+      "value": "transform 0.1s linear, opacity 0.1s linear"
+    },
+    {
+      "comp": "modal",
       "item": "motion-speed",
+      "selector": ".slds-modal__container",
+      "prop": "transition",
+      "value": "transform 0.1s linear, opacity 0.1s linear"
+    },
+    {
+      "comp": "modal",
+      "item": "motion-easing",
       "selector": ".slds-modal__container",
       "prop": "transition",
       "value": "transform 0.1s linear, opacity 0.1s linear"
@@ -11149,8 +11821,22 @@
       "value": "opacity 0.4s linear"
     },
     {
+      "comp": "backdrop",
+      "item": "motion-easing",
+      "selector": ".slds-backdrop_open,.slds-backdrop--open",
+      "prop": "transition",
+      "value": "opacity 0.4s linear"
+    },
+    {
       "comp": "fade-in-open",
       "item": "motion-speed",
+      "selector": ".slds-fade-in-open",
+      "prop": "transition",
+      "value": "opacity 0.1s linear"
+    },
+    {
+      "comp": "fade-in-open",
+      "item": "motion-easing",
       "selector": ".slds-fade-in-open",
       "prop": "transition",
       "value": "opacity 0.1s linear"
@@ -11164,7 +11850,21 @@
     },
     {
       "comp": "slide-up-open",
+      "item": "motion-easing",
+      "selector": ".slds-slide-up-open",
+      "prop": "transition",
+      "value": "opacity 0.1s linear, transform 0.2s linear"
+    },
+    {
+      "comp": "slide-up-open",
       "item": "motion-speed",
+      "selector": ".slds-slide-up-open .slds-modal__container-reset",
+      "prop": "transition",
+      "value": "opacity 0.2s linear, transform 0.2s linear"
+    },
+    {
+      "comp": "slide-up-open",
+      "item": "motion-easing",
       "selector": ".slds-slide-up-open .slds-modal__container-reset",
       "prop": "transition",
       "value": "opacity 0.2s linear, transform 0.2s linear"
@@ -11212,6 +11912,13 @@
       "value": "width 0.2s ease"
     },
     {
+      "comp": "wizard",
+      "item": "motion-easing",
+      "selector": ".slds-wizard__progress-bar",
+      "prop": "transition",
+      "value": "width 0.2s ease"
+    },
+    {
       "comp": "tabs",
       "item": "hover-press",
       "selector": ".slds-tabs_path .slds-is-complete:hover .slds-tabs_path__stage,.slds-tabs--path .slds-is-complete:hover .slds-tabs--path__stage",
@@ -11234,7 +11941,21 @@
     },
     {
       "comp": "tabs",
+      "item": "motion-easing",
+      "selector": ".slds-tabs_path__item,.slds-tabs--path__item",
+      "prop": "transition",
+      "value": "transform 0.1s ease-in-out, background-color 0.1s linear"
+    },
+    {
+      "comp": "tabs",
       "item": "motion-speed",
+      "selector": ".slds-tabs_path__item::before,.slds-tabs--path__item::before",
+      "prop": "transition",
+      "value": "transform 0.1s ease-in-out, background-color 0.1s linear"
+    },
+    {
+      "comp": "tabs",
+      "item": "motion-easing",
       "selector": ".slds-tabs_path__item::before,.slds-tabs--path__item::before",
       "prop": "transition",
       "value": "transform 0.1s ease-in-out, background-color 0.1s linear"
@@ -11249,6 +11970,13 @@
     {
       "comp": "tabs",
       "item": "motion-speed",
+      "selector": ".slds-tabs_path__title,.slds-tabs--path__title, .slds-tabs_path__stage, .slds-tabs--path__stage",
+      "prop": "transition",
+      "value": "transform 0.2s linear"
+    },
+    {
+      "comp": "tabs",
+      "item": "motion-easing",
       "selector": ".slds-tabs_path__title,.slds-tabs--path__title, .slds-tabs_path__stage, .slds-tabs--path__stage",
       "prop": "transition",
       "value": "transform 0.2s linear"
@@ -11339,7 +12067,21 @@
     },
     {
       "comp": "path",
+      "item": "motion-easing",
+      "selector": ".slds-path__title, .slds-path__stage",
+      "prop": "transition",
+      "value": "transform 0.2s linear"
+    },
+    {
+      "comp": "path",
       "item": "motion-speed",
+      "selector": ".slds-path .slds-path__trigger",
+      "prop": "transition",
+      "value": "0.4s transform ease-in-out"
+    },
+    {
+      "comp": "path",
+      "item": "motion-easing",
       "selector": ".slds-path .slds-path__trigger",
       "prop": "transition",
       "value": "0.4s transform ease-in-out"
@@ -11780,6 +12522,13 @@
     },
     {
       "comp": "sub-tabs",
+      "item": "motion-easing",
+      "selector": ".slds-sub-tabs__item.slds-has-success::before",
+      "prop": "transition",
+      "value": "background-color 0.25s cubic-bezier(0.39, 0.575, 0.565, 1)"
+    },
+    {
+      "comp": "sub-tabs",
       "item": "motion-speed",
       "selector": ".slds-sub-tabs__item.slds-has-error::before",
       "prop": "animation-duration",
@@ -11801,6 +12550,13 @@
     },
     {
       "comp": "sub-tabs",
+      "item": "motion-easing",
+      "selector": ".slds-sub-tabs__item.slds-has-error::before",
+      "prop": "transition",
+      "value": "background-color 0.25s cubic-bezier(0.39, 0.575, 0.565, 1)"
+    },
+    {
+      "comp": "sub-tabs",
       "item": "motion-speed",
       "selector": ".slds-sub-tabs__item.slds-has-warning::before",
       "prop": "animation-duration",
@@ -11816,6 +12572,13 @@
     {
       "comp": "sub-tabs",
       "item": "motion-speed",
+      "selector": ".slds-sub-tabs__item.slds-has-warning::before",
+      "prop": "transition",
+      "value": "background-color 0.25s cubic-bezier(0.39, 0.575, 0.565, 1)"
+    },
+    {
+      "comp": "sub-tabs",
+      "item": "motion-easing",
       "selector": ".slds-sub-tabs__item.slds-has-warning::before",
       "prop": "transition",
       "value": "background-color 0.25s cubic-bezier(0.39, 0.575, 0.565, 1)"
@@ -11955,6 +12718,13 @@
     },
     {
       "comp": "image",
+      "item": "hover-selected",
+      "selector": ".slds-image .slds-file__figure:hover::after, .slds-image .slds-file__figure:focus::after, .slds-image .slds-file__crop:hover::after, .slds-image .slds-file__crop:focus::after, .slds-file .slds-file__figure:hover::after, .slds-file .slds-file__figure:focus::after, .slds-file .slds-file__crop:hover::after, .slds-file .slds-file__crop:focus::after",
+      "prop": "background-image",
+      "value": "url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MiIgaGVpZ2h0PSI1MiI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTUxLjggMjVBMjkgMjkgMCAwIDAgMjYgOSAyOSAyOSAwIDAgMCAuMiAyNWEyIDIgMCAwIDAgMCAxLjhDNSAzNi40IDE0LjcgNDMgMjYgNDNhMjkgMjkgMCAwIDAgMjUuOC0xNiAyIDIgMCAwIDAgMC0xLjh6TTI2IDM3YTExIDExIDAgMSAxIDAtMjIgMTEgMTEgMCAxIDEgMCAyMnptMC0xOGMtNCAwLTcgMy03IDdzMyA3IDcgNyA3LTMgNy03LTMtNy03LTd6Ii8+PC9zdmc+)"
+    },
+    {
+      "comp": "image",
       "item": "hover-press",
       "selector": ".slds-image .slds-file__figure:hover::after, .slds-image .slds-file__figure:focus::after, .slds-image .slds-file__crop:hover::after, .slds-image .slds-file__crop:focus::after, .slds-file .slds-file__figure:hover::after, .slds-file .slds-file__figure:focus::after, .slds-file .slds-file__crop:hover::after, .slds-file .slds-file__crop:focus::after",
       "prop": "transform",
@@ -12046,7 +12816,21 @@
     },
     {
       "comp": "tree",
+      "item": "motion-easing",
+      "selector": "[aria-expanded='false'] > .slds-tree__item .slds-button__icon",
+      "prop": "transition",
+      "value": "0.2s transform ease-in-out"
+    },
+    {
+      "comp": "tree",
       "item": "motion-speed",
+      "selector": "[aria-expanded='true'] > .slds-tree__item .slds-button__icon",
+      "prop": "transition",
+      "value": "0.2s transform ease-in-out"
+    },
+    {
+      "comp": "tree",
+      "item": "motion-easing",
       "selector": "[aria-expanded='true'] > .slds-tree__item .slds-button__icon",
       "prop": "transition",
       "value": "0.2s transform ease-in-out"
@@ -12187,6 +12971,13 @@
     {
       "comp": "text-link",
       "item": "motion-speed",
+      "selector": ".slds-text-link",
+      "prop": "transition",
+      "value": "color 0.1s linear"
+    },
+    {
+      "comp": "text-link",
+      "item": "motion-easing",
       "selector": ".slds-text-link",
       "prop": "transition",
       "value": "color 0.1s linear"
@@ -14469,6 +15260,13 @@
     {
       "comp": "sldsUtilsInteractions",
       "item": "motion-speed",
+      "selector": ".slds-text-link",
+      "prop": "transition",
+      "value": "color 0.1s linear"
+    },
+    {
+      "comp": "sldsUtilsInteractions",
+      "item": "motion-easing",
       "selector": ".slds-text-link",
       "prop": "transition",
       "value": "color 0.1s linear"

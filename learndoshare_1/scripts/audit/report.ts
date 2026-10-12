@@ -23,8 +23,11 @@ const RANK: Status[] = ["n/a", "reached", "bridge", "fixed", "gap"];
 const CONTROLS = /\.slds-(button|input|input_faux|select|radio_button|checkbox_button)(?![\w-])|\[part~?=['"]?(button|input)['"]?\]/;
 // 음수·0·퍼센트·1px·env()는 배치용 값이라 밀도에서 뺀다 (연구 cov2.cjs의 relevant와 같은 취지)
 const GEOMETRY = /^(-|0(px|rem|em)?$)|\*\s*-1|%|^1px$|env\(/;
+// CSS 곡선 값(easing function)
+const EASING = /\b(ease(-in|-out|-in-out)?|linear|step-start|step-end)\b|\b(cubic-bezier|steps)\(/;
 
-// ponytail: 명세 항목 hook을 읽지 않는 선언을 속성과 선택자로 항목 하나에 넣는 1차 규칙이다. 항목에 없는 값(일반 폭, 배치)은 세지 않는다.
+// ponytail: 명세 항목 hook을 읽지 않는 선언을 속성과 선택자로 항목 하나에 넣는 1차 규칙이다(곡선이 든 움직임 shorthand는 buildReport가 곡선 항목에도 넣는다).
+// 항목에 없는 값(일반 폭, 배치)은 세지 않는다.
 // 빈틈 목록이 실제와 어긋나면 이 표를 고친다
 function ruleItem(d: Decl): string | null {
   const sel = d.selector;
@@ -96,10 +99,19 @@ function bridgeRules(css: string): BridgeRule[] {
 }
 export const bridgeSelectors = (css: string): string[] => [...new Set(bridgeRules(css).flatMap((r) => [...r.parts]))];
 
-// 같은 속성이거나 한쪽이 다른 쪽의 longhand다 (transition ↔ transition-duration)
+// 같은 속성이거나 한쪽이 다른 쪽의 longhand다 (border ↔ border-width)
 const related = (a: string, b: string) => a === b || a.startsWith(`${b}-`) || b.startsWith(`${a}-`);
-const bridged = (d: Decl, rules: BridgeRule[]) =>
-  list.comma(d.selector).every((part) => rules.some((r) => r.parts.has(part) && related(r.prop, d.prop)));
+// 움직임은 항목마다 맞는 longhand가 필요하다. 시간만 잇는 브리지가 곡선까지 덮었다고 보지 않는다
+const MOTION_PART: Record<string, string> = { "motion-speed": "duration", "motion-easing": "timing-function" };
+function covers(bridgeProp: string, d: Decl, item: string): boolean {
+  const part = MOTION_PART[item];
+  if (!part) return related(bridgeProp, d.prop);
+  const base = d.prop.startsWith("animation") ? "animation" : "transition";
+  return bridgeProp === base || bridgeProp === (d.prop === base ? `${base}-${part}` : d.prop);
+}
+// 선택자 목록의 모든 부분을 브리지가 덮어야 bridge다
+const bridged = (d: Decl, item: string, rules: BridgeRule[]) =>
+  list.comma(d.selector).every((part) => rules.some((r) => r.parts.has(part) && covers(r.prop, d, item)));
 
 // FIXED_ITEMS.match 계약(lib/fixed-list.ts): 주어진 조건을 모두 만족하면 맞는다. js 출처는 CSS 선언과 맞추지 않는다
 const isFixed = (d: Decl, mode: Mode, fixed: FixedItem[]) =>
@@ -125,12 +137,14 @@ export function buildReport(decls: Decl[], items: SpecItem[], bridgeCss: string,
     // hook 선언은 그 hook을 가진 명세 항목 모두에 넣는다. 그런 항목이 없거나 hook이 아니면 규칙 표로 항목 하나를 고른다
     const byHook = hook ? [...d.value.matchAll(/var\(\s*(--slds-[gs]-[\w-]+)/g)].flatMap(([, n]) => itemsOfHook.get(n) ?? []) : [];
     const byRule = ruleItem(d);
-    const targets = new Set(byHook.length ? byHook : byRule && ids.has(byRule) ? [byRule] : []);
+    // 곡선이 든 transition·animation shorthand는 시간과 곡선 두 항목에 넣는다
+    const ruled = byRule === "motion-speed" && /^(transition|animation)$/.test(d.prop) && EASING.test(d.value) ? [byRule, "motion-easing"] : byRule ? [byRule] : [];
+    const targets = new Set(byHook.length ? byHook : ruled.filter((i) => ids.has(i)));
     const row = status.get(d.comp) ?? new Map<string, Record<Mode, Status>>();
     for (const item of targets) {
       status.set(d.comp, row);
       for (const mode of modesOf(d)) {
-        const s: Status = hook ? "reached" : mode === "now" && bridged(d, bridge) ? "bridge" : isFixed(d, mode, fixed) ? "fixed" : "gap";
+        const s: Status = hook ? "reached" : mode === "now" && bridged(d, item, bridge) ? "bridge" : isFixed(d, mode, fixed) ? "fixed" : "gap";
         const cur = row.get(item) ?? { now: "n/a", native: "n/a" };
         if (RANK.indexOf(s) > RANK.indexOf(cur[mode])) cur[mode] = s;
         row.set(item, cur);
