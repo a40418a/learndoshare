@@ -45,7 +45,8 @@
     "prepare": "husky || true",
     "precommit": "lint-staged",
     "test:brands": "node scripts/check-brands.ts",
-    "audit:brand": "node scripts/audit/run.ts --check"
+    "audit:brand": "node scripts/audit/run.ts --check",
+    "bridge:generate": "node scripts/bridge/generate.ts"
   },
   "dependencies": {
     "@lwc/engine-dom": "9.4.3",
