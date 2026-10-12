@@ -507,8 +507,8 @@ test("override: @font-face와 @import는 오류", ...);
 **Interfaces:**
 - Produces (`lib/bridge-vars.ts`): `BRIDGE_VARS: Record<string, string>`. 키는 항목 id, 값은 변수 이름이다
   - 움직임 4개: 전역 제약의 이름
-  - 크기·모양: `--milvus-control-height`, `--milvus-input-border-width`, `--milvus-path-end-radius`, `--milvus-control-icon-size`, `--milvus-modal-width-medium`, `--milvus-modal-width-large`
-  - 글자: `--milvus-letter-spacing`, `--milvus-caps-transform`, `--milvus-choice-label-weight`
+  - 크기·모양: `--milvus-control-height`, `--milvus-input-border-width`, `--milvus-path-end-radius`, `--milvus-control-icon-size`, `--milvus-sort-icon-size`, `--milvus-modal-width-base`, `--milvus-modal-width-small`, `--milvus-modal-width-medium`, `--milvus-modal-width-large`, `--milvus-modal-width-full`, `--milvus-modal-min-width` (정렬 아이콘과 모달 너비 나머지는 2026-10-12 사용자 결정으로 Task 15에서 더함)
+  - 글자: `--milvus-letter-spacing`, `--milvus-caps-transform`, `--milvus-caps-letter-spacing`, `--milvus-choice-label-weight`
   - 커서·밑줄·그림자: `--milvus-cursor-disabled`, `--milvus-link-decoration-hover`, `--milvus-nubbin-shadow`
   - 아이콘: `--milvus-icon-color-all`
 - Produces (`lib/spec-items.ts`):
@@ -879,13 +879,14 @@ test("byItem은 항목마다 now·native의 reached/total을 낸다", ...);
 **Interfaces:**
 - Consumes: `BRIDGE_VARS`(Task 8)
 - Produces:
-  - `type BridgeTarget = { id: string; selectors: string[]; property: string; varName: string; min?: string }`
-  - `BRIDGE_TARGETS: BridgeTarget[]`. 설계 5.6 표에서 개체 아이콘을 뺀 것이다. `varName`은 `BRIDGE_VARS`에서 가져온다
+  - `type BridgeTarget = { id: string; selectors: string[]; property: string; varName: string; min?: string; token?: string; initial?: string }` (`token`·`initial`은 구현 때 더함: calc·shorthand 안 값만 바꾸기, 원본에 선언이 없을 때의 브라우저 기본값)
+  - `BRIDGE_TARGETS: BridgeTarget[]`. 설계 5.6 표에서 개체 아이콘을 뺀 것이다. `varName`은 `BRIDGE_VARS`에서 가져온다. 선언이 많은 움직임·커서·밑줄 등은 설치된 SLDS 2 CSS에서 모아 만든다
   - `generateBridge(sldsCss: string, targets: BridgeTarget[]): string`
 - 생성 규칙
-  - 각 선택자·속성의 원래 값을 SLDS 2 CSS에서 찾아 `var()` 기본값으로 쓴다
+  - 각 선택자·속성의 원래 값을 SLDS 2 CSS에서 찾아 `var()` 기본값으로 쓴다. 원본의 `@media`·`@supports` 맥락을 지킨다
   - 시간 묶음은 전역 제약을 따른다. 0.4s를 넘는 값과 스피너는 바꾸지 않는다
-  - 모달·배경막·토스트는 `max(var(…, <원래값>), 0.01ms)`로 감싼다
+  - 묶음에 드는 모든 시간을 `max(var(…, <원래값>), 0.01ms)`로 감싼다(구현 때 모달·배경막·토스트에서 넓힘)
+  - 원래 이기던 같은 우선순위 규칙을 원래 값 그대로 다시 넣는다(설계 5.6)
   - 줄인 움직임 규칙은 항상 넣는다: `@media (prefers-reduced-motion: reduce)`, 시간 `0.01ms`, `animation-iteration-count: 1`
 
 - [ ] **Step 1: 실패하는 테스트**
@@ -901,6 +902,7 @@ test("생성된 --milvus-* 이름이 loadRuleContext의 milvusVars에 잡힌다"
 - [ ] **Step 4: 생성하고 확인한다.**
   - `pnpm bridge:generate` → `node scripts/audit/run.ts --write` → `pnpm test`
   - 고정 목록에 없는 빈틈이 남으면 원인을 고친다. 고칠 수 없는 것만 사용자 합의를 받아 `FIXED_ITEMS`에 넣는다
+  - (2026-10-12) 남은 604개를 사용자가 16개 묶음으로 정했다. 판정 규칙 정리와 고정 목록 추가는 별도 커밋으로 하고, 빈틈이 0이 된 뒤 `audit:brand`를 `test`에 넣는다(설계 9.4 "2026-10-12 사용자 합의")
 - [ ] **Step 5: 커밋.** `[Feat] milvusBridge.css 생성기 (#N)`
 
 ### Task 16: 개체 아이콘 색 브리지 (빼는 순서 ⑥)
