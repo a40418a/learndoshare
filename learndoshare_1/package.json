@@ -44,7 +44,8 @@
     "prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "prepare": "husky || true",
     "precommit": "lint-staged",
-    "test:brands": "node scripts/check-brands.ts"
+    "test:brands": "node scripts/check-brands.ts",
+    "audit:brand": "node scripts/audit/run.ts --check"
   },
   "dependencies": {
     "@lwc/engine-dom": "9.4.3",

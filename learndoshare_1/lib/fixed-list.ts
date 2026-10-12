@@ -6,32 +6,37 @@
  * - mode: both는 지금(synthetic)과 native 모두, native는 기본 컴포넌트가 native shadow로 바뀐 뒤에만 고정이다
  * - match: 정적 반영 검사(Task 14)가 빈틈 선언을 이 항목으로 볼 조건. 주어진 조건을 모두 만족하면 맞는다
  *   - selector: `<컴포넌트 이름> <선택자>`에 맞춘다. 기본 컴포넌트의 native CSS 선택자에는 클래스가 없는 경우가 많다([part='input'])
- *   - property: 속성 이름이 같거나 그 longhand다(transition → transition-duration, background → background-color)
+ *   - property: 속성 이름이 같거나 그 longhand다(transition → transition-duration, background → background-color). 여러 개면 그중 하나
+ *   - value: 값(공백을 하나로 줄인 것)이 맞는다
  *   - source: 값이 있는 곳. 기본은 css. js는 JS 상수라 CSS 선언과 맞추지 않고 보여 주기만 한다
  */
 export type FixedItem = {
   id: string;
   label: string;
   mode: "both" | "native";
-  match: { selector?: RegExp; property?: string; source?: "css" | "js" };
+  match: { selector?: RegExp; property?: string | string[]; value?: RegExp; source?: "css" | "js" };
 };
 
-// ponytail: 선택자는 9.4 문장을 SLDS 2·기본 컴포넌트 CSS의 이름으로 옮긴 1차 매처다. Task 14가 실제 빈틈과 맞춰 좁힌다
+// 매처는 9.4 문장을 SLDS 2·기본 컴포넌트 CSS의 이름으로 옮긴 것이다(2026-10-12 Task 14가 실제 선언과 맞춰 좁힘).
+// 넓게 잡으면 같은 선택자 아래 새 하드코딩이 빈틈으로 드러나지 않으므로, 9.4 문장이 가리키는 속성만 맞춘다
 export const FIXED_ITEMS: FixedItem[] = [
   // 두 모드 모두 고정
   { id: "icon-glyph", label: "아이콘 SVG 모양과 개체 아이콘 글리프의 흰색", mode: "both", match: { selector: /\.slds-icon(?![\w-])/, property: "fill" } },
   { id: "z-index", label: "z-index 층", mode: "both", match: { property: "z-index" } },
-  { id: "opacity", label: "0·1이 아닌 투명도", mode: "both", match: { property: "opacity" } },
+  { id: "opacity", label: "0·1이 아닌 투명도", mode: "both", match: { property: "opacity", value: /^(0?\.\d+|\d{1,2}(\.\d+)?%)$/ } },
   { id: "toast-duration", label: "토스트 표시 시간(JS 상수 4800·9600ms)", mode: "both", match: { source: "js" } },
-  { id: "spinner", label: "스피너 모양", mode: "both", match: { selector: /spinner/i } },
-  { id: "color-picker-hue", label: "색 선택기 색상환", mode: "both", match: { selector: /hue/i } },
-  { id: "agentforce", label: "Agentforce 영역", mode: "both", match: { selector: /\.slds-subtheme-agentic/ } },
-  { id: "image-scrim", label: "이미지 위 어둡게 처리", mode: "both", match: { selector: /_scrim|--scrim/ } },
+  // 점의 크기·위치·움직임과 컨테이너의 나타남. 스피너 색은 hook을 읽는다
+  { id: "spinner", label: "스피너 모양", mode: "both", match: { selector: /spinner/i, property: ["animation", "transition", "transform", "inset", "width", "height", "margin"] } },
+  { id: "color-picker-hue", label: "색 선택기 색상환", mode: "both", match: { selector: /hue/i, property: "background" } },
+  { id: "agentforce", label: "Agentforce 영역", mode: "both", match: { selector: /\.slds-subtheme-agentic/, property: ["background", "border", "transition", "transform", "padding"] } },
+  // scrim(제목 뒤 그라데이션)과 overlay·hover 때 이미지를 덮는 반투명 막
+  { id: "image-scrim", label: "이미지 위 어둡게 처리", mode: "both", match: { selector: /_scrim|--scrim|(image|file)(_|--)overlay|file__figure:hover/, property: "background" } },
   { id: "destructive-success-text", label: "파괴·성공 버튼의 흰 글자", mode: "both", match: { selector: /button(_|--)(destructive|success)/, property: "color" } },
-  { id: "global-header", label: "LEX 전역 헤더(org 테마가 원본)", mode: "both", match: { selector: /\.slds-global-header/ } },
+  { id: "global-header", label: "LEX 전역 헤더(org 테마가 원본)", mode: "both", match: { selector: /\.slds-global-header/, property: "background" } },
 
   // native 전환 뒤 생기는 고정 (9.2의 c hook을 열면 일부 메울 수 있음)
-  { id: "popup-shadow", label: "드롭다운·팝오버·툴팁 그림자", mode: "native", match: { selector: /dropdown|popover|tooltip|bubble/i, property: "box-shadow" } },
+  // nubbin은 팝오버·드롭다운의 꼬리다
+  { id: "popup-shadow", label: "드롭다운·팝오버·툴팁 그림자", mode: "native", match: { selector: /dropdown|popover|tooltip|bubble|nubbin/i, property: "box-shadow" } },
   { id: "tooltip-background", label: "툴팁 배경", mode: "native", match: { selector: /tooltip|bubble/i, property: "background" } },
   { id: "tooltip-font-size", label: "툴팁 글자 크기", mode: "native", match: { selector: /tooltip|bubble/i, property: "font-size" } },
   { id: "card-shadow", label: "native lightning-card 그림자", mode: "native", match: { selector: /card/i, property: "box-shadow" } },

@@ -1,0 +1,5 @@
+/* 정적 반영 검사용 기본 컴포넌트 native CSS (lightning-base-components의 button.slds.css 모양) */
+:host([data-render-mode="shadow"]) [part~="button"] {
+  border-radius: var(--slds-g-radius-border-2);
+  transition: border 0.1s linear;
+}

@@ -1,0 +1,20 @@
+/* 정적 반영 검사(tests/audit.test.ts)용 작은 SLDS 2 CSS */
+@layer shared {
+  :where(html) {
+    --slds-s-button-spacing-inline: var(--slds-g-spacing-4);
+  }
+}
+.slds-button {
+  border-radius: var(--slds-g-radius-border-2);
+  padding-inline: var(--slds-s-button-spacing-inline);
+  transition: border 0.1s linear;
+  line-height: 1.875rem;
+}
+.slds-spinner {
+  transition: opacity 0.2s ease;
+  font-size: 2rem;
+}
+.slds-badge {
+  z-index: 100;
+  opacity: 0.5;
+}
