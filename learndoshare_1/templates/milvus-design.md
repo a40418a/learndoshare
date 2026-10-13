@@ -65,6 +65,8 @@
 
 (`lwc/`부터는 `force-app/main/default/` 아래다. `.milvus/`는 CLI 작업 폴더라 커밋하지 않는다)
 
+커밋된 `.claude/settings.json`의 hook은 팀원에게도 별도 동의 없이 실행된다(폴더 신뢰 말고는 hook마다 묻지 않고, 그 사람의 권한으로 돈다). 그래서 밀버스 hook은 `milvus-check.mjs` 하나만 둔다.
+
 ## 5. 디자인 규칙
 
 - **기본 우선.** 브랜드 요청이 없으면 Salesforce 기본 모양에 브랜드 색·로고(org 테마)만 바꾼다

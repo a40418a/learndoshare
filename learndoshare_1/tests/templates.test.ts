@@ -27,6 +27,13 @@ test("milvus-design.md 3절에 배포 뒤 할 일 두 가지가 있다: VF 설�
   for (const w of ["App Manager", "milvusBrandLoader", "앱이 열릴 때 백그라운드로 로드"]) assert.ok(s3.includes(w), w);
 });
 
+test("milvus-design.md 4절에 커밋된 hook은 팀원에게도 별도 동의 없이 실행된다는 안내가 있다(설계 7.2)", () => {
+  const s4 = section(design, 4);
+  assert.match(s4, /hook은[^\n]*팀원에게도 별도 동의 없이 실행된다/);
+  // 그래서 hook은 하나만 둔다
+  assert.match(s4, /hook은 `milvus-check\.mjs` 하나만 둔다/);
+});
+
 test("SKILL.md frontmatter에 name과 description이 있다", () => {
   const fm = /^---\n([\s\S]*?)\n---\n/.exec(skill)?.[1] ?? "";
   assert.match(fm, /^name: milvus-brand$/m);
