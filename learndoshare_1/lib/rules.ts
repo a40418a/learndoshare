@@ -127,8 +127,8 @@ function focusShadowOk(value: string): boolean {
   );
 }
 
-// 선언 하나의 문제. [규칙, 메시지] 또는 undefined
-function declProblem(name: string, value: string, ctx: RuleContext): [string, string] | undefined {
+// 선언 하나의 문제. [규칙, 메시지] 또는 undefined. Storybook "원본과 hook" 보기(scripts/generate-slds-catalog.ts)도 hook마다 부른다
+export function declProblem(name: string, value: string, ctx: RuleContext): [string, string] | undefined {
   if (!name.startsWith("--")) {
     return ALLOWED_PLAIN_PROPS.includes(name)
       ? undefined

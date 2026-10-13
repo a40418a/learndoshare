@@ -9,7 +9,7 @@ import type { SpecItem } from "../../lib/spec-items.ts";
 import type { Decl } from "./classify.ts";
 
 export type Status = "reached" | "bridge" | "gap" | "fixed" | "n/a";
-type Mode = "now" | "native";
+export type Mode = "now" | "native";
 type Count = { reached: number; total: number };
 export type Gap = { comp: string; item: string; selector: string; prop: string; value: string };
 export type Report = {
@@ -18,7 +18,7 @@ export type Report = {
   gaps: Gap[];
 };
 
-const RANK: Status[] = ["n/a", "reached", "bridge", "fixed", "gap"];
+export const RANK: Status[] = ["n/a", "reached", "bridge", "fixed", "gap"];
 // 컨트롤 높이 대상(설계 5.6): 버튼, 입력, 선택, 버튼형 라디오·체크박스. 기본 컴포넌트 native CSS는 part 속성으로 고른다
 const CONTROLS = /\.slds-(button|input|input_faux|select|radio_button|checkbox_button)(?![\w-])|\[part~?=['"]?(button|input)['"]?\]/;
 // 음수·0·퍼센트·1px·env()는 배치용 값이라 밀도에서 뺀다 (연구 cov2.cjs의 relevant와 같은 취지)
@@ -122,7 +122,7 @@ function ruleItem(d: Decl, sameRule: Decl[]): string | null {
 const offFamily = (d: Decl) =>
   d.cat === "radius" && /var\(\s*--slds-[gs]-/.test(d.value) && !/--slds-g-radius-border|--slds-s-[\w-]*radius/.test(d.value);
 
-const modesOf = (d: Decl): Mode[] =>
+export const modesOf = (d: Pick<Decl, "src" | "file" | "selector">): Mode[] =>
   d.src === "slds2" || /\.lbc\.synthetic\.css$/.test(d.file)
     ? ["now"]
     : /\.slds\.css$/.test(d.file) || /data-render-mode/.test(d.selector)
@@ -168,7 +168,10 @@ const isFixed = (d: Decl, mode: Mode, fixed: FixedItem[]) => fixed.some((f) => (
 /** 선언이 쓰이는 모드에서 맞는 고정 항목. --check가 새 하드코딩 줄에 붙인다 */
 export const fixedItemsOf = (d: Decl, fixed: FixedItem[]) => fixed.filter((f) => modesOf(d).some((mode) => isFixed(d, mode, [f])));
 
-export function buildReport(decls: Decl[], items: SpecItem[], bridgeCss: string, fixed: FixedItem[]): Report {
+/** 선언 하나 × 명세 항목 × 모드의 판정. buildReport와 Storybook "원본과 hook" 보기(scripts/generate-slds-catalog.ts)가 쓴다 */
+export type Judged = { d: Decl; item: string; mode: Mode; status: Exclude<Status, "n/a"> };
+
+export function judge(decls: Decl[], items: SpecItem[], bridgeCss: string, fixed: FixedItem[]): Judged[] {
   const ids = new Set(items.map((i) => i.id));
   const itemsOfHook = new Map<string, string[]>();
   for (const i of items) for (const h of i.hooks) itemsOfHook.set(h, [...(itemsOfHook.get(h) ?? []), i.id]);
@@ -176,8 +179,7 @@ export function buildReport(decls: Decl[], items: SpecItem[], bridgeCss: string,
   // ponytail: 같은 규칙을 파일·선택자로 묶는다. 같은 선택자가 다른 @media에 또 있으면 한 규칙으로 본다(삼각형 판정에만 쓴다)
   const rules = Map.groupBy(decls, (d) => `${d.file} ${d.selector}`);
 
-  const status = new Map<string, Map<string, Record<Mode, Status>>>();
-  const gaps = new Map<string, Gap>();
+  const out: Judged[] = [];
   for (const d of decls) {
     if (d.kind === "keyword" || d.kind === "keyframes") continue;
     const hook = (d.kind === "g" || d.kind === "s") && !offFamily(d);
@@ -187,19 +189,28 @@ export function buildReport(decls: Decl[], items: SpecItem[], bridgeCss: string,
     // 곡선이 든 transition·animation shorthand는 시간과 곡선 두 항목에 넣는다
     const ruled = byRule === "motion-speed" && /^(transition|animation)$/.test(d.prop) && EASING.test(d.value) ? [byRule, "motion-easing"] : byRule ? [byRule] : [];
     const targets = new Set(byHook.length ? byHook : ruled.filter((i) => ids.has(i)));
-    const row = status.get(d.comp) ?? new Map<string, Record<Mode, Status>>();
     for (const item of targets) {
-      status.set(d.comp, row);
       for (const mode of modesOf(d)) {
-        const s: Status = hook ? "reached" : mode === "now" && bridged(d, item, bridge) ? "bridge" : isFixed(d, mode, fixed) ? "fixed" : "gap";
-        const cur = row.get(item) ?? { now: "n/a", native: "n/a" };
-        if (RANK.indexOf(s) > RANK.indexOf(cur[mode])) cur[mode] = s;
-        row.set(item, cur);
-        if (s === "gap") {
-          const g: Gap = { comp: d.comp, item, selector: d.selector, prop: d.prop, value: d.value };
-          gaps.set(JSON.stringify(g), g);
-        }
+        const status = hook ? "reached" : mode === "now" && bridged(d, item, bridge) ? "bridge" : isFixed(d, mode, fixed) ? "fixed" : "gap";
+        out.push({ d, item, mode, status });
       }
+    }
+  }
+  return out;
+}
+
+export function buildReport(decls: Decl[], items: SpecItem[], bridgeCss: string, fixed: FixedItem[]): Report {
+  const status = new Map<string, Map<string, Record<Mode, Status>>>();
+  const gaps = new Map<string, Gap>();
+  for (const { d, item, mode, status: s } of judge(decls, items, bridgeCss, fixed)) {
+    const row = status.get(d.comp) ?? new Map<string, Record<Mode, Status>>();
+    status.set(d.comp, row);
+    const cur = row.get(item) ?? { now: "n/a", native: "n/a" };
+    if (RANK.indexOf(s) > RANK.indexOf(cur[mode])) cur[mode] = s;
+    row.set(item, cur);
+    if (s === "gap") {
+      const g: Gap = { comp: d.comp, item, selector: d.selector, prop: d.prop, value: d.value };
+      gaps.set(JSON.stringify(g), g);
     }
   }
 
