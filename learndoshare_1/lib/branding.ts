@@ -43,6 +43,15 @@ export function readBranding(xml: string): { brandColor: string; brandImage?: st
   return brandImage ? { brandColor, brandImage } : { brandColor };
 }
 
+/**
+ * BRAND_IMAGE(/file-asset/<자산 이름>?v=…)의 자산 이름. --from-org 프로젝트는 org 값 그대로라 <브랜드>Logo로 가정하지 않는다(R26).
+ * 이름은 경로와 sf 인자에 들어가므로 Salesforce API 이름 규칙(브랜드 이름과 같다)에 맞지 않으면 undefined
+ */
+export function logoAsset(brandImage: string): string | undefined {
+  const asset = /^\/file-asset\/([^/?]+)(\?.*)?$/.exec(brandImage)?.[1];
+  return asset && isValidBrandName(asset) ? asset : undefined;
+}
+
 /** brandingSets/LEXTHEMING<name>.brandingSet-meta.xml. logo면 BRAND_IMAGE = /file-asset/<name>Logo?v=1 */
 export function writeBrandingSet(o: { name: string; brandColor: string; logo?: boolean }): string {
   assertName(o.name);
