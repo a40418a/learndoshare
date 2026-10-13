@@ -34,7 +34,15 @@ const platformModules: Plugin = {
   load: (id) => (id.startsWith(PREFIX) ? platformModule(id.slice(PREFIX.length)) : null)
 };
 
-export function lwcRollupOptions(o: { out: string; entries: Record<string, string>; modules: LwcModule[] }): RollupOptions {
+// LWC 해석기(@lwc/module-resolver)는 npm 모듈 기록을 import한 파일에서 위로 찾은 package.json 폴더 기준으로 찾는다.
+// 고객 프로젝트의 LWC가 import하면 그 기준은 고객 프로젝트 루트이고, pnpm은 이 패키지의 의존성을 거기 두지 않아 이름으로는 찾지 못한다.
+// npmFromPackage이면 이름 대신 이 패키지에서 찾은 폴더의 절대 경로를 기록으로 준다(milvus storybook).
+// 저장소 빌드(pnpm build:lwc)는 이름 기록 그대로다. 절대 경로로 바꾸면 LWC 엔진 사본이 둘에서 하나로 합쳐져 번들이 달라지므로 따로 확인한 뒤에 바꾼다
+const npmDir = (name: string): string => dirname(createRequire(import.meta.url).resolve(`${name}/package.json`));
+const ENGINE_MODULES = ["@lwc/engine-dom", "@lwc/synthetic-shadow", "@lwc/wire-service"];
+
+export function lwcRollupOptions(o: { out: string; entries: Record<string, string>; modules: LwcModule[]; npmFromPackage?: boolean }): RollupOptions {
+  const npm = (name: string) => ({ npm: o.npmFromPackage ? npmDir(name) : name });
   return {
     // 모든 컴포넌트를 한 번에 빌드해 LWC 엔진이 한 벌만 들어가게 한다
     input: o.entries,
@@ -62,7 +70,9 @@ export function lwcRollupOptions(o: { out: string; entries: Record<string, strin
         rootDir: dirname(resolve(Object.values(o.entries)[0])),
         // 일부 공식 컴포넌트(multiColumnSortingModal 등)가 lwc:is 동적 컴포넌트를 쓴다
         enableDynamicComponents: true,
-        modules: [...o.modules, { npm: "lightning-base-components" }]
+        // defaultModules는 플러그인 기본값(ENGINE_MODULES)과 같은 목록이다
+        defaultModules: ENGINE_MODULES.map(npm),
+        modules: [...o.modules, npm("lightning-base-components")]
       }),
       nodeResolve()
     ]
@@ -104,5 +114,4 @@ export const catalogModules = (examples: { name: string; rel: string }[], lbcDir
   examples.map(({ name, rel }) => ({ name, path: resolve(lbcDir, rel) }));
 
 // lightning-base-components의 컴포넌트 폴더(src/lightning). 설치된 패키지에서 찾으므로 저장소와 고객 프로젝트 모두 같다
-export const lightningBaseComponentsDir = (): string =>
-  join(dirname(createRequire(import.meta.url).resolve("lightning-base-components/package.json")), "src/lightning");
+export const lightningBaseComponentsDir = (): string => join(npmDir("lightning-base-components"), "src/lightning");
