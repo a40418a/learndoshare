@@ -289,6 +289,13 @@ export function checkUtilCss(css: string, file: string, ctx: RuleContext): Issue
     );
   }
 
+  if (decls.has(BACKDROP_S) && !decls.has(BACKDROP_G)) {
+    add(
+      "backdrop-pair",
+      `${BACKDROP_S}만 있고 ${BACKDROP_G}가 없다. SLDS 2는 이 g를 정의하지 않아 배경막이 투명해진다. 두 줄을 함께 쓴다: ${BACKDROP_G}: light-dark(color-mix(…), …); ${BACKDROP_S}: var(${BACKDROP_G});`,
+    );
+  }
+
   for (const [text, bgs] of contrastTargets(decls)) {
     const hex = lightHex(decls.get(text)!, decls);
     if (!hex) continue;

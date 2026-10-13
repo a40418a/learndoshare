@@ -124,6 +124,8 @@ test("모달 배경막은 s hook이 native용 g를 참조하고 g에 light-dark 
   }
   // g는 중립 색처럼 light-dark()로 쓴다
   assert.deepEqual(rulesOf("--slds-g-color-neutral-10-opacity-50: rgba(8, 7, 7, 0.6);"), ["neutral-light-dark"]);
+  // SLDS 2는 g를 정의하지 않으므로 s만 쓰면 배경막이 투명해진다
+  assert.deepEqual(rulesOf(s("var(--slds-g-color-neutral-10-opacity-50)")), ["backdrop-pair"]);
 });
 
 test("--slds-s-label-spacing은 기본 컴포넌트가 읽으므로 허용, 아무도 읽지 않는 이름은 거부", () => {
