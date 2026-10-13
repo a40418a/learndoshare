@@ -289,7 +289,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     id: "hover-selected",
     group: "색",
     label: "hover·선택 바탕",
-    description: "목록·표·메뉴의 hover와 선택 바탕",
+    description: "목록·표·메뉴의 hover와 선택 바탕. 세로 내비(navigation-list-vertical) 선택 바탕은 브리지로 바꾼다",
     examples: ["목록 hover를 회색으로"],
     hooks: [
       c("surface-container-2"),
@@ -300,7 +300,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
       s("pill-color-background-hover"),
       s("button-color-background-hover"),
     ],
-    bridgeVars: [],
+    bridgeVars: [B["nav-selected-background"]],
     limits: "native에서는 2개만 닿는다",
     input: "text",
   },
@@ -535,7 +535,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     group: "아이콘",
     label: "개체 아이콘 색",
     description:
-      "브리지가 클래스마다 아이콘 배경 hook을 다시 정의한다(원래 색이 기본값). 전체는 --milvus-icon-color-all, 개체 하나는 --milvus-icon-<종류>-<이름>(예: --milvus-icon-standard-account)",
+      "브리지가 클래스마다 아이콘 배경 hook을 다시 정의한다(원래 색이 기본값). 전체는 --milvus-icon-color-all, 개체 하나는 --milvus-icon-<종류>-<이름>(예: --milvus-icon-standard-account). icon-name `종류:이름`에서 `:`와 `_`를 `-`로 바꾼다(예: `standard:user_role` → `--milvus-icon-standard-user-role`)",
     examples: ["Account 아이콘을 브랜드 남색으로"],
     hooks: [],
     bridgeVars: [B["icon-color-all"]],

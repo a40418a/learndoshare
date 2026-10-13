@@ -72,18 +72,26 @@ export const FIXED_ITEMS: FixedItem[] = [
       value: OUT_OF_BAND,
     },
   },
-  // ④ 0.125rem 이하는 어디서나, 그보다 큰 값은 특수 영역(색 선택기 요약, 선택 그룹, 내비 드롭다운, Path, 서식 편집기 dd, markdown, 고정 머리글 표, 웰컴 매트, 설정 도우미, 페이지 템플릿)만
+  // ④ 0.125rem 이하는 어디서나, 그보다 큰 값은 특수 영역에서 흡수한 선택자·속성만(블루프린트 전체가 아니다)
   {
     id: "spacing-fine",
     label: "미세 간격(0.125rem 이하)과 특수 영역 간격",
     mode: "both",
     match: [
       { property: SPACING, value: FINE },
-      {
-        selector:
-          /\.slds-(color-picker__summary-button|listbox_selection-group|context-bar__dropdown-trigger|tabs_path__link|path|rich-text-editor__(textarea|output) dd|markdown|table_header-fixed_container|welcome-mat__tile_complete|setup-assistant__step-detail|template)/,
-        property: SPACING,
-      },
+      { selector: /\.slds-color-picker__summary-button(?![\w-])/, property: "padding-block" },
+      { selector: /\.slds-listbox_selection-group,/, property: "padding-inline-end" },
+      { selector: /\.slds-context-bar__dropdown-trigger \.slds-dropdown(?![\w-])/, property: "margin-top" },
+      { selector: /\.slds-tabs_path__link(?![\w-])/, property: "padding-inline-start" },
+      { selector: /\.slds-path_has-coaching \.slds-path__action(?![\w-])/, property: "padding-inline-start" },
+      { selector: /\.slds-path__item(:first-child|:last-child)?(,|$)/, property: ["margin-inline", "padding-inline"] },
+      { selector: /\.slds-rich-text-editor__(textarea|output) dd(,|$)/, property: "margin-inline-start" },
+      { selector: /\.slds-markdown (ul|ol|li:has\(> input\[type='checkbox'\]\)|blockquote)(,|$)/, property: ["margin-inline", "padding-inline-start"] },
+      { selector: /\.slds-table_header-fixed_container,/, property: "padding-block-start" },
+      { selector: /\.slds-welcome-mat__tile_complete \.slds-icon-action-check,/, property: "padding" },
+      { selector: /\.slds-setup-assistant__step-detail$/, property: "padding-inline-start" },
+      // 페이지 템플릿 간격 private 변수
+      { selector: /\.slds-template/, property: "padding", value: /^var\(--_slds-c-template[\w-]*-sizing-gap\)/ },
     ],
   },
   // ⑥ datepicker 날짜, 조건식 라벨, Path 코칭 제목, markdown, 섹션 제목
@@ -112,6 +120,13 @@ export const FIXED_ITEMS: FixedItem[] = [
   // ⑩ c hook(--slds-c-button-*-shadow-hover)이라 util.css로 못 바꾼다
   { id: "button-hover-shadow", label: "파괴·성공·인버스 버튼 hover 그림자", mode: "both", match: { selector: /\.slds-button_(destructive|text-destructive|success|inverse|icon-border-inverse):hover/, property: "box-shadow" } },
   { id: "misc-shadow", label: "색 선택기·패널 편집·아바타 이니셜 그림자", mode: "both", match: { selector: /\.slds-(color-picker__range-indicator|panel\.slds-is-editing|avatar__initials)/, property: ["box-shadow", "text-shadow"] } },
+  // ⑩ 결정 2(2026-10-12): 규칙 ⑩을 :hover로 좁혀 돌아온 kx 브레드크럼 눌림 축소 한 선언
+  {
+    id: "breadcrumb-press",
+    label: "브레드크럼 눌림 축소",
+    mode: "both",
+    match: { selector: /\[kx-scope='breadcrumbs-item'\]\[kx-type='underline'\] > a:active$/, property: "transform", value: /^scale\(0\.95\)$/ },
+  },
   // ⑪
   { id: "image-focus-shadow", label: "이미지 포커스 그림자", mode: "both", match: { selector: /\.slds-(image|file):focus/, property: "box-shadow" } },
   // ⑬
@@ -123,7 +138,7 @@ export const FIXED_ITEMS: FixedItem[] = [
     mode: "both",
     match: { selector: /\.slds-popover_brand-(top|left|bottom|right)/, property: ["border-block-start-width", "border-block-end-width", "border-inline-start-width", "border-inline-end-width"] },
   },
-  // ⑮ timeline 개체 색, 테마 배경 위 링크의 흰 반투명 글자, 세로 내비 선택 바탕, 표 hover 글자 자름 페이드·색 선택기 범위
+  // ⑮ timeline 개체 색, 테마 배경 위 링크의 흰 반투명 글자, 표 hover 글자 자름 페이드·색 선택기 범위. 세로 내비 선택 바탕은 브리지로 잇는다(--milvus-nav-selected-background)
   { id: "timeline-color", label: "timeline 항목 색", mode: "both", match: { selector: /\.slds-timeline__item_(call|email|event|task)::before/, property: "background" } },
   {
     id: "theme-translucent-text",
@@ -131,7 +146,6 @@ export const FIXED_ITEMS: FixedItem[] = [
     mode: "both",
     match: { selector: /\.slds-theme_[\w-]+ a:not\(\.slds-button_neutral\)/, property: "color", value: /^rgb\(255, 255, 255, 0?\.\d+\)$/ },
   },
-  { id: "nav-vertical-hover", label: "세로 내비 hover 바탕", mode: "both", match: { selector: /\.slds-navigation-list-vertical/, property: "background" } },
   { id: "fade-gradient", label: "글자 자름 페이드·색 선택기 그라데이션", mode: "both", match: { selector: /\.slds-truncate::after|\.slds-color-picker__custom-range::before/, property: "background", value: /linear-gradient\(/ } },
 
   // native 전환 뒤 생기는 고정 (9.2의 c hook을 열면 일부 메울 수 있음)

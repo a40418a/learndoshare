@@ -126,6 +126,23 @@ const LISTED: BridgeTarget[] = [
     ],
     "font-weight",
   ),
+  // 세로 내비 선택 바탕(2026-10-12 결정). 원본 선택자 목록에 같은 부분이 두 번 있어 그대로 둔다
+  T(
+    "nav-selected-background",
+    [
+      [
+        ".slds-navigation-list-vertical .slds-is-active .slds-navigation-list-vertical__action",
+        ".slds-navigation-list--vertical .slds-is-active .slds-navigation-list-vertical__action",
+        ".slds-navigation-list_vertical .slds-is-active .slds-navigation-list-vertical__action",
+        ".slds-navigation-list--vertical .slds-is-active .slds-navigation-list-vertical__action",
+        ".slds-navigation-list-vertical .slds-is-active .slds-navigation-list--vertical__action",
+        ".slds-navigation-list--vertical .slds-is-active .slds-navigation-list--vertical__action",
+        ".slds-navigation-list_vertical .slds-is-active .slds-navigation-list--vertical__action",
+        ".slds-navigation-list--vertical .slds-is-active .slds-navigation-list--vertical__action",
+      ].join(", "),
+    ],
+    "background-color",
+  ),
 ];
 
 // 바꾸지 않는 움직임: 스피너(점별 지연이 1000ms 기준), Agentforce 영역(고정 목록)

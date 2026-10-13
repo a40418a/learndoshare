@@ -145,6 +145,21 @@ test("SPEC_ITEMS의 모든 bridgeVars가 생성된 CSS에서 읽힌다", () => {
     [" | .slds-section-title_divider, .slds-section-title--divider", "letter-spacing", BRIDGE_VARS["caps-letter-spacing"]],
     [" | .slds-is-sortable__icon", "width", BRIDGE_VARS["sort-icon-size"]],
     [" | .slds-is-sortable__icon", "height", BRIDGE_VARS["sort-icon-size"]],
+    // 세로 내비 선택 바탕(2026-10-12 결정). 원본 선택자 목록 그대로(같은 부분이 두 번 나온다)
+    [
+      ` | ${[
+        ".slds-navigation-list-vertical .slds-is-active .slds-navigation-list-vertical__action",
+        ".slds-navigation-list--vertical .slds-is-active .slds-navigation-list-vertical__action",
+        ".slds-navigation-list_vertical .slds-is-active .slds-navigation-list-vertical__action",
+        ".slds-navigation-list--vertical .slds-is-active .slds-navigation-list-vertical__action",
+        ".slds-navigation-list-vertical .slds-is-active .slds-navigation-list--vertical__action",
+        ".slds-navigation-list--vertical .slds-is-active .slds-navigation-list--vertical__action",
+        ".slds-navigation-list_vertical .slds-is-active .slds-navigation-list--vertical__action",
+        ".slds-navigation-list--vertical .slds-is-active .slds-navigation-list--vertical__action",
+      ].join(", ")}`,
+      "background-color",
+      BRIDGE_VARS["nav-selected-background"],
+    ],
   ];
   assert.deepEqual(expected.filter(([key, prop, v]) => !reads(key, prop, v)), []);
   // 작은 화면의 full 모달(100%·최소 0)은 전체 화면이라 바꾸지 않는다

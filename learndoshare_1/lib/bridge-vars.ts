@@ -30,6 +30,8 @@ export const BRIDGE_VARS: Record<string, string> = {
   "cursor-disabled": "--milvus-cursor-disabled",
   "link-decoration-hover": "--milvus-link-decoration-hover",
   "nubbin-shadow": "--milvus-nubbin-shadow",
+  // 색: 세로 내비 선택 바탕(SLDS 2 리터럴 rgb(21, 137, 238, 0.1), hook 없음)
+  "nav-selected-background": "--milvus-nav-selected-background",
   // 아이콘
   "icon-color-all": "--milvus-icon-color-all",
 };

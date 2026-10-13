@@ -41,6 +41,10 @@
         "now": "reached",
         "native": "n/a"
       },
+      "hover-press": {
+        "now": "fixed",
+        "native": "n/a"
+      },
       "motion-speed": {
         "now": "fixed",
         "native": "n/a"
@@ -4558,7 +4562,7 @@
         "native": "n/a"
       },
       "hover-selected": {
-        "now": "fixed",
+        "now": "bridge",
         "native": "n/a"
       },
       "border-width": {
@@ -9164,7 +9168,7 @@
     },
     "hover-selected": {
       "now": {
-        "reached": 65,
+        "reached": 66,
         "total": 70
       },
       "native": {
@@ -9285,7 +9289,7 @@
     "hover-press": {
       "now": {
         "reached": 7,
-        "total": 9
+        "total": 10
       },
       "native": {
         "reached": 6,

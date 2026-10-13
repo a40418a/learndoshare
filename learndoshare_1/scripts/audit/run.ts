@@ -2,7 +2,7 @@
 //   --write  audit/report.json(컴포넌트·명세 항목별 반영 상태, 패키지에 들어감)과 audit/baseline.json(비교 기준)을 쓴다
 //   --check  다음이면 1로 끝난다
 //            1. FIXED_ITEMS에 없는 빈틈이 있다(기준 파일과 상관없음)
-//            2. 기준 대비 새 하드코딩, hook 변화, native 지원 목록 변화가 있거나 브리지 선택자가 원본에서 사라졌다
+//            2. 기준 대비 새 하드코딩(고정 항목이 흡수하면 그 라벨을 붙인다), hook 변화, native 지원 목록 변화가 있거나 브리지 선택자가 원본에서 사라졌다
 // 결과에는 개발자 PC의 경로를 넣지 않는다. 파일은 패키지 기준 상대 경로다
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createRequire } from "node:module";
@@ -13,7 +13,7 @@ import { FIXED_ITEMS } from "../../lib/fixed-list.ts";
 import { buildHooksIndex } from "../../lib/hooks-index.ts";
 import { SPEC_ITEMS } from "../../lib/spec-items.ts";
 import { classify, type Decl, type LbcFile } from "./classify.ts";
-import { bridgeSelectors, buildReport } from "./report.ts";
+import { bridgeSelectors, buildReport, fixedItemsOf } from "./report.ts";
 
 export type Sources = { sldsCss: string; lbcFiles: LbcFile[]; bridgeCss: string; nativeList: string[] };
 /** hardcoded: hook을 읽지 않는 선언 "출처 컴포넌트 속성: 값"별 개수. 줄 번호·선택자는 넣지 않아 원본의 위치 이동에는 흔들리지 않는다 */
@@ -47,11 +47,12 @@ export function readSources(): Sources {
   };
 }
 
+const hardcodedKey = (d: Decl) => `${d.src} ${d.comp} ${d.prop}: ${d.value}`;
 function snapshot(src: Sources, decls: Decl[]): Baseline {
   const hardcoded: Record<string, number> = {};
   for (const d of decls) {
     if (d.kind === "g" || d.kind === "s" || d.kind === "keyword") continue;
-    const key = `${d.src} ${d.comp} ${d.prop}: ${d.value}`;
+    const key = hardcodedKey(d);
     hardcoded[key] = (hardcoded[key] ?? 0) + 1;
   }
   const index = buildHooksIndex({ sldsCss: src.sldsCss, lbcCss: src.lbcFiles.map((f) => f.css) });
@@ -95,7 +96,13 @@ export function runAudit(argv: string[], src: Sources, dir: string): { code: num
   if (existsSync(baselineFile)) {
     const before = JSON.parse(readFileSync(baselineFile, "utf8")) as Baseline;
     const added = Object.entries(current.hardcoded).filter(([key, n]) => n > (before.hardcoded[key] ?? 0));
-    changes.push(...shown(added.map(([key]) => `새 하드코딩: ${key}`)));
+    // 고정 항목이 이미 흡수하는 새 하드코딩은 빈틈으로 안 보인다. --write로 기준에 넣기 전에 사람이 합의 범위인지 보도록 라벨을 붙인다
+    const byKey = Map.groupBy(decls, hardcodedKey);
+    const fixedNote = (key: string) => {
+      const labels = [...new Set((byKey.get(key) ?? []).flatMap((d) => fixedItemsOf(d, FIXED_ITEMS).map((f) => f.label)))];
+      return labels.length ? ` (고정: ${labels.join(", ")})` : "";
+    };
+    changes.push(...shown(added.map(([key]) => `새 하드코딩: ${key}${fixedNote(key)}`)));
     changes.push(...setChange("hook 변화", before.hooks, current.hooks));
     changes.push(...setChange("native 지원 목록 변화", before.nativeShadowEnabledComponents, current.nativeShadowEnabledComponents));
   } else {

@@ -4808,10 +4808,15 @@ button, input, optgroup, select, textarea {
   border-bottom: var(--slds-g-sizing-border-1) solid transparent;
 }
 .slds-navigation-list-vertical .slds-is-active .slds-navigation-list-vertical__action, .slds-navigation-list--vertical .slds-is-active .slds-navigation-list-vertical__action, .slds-navigation-list_vertical .slds-is-active .slds-navigation-list-vertical__action, .slds-navigation-list--vertical .slds-is-active .slds-navigation-list-vertical__action, .slds-navigation-list-vertical .slds-is-active .slds-navigation-list--vertical__action, .slds-navigation-list--vertical .slds-is-active .slds-navigation-list--vertical__action, .slds-navigation-list_vertical .slds-is-active .slds-navigation-list--vertical__action, .slds-navigation-list--vertical .slds-is-active .slds-navigation-list--vertical__action {
+  background-color: var(--milvus-nav-selected-background, rgb(21, 137, 238, 0.1));
   font-weight: var(--slds-s-navigation-font-weight);
 }
 .slds-navigation-list-vertical_shade .slds-is-active .slds-navigation-list-vertical__action, .slds-navigation-list-vertical--shade .slds-is-active .slds-navigation-list-vertical__action, .slds-navigation-list-vertical--shade .slds-is-active .slds-navigation-list-vertical__action, .slds-navigation-list_vertical-inverse .slds-is-active .slds-navigation-list-vertical__action, .slds-navigation-list--vertical-inverse .slds-is-active .slds-navigation-list-vertical__action, .slds-navigation-list--vertical-inverse .slds-is-active .slds-navigation-list-vertical__action, .slds-navigation-list-vertical_shade .slds-is-active .slds-navigation-list--vertical__action, .slds-navigation-list-vertical--shade .slds-is-active .slds-navigation-list--vertical__action, .slds-navigation-list-vertical--shade .slds-is-active .slds-navigation-list--vertical__action, .slds-navigation-list_vertical-inverse .slds-is-active .slds-navigation-list--vertical__action, .slds-navigation-list--vertical-inverse .slds-is-active .slds-navigation-list--vertical__action, .slds-navigation-list--vertical-inverse .slds-is-active .slds-navigation-list--vertical__action {
+  background-color: var(--slds-g-color-surface-container-1);
   font-weight: var(--slds-s-navigation-font-weight);
+}
+.slds-navigation-list-vertical_shade .slds-navigation-list-vertical__action:hover, .slds-navigation-list-vertical--shade .slds-navigation-list-vertical__action:hover, .slds-navigation-list-vertical--shade .slds-navigation-list-vertical__action:hover, .slds-navigation-list_vertical-inverse .slds-navigation-list-vertical__action:hover, .slds-navigation-list--vertical-inverse .slds-navigation-list-vertical__action:hover, .slds-navigation-list--vertical-inverse .slds-navigation-list-vertical__action:hover, .slds-navigation-list-vertical_shade .slds-navigation-list--vertical__action:hover, .slds-navigation-list-vertical--shade .slds-navigation-list--vertical__action:hover, .slds-navigation-list-vertical--shade .slds-navigation-list--vertical__action:hover, .slds-navigation-list_vertical-inverse .slds-navigation-list--vertical__action:hover, .slds-navigation-list--vertical-inverse .slds-navigation-list--vertical__action:hover, .slds-navigation-list--vertical-inverse .slds-navigation-list--vertical__action:hover {
+  background-color: var(--slds-g-color-surface-container-1);
 }
 .slds-nav-vertical__item:has(:focus-visible)::before, .slds-nav-vertical__action_overflow:focus-visible, .slds-nav-vertical__action--overflow:focus-visible {
   box-shadow: var(--slds-g-shadow-inset-focus-1);
@@ -5077,12 +5082,18 @@ button, input, optgroup, select, textarea {
 .slds-table_fixed-layout .slds-cell-shrink, .slds-table--fixed-layout .slds-cell-shrink {
   width: var(--slds-g-sizing-3);
 }
+.slds-is-sortable .slds-th__action:hover, .slds-is-sortable .slds-th__action:focus, .slds-is-sortable.slds-has-focus .slds-th__action, .slds-is-sortable.slds-has-focus .slds-th__action:hover, .slds-is-sortable.slds-has-focus .slds-th__action:focus {
+  background-color: var(--slds-s-table-header-color-background-hover);
+}
 .slds-th__action {
   height: 2rem;
 }
 .slds-th__action-button {
   min-width: var(--slds-g-sizing-7);
   min-height: var(--slds-g-sizing-7);
+}
+.slds-th__action-button > .slds-button:hover {
+  background-color: transparent;
 }
 .slds-is-sortable__icon {
   width: var(--milvus-sort-icon-size, 0.75rem);
@@ -5113,10 +5124,14 @@ button, input, optgroup, select, textarea {
 .slds-table_edit_container:focus::before, .slds-table--edit_container:focus::before {
   box-shadow: 0 0 0 4px var(--slds-g-color-accent-2) inset;
 }
+.slds-table_edit_container:focus .slds-table_edit_container-message, .slds-table--edit_container:focus .slds-table--edit--container-message {
+  background-color: var(--slds-g-color-surface-container-1);
+}
 .slds-has-focus .slds-th__action {
   box-shadow: var(--slds-g-shadow-insetinverse-focus-1);
 }
 .slds-has-focus.slds-is-resizable .slds-th__action, .slds-has-focus.slds-is-resizable .slds-th__action:focus, .slds-has-focus.slds-is-resizable .slds-th__action:hover, .slds-has-focus.slds-is-resizable .slds-th__action:focus:hover, .slds-is-resizable .slds-th__action:focus, .slds-is-resizable .slds-th__action:focus:hover {
+  background-color: var(--slds-g-color-surface-container-1);
   box-shadow: var(--slds-g-shadow-insetinverse-focus-1), var(--slds-g-color-accent-2) -0.25rem 0 0 inset;
 }
 .slds-has-focus.slds-is-resizable .slds-th__action:has(.slds-button_icon-bare:focus-visible), .slds-has-focus.slds-is-resizable .slds-th__action:has(.slds-button--icon-bare:focus-visible), .slds-has-focus.slds-is-resizable .slds-th__action:focus:has(.slds-button_icon-bare:focus-visible), .slds-has-focus.slds-is-resizable .slds-th__action:focus:has(.slds-button--icon-bare:focus-visible), .slds-has-focus.slds-is-resizable .slds-th__action:hover:has(.slds-button_icon-bare:focus-visible), .slds-has-focus.slds-is-resizable .slds-th__action:hover:has(.slds-button--icon-bare:focus-visible), .slds-has-focus.slds-is-resizable .slds-th__action:focus:hover:has(.slds-button_icon-bare:focus-visible), .slds-has-focus.slds-is-resizable .slds-th__action:focus:hover:has(.slds-button--icon-bare:focus-visible), .slds-is-resizable .slds-th__action:focus:has(.slds-button_icon-bare:focus-visible), .slds-is-resizable .slds-th__action:focus:has(.slds-button--icon-bare:focus-visible), .slds-is-resizable .slds-th__action:focus:hover:has(.slds-button_icon-bare:focus-visible), .slds-is-resizable .slds-th__action:focus:hover:has(.slds-button--icon-bare:focus-visible) {
@@ -5126,6 +5141,7 @@ button, input, optgroup, select, textarea {
   box-shadow: none;
 }
 .slds-table .slds-cell-edit.slds-has-focus {
+  background-color: var(--slds-g-color-surface-container-1);
   box-shadow: var(--slds-g-shadow-inset-focus-1);
 }
 .slds-table .slds-cell-edit.slds-has-focus:hover {
@@ -5133,9 +5149,11 @@ button, input, optgroup, select, textarea {
 }
 .slds-table .slds-cell-edit.slds-is-edited, .slds-table .slds-cell-edit.slds-is-edited:hover {
   font-weight: 600;
+  background-color: var(--_slds-c-datatable-color-background-edit);
 }
 .slds-table .slds-cell-edit.slds-has-error, .slds-table .slds-cell-edit.slds-has-error:hover {
   font-weight: 600;
+  background-color: var(--_slds-c-datatable-color-background-error);
   box-shadow: var(--slds-g-color-error-1) 0 0 0 var(--slds-g-sizing-border-2) inset;
 }
 .slds-cell-edit__button {
@@ -5146,12 +5164,18 @@ button, input, optgroup, select, textarea {
   box-shadow: none;
 }
 .slds-no-cell-focus .slds-has-focus .slds-th__action, .slds-no-cell-focus .slds-has-focus .slds-th__action:hover, .slds-no-cell-focus .slds-has-focus .slds-th__action:focus, .slds-no-cell-focus .slds-has-focus .slds-th__action:focus:hover {
+  background-color: var(--slds-g-color-surface-container-1);
   box-shadow: none;
 }
 .slds-no-cell-focus .slds-has-focus.slds-is-resizable:hover .slds-th__action {
+  background-color: var(--slds-g-color-surface-container-1);
   box-shadow: var(--slds-g-color-border-1) -0.25rem 0 0 inset;
 }
+.slds-no-cell-focus .slds-is-edited, .slds-no-cell-focus .slds-is-edited:hover {
+  background-color: var(--_slds-c-datatable-color-background-edit);
+}
 .slds-no-cell-focus .slds-has-error, .slds-no-cell-focus .slds-has-error:hover {
+  background-color: var(--slds-g-color-palette-yellow-90);
   box-shadow: var(--slds-g-color-error-1) 0 0 0 var(--slds-g-sizing-border-2) inset;
 }
 .slds-popover_edit, .slds-popover--edit {
@@ -5193,6 +5217,7 @@ button, input, optgroup, select, textarea {
   box-shadow: var(--slds-g-color-accent-1) -4px 0 0 inset, var(--slds-g-shadow-inset-focus-1);
 }
 .slds-tree [aria-disabled='true'] .slds-tree__item.slds-is-hovered, .slds-tree [aria-disabled='true'] .slds-tree__item:hover {
+  background-color: transparent;
   cursor: var(--milvus-cursor-disabled, default);
 }
 [aria-expanded='false'] > .slds-tree__item .slds-button__icon {
@@ -5213,6 +5238,9 @@ button, input, optgroup, select, textarea {
 .slds-section__title-action {
   cursor: pointer;
   width: 100%;
+}
+.slds-section__title-action:hover, .slds-section__title-action:focus, .slds-section__title-action:active {
+  background-color: var(--slds-g-color-surface-container-2);
 }
 .slds-section__content {
   height: 0;
@@ -5388,13 +5416,16 @@ button, input, optgroup, select, textarea {
   border-color: transparent;
 }
 .slds-list_vertical.slds-has-dividers > .slds-list__item:hover, .slds-list--vertical.slds-has-dividers > .slds-list__item:hover {
+  background-color: var(--slds-g-color-surface-container-2);
   cursor: pointer;
 }
 .slds-list_vertical.slds-has-dividers > .slds-list__item:active, .slds-list--vertical.slds-has-dividers > .slds-list__item:active {
+  background-color: var(--slds-g-color-surface-container-2);
   box-shadow: var(--slds-g-color-border-1) 0 -1px 0 inset;
 }
 .slds-list_vertical.slds-has-dividers > .slds-list__item.slds-is-selected, .slds-list--vertical.slds-has-dividers > .slds-list__item.slds-is-selected {
   box-shadow: var(--slds-g-color-accent-2) 0 0 0 1px inset;
+  background-color: var(--slds-g-color-surface-container-2);
 }
 .slds-list_vertical.slds-has-dividers > .slds-list__item.slds-is-selected:hover, .slds-list--vertical.slds-has-dividers > .slds-list__item.slds-is-selected:hover, .slds-list_vertical.slds-has-dividers > .slds-list__item.slds-is-selected:focus, .slds-list--vertical.slds-has-dividers > .slds-list__item.slds-is-selected:focus {
   box-shadow: var(--slds-g-color-accent-1) 0 -2px 0 inset, var(--slds-g-color-accent-1) 0 0 0 1px inset;
@@ -5427,13 +5458,16 @@ button, input, optgroup, select, textarea {
   border-radius: var(--slds-g-radius-border-2);
 }
 .slds-has-list-interactions > .slds-list__item:hover, .slds-has-list-interactions > .slds-item:hover {
+  background-color: var(--slds-g-color-surface-container-2);
   cursor: pointer;
 }
 .slds-has-list-interactions > .slds-list__item:active, .slds-has-list-interactions > .slds-item:active {
+  background-color: var(--slds-g-color-surface-container-2);
   box-shadow: var(--slds-g-color-border-1) 0 -1px 0 inset;
 }
 .slds-has-list-interactions > .slds-list__item.slds-is-selected, .slds-has-list-interactions > .slds-item.slds-is-selected {
   box-shadow: var(--slds-g-color-accent-2) 0 0 0 1px inset;
+  background-color: var(--slds-g-color-surface-container-2);
 }
 .slds-has-list-interactions > .slds-list__item.slds-is-selected:hover, .slds-has-list-interactions > .slds-list__item.slds-is-selected:focus, .slds-has-list-interactions > .slds-item.slds-is-selected:hover, .slds-has-list-interactions > .slds-item.slds-is-selected:focus {
   box-shadow: var(--slds-g-color-accent-1) 0 -2px 0 inset, var(--slds-g-color-accent-1) 0 0 0 1px inset;
@@ -7175,6 +7209,18 @@ button, input, optgroup, select, textarea {
 }
 .slds-is-visually-empty {
   width: 0;
+}
+.slds-subtheme-agentic .slds-button.slds-button_brand:not(:disabled):hover, .slds-subtheme-agentic .slds-button.slds-button--brand:not(:disabled):hover, .slds-subtheme-agentic .slds-button_icon.slds-button_icon-brand:not(:disabled):hover, .slds-subtheme-agentic .slds-button--icon.slds-button--icon-brand:not(:disabled):hover {
+  background-color: #032cbf;
+}
+.slds-subtheme-agentic .slds-button.slds-button_neutral:not(:disabled):hover, .slds-subtheme-agentic .slds-button.slds-button--neutral:not(:disabled):hover, .slds-subtheme-agentic .slds-button.slds-button_neutral:not(:disabled):active, .slds-subtheme-agentic .slds-button.slds-button--neutral:not(:disabled):active, .slds-subtheme-agentic .slds-button_icon.slds-button_icon-border-filled:not(:disabled):hover, .slds-subtheme-agentic .slds-button--icon.slds-button--icon-border-filled:not(:disabled):hover, .slds-subtheme-agentic .slds-button_icon.slds-button_icon-border-filled:not(:disabled):active, .slds-subtheme-agentic .slds-button--icon.slds-button--icon-border-filled:not(:disabled):active, .slds-subtheme-agentic .slds-button_icon.slds-button_icon-border:not(:disabled):hover, .slds-subtheme-agentic .slds-button--icon.slds-button--icon-border:not(:disabled):hover, .slds-subtheme-agentic .slds-button_icon.slds-button_icon-border:not(:disabled):active, .slds-subtheme-agentic .slds-button--icon.slds-button--icon-border:not(:disabled):active {
+  background-color: hsl(0, 0%, 100%, 1);
+}
+.slds-subtheme-agentic .slds-button.slds-button_neutral:not(:disabled):hover, .slds-subtheme-agentic .slds-button.slds-button--neutral:not(:disabled):hover {
+  background-color: hsl(0, 0%, 100%, 1);
+}
+.slds-subtheme-agentic .slds-button.slds-button_neutral:not(:disabled):active, .slds-subtheme-agentic .slds-button.slds-button--neutral:not(:disabled):active {
+  background-color: hsl(217, 100%, 96%, 1);
 }
 .slds-subtheme-agentic .slds-button.slds-button_neutral:not(:disabled):hover, .slds-subtheme-agentic .slds-button.slds-button--neutral:not(:disabled):hover, .slds-subtheme-agentic .slds-button.slds-button_brand:not(:disabled):hover, .slds-subtheme-agentic .slds-button.slds-button--brand:not(:disabled):hover {
   box-shadow: 0 0 8px 2px color-mix(in oklab, var(--slds-g-color-palette-purple-50), transparent 85%);

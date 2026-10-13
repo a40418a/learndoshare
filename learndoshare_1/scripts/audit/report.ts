@@ -27,12 +27,15 @@ const GEOMETRY = /^(-|0(px|rem|em)?$)|\*\s*-1|%|^1px$|env\(/;
 const EASING = /\b(ease(-in|-out|-in-out)?|linear|step-start|step-end)\b|\b(cubic-bezier|steps)\(/;
 
 // 브랜드 항목이 아닌 선언 (2026-10-12 사용자 결정, 설계 9.6의 4). 항목에서 빼면 배정되는 항목이 없어 세지 않는다
-// - 간격: em만 쓴 들여쓰기(글자 크기 배수), auto가 든 margin(가운데·오른쪽 정렬), revert 기본값
+// - 간격: em만 쓴 들여쓰기(글자 크기 배수), 0과 auto만 쓴 margin(가운데·오른쪽 정렬), revert 기본값
 const EM_ONLY = /^\d*\.?\d+em( \d*\.?\d+em)*$/;
-// - 컨트롤 높이: 숨긴 입력(선택자 끝이 [type='checkbox'|'radio'])과 트리 표 버튼
+const AUTO_ALIGN = /^(?=.*\bauto\b)(0|auto)( (0|auto))*$/;
+// - 컨트롤 높이: 숨긴 입력(선택자 끝이 [type='checkbox'|'radio'])과 트리 표(table_tree) 안 트리 버튼
 const HIDDEN_INPUT = /\[type=['"]?(checkbox|radio)['"]?\]$/;
-// - hover·눌림: 뒤집기(rotate), 가운데 맞춤(translate -50%), 확대(scale). 떠오름(translateY(-2px) 등)은 남는다
+const TREE_TABLE_BUTTON = /\.slds-table(_|--)tree[^,]*\.slds-tree__item/;
+// - hover·눌림: :hover의 뒤집기(rotate), 가운데 맞춤(translate -50%), 확대(scale). 떠오름(-50%가 아닌 translate)이 섞인 값과 :active 눌림은 남는다
 const SHAPE_MOTION = /rotate|scale|translate[XY]?\(\s*-50%/;
+const LIFT = /translate[XY]?\(\s*(?!-50%)/;
 // - 글자 크기: 상대 크기(em·%). var() 기본값도 본다
 const RELATIVE_SIZE = /^\d*\.?\d+(em|%)$/;
 // - 색: 이미지(url(), 이름에 image가 든 변수), 색이 없는 값(transparent·currentColor·시스템 색·color-mix·0 0, 색을 적지 않은 border)
@@ -74,7 +77,8 @@ function ruleItem(d: Decl, sameRule: Decl[]): string | null {
     case "shadow":
       return /:focus/.test(sel) ? "focus-ring" : hoverOrActive ? "hover-press" : "shadow";
     case "transform":
-      return hoverOrActive && !SHAPE_MOTION.test(d.value) ? "hover-press" : null;
+      if (!hoverOrActive) return null;
+      return /:hover/.test(sel) && SHAPE_MOTION.test(d.value) && !LIFT.test(d.value) ? null : "hover-press";
     case "zIndex":
     case "opacity":
       return "fixed";
@@ -88,11 +92,11 @@ function ruleItem(d: Decl, sameRule: Decl[]): string | null {
     case "sizing":
       if (/icon/i.test(sel)) return "icon-size";
       if (CONTROLS.test(sel) && /height/.test(d.prop))
-        return list.comma(sel).every((p) => HIDDEN_INPUT.test(p)) || /\.slds-tree__item/.test(sel) ? null : "control-height";
+        return list.comma(sel).every((p) => HIDDEN_INPUT.test(p)) || TREE_TABLE_BUTTON.test(sel) ? null : "control-height";
       return /modal__container/.test(sel) && /width/.test(d.prop) ? "component" : null;
     case "spacing":
       if (!/^(padding|margin|gap|row-gap|column-gap)/.test(d.prop) || GEOMETRY.test(d.value)) return null;
-      return EM_ONLY.test(d.value) || (d.prop.startsWith("margin") && /\bauto\b/.test(d.value)) || /\brevert\b/.test(d.value) ? null : "density";
+      return EM_ONLY.test(d.value) || (d.prop.startsWith("margin") && AUTO_ALIGN.test(d.value)) || /\brevert\b/.test(d.value) ? null : "density";
     case "typography":
       if (d.prop === "line-height") return CONTROLS.test(sel) ? "control-height" : "line-height";
       if (d.prop === "letter-spacing") return "letter-spacing";
@@ -161,6 +165,8 @@ const matchesFixed = (d: Decl, item: FixedItem) =>
       (!m.value || m.value.test(d.value)),
   );
 const isFixed = (d: Decl, mode: Mode, fixed: FixedItem[]) => fixed.some((f) => (mode === "native" || f.mode === "both") && matchesFixed(d, f));
+/** 선언이 쓰이는 모드에서 맞는 고정 항목. --check가 새 하드코딩 줄에 붙인다 */
+export const fixedItemsOf = (d: Decl, fixed: FixedItem[]) => fixed.filter((f) => modesOf(d).some((mode) => isFixed(d, mode, [f])));
 
 export function buildReport(decls: Decl[], items: SpecItem[], bridgeCss: string, fixed: FixedItem[]): Report {
   const ids = new Set(items.map((i) => i.id));

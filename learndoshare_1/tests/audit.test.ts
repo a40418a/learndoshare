@@ -151,17 +151,17 @@ const NOT_BRAND: [string, string, string[]][] = [
     [".slds-b animation-duration motion-speed"],
   ],
   [
-    "④ em만 쓴 들여쓰기, auto가 든 margin, revert 기본값은 밀도가 아니다",
+    "④ em만 쓴 들여쓰기, 0과 auto만 쓴 margin(정렬), revert 기본값은 밀도가 아니다",
     `.slds-a { margin: 0 auto; } .slds-b { margin: 0 0 0 auto; } .slds-c { padding-inline-start: 4.5em; }
      .slds-d { margin-inline-end: var(--slds-c-d-spacing, revert); }
-     .slds-e { margin: 0.5rem; } .slds-f { padding-inline-start: 1.5rem; } .slds-g { padding: 1em 0.5rem; }`,
-    [".slds-e margin density", ".slds-f padding-inline-start density", ".slds-g padding density"],
+     .slds-e { margin: 0.5rem; } .slds-f { padding-inline-start: 1.5rem; } .slds-g { padding: 1em 0.5rem; } .slds-h { margin: 0.5rem auto; }`,
+    [".slds-e margin density", ".slds-f padding-inline-start density", ".slds-g padding density", ".slds-h margin density"],
   ],
   [
-    "⑥ 숨긴 입력(1px)과 트리 표 버튼은 컨트롤 높이가 아니다",
+    "⑥ 숨긴 입력(1px)과 트리 표 버튼은 컨트롤 높이가 아니다(표가 아닌 트리 버튼은 남는다)",
     `.slds-checkbox_button [type='checkbox'] { height: 1px; } .slds-table_tree .slds-tree__item > .slds-button { height: 1.5rem; }
-     .slds-checkbox_button { height: 2rem; } .slds-button { height: 1.5rem; }`,
-    [".slds-checkbox_button height control-height", ".slds-button height control-height"],
+     .slds-checkbox_button { height: 2rem; } .slds-button { height: 1.5rem; } .slds-tree .slds-tree__item > .slds-button { height: 2rem; }`,
+    [".slds-checkbox_button height control-height", ".slds-button height control-height", ".slds-tree .slds-tree__item > .slds-button height control-height"],
   ],
   [
     "⑨ 크기 hook으로 만든 원은 모서리가 아니다(두께 hook은 남는다)",
@@ -169,11 +169,11 @@ const NOT_BRAND: [string, string, string[]][] = [
     [".slds-a border-radius radius", ".slds-b border-radius radius"],
   ],
   [
-    "⑩ hover·눌림의 뒤집기·가운데 맞춤·scale transform은 hover·눌림 효과가 아니다(떠오름은 남는다)",
+    "⑩ hover의 뒤집기·가운데 맞춤·확대 transform은 hover·눌림 효과가 아니다(떠오름이 섞인 값과 :active 눌림은 남는다)",
     `.slds-path__nav .slds-is-complete:hover .slds-path__stage { transform: translate(-50%, -50%) rotateX(-180deg); }
-     .slds-image:hover::after { transform: translate(-50%, -50%); } .slds-a:active { transform: scale(0.95); }
-     .slds-b:hover { transform: translateY(-2px); }`,
-    [".slds-b:hover transform hover-press"],
+     .slds-image:hover::after { transform: translate(-50%, -50%); } .slds-d:hover { transform: scale(1.1, 1.1); }
+     .slds-a:active { transform: scale(0.95); } .slds-b:hover { transform: translateY(-2px); } .slds-c:hover { transform: translateY(-2px) scale(1.02); }`,
+    [".slds-a:active transform hover-press", ".slds-b:hover transform hover-press", ".slds-c:hover transform hover-press"],
   ],
   [
     "⑪ outline-offset은 포커스 링 모양이 아니다",
@@ -209,8 +209,10 @@ const NOT_BRAND: [string, string, string[]][] = [
      .slds-d { color: color-mix(in oklab, currentColor, transparent 90%); } .slds-e { background: 0 0; }
      .slds-f::before { border-block-end: 5px solid currentColor; } .slds-g { color: var(--slds-c-g-color, color-mix(in oklab, currentColor, transparent 50%)); }
      .slds-h { background: rgb(72, 195, 204); } .slds-i { background: linear-gradient(to right, rgb(250, 250, 249, 0) 0%, rgb(250, 250, 249, 1) 69%); }
-     .slds-j { color: grey; } .slds-k { border: 1px solid #dddbda; }`,
-    [".slds-h background surface", ".slds-i background surface", ".slds-j color text-color", ".slds-k border border-color"],
+     .slds-j { color: grey; } .slds-k { border: 1px solid #dddbda; }
+     .slds-l { border-block-end: 1px dotted; } .slds-m { border-block-end: 1px dotted #cccccc; }`,
+    // 색을 적지 않은 border(.slds-l)는 CSS 초기값 currentColor라 빠진다
+    [".slds-h background surface", ".slds-i background surface", ".slds-j color text-color", ".slds-k border border-color", ".slds-m border-block-end border-color"],
   ],
 ];
 for (const [name, sldsCss, kept] of NOT_BRAND) {
@@ -236,7 +238,12 @@ test("2026-10-12 합의 고정 항목은 그 묶음만 흡수하고 비슷한 �
     .slds-listbox_inline { margin-inline-start: 0.125rem; margin-inline-end: 0.25rem; }
     .slds-tree__item .slds-button { margin-block-start: 2px; }
     .slds-markdown blockquote { margin-inline-start: 1.25rem; }
-    .slds-card__body { padding: 0.75rem; }`;
+    .slds-card__body { padding: 0.75rem; }
+    [kx-scope='breadcrumbs-item'][kx-type='underline'] > a:active { transform: scale(0.95); }
+    .slds-pill:active { transform: scale(0.95); }
+    .slds-path__item { margin-inline-start: 0.375rem; }
+    .slds-path__title { padding: 0.5rem; }
+    .slds-markdown p { margin-block: 1rem; }`;
   const lbcFiles = [
     {
       comp: "toast",
@@ -268,8 +275,14 @@ test("2026-10-12 합의 고정 항목은 그 묶음만 흡수하고 비슷한 �
       css: `:host([data-render-mode="shadow"]) .slds-progress-ring { border-radius: 1.5rem; }
         :host([data-render-mode="shadow"]) .slds-progress-ring__content .slds-icon { width: 0.75rem; }`,
     },
-    // 툴팁·진행 링이 아닌 native 리터럴 반경은 빈틈으로 남는다
-    { comp: "card", file: "lightning-base-components/src/lightning/card/card.slds.css", css: `:host([data-render-mode="shadow"]) .slds-card { border-radius: 0.5rem; }` },
+    // 툴팁·진행 링이 아닌 native 리터럴 반경, 값 조건 밖의 native 커서(pointer)·색(hsl)은 빈틈으로 남는다
+    {
+      comp: "card",
+      file: "lightning-base-components/src/lightning/card/card.slds.css",
+      css: `:host([data-render-mode="shadow"]) .slds-card { border-radius: 0.5rem; }
+        :host([data-render-mode="shadow"]) [part~='button']:disabled { cursor: pointer; }
+        :host([data-render-mode="shadow"]) .slds-card__header { color: hsl(0, 0%, 50%); }`,
+    },
   ];
   const { byComponent, gaps } = buildReport(classify({ sldsCss, lbcFiles }), SPEC_ITEMS, "", FIXED_ITEMS);
   assert.deepEqual(gaps.map((g) => `${g.selector} { ${g.prop}: ${g.value} } ${g.item}`), [
@@ -280,12 +293,21 @@ test("2026-10-12 합의 고정 항목은 그 묶음만 흡수하고 비슷한 �
     // 애니메이션 아이콘이 아닌 아이콘 크기, 지금 모드의 입력 안 아이콘(native 항목은 native에서만)
     ".slds-icon { width: 1rem } icon-size",
     ".slds-input-has-icon .slds-input__icon { width: 0.75rem } icon-size",
-    // 0.125rem보다 큰 간격, 특수 영역이 아닌 간격, 목록에 없는 기본 컴포넌트
+    // 0.125rem보다 큰 간격, 특수 영역이 아닌 간격
     ".slds-listbox_inline { margin-inline-end: 0.25rem } density",
     ".slds-card__body { padding: 0.75rem } density",
+    // kx 브레드크럼이 아닌 눌림 축소
+    ".slds-pill:active { transform: scale(0.95) } hover-press",
+    // 특수 영역 블루프린트(Path·markdown)라도 흡수한 선택자·속성이 아니면 남는다
+    ".slds-path__title { padding: 0.5rem } density",
+    ".slds-markdown p { margin-block: 1rem } density",
+    // 목록에 없는 기본 컴포넌트
     ".fix-slds-button { margin: 1rem } density",
     ':host([data-render-mode="shadow"]) .slds-card { border-radius: 0.5rem } radius',
+    `:host([data-render-mode="shadow"]) [part~='button']:disabled { cursor: pointer } cursor-underline`,
+    ':host([data-render-mode="shadow"]) .slds-card__header { color: hsl(0, 0%, 50%) } text-color',
   ]);
+  assert.deepEqual(byComponent["(global)"]["hover-press"], { now: "fixed", native: "n/a" });
   assert.deepEqual(byComponent.baseCombobox["icon-size"], { now: "n/a", native: "fixed" });
   assert.deepEqual(byComponent.modalHeader.typography, { now: "n/a", native: "fixed" });
   assert.deepEqual(byComponent.primitiveBubble.radius, { now: "n/a", native: "fixed" });
@@ -321,4 +343,14 @@ test("--check는 기준 대비 새 하드코딩, hook 변화, native 목록 변�
     assert.equal(result.code, 1, String(message));
     assert.match(result.message, message);
   }
+});
+
+test("--check의 새 하드코딩 줄에 그 선언을 흡수하는 고정 항목 라벨을 붙인다(--write 전에 합의 없이 고정되는 것을 보이게)", () => {
+  const dir = join(tmp, "흡수");
+  const base: Sources = { sldsCss: ".slds-badge { border-radius: var(--slds-g-radius-border-1); }", lbcFiles: [], bridgeCss: "", nativeList: [] };
+  assert.equal(runAudit(["--write"], base, dir).code, 0);
+  const pill = { comp: "pill", file: "lightning-base-components/src/lightning/pill/pill.slds.css", css: `:host([data-render-mode="shadow"]) .slds-pill { padding: 0.3rem; }` };
+  const { message } = runAudit(["--check"], { ...base, sldsCss: `${base.sldsCss} .slds-card { padding: 0.3rem; }`, lbcFiles: [pill] }, dir);
+  assert.match(message, /^새 하드코딩: lbc pill padding: 0\.3rem \(고정: native 간격\)$/m);
+  assert.match(message, /^새 하드코딩: slds2 card padding: 0\.3rem$/m);
 });
