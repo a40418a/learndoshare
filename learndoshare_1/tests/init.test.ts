@@ -157,7 +157,10 @@ test("두 번 실행해도 파일 내용과 milvus.config.json이 같다", async
     }
     assert.deepEqual(readBranding(read(root, `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`)), { brandColor: "#0176D3" });
     assert.match(read(root, `${FA}/lightningExperienceThemes/Acme.lightningExperienceTheme-meta.xml`), /<defaultBrandingSet>LEXTHEMINGAcme</);
-    assert.ok(existsSync(join(root, `${FA}/staticresources/milvusVf.css`)));
+    // VF는 기본 포함이다: milvusHead(+meta)와 milvusVf(+meta) 틀을 놓는다
+    for (const f of ["components/milvusHead.component", "components/milvusHead.component-meta.xml", "staticresources/milvusVf.css", "staticresources/milvusVf.resource-meta.xml"]) {
+      assert.ok(existsSync(join(root, `${FA}/${f}`)), f);
+    }
     // 배포 뒤 사람이 org에서 할 일(10/9 D2·D3)을 안내한다
     assert.match(first.stdout, /milvusBrandLoader/);
     assert.match(first.stdout, /Visualforce Settings/);

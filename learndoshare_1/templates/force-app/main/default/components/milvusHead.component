@@ -1,1 +1,7 @@
-<!-- VF 페이지용 머리 컴포넌트: milvusVf, milvusBridge, milvusBrand, milvusOverride 순서로 스타일을 넣는다(설계 5.5). 내용은 아직 쓰지 않았다 -->
+<apex:component>
+  <apex:slds />
+  <apex:stylesheet value="{!$Resource.milvusVf}" />
+  <apex:stylesheet value="{!$Resource.milvusBridge}" />
+  <apex:stylesheet value="{!$Resource.milvusBrand}" />
+  <apex:stylesheet value="{!$Resource.milvusOverride}" />
+</apex:component>

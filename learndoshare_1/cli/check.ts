@@ -3,19 +3,21 @@
 //   milvusOverride.css(5.1), config 브랜드 BrandingSet의 BRAND_COLOR 형식만 보고, hook 이름은 설치된 패키지의 dist/hooks-index.json에서
 //   읽는다(lib/hooks-index.ts). 실패하면 2(Claude Code가 stderr를 Claude에게 보여 준다)
 // - 전체: deploy와 CI가 실행한다. --style 항목 + 밀버스 관리 파일 sha256(milvus.config.json). 실패하면 1.
-//   밀버스 LWC는 JS라 타입 검사는 하지 않는다(10/9 D1). milvusVf.css 다시 만들기는 Task 24에서 붙인다
-import { existsSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+//   밀버스 LWC는 JS라 타입 검사는 하지 않는다(10/9 D1). config.vf면 milvusVf.css도 지금 BRAND_COLOR 팔레트로 다시 만든다(설계 3장 [생성])
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
 import { readBranding } from "../lib/branding.ts";
 import { loadRuleContext } from "../lib/hooks-index.ts";
 import { sha256 } from "../lib/managed.ts";
 import { checkOverrideCss, checkUtilCss, type Issue } from "../lib/rules.ts";
+import { buildMilvusVfCss } from "../lib/vf.ts";
 import { findProject, packageInfo, readConfig } from "./context.ts";
 
 const RES = "force-app/main/default/staticresources";
 const BRAND_CSS = `${RES}/milvusBrand.css`;
 const OVERRIDE_CSS = `${RES}/milvusOverride.css`;
+const VF_CSS = `${RES}/milvusVf.css`;
 const BRANDING_SETS = "force-app/main/default/brandingSets";
 const USAGE = "사용법: pnpm milvus check [--style]";
 
@@ -61,9 +63,30 @@ function brandingIssues(root: string): Issue[] {
   }
 }
 
+// config.vf면 milvusVf.css를 BrandingSet의 지금 BRAND_COLOR 팔레트로 다시 쓰고, 내용이 바뀌었을 때만 경로를 돌려준다.
+// milvusVf는 [생성]이라 milvus.config.json의 managed(sha256)에 없어 관리 파일 검사와 겹치지 않는다.
+// config나 BRAND_COLOR를 읽지 못하면 건너뛴다(managedIssues·brandingIssues가 이미 실패로 알린다)
+function regenerateVfCss(root: string): string[] {
+  let css: string;
+  try {
+    const config = readConfig(root);
+    if (!config?.vf) return [];
+    const brandingSet = readFileSync(join(root, `${BRANDING_SETS}/LEXTHEMING${config.brand}.brandingSet-meta.xml`), "utf8");
+    css = buildMilvusVfCss(readBranding(brandingSet).brandColor);
+  } catch {
+    return [];
+  }
+  const path = join(root, VF_CSS);
+  if (existsSync(path) && readFileSync(path, "utf8") === css) return [];
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(path, css);
+  return [VF_CSS];
+}
+
 /**
  * 검사 결과를 stderr에 쓰고 종료 코드를 돌려준다. issues는 실패시키는 문제만 담는다(override 경고는 stderr에만).
- * pkgRoot는 dist/hooks-index.json을 찾을 패키지 폴더다. 기본은 이 패키지다
+ * pkgRoot는 dist/hooks-index.json을 찾을 패키지 폴더다. 기본은 이 패키지다.
+ * regenerated는 전체 check가 다시 쓴 [생성] 파일(루트 기준 경로)이다. --style은 파일을 쓰지 않는다
  */
 export async function runCheck(o: { root: string; style: boolean; pkgRoot?: string }): Promise<{ code: 0 | 1 | 2; issues: Issue[]; regenerated: string[] }> {
   const issues: Issue[] = [];
@@ -88,7 +111,7 @@ export async function runCheck(o: { root: string; style: boolean; pkgRoot?: stri
     );
   }
   if (issues.length) process.stderr.write(`milvus check${o.style ? " --style" : ""}: 고칠 것 ${issues.length}개\n${lines(issues)}`);
-  return { code: issues.length ? (o.style ? 2 : 1) : 0, issues, regenerated: [] };
+  return { code: issues.length ? (o.style ? 2 : 1) : 0, issues, regenerated: o.style ? [] : regenerateVfCss(o.root) };
 }
 
 /** pnpm milvus check [--style]. sfdx-project.json이 있는 폴더를 위로 찾아 검사한다 */
@@ -101,7 +124,8 @@ export async function checkCommand(argv: string[]): Promise<number> {
     return 1;
   }
   try {
-    const { code } = await runCheck({ root: findProject(process.cwd()).root, style });
+    const { code, regenerated } = await runCheck({ root: findProject(process.cwd()).root, style });
+    if (regenerated.length) process.stdout.write(`지금 브랜드 색으로 다시 만든 파일: ${regenerated.join(", ")}\n`);
     if (code === 0) process.stdout.write(`milvus check${style ? " --style" : ""} 통과\n`);
     return code;
   } catch (e) {
