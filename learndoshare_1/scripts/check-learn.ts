@@ -32,6 +32,7 @@ export const SOURCE_DOMAINS = [
   "code.claude.com",
   "docs.anthropic.com",
   "www.w3.org",
+  "html.spec.whatwg.org", // HTML 표준 (WHATWG)
   "developer.mozilla.org",
   // 문서가 직접 다루는 서드파티 도구의 1차 저장소·사이트. 그 도구에 대한 사실에만 쓴다
   "github.com/DietrichGebert", // Ponytail

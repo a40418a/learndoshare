@@ -83,6 +83,7 @@ test("출처 도메인은 경계까지 맞아야 한다", () => {
     "https://github.com/DietrichGebert/ponytail",
     "https://github.com/lukethacoder/lwc-garden",
     "https://lwc.garden",
+    "https://html.spec.whatwg.org/multipage/rendering.html#form-controls",
     "../docs/research/2026-10-08/summary.md",
     "../docs/specs/2026-10-08-milvus-package-design.md",
     "../README.md",
@@ -96,6 +97,8 @@ test("출처 도메인은 경계까지 맞아야 한다", () => {
     "https://github.com/someone/salesforce",
     "https://github.com/pnpmfan/x",
     "https://lwc.garden.evil.example",
+    "https://html.spec.whatwg.org.evil.example/multipage/",
+    "https://whatwg.org.evil.example/html",
     // 경로를 정규화하면 허용 범위 밖이거나, 원문과 실제 주소가 달라지는 링크
     "https://github.com/salesforce/../someone/blog",
     "https://github.com/salesforce/%2e%2e/someone",
