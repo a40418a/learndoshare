@@ -11,8 +11,8 @@ addons.setConfig({
     brandUrl: "./",
     brandImage: brand.logoUrl,
     brandTarget: "_self",
-    colorPrimary: brand.color,
-    colorSecondary: brand.color,
+    // 오류 상태(SLDS 기본)에는 색이 없다. undefined를 넘기면 기본 색까지 지워져 사이드바 선택 항목이 안 보이고 검색이 깨진다
+    ...(brand.color && { colorPrimary: brand.color, colorSecondary: brand.color }),
     fontBase: '"Salesforce Sans", "Pretendard", "Apple SD Gothic Neo", system-ui, sans-serif',
   }),
 });

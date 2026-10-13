@@ -36,6 +36,7 @@ const RESOLVED = `\0${VIRTUAL}`;
 const PKG_ROOT = fileURLToPath(new URL("..", import.meta.url));
 const MAX_BODY = 1_000_000;
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
+const LOOPBACK = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]);
 
 // 이름에 -가 있어 브랜드 이름(^[A-Za-z][A-Za-z0-9_]*$)과 겹치지 않는다. 팔레트가 비면 SLDS 2 Cosmos 기본 팔레트 그대로다
 const SLDS: BrandData = { name: "slds-default", label: "SLDS 기본", source: "slds", palette: {}, utilCss: "", bridgeCss: "", overrideCss: "" };
@@ -63,7 +64,9 @@ export function brandsFromRepo(repoDir: string): BrandData[] {
   const bridgeCss = read(join(res, "milvusBridge.css"));
   const overrideCss = read(join(res, "milvusOverride.css"));
   // ponytail: 브랜드마다 bridgeCss(약 358KB) 사본이 가상 모듈에 들어간다(저장소 2개 → 약 700KB). 브랜드가 늘면 공유 문자열로 뺀다
+  // theme.json이 있는 폴더만 브랜드다(.DS_Store 같은 파일은 건너뛴다)
   return readdirSync(join(repoDir, "brands"))
+    .filter((dir) => existsSync(join(repoDir, "brands", dir, "theme.json")))
     .sort()
     .map((dir) => {
       const base = join(repoDir, "brands", dir);
@@ -128,27 +131,36 @@ export function loadBrands(o: PluginOptions): BrandData[] {
   return brandsFromProject(o.projectDir!, config);
 }
 
-// Host와 Origin(있으면)이 모두 localhost여야 한다. 다른 사이트의 페이지나 같은 네트워크의 다른 PC가 요청 파일을 쓰지 못하게 한다
-function isLocal(req: IncomingMessage): boolean {
-  const local = (url: string) => {
-    try {
-      return LOCAL_HOSTS.has(new URL(url).hostname);
-    } catch {
-      return false;
-    }
-  };
-  return local(`http://${req.headers.host}`) && (req.headers.origin === undefined || local(req.headers.origin));
+const parseUrl = (url: string) => {
+  try {
+    return new URL(url);
+  } catch {
+    return undefined;
+  }
+};
+
+/**
+ * 같은 PC의 같은 서버에서 온 요청인가. 다른 PC(소켓 주소), DNS rebinding(Host), 다른 사이트·다른 포트의 페이지(Origin)를 막는다.
+ * 소켓 주소를 먼저 보는 것은 Storybook을 --host 0.0.0.0으로 띄우면 Vite의 Host 검사가 꺼지고, 헤더는 클라이언트가 정하기 때문이다
+ */
+export function isLocal(req: IncomingMessage): boolean {
+  if (!LOOPBACK.has(req.socket.remoteAddress ?? "")) return false;
+  if (!LOCAL_HOSTS.has(parseUrl(`http://${req.headers.host}`)?.hostname ?? "")) return false;
+  if (req.headers.origin === undefined) return true;
+  const origin = parseUrl(req.headers.origin);
+  if (!origin || !LOCAL_HOSTS.has(origin.hostname)) return false;
+  return Number(origin.port || (origin.protocol === "https:" ? 443 : 80)) === req.socket.localPort;
 }
 
+// 한도를 넘으면 버퍼에 담지 않고 끝까지 흘려보낸 뒤 undefined. 중간에 끊으면 소켓이 닫혀 413이 클라이언트에 닿지 않는다
 async function readBody(req: IncomingMessage): Promise<string | undefined> {
   const chunks: Buffer[] = [];
   let size = 0;
   for await (const chunk of req) {
     size += (chunk as Buffer).length;
-    if (size > MAX_BODY) return undefined;
-    chunks.push(chunk as Buffer);
+    if (size <= MAX_BODY) chunks.push(chunk as Buffer);
   }
-  return Buffer.concat(chunks).toString("utf8");
+  return size > MAX_BODY ? undefined : Buffer.concat(chunks).toString("utf8");
 }
 
 // 본문의 경로·파일 이름은 보지 않는다. 쓰는 곳은 프로젝트 루트의 milvus-brand-request.md 하나다(설계 6.1)
@@ -158,6 +170,15 @@ async function brandRequest(o: PluginOptions, req: IncomingMessage, res: ServerR
     res.setHeader("Content-Type", "application/json; charset=utf-8");
     res.end(JSON.stringify(body));
   };
+  try {
+    await handleBrandRequest(o, req, send);
+  } catch (e) {
+    if (res.headersSent) res.end();
+    else send(500, { error: `요청 파일을 처리하지 못했습니다: ${(e as Error).message}` });
+  }
+}
+
+async function handleBrandRequest(o: PluginOptions, req: IncomingMessage, send: (status: number, body: unknown) => void): Promise<void> {
   if (!isLocal(req)) return send(403, { error: "localhost로 연 Storybook에서만 쓸 수 있습니다" });
   const file = o.mode === "project" ? join(o.projectDir!, REQUEST_FILE) : undefined;
   if (req.method === "GET") return send(200, { text: file && existsSync(file) ? readFileSync(file, "utf8") : null, writable: file !== undefined });
@@ -202,12 +223,7 @@ export function milvusStorybookPlugin(o: PluginOptions): Plugin {
       };
       for (const event of ["add", "change", "unlink"]) server.watcher.on(event, reload);
 
-      server.middlewares.use(ENDPOINT, (req, res) => {
-        brandRequest(o, req, res).catch((e: Error) => {
-          res.statusCode = 500;
-          res.end(JSON.stringify({ error: `요청 파일을 처리하지 못했습니다: ${e.message}` }));
-        });
-      });
+      server.middlewares.use(ENDPOINT, (req, res) => void brandRequest(o, req, res));
     },
   };
 }

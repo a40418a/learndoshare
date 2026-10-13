@@ -40,8 +40,9 @@ test("pack 결과에 tsconfig.lwc.base.json·lwc-platform.d.ts와 force-app 아�
   assert.ok(entries.includes("package/force-app/main/default/lwc/milvusBrandLoader/milvusBrandLoader.js"), entries.join("\n"));
 });
 
-// .storybook은 원본 .ts로 발행한다(Task 3). files에 고른 lib·cli 원본이 빠지면 프로젝트 모드 Storybook이 import에서 멈춘다
-test("pack 결과에 .storybook 설정과 그것이 상대 경로로 import하는 파일이 모두 있다", () => {
+// .storybook은 원본 .ts로 발행한다(Task 3). files에 고른 lib·cli 원본이 빠지면 프로젝트 모드 Storybook이 import에서 멈춘다.
+// 시작점은 발행된 .storybook·stories의 모든 스크립트와 MDX다. 새 스토리가 발행 안 된 lib을 import하면 여기서 잡힌다
+test("pack 결과에 .storybook·stories와 그것이 상대 경로로 import하는 파일이 모두 있다", () => {
   const seen = new Set<string>();
   const visit = (file: string) => {
     if (seen.has(file)) return;
@@ -51,7 +52,9 @@ test("pack 결과에 .storybook 설정과 그것이 상대 경로로 import하�
       visit(posix.join(posix.dirname(file), spec));
     }
   };
-  for (const start of [".storybook/main.ts", ".storybook/preview.ts", ".storybook/manager.ts", "stories/Welcome.mdx", "stories/foundations/BrandStyle.stories.js"]) visit(start);
+  const starts = entries.filter((e) => /^package\/(\.storybook|stories)\/.*\.(js|ts|mdx)$/.test(e)).map((e) => e.slice("package/".length));
+  assert.ok(starts.includes(".storybook/main.ts") && starts.includes("stories/Welcome.mdx"), starts.join("\n"));
+  starts.forEach(visit);
   assert.ok(seen.has("lib/storybook-plugin.ts") && seen.has("cli/context.ts"), [...seen].join("\n"));
 });
 
