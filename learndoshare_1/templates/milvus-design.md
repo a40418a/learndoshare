@@ -65,7 +65,7 @@
 
 (`lwc/`부터는 `force-app/main/default/` 아래다. `.milvus/`는 CLI 작업 폴더라 커밋하지 않는다)
 
-커밋된 `.claude/settings.json`의 hook은 팀원에게도 별도 동의 없이 실행된다(폴더 신뢰 말고는 hook마다 묻지 않고, 그 사람의 권한으로 돈다). 그래서 밀버스 hook은 `milvus-check.mjs` 하나만 둔다.
+커밋된 `.claude/settings.json`의 hook은 팀원에게도 별도 동의 없이 실행된다(대화형 세션은 폴더 신뢰 대화상자를 받아들이면 hook마다 묻지 않고, `claude -p`·SDK는 그 대화상자도 없이 실행한다. hook은 그 사람의 전체 사용자 권한으로 돈다). 그래서 밀버스 hook은 `milvus-check.mjs` 하나만 둔다.
 
 ## 5. 디자인 규칙
 
