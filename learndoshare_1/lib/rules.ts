@@ -128,9 +128,11 @@ function declProblem(name: string, value: string, ctx: RuleContext): [string, st
       : ["plain-prop", `${name}: :root의 일반 속성은 ${ALLOWED_PLAIN_PROPS.join(", ")}만 쓴다`];
   }
   if (name.startsWith("--milvus-")) {
-    return ctx.milvusVars.has(name)
-      ? undefined
-      : ["milvus-var", `${name}: 이 변수를 읽는 밀버스 컴포넌트나 milvusBridge.css가 없다(오타이거나 효과가 없다)`];
+    if (!ctx.milvusVars.has(name)) return ["milvus-var", `${name}: 이 변수를 읽는 밀버스 컴포넌트나 milvusBridge.css가 없다(오타이거나 효과가 없다)`];
+    // 브리지는 시간을 max(var(…), 0.01ms)로 감싼다. 단위 없는 숫자는 max()를 무효로 만들어 0.01ms 하한이 무너진다(설계 5.6)
+    return name.startsWith("--milvus-motion-duration-") && /^[+-]?[\d.]+$/.test(value)
+      ? ["motion-unit", `${name}: ${value} — 시간에는 단위를 붙인다(예: 0.01ms, 0.2s). 단위 없는 숫자는 브리지의 max()를 무효로 만들어 모달·토스트가 닫히지 않을 수 있다`]
+      : undefined;
   }
   if (/^--(slds|sds)-c-/.test(name)) {
     return ["c-hook", `${name}: --slds-c-*·--sds-c-*는 쓰지 않는다. SLDS 2 지원이 미확인이고 :root에 두면 모든 변형을 덮는다`];

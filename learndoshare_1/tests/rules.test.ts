@@ -185,6 +185,14 @@ test("--milvus-*는 milvusVars에 있을 때만 허용", () => {
   assert.deepEqual(rulesOf("--milvus-button-font-wieght: 700;"), ["milvus-var"]);
 });
 
+test("움직임 시간 변수는 단위가 있어야 한다(단위 없는 0은 브리지의 max()를 무효로 만든다, 설계 5.6)", () => {
+  const motion: RuleContext = { ...ctx, milvusVars: new Set(["--milvus-motion-duration-fast"]) };
+  const rules = (value: string) => checkUtilCss(`:root { --milvus-motion-duration-fast: ${value}; }`, "util.css", motion).map((i) => i.rule);
+  assert.deepEqual(rules("0"), ["motion-unit"]);
+  assert.deepEqual(rules("0.2"), ["motion-unit"]);
+  for (const ok of ["0.01ms", "0s", "0.2s", "150ms"]) assert.deepEqual(rules(ok), [], ok);
+});
+
 test("CSS 문법 오류는 던지지 않고 issue로 돌려준다", () => {
   assert.deepEqual(check(":root { --slds-g-radius-border-2: 0.25rem;").map((i) => i.rule), ["syntax"]);
   assert.deepEqual(checkOverrideCss(".slds-button {", "o.css").errors.map((i) => i.rule), ["syntax"]);
