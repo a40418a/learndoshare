@@ -19,6 +19,8 @@ export type BrandData = {
   label: string;
   source: "org" | "sample" | "project" | "slds";
   palette: Record<number, string>;
+  /** org 테마에 넣은 브랜드 색(BRAND_COLOR). 명세 페이지가 버튼(50)·링크(40) 색과 함께 보여 준다. SLDS 기본에는 없다 */
+  brandColor?: string;
   utilCss: string;
   bridgeCss: string;
   overrideCss: string;
@@ -72,7 +74,7 @@ export function brandsFromRepo(repoDir: string): BrandData[] {
       const base = join(repoDir, "brands", dir);
       const theme = JSON.parse(readFileSync(join(base, "theme.json"), "utf8"));
       const logoUrl = theme.logo ? dataUrl(join(base, theme.logo), theme.logo) : undefined;
-      const brand: BrandData = { name: theme.name, label: theme.label, source: theme.source, palette: theme.palette, utilCss: read(join(base, "util.css")), bridgeCss, overrideCss };
+      const brand: BrandData = { name: theme.name, label: theme.label, source: theme.source, palette: theme.palette, brandColor: theme.brandColor, utilCss: read(join(base, "util.css")), bridgeCss, overrideCss };
       return logoUrl ? { ...brand, logoUrl } : brand;
     });
 }
@@ -111,6 +113,7 @@ export function brandsFromProject(projectDir: string, config: MilvusConfig): Bra
     label: config.brand,
     source: "project",
     palette: brandPalette(branding.brandColor),
+    brandColor: branding.brandColor,
     utilCss,
     bridgeCss: read(join(projectDir, RES, "milvusBridge.css")),
     overrideCss: read(join(projectDir, RES, "milvusOverride.css")),

@@ -97,6 +97,7 @@ test("프로젝트 BrandingSet의 BRAND_COLOR로 팔레트를 계산하고 로�
   assert.equal(brand.name, "Acme");
   assert.equal(brand.source, "project");
   assert.deepEqual(brand.palette, brandPalette("#2E7D32"));
+  assert.equal(brand.brandColor, "#2E7D32");
   assert.equal(brand.utilCss, readFileSync(join(dir, RES, "milvusBrand.css"), "utf8"));
   assert.equal(brand.bridgeCss, "/* 브리지 */");
   assert.equal(brand.overrideCss, "/* override */");
@@ -131,6 +132,7 @@ test("저장소 모드는 brands/의 Milvus_DesignSystem, Sample_Forest", async 
   assert.equal(brands[1].utilCss, readFileSync(join(repo, "brands/Sample_Forest/util.css"), "utf8"));
   assert.match(brands[0].logoUrl!, /^data:image\/jpeg;base64,/);
   assert.equal(brands[1].logoUrl, undefined);
+  assert.deepEqual(brands.map((b) => b.brandColor), ["#0176D3", "#2E7D5B"]);
 
   // brands/의 파일(.DS_Store)과 theme.json 없는 폴더는 건너뛴다
   const fake = mkdtempSync(join(tmpdir(), "milvus-sb-repo-"));

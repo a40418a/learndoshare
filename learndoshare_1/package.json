@@ -22,6 +22,10 @@
     "lib/hooks-index.ts",
     "lib/palette.ts",
     "lib/rules.ts",
+    "lib/request.ts",
+    "lib/spec-items.ts",
+    "lib/fixed-list.ts",
+    "lib/bridge-vars.ts",
     "cli/context.ts",
     "brands/Milvus_DesignSystem/logo.jpg"
   ],
