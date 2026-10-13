@@ -116,6 +116,8 @@ test("--yes 없이 실행하면 계획만 출력하고 deploy start를 부르지
     assert.match(r.stdout, /Old_Theme → Acme/);
     assert.match(r.stdout, /lwc\/milvusButton/);
     assert.match(r.stdout, /pnpm milvus deploy --yes/);
+    // fixture가 BRAND_COLOR를 바꿨으므로 check가 milvusVf.css를 다시 만들고 알린다
+    assert.match(r.stdout, /지금 브랜드 색으로 다시 만든 파일: .*milvusVf\.css/);
     assert.deepEqual(sf.deploys(), []);
     assert.equal(existsSync(join(root, SETTINGS)), false);
 
@@ -220,6 +222,30 @@ test("1단계 실패 시 2단계를 부르지 않고 failures를 출력한다", 
     assert.equal(a.code, 1);
     assert.equal(a.stage, "activate");
     assert.match(a.failures[0].problem, /활성화 실패\(가짜\)/);
+    const activateFailed = await deploy(root, ["--yes"], { sf: fakeSf({ activate: { code: 1, stdout: JSON.stringify({ status: 1, message: "x" }), stderr: "" } }) });
+    assert.equal(activateFailed.result, 1);
+    assert.match(activateFailed.stderr, /바뀌지 않았을 수 있습니다\. org에서 확인하세요/);
+  });
+});
+
+test("컴포넌트가 아닌 배포 실패도 이유를 보여 주고, result가 있으면 로그인 안내를 붙이지 않는다", async () => {
+  await withProject({}, async (root) => {
+    const plan = await planDeploy({ root, config: config(root) }, fakeSf());
+    const run = (result: object) => executeDeploy(plan, fakeSf({ deploy: { code: 1, stdout: JSON.stringify({ status: 1, result }), stderr: "" } }));
+
+    // sf 3.x의 deploy 실패는 맨 위 message 없이 result로 끝난다
+    const e = await run({ success: false, errorMessage: "Deployment cancelled(가짜)" });
+    assert.deepEqual(e.failures, [{ name: "sf", problem: "Deployment cancelled(가짜)" }]);
+
+    // 운영 org의 Apex 테스트 실패(RunLocalTests). 하나면 객체로 올 수 있다
+    const t = await run({ success: false, details: { runTestResult: { failures: { name: "MilvusDesignTest", methodName: "renders", message: "Assertion Failed" } } } });
+    assert.deepEqual(t.failures, [{ name: "MilvusDesignTest.renders", problem: "Assertion Failed" }]);
+
+    // 이유가 하나도 없어도 빈 문구가 아니고, result가 있으니 로그인 안내는 없다
+    const empty = await run({ success: false });
+    assert.equal(empty.failures.length, 1);
+    assert.match(empty.failures[0].problem, /sf가 이유를 알려 주지 않았습니다/);
+    assert.doesNotMatch(empty.failures[0].problem, /sf org login/);
   });
 });
 
@@ -258,6 +284,8 @@ test("sourceDirs에 milvusBridge·milvusOverride·milvusBrandLoader와 contentas
     const [first, second] = sf.deploys().map((c) => c.args);
     assert.deepEqual(first.filter((_, i) => first[i - 1] === "--source-dir"), plan.sourceDirs);
     assert.deepEqual(second.slice(second.indexOf("--metadata-dir"), second.indexOf("--metadata-dir") + 2), ["--metadata-dir", SETTINGS]);
+    // 폴더 --metadata-dir는 sf가 zip/ 아래에 넣어 묶으므로 --single-package를 붙이지 않는다(리뷰 Important 1)
+    assert.ok(!second.includes("--single-package"), second.join(" "));
   });
 });
 

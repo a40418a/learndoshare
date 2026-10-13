@@ -39,14 +39,20 @@ async function callSf(sf: SfRunner, args: string[], cwd: string, org: string): P
     return [{ name: "sf", problem: redact(`sf 결과(--json)를 해석하지 못했습니다(종료 코드 ${r.code}). sf 버전을 확인하세요: ${(r.stderr || r.stdout).trim()}`) }];
   }
   if (r.code === 0) return [];
-  // componentFailures는 하나면 배열이 아닌 객체로 올 수 있다
-  const details = (json?.result ?? json?.data)?.details;
-  const failures: Failure[] = [details?.componentFailures ?? []]
-    .flat()
-    .map((f: { componentType?: string; fullName?: string; problem?: string }) => ({ name: redact(`${f.componentType}:${f.fullName}`), problem: redact(String(f.problem)) }));
-  if (failures.length) return failures;
-  const message = typeof json?.message === "string" ? json.message : r.stderr;
-  return [{ name: "sf", problem: redact(`sf가 실패했습니다(종료 코드 ${r.code}). 로그인이 만료되었으면 sf org login web --alias ${org}로 로그인하세요: ${message.trim()}`) }];
+  // 배포 실패는 오류 봉투가 아니라 { status, result: { errorMessage, details } }로 끝난다(맨 위 message 없음).
+  // componentFailures·runTestResult.failures는 하나면 배열이 아닌 객체로 올 수 있다
+  const result = json?.result;
+  const details = (result ?? json?.data)?.details;
+  const failures: Failure[] = [
+    ...[details?.componentFailures ?? []].flat().map((f) => ({ name: `${f.componentType}:${f.fullName}`, problem: String(f.problem) })),
+    ...[details?.runTestResult?.failures ?? []].flat().map((f) => ({ name: `${f.name}.${f.methodName}`, problem: String(f.message) })),
+  ];
+  if (!failures.length && typeof result?.errorMessage === "string") failures.push({ name: "sf", problem: result.errorMessage });
+  if (failures.length) return failures.map((f) => ({ name: redact(f.name), problem: redact(f.problem) }));
+  const message = (typeof json?.message === "string" ? json.message : r.stderr).trim() || "sf가 이유를 알려 주지 않았습니다";
+  // result가 없는 오류 봉투(NoAuthInfoFound 등)만 로그인·연결 문제일 수 있다
+  const login = result ? "" : ` 로그인이 만료되었으면 sf org login web --alias ${org}로 로그인하세요.`;
+  return [{ name: "sf", problem: redact(`sf가 실패했습니다(종료 코드 ${r.code}).${login} ${message}`) }];
 }
 
 // dir(force-app/main/default 기준) 안에서 이름이 prefix.로 시작하는 파일. 정적 리소스·BrandingSet처럼 본문과 -meta.xml을 함께 고른다
@@ -123,7 +129,7 @@ export async function executeDeploy(
   mkdirSync(join(dir, "settings"), { recursive: true });
   writeFileSync(join(dir, "package.xml"), writeSettingsPackageXml());
   writeFileSync(join(dir, "settings/LightningExperience.settings"), writeActiveThemeSettings(plan.newTheme));
-  const activate = await callSf(sf, ["project", "deploy", "start", "--metadata-dir", plan.settingsDir, "--single-package", ...org], plan.root, plan.targetOrg);
+  const activate = await callSf(sf, ["project", "deploy", "start", "--metadata-dir", plan.settingsDir, ...org], plan.root, plan.targetOrg);
   if (activate.length) return { code: 1, stage: "activate", failures: activate };
   return { code: 0, stage: "done", failures: [] };
 }
@@ -168,6 +174,7 @@ export async function runDeploy(argv: string[], deps: { sf?: SfRunner; isTTY?: b
     const config = readConfig(root);
     if (!config) throw new Error("milvus.config.json이 없습니다. 프로젝트에 밀버스를 준비하려면 pnpm milvus init을 먼저 실행하세요");
     const check = await runCheck({ root, style: false });
+    if (check.regenerated.length) process.stdout.write(`지금 브랜드 색으로 다시 만든 파일: ${check.regenerated.join(", ")}\n`);
     if (check.code !== 0) throw new Error("milvus check를 통과하지 못해 배포하지 않습니다. 위 안내대로 고친 뒤 다시 실행하세요");
 
     const plan = await planDeploy({ root, config, targetOrg: values["target-org"] }, sf);
@@ -189,7 +196,7 @@ export async function runDeploy(argv: string[], deps: { sf?: SfRunner; isTTY?: b
       return 1;
     }
     if (result.stage === "activate") {
-      process.stderr.write(`milvus deploy 실패: 1단계 배포는 됐지만 2단계(활성 테마 변경)가 실패했습니다. 활성 테마는 ${plan.currentTheme} 그대로입니다:\n${list}`);
+      process.stderr.write(`milvus deploy 실패: 1단계 배포는 됐지만 2단계(활성 테마 변경)의 성공을 확인하지 못했습니다. 활성 테마는 ${plan.currentTheme}에서 바뀌지 않았을 수 있습니다. org에서 확인하세요:\n${list}`);
       return 1;
     }
     process.stdout.write(
