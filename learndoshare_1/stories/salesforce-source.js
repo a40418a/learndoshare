@@ -1,8 +1,10 @@
 // Storybook "원본과 hook" 보기 (설계 9.5). 카탈로그 스토리(scripts/generate-slds-catalog.ts가 만드는 stories/slds-catalog/*.stories.js)가 부른다.
 // 데이터(요약·hook 표·빈틈 표)는 생성기가 정적 반영 검사(scripts/audit)를 다시 돌려 만든다. 손으로 쓰지 않는다.
+// 출처마다 절을 나눈다: 기본 컴포넌트 폴더의 자기 파일, 여러 폴더에 복사된 공용 사본, SLDS 2 블루프린트(직접 / 공용 사본에서 온 것).
 // 원본 파일은 Storybook이 빌드할 때 ?raw로 읽고, 원본 절을 펼칠 때 불러온다
 import lbcLicense from "lightning-base-components/LICENSE.txt?raw";
 import sldsLicense from "@salesforce-ux/design-system-2/LICENSE.txt?raw";
+import { SPEC_ITEMS } from "../lib/spec-items.ts";
 
 export const NOTICE =
   "원본은 고치는 대상이 아니라 확인 근거다. 고쳐도 Storybook만 바뀌고 org는 바뀌지 않는다.";
@@ -26,6 +28,7 @@ const MARK = {
 };
 // SLDS 리셋이 summary의 펼침 표시를 지운다. 눌러 펼칠 수 있다는 것을 다시 보인다
 const SUMMARY = "display: list-item; cursor: pointer";
+const item = (id) => SPEC_ITEMS.find((i) => i.id === id);
 
 function h(tag, props = {}, ...children) {
   const e = Object.assign(document.createElement(tag), props);
@@ -82,40 +85,87 @@ function table(caption, head, rows) {
 
 const heading = (s) =>
   h("h3", { className: "slds-text-heading_small slds-m-top_large" }, s);
+const fold = (title, open, ...body) =>
+  h(
+    "details",
+    { open },
+    h(
+      "summary",
+      {
+        className: "slds-text-title_bold slds-m-vertical_x-small",
+        style: SUMMARY
+      },
+      title
+    ),
+    h("div", { className: "slds-m-left_medium sb-stack" }, body)
+  );
 
-function cellText(c) {
-  const n = c.counts;
+// 요약 칸: 절 여러 개의 개수 [hook, 브리지, 고정, 빈틈]를 더해 반영 / 일부 / 안 됨 / 해당 없음
+function cell(sections, id, mode) {
+  const n = [0, 0, 0, 0];
+  for (const s of sections) s.counts[id]?.[mode].forEach((x, i) => (n[i] += x));
+  const [reached, bridge, fixed, gap] = n;
+  if (!(reached + bridge + fixed + gap)) return "해당 없음";
+  const label = !(fixed + gap)
+    ? "반영"
+    : !(reached + bridge)
+      ? "안 됨"
+      : "일부";
   const parts = [
-    n.reached && `hook ${n.reached}`,
-    n.bridge && `브리지 ${n.bridge}`,
-    n.fixed && `고정 ${n.fixed}`,
-    n.gap && `빈틈 ${n.gap}`
+    reached && `hook ${reached}`,
+    bridge && `브리지 ${bridge}`,
+    fixed && `고정 ${fixed}`,
+    gap && `빈틈 ${gap}`
   ].filter(Boolean);
-  return parts.length ? `${c.label} (${parts.join(" · ")})` : c.label;
+  return `${label} (${parts.join(" · ")})`;
 }
 
-function header(view) {
+/** 페이지의 절: 자기 파일 → 공용 사본 → 블루프린트. 공용 사본은 이 폴더에서 판정이 다른 부분만 페이지 데이터가 덮어쓴다 */
+function sectionsOf(view, sharedInfo) {
+  const blueprint = (b) => ({
+    ...sharedInfo.blueprints[b.name],
+    kind: "blueprint",
+    ...b
+  });
+  return {
+    own: { ...view.own, kind: "own" },
+    files: view.shared.map((s) => ({
+      ...sharedInfo.files[s.file],
+      kind: "file",
+      ...s
+    })),
+    direct: view.blueprints.filter((b) => !b.shared).map(blueprint),
+    sharedBlueprints: view.blueprints.filter((b) => b.shared).map(blueprint)
+  };
+}
+
+function header(view, all) {
+  const names = (list) =>
+    list.length ? list.map((b) => b.name).join(", ") : "없음";
+  const row = (label, value) => [
+    h("dt", { className: "slds-dl_horizontal__label" }, label),
+    h("dd", { className: "slds-dl_horizontal__detail" }, value)
+  ];
   return h(
     "dl",
     { className: "slds-dl_horizontal" },
-    h("dt", { className: "slds-dl_horizontal__label" }, "컴포넌트"),
-    h(
-      "dd",
-      { className: "slds-dl_horizontal__detail" },
+    row(
+      "컴포넌트",
       `${view.tag} (lightning-base-components 폴더 ${view.folder})`
     ),
-    h("dt", { className: "slds-dl_horizontal__label" }, "SLDS 블루프린트"),
-    h(
-      "dd",
-      { className: "slds-dl_horizontal__detail" },
+    row(
+      "SLDS 블루프린트 (직접)",
       view.blueprints.length
-        ? view.blueprints.join(", ")
+        ? names(all.direct)
         : "없음 (이 폴더에는 CSS가 없다. 안에서 쓰는 다른 기본 컴포넌트를 본다)"
     ),
-    h("dt", { className: "slds-dl_horizontal__label" }, "native 지원 목록"),
-    h(
-      "dd",
-      { className: "slds-dl_horizontal__detail" },
+    all.files.length > 0 &&
+      row(
+        "공용 사본",
+        `${all.files.map((f) => f.file).join(", ")} → 블루프린트 ${names(all.sharedBlueprints)}`
+      ),
+    row(
+      "native 지원 목록",
       view.native
         ? "있음 — Salesforce가 이 컴포넌트를 native shadow로 바꿀 수 있다(lightning-base-components package.json의 lwc.nativeShadowEnabledComponents)"
         : "없음 (lightning-base-components package.json의 lwc.nativeShadowEnabledComponents)"
@@ -123,124 +173,184 @@ function header(view) {
   );
 }
 
-function summary(view) {
-  if (!view.summary.length)
+function summary(all) {
+  const main = [all.own, ...all.direct];
+  const shared = [...all.files, ...all.sharedBlueprints];
+  const ids = SPEC_ITEMS.map((i) => i.id).filter((id) =>
+    [...main, ...shared].some((s) => s.counts[id])
+  );
+  if (!ids.length)
     return h("p", {}, "브랜드 명세 항목에 해당하는 선언이 없다.");
-  return table(
-    "브랜드 명세 항목별 반영 상태",
-    ["명세 항목", "지금", "native"],
-    view.summary.map((r) => [r.label, cellText(r.now), cellText(r.native)])
-  );
-}
-
-// 지금 브랜드 값: Storybook이 문서 루트에 적용한 값(브랜드 util.css가 없으면 SLDS 기본값)
-function brandValue(name, info) {
-  const value = getComputedStyle(document.documentElement)
-    .getPropertyValue(name)
-    .trim();
-  if (!value) return "—";
-  const def =
-    info.light === info.dark
-      ? info.light
-      : `light-dark(${info.light}, ${info.dark})`;
-  return value.replace(/\s+/g, " ") === def ? "기본값" : value;
-}
-
-function hooks(view, hookInfo) {
-  if (!view.hooks.length)
-    return h("p", {}, "이 컴포넌트의 CSS가 읽는 변수가 없다.");
-  const groups = KINDS.map((kind) => [
-    kind,
-    view.hooks.filter((r) => hookInfo[r.name]?.kind === kind)
-  ]).filter(([, rows]) => rows.length);
-  return groups.map(([kind, rows]) =>
-    h(
-      "details",
-      { open: kind === "g" || kind === "s" },
-      h(
-        "summary",
-        {
-          className: "slds-text-title_bold slds-m-vertical_x-small",
-          style: SUMMARY
-        },
-        `${kind} ${rows.length}개 — ${KIND_NOTE[kind]}`
-      ),
-      table(
-        `${kind} hook`,
-        [
-          "hook",
-          "종류",
-          "기본값 (라이트 · 다크)",
-          "지금 브랜드 값",
-          "읽는 곳 (지금 · native)",
-          "util.css로 바뀌는가",
-          "명세 항목"
-        ],
-        rows.map((r) => {
-          const info = hookInfo[r.name];
-          const where = (mode, n, at) =>
-            n
-              ? h("div", {}, `${MODE[mode]} ${n}곳: ${at}${n > 1 ? " 등" : ""}`)
-              : null;
-          return [
-            h("code", {}, r.name, info.next ? ` → ${info.next}` : ""),
-            info.kind,
-            info.light === undefined
-              ? "—"
-              : info.light === info.dark
-                ? info.light
-                : `${info.light} · ${info.dark}`,
-            brandValue(r.name, info),
-            [
-              where("now", r.now, r.nowAt),
-              where("native", r.native, r.nativeAt)
-            ],
-            info.util,
-            info.items.length ? info.items.join(", ") : "—"
-          ];
-        })
-      )
-    )
-  );
-}
-
-function gaps(view) {
-  const count = (prefix) =>
-    view.gaps.filter((g) => g.how.startsWith(prefix)).length;
+  const head = ["명세 항목", "이 컴포넌트 · 지금", "이 컴포넌트 · native"];
+  if (shared.length)
+    head.push(
+      "공용 사본·공용 블루프린트 · 지금",
+      "공용 사본·공용 블루프린트 · native"
+    );
   return [
     h(
       "p",
       {},
-      `hook이 직접 닿지 않는 선언 ${view.gaps.length}개: 브리지 ${count("브리지")} · Salesforce 고정 ${count("Salesforce 고정")} · 고정 목록에 없는 빈틈 ${count("빈틈")}. ` +
-        "빈틈이 생기면 정적 반영 검사(pnpm audit:brand)가 실패한다(설계 9.6)."
+      "이 컴포넌트 = 폴더의 자기 파일 + 직접 쓰는 블루프린트. 공용 사본(여러 기본 컴포넌트에 복사된 파일)과 거기서만 오는 블루프린트는 다른 컴포넌트와 함께 쓰는 판정이라 따로 센다."
     ),
-    view.gaps.length > 0 &&
+    table(
+      "브랜드 명세 항목별 반영 상태",
+      head,
+      ids.map((id) => [
+        item(id).label,
+        cell(main, id, "now"),
+        cell(main, id, "native"),
+        ...(shared.length
+          ? [cell(shared, id, "now"), cell(shared, id, "native")]
+          : [])
+      ])
+    )
+  ];
+}
+
+// 지금 값: Storybook이 문서 루트에서 계산한 값. 기본값(var()는 푼 식)과 같으면 "기본값"이라 적어 브랜드가 바꾼 값과 구분한다
+function currentValue(name, info) {
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(name)
+    .trim()
+    .replace(/\s+/g, " ");
+  if (!value) return "—";
+  const def =
+    info.resolved ??
+    (info.light === info.dark
+      ? info.light
+      : `light-dark(${info.light}, ${info.dark})`);
+  return value === def ? "기본값" : value;
+}
+
+function hooks(rows, hookInfo) {
+  if (!rows.length) return h("p", {}, "읽는 변수가 없다.");
+  return KINDS.map((kind) => [
+    kind,
+    rows.filter(([name]) => hookInfo[name]?.kind === kind)
+  ])
+    .filter(([, list]) => list.length)
+    .map(([kind, list]) =>
+      fold(
+        `${kind} ${list.length}개 — ${KIND_NOTE[kind]}`,
+        kind === "g" || kind === "s",
+        table(
+          `${kind} hook`,
+          [
+            "hook",
+            "종류",
+            "기본값 (라이트 · 다크)",
+            "지금 값 (계산된 값)",
+            "읽는 곳 (지금 · native)",
+            "util.css로 바뀌는가",
+            "명세 항목"
+          ],
+          list.map(([name, now, nowAt, native, nativeAt]) => {
+            const info = hookInfo[name];
+            const where = (mode, n, at) =>
+              n
+                ? h(
+                    "div",
+                    {},
+                    `${MODE[mode]} ${n}곳: ${at}${n > 1 ? " 등" : ""}`
+                  )
+                : null;
+            return [
+              h("code", {}, name, info.next ? ` → ${info.next}` : ""),
+              info.kind,
+              info.light === undefined
+                ? "—"
+                : info.light === info.dark
+                  ? info.light
+                  : `${info.light} · ${info.dark}`,
+              currentValue(name, info),
+              [where("now", now, nowAt), where("native", native, nativeAt)],
+              info.util,
+              info.items.length ? info.items.join(", ") : "—"
+            ];
+          })
+        )
+      )
+    );
+}
+
+function gaps(rows) {
+  const count = (prefix) => rows.filter((g) => g.how.startsWith(prefix)).length;
+  // 브리지가 잇는 변수는 명세 항목(SPEC_ITEMS)의 bridgeVars다
+  const how = (g) =>
+    g.how === "브리지" && item(g.item)?.bridgeVars.length
+      ? `브리지 (${item(g.item).bridgeVars.join(", ")})`
+      : g.how;
+  return [
+    h(
+      "p",
+      {},
+      `hook이 직접 닿지 않는 선언 ${rows.length}개: 브리지 ${count("브리지")} · Salesforce 고정 ${count("Salesforce 고정")} · 고정 목록에 없는 빈틈 ${count("빈틈")}`
+    ),
+    rows.length > 0 &&
       table(
         "빈틈 표",
-        ["속성과 값", "위치", "모드", "영향(명세 항목)", "메우는 방법"],
-        view.gaps.map((g) => [
+        [
+          "속성과 값",
+          "위치 (선택자, 파일:줄)",
+          "모드",
+          "영향(명세 항목)",
+          "메우는 방법"
+        ],
+        rows.map((g) => [
           h("code", {}, `${g.prop}: ${g.value}`),
           [
             h("div", {}, g.selector),
             h("div", { className: "slds-text-color_weak" }, g.at)
           ],
           MODE[g.mode],
-          g.item,
-          g.how
+          item(g.item)?.label ?? g.item,
+          how(g)
         ])
-      ),
-    view.js.length > 0 && [
-      h(
-        "h4",
-        { className: "slds-text-title_bold slds-m-top_medium" },
-        "JS에 박힌 값"
-      ),
-      h(
-        "ul",
-        { className: "slds-list_dotted" },
-        view.js.map((s) => h("li", {}, s))
       )
-    ]
+  ];
+}
+
+const sectionBody = (s, hookInfo) => [
+  h("p", { className: "slds-text-title_bold" }, "hook 표"),
+  hooks(s.hooks, hookInfo),
+  h("p", { className: "slds-text-title_bold" }, "빈틈 표"),
+  gaps(s.gaps)
+];
+
+function sections(all, hookInfo) {
+  const files = (list) => list.join(", ");
+  return [
+    h(
+      "p",
+      {},
+      "줄 번호: 기본 컴포넌트 선언은 원본 절의 같은 이름 파일 기준이다. SLDS 2 선언은 정적 검사가 읽는 합친 파일 slds2.cosmos.css 기준인데, 이 파일은 원본 절에 없으니(원본 절은 컴포넌트별 SLDS 2 CSS) 선택자로 찾는다."
+    ),
+    fold(
+      `기본 컴포넌트 폴더의 자기 파일: ${files(all.own.files) || "CSS 없음"}`,
+      true,
+      sectionBody(all.own, hookInfo)
+    ),
+    all.files.map((f) =>
+      fold(
+        `공용 사본 ${f.file} — 여러 기본 컴포넌트 폴더에 같은 파일이 복사돼 있다. 이 컴포넌트도 native에서 싣는다`,
+        false,
+        sectionBody(f, hookInfo)
+      )
+    ),
+    [...all.direct, ...all.sharedBlueprints].map((b) =>
+      fold(
+        `SLDS 2 블루프린트 ${b.name} — ${
+          b.shared
+            ? `공용 사본 ${files(b.files)}에 .slds-${b.name} 선택자가 있어 함께 본다`
+            : b.files.length
+              ? `이 컴포넌트 파일 ${files(b.files.filter((f) => all.own.files.includes(f)))}이 직접 쓴다`
+              : "폴더 이름과 같은 블루프린트(지금 org에서 SLDS 2 CSS가 꾸민다)"
+        }`,
+        false,
+        sectionBody(b, hookInfo)
+      )
+    )
   ];
 }
 
@@ -361,7 +471,7 @@ function sources(list) {
       h("mark", { style: MARK.hook }, "hook"),
       " ",
       h("mark", { style: MARK.literal }, "하드코딩(var() 없는 색·길이·시간)"),
-      ". 정적 검사는 SLDS 2 CSS를 합친 slds2.cosmos.css로 판정하므로 빈틈 표의 줄 번호는 그 파일 기준이다."
+      "."
     ),
     list.map(sourceFile),
     h(
@@ -377,8 +487,12 @@ function sources(list) {
   ];
 }
 
-/** 원본과 hook 스토리 본문. view: 페이지 데이터, sources: [경로, () => import("…?raw")], hookInfo: hook-info.js */
-export function sourceAndHooks(view, list, hookInfo) {
+/**
+ * 원본과 hook 스토리 본문.
+ * view: 페이지 데이터, list: [경로, () => import("…?raw")], hookInfo: hook-info.js, sharedInfo: shared-info.js(블루프린트·공용 사본 절)
+ */
+export function sourceAndHooks(view, list, hookInfo, sharedInfo) {
+  const all = sectionsOf(view, sharedInfo);
   return h(
     "div",
     { className: "sb-stack" },
@@ -388,13 +502,19 @@ export function sourceAndHooks(view, list, hookInfo) {
       "판정은 정적 반영 검사(설계 9.6, audit/report.json과 같은 계산)를 카탈로그를 만들 때 다시 돌린 결과다. " +
         "지금은 org가 쓰는 synthetic 경로(SLDS 2 CSS), native는 기본 컴포넌트가 native shadow로 바뀐 뒤(*.slds.css)다."
     ),
-    header(view),
+    header(view, all),
     heading("요약: 브랜드 명세 항목별 반영"),
-    summary(view),
-    heading("hook 표: 이 컴포넌트가 읽는 변수"),
-    hooks(view, hookInfo),
-    heading("빈틈 표: hook이 닿지 않는 선언"),
-    gaps(view),
+    summary(all),
+    heading("출처별 hook 표와 빈틈 표"),
+    sections(all, hookInfo),
+    view.js.length > 0 && [
+      heading("JS에 박힌 값"),
+      h(
+        "ul",
+        { className: "slds-list_dotted" },
+        view.js.map((s) => h("li", {}, s))
+      )
+    ],
     heading("원본"),
     sources(list)
   );

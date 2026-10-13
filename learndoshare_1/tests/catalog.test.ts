@@ -89,43 +89,54 @@ test("없는 폴더, 빈 폴더, 이전에 만든 폴더(examples.json 있음)�
   assert.deepEqual(generateCatalog({ lbcDir, outStories: empty }), generated);
 });
 
-// 원본과 hook 보기(설계 9.5). 데이터는 생성 파일의 `const view = {...};` 한 줄이다
+// 원본과 hook 보기(설계 9.5). 데이터는 생성 파일의 `const view = {...};` 한 줄과 공유 모듈 hook-info.js·shared-info.js의 `export default {...};` 한 줄이다
 const viewOf = (file: string) => JSON.parse(/^const view = (.*);$/m.exec(readFileSync(join(out, file), "utf8"))![1]);
+const moduleOf = (file: string) => JSON.parse(/^export default (.*);$/m.exec(readFileSync(join(out, file), "utf8"))![1]);
 const req = createRequire(join(root, "package.json"));
 const rawImports = (text: string) => [...text.matchAll(/import\("([^"]+)\?raw"\)|from "([^"]+)\?raw"/g)].map((m) => m[1] ?? m[2]);
+type Section = { counts: Record<string, Record<string, number[]>>; hooks: [string, number, string, number, string][]; gaps: { how: string }[] };
+// 절 여러 개의 개수 [hook, 브리지, 고정, 빈틈]를 더한 가장 나쁜 상태(report.json의 판정 방식)
+const worst = (sections: Section[], item: string, mode: string) => {
+  const n = [0, 0, 0, 0];
+  for (const s of sections) s.counts[item]?.[mode].forEach((x, i) => (n[i] += x));
+  return n[3] ? "gap" : n[2] ? "fixed" : n[1] ? "bridge" : n[0] ? "reached" : "n/a";
+};
+const reportWorst = (report: { byComponent: Record<string, Record<string, Record<string, string>>> }, keys: string[], item: string, mode: string) =>
+  keys.map((k) => report.byComponent[k]?.[item]?.[mode] ?? "n/a").reduce((a, b) => ((RANK as string[]).indexOf(b) > (RANK as string[]).indexOf(a) ? b : a));
+const report = JSON.parse(readFileSync(join(root, "audit/report.json"), "utf8"));
+const ITEMS = Object.keys(report.byItem);
 
 test("Button 스토리 파일에 '원본과 hook' 스토리가 있고 report의 button 항목을 쓴다", () => {
   const story = readFileSync(join(out, "Button.stories.js"), "utf8");
   assert.match(story, /name: "원본과 hook"/);
-  const view = viewOf("Button.stories.js");
-  assert.equal(view.tag, "lightning-button");
-  assert.equal(view.native, true);
-  assert.ok(view.blueprints.includes("button"), view.blueprints.join(" "));
-  // 머리 요약의 상태는 audit/report.json byComponent의 button(기본 컴포넌트 폴더와 같은 이름의 블루프린트)과
-  // 이 페이지가 함께 보는 블루프린트 항목 중 가장 나쁜 상태와 같다
-  const report = JSON.parse(readFileSync(join(root, "audit/report.json"), "utf8"));
-  const keys = [view.folder, ...view.blueprints];
-  assert.ok(report.byComponent.button && view.folder === "button");
-  for (const row of view.summary) {
-    for (const mode of ["now", "native"]) {
-      const expected = keys.map((k: string) => report.byComponent[k]?.[row.item]?.[mode] ?? "n/a").reduce((a: string, b: string) => ((RANK as string[]).indexOf(b) > (RANK as string[]).indexOf(a) ? b : a));
-      assert.equal(row[mode].status, expected, `${row.item} ${mode}`);
-    }
-  }
-  assert.deepEqual(Object.keys(report.byComponent.button).filter((i) => !view.summary.some((r: { item: string }) => r.item === i)), []);
-  // hook 표: 페이지에는 읽는 곳, 공유 hook-info.js에는 종류·이어지는 hook·기본값·util.css 허용
-  const info = JSON.parse(/^export default (.*);$/m.exec(readFileSync(join(out, "hook-info.js"), "utf8"))![1]);
-  const hook = (name: string) => view.hooks.some((h: { name: string }) => h.name === name) && info[name];
   assert.match(story, /^import hookInfo from "\.\/hook-info\.js";$/m);
-  assert.ok(view.hooks.find((h: { name: string }) => h.name === "--slds-s-button-radius-border").now > 0);
+  assert.match(story, /^import sharedInfo from "\.\/shared-info\.js";$/m);
+  assert.match(story, /^import \{ sourceAndHooks \} from "\.\.\/salesforce-source\.js";$/m);
+  const view = viewOf("Button.stories.js");
+  const shared = moduleOf("shared-info.js");
+  assert.deepEqual([view.tag, view.folder, view.native], ["lightning-button", "button", true]);
+  // "이 컴포넌트"(폴더의 자기 파일 + 직접 쓰는 블루프린트)의 판정은 report.json byComponent의 button(폴더와 같은 이름의 블루프린트를 한 키로 센다)과 같다
+  const direct = view.blueprints.filter((b: { shared: boolean }) => !b.shared).map((b: { name: string }) => b.name);
+  assert.ok(direct.includes("button") && view.shared.length === 0, JSON.stringify(view.blueprints));
+  const main = [view.own, ...direct.map((b: string) => shared.blueprints[b])];
+  for (const item of ITEMS) for (const mode of ["now", "native"]) assert.equal(worst(main, item, mode), reportWorst(report, [view.folder, ...direct], item, mode), `${item} ${mode}`);
+  assert.ok(Object.keys(report.byComponent.button).every((i) => main.some((s) => s.counts[i])));
+  // hook 표: 행은 절에, 종류·이어지는 hook·기본값·util.css 허용은 공유 hook-info.js에
+  const info = moduleOf("hook-info.js");
+  const rows = main.flatMap((s) => s.hooks);
+  const hook = (name: string) => rows.some(([n]) => n === name) && info[name];
+  assert.ok(rows.some(([n, now]) => n === "--slds-s-button-radius-border" && now > 0));
   assert.deepEqual([hook("--slds-s-button-radius-border")?.kind, hook("--slds-s-button-radius-border")?.next], ["s", "--slds-g-radius-border-2"]);
   assert.equal(hook("--slds-g-radius-border-2")?.light, "0.5rem");
   assert.equal(hook("--slds-g-radius-border-2")?.util, "예");
   assert.equal(hook("--slds-c-button-radius-border")?.kind, "c");
   assert.match(hook("--slds-c-button-radius-border")?.util, /^아니요/);
+  // 기본값에 var()가 있으면 푼 식을 함께 둔다(지금 값과 비교해 "기본값"을 가린다)
+  assert.match(hook("--slds-g-color-accent-2")?.resolved, /^light-dark\(#[0-9a-f]+, #[0-9a-f]+\)$/i);
   // 빈틈 표: 브리지와 고정으로 판정된 선언도 메우는 방법과 함께 보여 준다
-  assert.ok(view.gaps.some((g: { how: string }) => g.how.startsWith("브리지")));
-  assert.ok(view.gaps.some((g: { how: string }) => g.how.startsWith("Salesforce 고정")));
+  const gaps = main.flatMap((s) => s.gaps);
+  assert.ok(gaps.some((g) => g.how === "브리지"));
+  assert.ok(gaps.some((g) => g.how.startsWith("Salesforce 고정")));
   // 원본 탭: 기본 컴포넌트 폴더의 html·js·css와 SLDS 2 컴포넌트 CSS를 bare specifier ?raw로 읽는다
   const raws = rawImports(story);
   for (const spec of [
@@ -137,12 +148,38 @@ test("Button 스토리 파일에 '원본과 hook' 스토리가 있고 report의 
     assert.ok(raws.includes(spec), `${spec}이 없다`);
   }
   assert.deepEqual(raws.filter((spec) => !existsSync(req.resolve(spec))), []);
-  assert.match(story, /^import \{ sourceAndHooks \} from "\.\.\/salesforce-source\.js";$/m);
+});
+
+test("Helptext는 공용 사본(form-element.slds.css)과 거기서 온 블루프린트를 이 컴포넌트 것과 나눠 보인다", () => {
+  const view = viewOf("Helptext.stories.js");
+  const shared = moduleOf("shared-info.js");
+  assert.ok(view.shared.some((s: { file: string }) => s.file === "form-element.slds.css"), JSON.stringify(view.shared));
+  assert.ok(!view.own.files.includes("form-element.slds.css"));
+  const bp = (name: string) => view.blueprints.find((b: { name: string }) => b.name === name);
+  assert.deepEqual(bp("checkbox"), { name: "checkbox", shared: true, files: ["form-element.slds.css"] });
+  assert.equal(bp("dueling-list")?.shared, true);
+  // 폴더 전체(자기 파일 + 공용 사본)는 report.json의 폴더 키 helptext와 같은 판정이다
+  const folder = [view.own, ...view.shared.map((s: { file: string }) => ({ ...shared.files[s.file], ...s }))];
+  for (const item of ITEMS) for (const mode of ["now", "native"]) assert.equal(worst(folder, item, mode), reportWorst(report, ["helptext"], item, mode), `${item} ${mode}`);
+});
+
+test("블루프린트와 공용 사본 절은 shared-info.js에 한 번만 쓰고, 페이지에는 이름과 출처만 둔다", () => {
+  const shared = moduleOf("shared-info.js");
+  const pages = readdirSync(out).filter((f) => f.endsWith(".stories.js")).map(viewOf);
+  for (const view of pages) {
+    for (const b of view.blueprints) {
+      assert.deepEqual(Object.keys(b).sort(), ["files", "name", "shared"], view.folder);
+      assert.ok(shared.blueprints[b.name], `${view.folder}: ${b.name}`);
+    }
+    for (const s of view.shared) assert.ok(shared.files[s.file], `${view.folder}: ${s.file}`);
+  }
+  // 버튼 블루프린트를 여러 페이지가 보지만 행은 shared-info.js에만 있다
+  assert.ok(pages.filter((v) => v.blueprints.some((b: { name: string }) => b.name === "button")).length > 5);
 });
 
 test("CSS가 없는 컴포넌트(treeGrid)도 '원본과 hook' 스토리가 있다", () => {
   const view = viewOf("TreeGrid.stories.js");
-  assert.deepEqual([view.blueprints, view.hooks, view.gaps], [[], [], []]);
+  assert.deepEqual([view.blueprints, view.shared, view.own.hooks, view.own.gaps], [[], [], [], []]);
   assert.ok(rawImports(readFileSync(join(out, "TreeGrid.stories.js"), "utf8")).includes("lightning-base-components/src/lightning/treeGrid/treeGrid.js"));
 });
 

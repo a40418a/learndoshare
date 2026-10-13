@@ -22,12 +22,15 @@ export type Baseline = { hardcoded: Record<string, number>; hooks: string[]; nat
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const SHOWN = 20;
 
-/** 설치된 SLDS 2·기본 컴포넌트와 저장소의 milvusBridge.css를 읽는다. 순서를 고정해 OS와 상관없이 같은 결과를 낸다 */
-export function readSources(): Sources {
+/**
+ * 설치된 SLDS 2·기본 컴포넌트와 저장소의 milvusBridge.css를 읽는다. 순서를 고정해 OS와 상관없이 같은 결과를 낸다.
+ * lbcDir: 기본 컴포넌트의 src/lightning 폴더. 기본은 설치본이고, 카탈로그 생성기는 예제를 읽은 폴더를 넘긴다
+ */
+export function readSources(lbcDir?: string): Sources {
   const req = createRequire(join(root, "package.json"));
   const pkgDir = (name: string) => dirname(req.resolve(`${name}/package.json`));
-  const lbcPkg = pkgDir("lightning-base-components");
-  const lbc = join(lbcPkg, "src/lightning");
+  const lbc = lbcDir ?? join(pkgDir("lightning-base-components"), "src/lightning");
+  const lbcPkg = join(lbc, "../..");
   // 컴포넌트 폴더 바로 아래 CSS만 읽는다. 더 아래(__examples__)는 문서 예제다
   const lbcFiles = readdirSync(lbc, { withFileTypes: true })
     .filter((d) => d.isDirectory())
