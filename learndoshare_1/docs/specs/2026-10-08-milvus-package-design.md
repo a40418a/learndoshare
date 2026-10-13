@@ -523,7 +523,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 - **두 모드 모두 고정:** 아이콘 SVG 모양과 개체 아이콘 글리프의 흰색, z-index 층, 0·1이 아닌 투명도, 토스트 표시 시간(JS 상수 4800·9600ms), 스피너 모양, 색 선택기 색상환, Agentforce 영역, 이미지 위 어둡게 처리, 파괴·성공 버튼의 흰 글자, LEX 전역 헤더(org 테마가 원본)
 - **native 전환 뒤 생기는 고정:** 드롭다운·팝오버·툴팁 그림자, 툴팁 배경과 글자 크기, native `lightning-card` 그림자, 모달 반경, 배지·토글 15rem, 입력창 두께, 콤보박스 높이, `:focus` 위주 포커스 표시와 3px 글로우, 버튼 떠오름, 표 머리글·hover 회색, 검색 강조 `#ff0`, 모든 움직임(9.2의 c hook을 열면 일부 메울 수 있음)
 
-**2026-10-12 사용자 합의로 넓히고 더한 것.** Task 14 정적 검사와 Task 15 브리지 뒤에 남은 빈틈 604개(지금 270, native 341)를 사용자가 16개 묶음으로 하나씩 보고 정했다. 매처는 `lib/fixed-list.ts`에 있다.
+**2026-10-12 사용자 합의로 넓히고 더한 것.** Task 14 정적 검사와 Task 15 브리지 뒤에 남은 빈틈 604개(중복을 뺀 수. 모드별로 세면 지금 270, native 344이고, 두 모드에 겹치는 선언이 있어 합과 다르다)를 사용자가 16개 묶음으로 하나씩 보고 정했다. 매처는 `lib/fixed-list.ts`에 있다.
 - **판정에서 뺀 것 (브랜드 항목이 아님):** 순차 지연(`*-delay`), em 들여쓰기·`auto` 정렬·`revert`, 숨긴 입력 1px·트리 표 버튼, 크기 hook으로 만든 원, hover의 회전·이동·확대 변형(떠오름이 섞인 값과 눌림 `:active`는 남김), `outline-offset`, 상대 글자 크기(`1em`·`%`), border로 그린 삼각형, 이미지·`transparent`·`currentColor`·시스템 색. 그리고 `:not(:disabled)`을 비활성으로 세던 오류를 고쳤다
 - **넓힌 라벨:** 아이콘 SVG·애니메이션 아이콘 모양과 개체 아이콘 글리프의 흰색 / 토스트 표시·등장 시간(JS 4800·9600ms, 등장 0.4s) / 드롭다운·팝오버·툴팁 그림자(꼬리 포함) / native 컨트롤 높이(콤보박스·버튼·range 입력) / native 포커스 표시(:focus 위주, 3px 글로우, Firefox 링·F6 강조)
 - **두 모드 모두 고정에 더함:** 시간 묶음 밖 움직임(아이콘·알림 애니메이션)과 프레임 애니메이션, 미세 간격(0.125rem 이하)과 특수 영역 간격, 특수 영역 줄 간격, 기본 컴포넌트 내부 값, 목록 머리글 포커스 모서리·읽기 전용 입력 모서리, 파괴·성공·인버스 버튼 hover 그림자, 색 선택기·패널 편집·아바타 이니셜 그림자, 이미지 포커스 그림자, 표 편집 셀·전역 내비 굵기, 팝오버 강조선 두께, timeline 항목 색, 테마 배경 위 반투명 글자, 글자 자름 페이드·색 선택기 그라데이션, 브레드크럼 눌림 축소. 세로 내비 선택 바탕은 고정 대신 브리지로 잇는다(5.6)
@@ -627,7 +627,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | GitHub Packages는 `@범위/이름` 형식이 필요하고, 공개 패키지도 설치에 토큰이 필요하다 | GitHub 공식 문서 |
 | Node 22.18+/23.6+는 `.ts`를 그대로 실행하지만 `node_modules` 안의 `.ts`는 거부한다 | Node 공식 문서 |
 | `permissions.ask`는 auto 모드에서도 실행 전에 묻는다. `Edit(...)` 규칙 하나가 모든 파일 편집 도구를 막는다. `CLAUDE.md`에 `@milvus-design.md`라고 쓰면 그 파일을 함께 불러온다 | Claude Code 공식 문서 |
-| SLDS 2 CSS는 976KB(압축 약 108KB)이고 글꼴 파일을 참조하지 않는다 | 로컬 |
+| SLDS 2 CSS는 약 1MB(996,682바이트, gzip 약 108KiB)이고 글꼴 파일을 참조하지 않는다 | 로컬 |
 | Salesforce 원본(`lightning-base-components`) 이용 약관은 복제·공개 게시·배포를 허락하고 약관 동봉을 요구한다 | `LICENSE.txt` |
 | LWC `.ts` 검사는 `@salesforce/eslint-config-lwc`(4.1.2)의 `recommended-ts` 설정으로 한다(10/9부터 쓰지 않음). `sfdx-lwc-jest`에 `lightning/platformResourceLoader` stub이 있다 | 설치된 패키지 |
 | 패키지에 넣은 Storybook 설정을 `node_modules`에서 그대로 띄울 수 있다. `main.ts`, 형제 `.ts` 모듈(상대 import에 `.ts`), `.ts` 스토리가 동작한다. Storybook이 자체 로더(esbuild)로 `node_modules` 안의 `.ts`도 변환하므로 `dist/`로 컴파일할 필요가 없다. framework(`@storybook/web-components-vite`)와 addon(`addon-docs`, `addon-a11y`, autodocs 화면)도 찾는다 | Task 3 스파이크(2026-10-09): `pnpm pack` tgz를 새 SFDX 프로젝트(`learndoshare_2`)에 `pnpm add -D`, Storybook 10.6.0·Vite 7.3.7, 브라우저로 스토리 화면 확인 |
