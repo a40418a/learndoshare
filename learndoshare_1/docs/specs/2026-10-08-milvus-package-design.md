@@ -177,7 +177,7 @@ force-app/main/default/
 - sha256이 다르면 `pnpm milvus update --force`로 되돌리라고 안내한다
 
 ### 4.4 `deploy [--target-org <별칭>] [--yes]`
-1. 대상 org: `--target-org` → `milvus.config.json` 순서로 정한다. sf 기본 org는 쓰지 않는다. 정해지지 않으면 로그인된 org 목록을 보여 주고 멈춘다
+1. 대상 org: `--target-org` → `milvus.config.json` 순서로 정한다. sf 기본 org는 쓰지 않는다. 정해지지 않으면 `sf org list`로 별칭을 확인하라고 안내하고 멈춘다(org 목록을 직접 출력하면 org ID가 함께 나오므로 출력하지 않는다, 2026-10-13 구현 판단. `sf org list --json`은 모든 org의 액세스 토큰을 출력하므로 안내하지 않는다)
 2. 전체 `check`를 실행한다. 실패하면 멈춘다. 이때 `milvusVf.css`를 다시 만든다(`BRAND_COLOR`로 계산한 팔레트 `:root{--slds-r-color-brand-5~95}`만, 약 620바이트, `text/css`. SLDS 2 CSS 사본은 넣지 않는다, 10/9 D2)
 3. `sf`가 없거나 대상 org 로그인이 만료되었으면 멈춘다
 4. **계획 출력:** 대상 org, 지금 활성 테마 → 새 활성 테마, 배포 목록, 경고("활성 테마 변경은 org 전체 사용자 화면에 적용됩니다"). VF 사용 시 안내도 낸다: VF 페이지가 SLDS 2로 그려지려면 Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켜야 한다. 이 설정은 메타데이터로 읽을 수 없어 `deploy`가 확인하지 못한다. `--yes`가 없으면 여기서 끝난다. 사람이 터미널에서 실행했고 `--yes`가 없으면 y/N을 묻는다
