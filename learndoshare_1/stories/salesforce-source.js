@@ -139,6 +139,15 @@ function sectionsOf(view, sharedInfo) {
   };
 }
 
+function directText(all) {
+  if (all.direct.length) return all.direct.map((b) => b.name).join(", ");
+  if (!all.own.files.length && !all.files.length)
+    return "없음 (이 폴더에는 CSS가 없다. 안에서 쓰는 다른 기본 컴포넌트를 본다)";
+  return all.sharedBlueprints.length
+    ? "없음 (공용 사본에서 온 블루프린트만 있다)"
+    : "없음 (이 폴더의 CSS에 SLDS 2 블루프린트 선택자가 없다)";
+}
+
 function header(view, all) {
   const names = (list) =>
     list.length ? list.map((b) => b.name).join(", ") : "없음";
@@ -153,12 +162,7 @@ function header(view, all) {
       "컴포넌트",
       `${view.tag} (lightning-base-components 폴더 ${view.folder})`
     ),
-    row(
-      "SLDS 블루프린트 (직접)",
-      view.blueprints.length
-        ? names(all.direct)
-        : "없음 (이 폴더에는 CSS가 없다. 안에서 쓰는 다른 기본 컴포넌트를 본다)"
-    ),
+    row("SLDS 블루프린트 (직접)", directText(all)),
     all.files.length > 0 &&
       row(
         "공용 사본",
@@ -343,9 +347,13 @@ function sections(all, hookInfo) {
         `SLDS 2 블루프린트 ${b.name} — ${
           b.shared
             ? `공용 사본 ${files(b.files)}에 .slds-${b.name} 선택자가 있어 함께 본다`
-            : b.files.length
+            : b.files.some((f) => all.own.files.includes(f))
               ? `이 컴포넌트 파일 ${files(b.files.filter((f) => all.own.files.includes(f)))}이 직접 쓴다`
-              : "폴더 이름과 같은 블루프린트(지금 org에서 SLDS 2 CSS가 꾸민다)"
+              : `폴더 이름과 같은 블루프린트(지금 org에서 SLDS 2 CSS가 꾸민다. report.json도 폴더와 같은 키로 센다)${
+                  b.files.length
+                    ? `. 공용 사본 ${files(b.files)}에도 선택자가 있다`
+                    : ""
+                }`
         }`,
         false,
         sectionBody(b, hookInfo)

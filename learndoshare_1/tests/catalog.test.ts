@@ -163,6 +163,26 @@ test("Helptext는 공용 사본(form-element.slds.css)과 거기서 온 블루�
   for (const item of ITEMS) for (const mode of ["now", "native"]) assert.equal(worst(folder, item, mode), reportWorst(report, ["helptext"], item, mode), `${item} ${mode}`);
 });
 
+test("공용 사본의 판정이 폴더마다 다르면 그 페이지가 덮어쓰고, 폴더 전체는 report.json의 폴더 키와 같다(Carousel, ButtonMenu)", () => {
+  const shared = moduleOf("shared-info.js");
+  for (const file of ["Carousel.stories.js", "ButtonMenu.stories.js"]) {
+    const view = viewOf(file);
+    // button.slds.css는 폴더 안 변수 정의에 따라 native 컨트롤 높이 개수가 달라 이 페이지들이 counts를 덮어쓴다
+    assert.ok(view.shared.some((s: { file: string; counts?: unknown }) => s.file === "button.slds.css" && s.counts), file);
+    // report.json은 폴더와 이름이 같은 블루프린트(carousel)를 폴더 키에 함께 센다
+    const sameName = view.blueprints.some((b: { name: string }) => b.name === view.folder) ? [shared.blueprints[view.folder]] : [];
+    const folder = [view.own, ...view.shared.map((s: { file: string }) => ({ ...shared.files[s.file], ...s })), ...sameName];
+    for (const item of ITEMS) for (const mode of ["now", "native"]) assert.equal(worst(folder, item, mode), reportWorst(report, [view.folder], item, mode), `${file} ${item} ${mode}`);
+  }
+});
+
+test("폴더 이름과 같은 블루프린트는 공용 사본에서만 와도 직접이다(Accordion)", () => {
+  const view = viewOf("Accordion.stories.js");
+  const accordion = view.blueprints.find((b: { name: string }) => b.name === "accordion");
+  assert.deepEqual(accordion, { name: "accordion", shared: false, files: ["accordion-section.slds.css"] });
+  assert.ok(view.shared.some((s: { file: string }) => s.file === "accordion-section.slds.css"));
+});
+
 test("블루프린트와 공용 사본 절은 shared-info.js에 한 번만 쓰고, 페이지에는 이름과 출처만 둔다", () => {
   const shared = moduleOf("shared-info.js");
   const pages = readdirSync(out).filter((f) => f.endsWith(".stories.js")).map(viewOf);
@@ -175,6 +195,12 @@ test("블루프린트와 공용 사본 절은 shared-info.js에 한 번만 쓰�
   }
   // 버튼 블루프린트를 여러 페이지가 보지만 행은 shared-info.js에만 있다
   assert.ok(pages.filter((v) => v.blueprints.some((b: { name: string }) => b.name === "button")).length > 5);
+  // 읽는 곳의 선택자 자리는 비지 않는다(native 표시만 있던 선택자는 :host)
+  const ats = [...pages.map((v) => v.own), ...Object.values(shared.files), ...Object.values(shared.blueprints)].flatMap((s) =>
+    (s as Section).hooks.flatMap(([, , nowAt, , nativeAt]) => [nowAt, nativeAt]),
+  );
+  assert.deepEqual(ats.filter((at) => /^ \{|· +\{|  /.test(at)), []);
+  assert.ok(ats.some((at) => at.includes("· :host {")));
 });
 
 test("CSS가 없는 컴포넌트(treeGrid)도 '원본과 hook' 스토리가 있다", () => {

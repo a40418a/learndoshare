@@ -145,7 +145,8 @@ function readAudit(lbcDir: string): Audit {
       if (s === "slds2") a.sldsBlueprints.add(comp);
       const list = a.reads.get(`${s} ${comp}`) ?? [];
       // native 표시 :host([data-render-mode="shadow"])는 모드 열이 말해 주므로 읽는 곳에서는 뗀다(생성 파일 크기)
-      const at = `${where}${cssList.comma(selector)[0].replace(/^:host\(\[data-render-mode="shadow"\]\)\s*/, "")} { ${d.prop} }`;
+      // 선택자가 그것뿐이면 :host로 적는다
+      const at = `${where}${cssList.comma(selector)[0].replace(/^:host\(\[data-render-mode="shadow"\]\)\s*/, "") || ":host"} { ${d.prop} }`;
       for (const [, name] of d.value.matchAll(/var\(\s*(--[\w-]+)/g)) list.push({ name, at, modes });
       a.reads.set(`${s} ${comp}`, list);
     });
@@ -277,8 +278,9 @@ const sectionFor = (keys: string[], a: Audit): Section =>
  * 컴포넌트 페이지 하나의 데이터. 출처마다 절을 나눠 다른 컴포넌트의 판정이 섞여 보이지 않게 한다.
  * - own: 기본 컴포넌트 폴더의 자기 파일(폴더 이름과 같은 파일이거나 이 폴더에만 있는 파일)
  * - shared: 여러 폴더에 같은 이름으로 복사해 넣은 공용 사본(form-element.slds.css 등). 절 내용은 shared-info.js에 파일 이름으로 한 번만 쓴다
- * - blueprints: 폴더 CSS가 쓰는 SLDS 블루프린트. 자기 파일이 쓰거나 폴더 이름과 같으면(input, card. report.json도 폴더와 같은 키로 센다) 직접,
- *   공용 사본에서만 오면 shared. 절 내용은 shared-info.js에 블루프린트마다 한 번만 쓴다
+ * - blueprints: 폴더 CSS가 쓰는 SLDS 블루프린트와 폴더 이름과 같은 블루프린트. 직접(shared: false)은 자기 파일이 쓰는 것과 폴더 이름과 같은 것이다.
+ *   폴더 이름과 같으면 공용 사본에서만 와도 직접이다(accordion. report.json도 폴더와 같은 키로 함께 센다). 그 밖에 공용 사본에서만 오면 shared.
+ *   files는 그 블루프린트를 쓰는 폴더 안 파일이다. 절 내용은 shared-info.js에 블루프린트마다 한 번만 쓴다
  */
 function viewOf(comp: string, tag: string, a: Audit) {
   const files = a.lbcFiles.get(comp) ?? [];
@@ -290,7 +292,7 @@ function viewOf(comp: string, tag: string, a: Audit) {
     .sort()
     .map((name) => {
       const files = [...(used.get(name) ?? [])].sort();
-      return { name, shared: files.length > 0 && files.every(isShared), files };
+      return { name, shared: name !== kebab(comp) && files.length > 0 && files.every(isShared), files };
     });
 
   // JS에 박힌 값은 CSS 정적 검사에 보이지 않아 따로 적는다(설계 9.5). 카탈로그에 있는 것은 개체 아이콘 색을 쓰는 icon·avatar다
