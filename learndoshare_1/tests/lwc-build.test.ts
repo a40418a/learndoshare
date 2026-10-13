@@ -4,7 +4,8 @@ import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSyn
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildLwc, sfdxLwcModules } from "../lib/lwc-build.ts";
+import type { RollupLog } from "rollup";
+import { buildLwc, lwcRollupOptions, sfdxLwcModules } from "../lib/lwc-build.ts";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const fixture = join(root, "tests/fixtures/lwc");
@@ -60,4 +61,41 @@ test("sfdxLwcModules는 모든 패키지 폴더의 lwc/<이름>/<이름>.js를 c
     { name: "c/a", path: join(project, "force-app/main/default/lwc/a/a.js") },
     { name: "c/b", path: join(project, "extra/lwc/b/b.js") }
   ]);
+});
+
+// onwarn과 manualChunks만 부른다. 입력 파일은 읽지 않는다
+const options = (npmFromPackage?: boolean) => lwcRollupOptions({ out: join(tmp, "o"), entries: { index: join(fixture, "index.js") }, modules: [], npmFromPackage });
+const warnings = (npmFromPackage: boolean | undefined, ...logs: RollupLog[]) => {
+  const shown: RollupLog[] = [];
+  for (const log of logs) options(npmFromPackage).onwarn?.(log, (w) => shown.push(w as RollupLog));
+  return shown.map((w) => w.code);
+};
+const LBC = "/p/node_modules/.pnpm/lightning-base-components@1/node_modules/lightning-base-components/src/lightning";
+const log = (code: string, extra: Partial<RollupLog> = {}): RollupLog => ({ code, message: code, ...extra });
+const lbcWarning = log("PLUGIN_WARNING", { id: `${LBC}/card/card.html` });
+const projectWarning = log("PLUGIN_WARNING", { id: "/customer/force-app/main/default/lwc/a/a.html" });
+
+test("npmFromPackage면 lightning-base-components 안의 컴파일 경고와 순환 import 경고를 숨기고 고객 파일 경고는 보인다", () => {
+  const cycle = log("CIRCULAR_DEPENDENCY", { ids: [`${LBC}/a/a.js`, `${LBC}/b/b.js`] });
+  const customerCycle = log("CIRCULAR_DEPENDENCY", { ids: [`${LBC}/a/a.js`, "/customer/force-app/main/default/lwc/a/a.js"] });
+  assert.deepEqual(warnings(true, lbcWarning, cycle), []);
+  assert.deepEqual(warnings(true, projectWarning, customerCycle), ["PLUGIN_WARNING", "CIRCULAR_DEPENDENCY"]);
+  assert.deepEqual(warnings(true, log("PLUGIN_WARNING", { id: `${LBC.replaceAll("/", "\\")}\\card\\card.html` })), []); // Windows 경로
+});
+
+test("npmFromPackage가 없으면(저장소 빌드) 경고를 모두 그대로 보인다", () => {
+  assert.deepEqual(warnings(undefined, lbcWarning, log("CIRCULAR_DEPENDENCY", { ids: [`${LBC}/a/a.js`] })), ["PLUGIN_WARNING", "CIRCULAR_DEPENDENCY"]);
+});
+
+test("해석하지 못한 import는 npmFromPackage와 무관하게 빌드를 실패시킨다", () => {
+  for (const flag of [true, undefined]) {
+    assert.throws(() => options(flag).onwarn?.(log("UNRESOLVED_IMPORT", { message: "못 찾음" }), () => {}), /못 찾음/);
+  }
+});
+
+test("synthetic-shadow chunk 판정은 Windows 경로 구분자도 같게 본다", () => {
+  const { manualChunks } = options().output as { manualChunks: (id: string) => string | undefined };
+  assert.equal(manualChunks("/p/node_modules/@lwc/synthetic-shadow/dist/index.js"), "synthetic-shadow");
+  assert.equal(manualChunks("C:\\p\\node_modules\\@lwc\\synthetic-shadow\\dist\\index.js"), "synthetic-shadow");
+  assert.equal(manualChunks("/p/node_modules/@lwc/engine-dom/dist/index.js"), undefined);
 });

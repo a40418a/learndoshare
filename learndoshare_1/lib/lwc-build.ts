@@ -39,7 +39,12 @@ const platformModules: Plugin = {
 // npmFromPackage이면 이름 대신 이 패키지에서 찾은 폴더의 절대 경로를 기록으로 준다(milvus storybook).
 // 저장소 빌드(pnpm build:lwc)는 이름 기록 그대로다. 절대 경로로 바꾸면 LWC 엔진 사본이 둘에서 하나로 합쳐져 번들이 달라지므로 따로 확인한 뒤에 바꾼다
 const npmDir = (name: string): string => dirname(createRequire(import.meta.url).resolve(`${name}/package.json`));
+// @lwc/rollup-plugin 9.4.3의 defaultModules 복사본이다. 플러그인을 올릴 때 기본값과 비교한다
 const ENGINE_MODULES = ["@lwc/engine-dom", "@lwc/synthetic-shadow", "@lwc/wire-service"];
+// Windows 경로 구분자도 /로 맞춰 비교한다
+const slash = (id: string) => id.replaceAll("\\", "/");
+// 고객이 고칠 수 없는 공식 컴포넌트(lightning-base-components)의 경고인지
+const inLbc = (id?: string) => id !== undefined && slash(id).includes("/lightning-base-components/");
 
 export function lwcRollupOptions(o: { out: string; entries: Record<string, string>; modules: LwcModule[]; npmFromPackage?: boolean }): RollupOptions {
   const npm = (name: string) => ({ npm: o.npmFromPackage ? npmDir(name) : name });
@@ -54,11 +59,13 @@ export function lwcRollupOptions(o: { out: string; entries: Record<string, strin
       sourcemap: true,
       // synthetic shadow는 LWC 엔진보다 먼저 실행돼야 한다(엔진이 로드될 때 한 번 확인한다). 진입이 둘이면 엔진이
       // 공통 chunk로 빠져 진입 파일 본문보다 먼저 실행되므로, synthetic shadow도 chunk로 빼서 import 순서로 앞에 둔다
-      manualChunks: (id) => (id.includes("@lwc/synthetic-shadow") ? "synthetic-shadow" : undefined)
+      manualChunks: (id) => (slash(id).includes("@lwc/synthetic-shadow") ? "synthetic-shadow" : undefined)
     },
     // 해석하지 못한 import를 그대로 두면 Storybook에서 파일 전체가 깨진다. 빌드 단계에서 실패시킨다
     onwarn(warning, warn) {
       if (warning.code === "UNRESOLVED_IMPORT") throw new Error(warning.message);
+      // 고객 프로젝트에서는 공식 컴포넌트 안의 컴파일 경고와 순환 import 경고를 숨긴다(고객이 고칠 수 없다). 저장소 빌드는 그대로 보인다
+      if (o.npmFromPackage && (inLbc(warning.id) || (warning.code === "CIRCULAR_DEPENDENCY" && warning.ids?.every(inLbc)))) return;
       warn(warning);
     },
     // 대체 모듈은 LWC 플러그인보다 앞에 둔다
