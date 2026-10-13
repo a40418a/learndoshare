@@ -1,0 +1,4 @@
+/* 정적 반영 검사용 브리지: .slds-button의 transition 시간만 잇는다 */
+.slds-button {
+  transition-duration: var(--milvus-motion-duration-fast, 0.1s);
+}

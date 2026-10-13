@@ -26,7 +26,7 @@
   },
   "scripts": {
     "lint": "eslint \"force-app/**/lwc/**/*.js\"",
-    "test": "pnpm typecheck && pnpm test:unit && pnpm test:node && pnpm test:brands && pnpm test:learn",
+    "test": "pnpm typecheck && pnpm test:unit && pnpm test:node && pnpm test:brands && pnpm test:learn && pnpm audit:brand",
     "test:unit": "sfdx-lwc-jest",
     "test:node": "node --test \"tests/**/*.test.ts\"",
     "test:learn": "node scripts/check-learn.ts",
@@ -44,7 +44,9 @@
     "prettier:verify": "prettier --check \"**/*.{cls,cmp,component,css,html,js,json,md,page,trigger,xml,yaml,yml}\"",
     "prepare": "husky || true",
     "precommit": "lint-staged",
-    "test:brands": "node scripts/check-brands.ts"
+    "test:brands": "node scripts/check-brands.ts",
+    "audit:brand": "node scripts/audit/run.ts --check",
+    "bridge:generate": "node scripts/bridge/generate.ts"
   },
   "dependencies": {
     "@lwc/engine-dom": "9.4.3",

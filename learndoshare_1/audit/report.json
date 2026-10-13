@@ -1,0 +1,9371 @@
+{
+  "byComponent": {
+    "(global)": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "highlight": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-press": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "accordion": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "accordionSection": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "app-launcher": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "avatar": {
+      "radius": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "avatar-icon-shape": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "fixed",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "avatar-grouped": {
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "avatar-icon-shape": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "backdrop": {
+      "backdrop": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "badge": {
+      "radius": {
+        "now": "reached",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "reached"
+      }
+    },
+    "baseCombobox": {
+      "radius": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "fixed"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "inverse": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "line-height": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "fixed",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "baseComboboxItem": {
+      "density": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "border": {
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "box": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "brand-band": {
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "breadcrumb": {
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "builder-header": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "tab-header-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "builder-toolbar": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "button": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "bridge",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "hover-press": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "fixed"
+      }
+    },
+    "button-group": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "button-group-list": {
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "button-group-row": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "button-space-left": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "buttonGroup": {
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "buttonIcon": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "buttonIconStateful": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "fixed",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "buttonMenu": {
+      "radius": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "inverse": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "fixed",
+        "native": "fixed"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "buttonStateful": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "calendar": {
+      "radius": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "inverse": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "card": {
+      "radius": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "reached"
+      }
+    },
+    "card-wrapper": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "carousel": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "component": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-press": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "carouselImage": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "cell-edit": {
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "cell-fixed": {
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "chat": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "chat-avatar": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "chat-bookend": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "chat-event": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "chat-icon": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "chat-list": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "chat-listitem": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "chat-message": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "checkbox": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "control-height": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-press": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "checkbox-button": {
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-press": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "checkboxGroup": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "coach": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "col": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "color": {
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "color-picker": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "colorPickerCustom": {
+      "radius": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "hover-press": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "colorPickerPanel": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "colorSwatch": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "combobox": {
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "combobox-addon": {
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "combobox-button": {
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "combobox-group": {
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "comment": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "context-bar": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "tab-header-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "coordinates": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "datatable": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "avatar-icon-shape": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "letter-spacing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "text-case": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "datepicker": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "line-height": {
+        "now": "fixed",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "datetimepicker": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "day": {
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "dialog": {
+      "radius": {
+        "now": "fixed",
+        "native": "fixed"
+      }
+    },
+    "disabled-text": {
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "dl": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "docked": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "docked-composer": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "docked-composer-modal": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "docked-form-footer": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "drop-zone": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "dropdown": {
+      "radius": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "dropdown-trigger": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "dualListbox": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "dueling-list": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "dynamic-menu": {
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "dynamicIcon": {
+      "surface": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "einstein-header": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "email-composer": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "expression": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "fade-in-open": {
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "fall-into-ground": {
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "feed": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "file-selector": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "filters": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "highlight": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "form": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "form-element": {
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "formattedEmail": {
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      }
+    },
+    "formattedRichText": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "formattedRichTextRenderer": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "global-actions": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "global-header": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "tab-header-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "grid": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "groupedCombobox": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "gutters": {
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "has-block-links": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-blur-focus": {
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-buffer": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-button-menu": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-cards": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-coordinates": {
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-cushion": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-divider": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-dividers": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-error": {
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-focus": {
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-inline-block-links": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-inline-listbox": {
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-input-focus": {
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-list-interactions": {
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-pinned-regions": {
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "has-submenu": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "helptext": {
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "hint-parent": {
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "icon": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "avatar-icon-shape": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "icon-ellie": {
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "icon-eq": {
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "icon-help": {
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "icon-score": {
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "icon-strength": {
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "icon-text-default": {
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "icon-trend": {
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "icon-typing": {
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "icon-waffle": {
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "highlight": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "illustration": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "image": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "image-has-actions": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "indicator": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "indicator-container": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "input": {
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "input-has-icon": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "inputAddress": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "inputLocation": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "inputName": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "interactiveDialogBase": {
+      "radius": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "fixed",
+        "native": "fixed"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "backdrop": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "fixed",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "is-active": {
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "is-edited": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "highlight": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "is-nested": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "is-open": {
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "is-sortable": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "list": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "listbox": {
+      "radius": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "lookup": {
+      "radius": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "lookupAddress": {
+      "density": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "m-around": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "m-bottom": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "m-horizontal": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "m-left": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "m-right": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "m-top": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "m-vertical": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "markdown": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "highlight": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "media": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "menuDivider": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "menuItem": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "menuSubheader": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "modal": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "modalBase": {
+      "radius": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "fixed"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "backdrop": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "modalBody": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "modalFooter": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "modalHeader": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "multiColumnSortingModal": {
+      "density": {
+        "now": "fixed",
+        "native": "fixed"
+      }
+    },
+    "nav-vertical": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-press": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "navigation-list-vertical": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "no-cell-focus": {
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "highlight": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "notification": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "notification-badge": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "notification-container": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "notify": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "nubbin": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "p-around": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "p-bottom": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "p-horizontal": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "p-left": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "p-right": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "p-top": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "p-vertical": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "page-header": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "tab-header-shape": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "panel": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "path": {
+      "radius": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "path-coach": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "picklist": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "pill": {
+      "radius": {
+        "now": "reached",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "fixed"
+      },
+      "icon-size": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "pillContainer": {
+      "radius": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "popover": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "popup": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "post": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "primitiveBubble": {
+      "radius": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveCellCheckbox": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveCellFactory": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveColorpickerButton": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "primitiveColumnSorter": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "reached",
+        "native": "fixed"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveCoordinateItem": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveDatatableIeditPanel": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveDatatableStatusBar": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveDatatableTooltip": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveDatatableTooltipBubble": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "avatar-icon-shape": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveHeaderActions": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "primitiveHeaderFactory": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "avatar-icon-shape": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "primitiveIcon": {
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "avatar-icon-shape": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveInputCheckbox": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveInputCheckboxButton": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveInputColor": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveInputFile": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveInputSimple": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveInputToggle": {
+      "radius": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveResizeHandler": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "primitiveTreegridCellToggle": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "progress": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "progress-bar": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "progress-ring": {
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "progressBar": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "progressIndicator": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "progressRing": {
+      "radius": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "progressStep": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "inverse": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "prompt": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "publisher": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "radio": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "control-height": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "hover-press": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "radioGroup": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "region": {
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "required": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "resizable": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "rich-text-area": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "rich-text-editor": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "rise-from-ground": {
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "scoped-notification": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "section": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "section-title": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "letter-spacing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "text-case": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "select": {
+      "radius": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "density": {
+        "now": "reached",
+        "native": "fixed"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "fixed"
+      }
+    },
+    "setup-assistant": {
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "sldsCommon": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "sldsFormElementUtils": {
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "reached"
+      }
+    },
+    "sldsMediaObject": {
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      }
+    },
+    "sldsUtilsBorders": {
+      "border-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "reached"
+      }
+    },
+    "sldsUtilsBox": {
+      "radius": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "sldsUtilsGrid": {
+      "density": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "sldsUtilsInteractions": {
+      "surface": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "fixed"
+      }
+    },
+    "sldsUtilsMargin": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "sldsUtilsPadding": {
+      "density": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "sldsUtilsThemes": {
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "inverse": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "slide-up-open": {
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "slider": {
+      "radius": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "fixed"
+      }
+    },
+    "spinner": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "fixed",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "fixed",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "fixed"
+      }
+    },
+    "split-view": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "stackedTab": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "stackedTabset": {
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "staticMap": {
+      "fixed": {
+        "now": "fixed",
+        "native": "fixed"
+      }
+    },
+    "sub-tabs": {
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "subtheme-agentic": {
+      "radius": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "hover-press": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "summary-detail": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "swatch": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "tab": {
+      "radius": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "tabBar": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "table": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-press": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "tabs": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "tab-header-shape": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "tab-header-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "tabs-mobile": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "tabset": {
+      "radius": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "template": {
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "text-body": {
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "text-color": {
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "text-heading": {
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "text-link": {
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "text-longform": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "text-title": {
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "letter-spacing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "text-case": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "textarea": {
+      "radius": {
+        "now": "fixed",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "fixed"
+      }
+    },
+    "th": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "theme": {
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "tile": {
+      "density": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "reached"
+      }
+    },
+    "timeline": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "timepicker": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "highlight": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "toast": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "avatar-icon-shape": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "icon-size": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "fixed": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "toastContainer": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "feedback": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "tooltip": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "tree": {
+      "density": {
+        "now": "fixed",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "tree-container": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "treeItem": {
+      "radius": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "disabled": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "line-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "motion-speed": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "motion-easing": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "trial-header": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "tab-header-height": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "truncate": {
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "utility-bar": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "inverse": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "fixed": {
+        "now": "fixed",
+        "native": "n/a"
+      }
+    },
+    "utility-panel": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "var-m-around": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "var-m-bottom": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "var-m-horizontal": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "var-m-left": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "var-m-right": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "var-m-top": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "var-m-vertical": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "var-p-around": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "var-p-bottom": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "var-p-horizontal": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "var-p-left": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "var-p-right": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "var-p-top": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "var-p-vertical": {
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "vertical-tabs": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "verticalNavigationItem": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-press": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "verticalNavigationItemBadge": {
+      "radius": {
+        "now": "n/a",
+        "native": "fixed"
+      },
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-press": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "verticalNavigationItemIcon": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-press": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "verticalNavigationOverflow": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "component": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "surface": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "text-color": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "neutral-tone": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-selected": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "border-width": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "control-height": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "shadow": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "hover-press": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "focus-ring": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "cursor-underline": {
+        "now": "n/a",
+        "native": "fixed"
+      }
+    },
+    "verticalNavigationSection": {
+      "density": {
+        "now": "n/a",
+        "native": "reached"
+      },
+      "typography": {
+        "now": "n/a",
+        "native": "reached"
+      }
+    },
+    "visual-picker": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "disabled": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-press": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "cursor-underline": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    },
+    "welcome-mat": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "fixed",
+        "native": "n/a"
+      },
+      "typography": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "feedback": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "component": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "text-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-color": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "neutral-tone": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "border-width": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "icon-size": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "line-height": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "shadow": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "focus-ring": {
+        "now": "reached",
+        "native": "n/a"
+      }
+    },
+    "wizard": {
+      "radius": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "density": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "surface": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "hover-selected": {
+        "now": "reached",
+        "native": "n/a"
+      },
+      "motion-speed": {
+        "now": "bridge",
+        "native": "n/a"
+      },
+      "motion-easing": {
+        "now": "bridge",
+        "native": "n/a"
+      }
+    }
+  },
+  "byItem": {
+    "brand-color": {
+      "now": {
+        "reached": 0,
+        "total": 0
+      },
+      "native": {
+        "reached": 0,
+        "total": 0
+      }
+    },
+    "logo": {
+      "now": {
+        "reached": 0,
+        "total": 0
+      },
+      "native": {
+        "reached": 0,
+        "total": 0
+      }
+    },
+    "radius": {
+      "now": {
+        "reached": 58,
+        "total": 64
+      },
+      "native": {
+        "reached": 33,
+        "total": 51
+      }
+    },
+    "density": {
+      "now": {
+        "reached": 143,
+        "total": 169
+      },
+      "native": {
+        "reached": 76,
+        "total": 93
+      }
+    },
+    "typography": {
+      "now": {
+        "reached": 62,
+        "total": 65
+      },
+      "native": {
+        "reached": 63,
+        "total": 71
+      }
+    },
+    "feedback": {
+      "now": {
+        "reached": 32,
+        "total": 32
+      },
+      "native": {
+        "reached": 40,
+        "total": 40
+      }
+    },
+    "component": {
+      "now": {
+        "reached": 26,
+        "total": 26
+      },
+      "native": {
+        "reached": 30,
+        "total": 32
+      }
+    },
+    "milvus-component": {
+      "now": {
+        "reached": 0,
+        "total": 0
+      },
+      "native": {
+        "reached": 0,
+        "total": 0
+      }
+    },
+    "font": {
+      "now": {
+        "reached": 0,
+        "total": 0
+      },
+      "native": {
+        "reached": 0,
+        "total": 0
+      }
+    },
+    "overall": {
+      "now": {
+        "reached": 0,
+        "total": 0
+      },
+      "native": {
+        "reached": 0,
+        "total": 0
+      }
+    },
+    "surface": {
+      "now": {
+        "reached": 97,
+        "total": 102
+      },
+      "native": {
+        "reached": 72,
+        "total": 78
+      }
+    },
+    "text-color": {
+      "now": {
+        "reached": 82,
+        "total": 82
+      },
+      "native": {
+        "reached": 75,
+        "total": 78
+      }
+    },
+    "border-color": {
+      "now": {
+        "reached": 76,
+        "total": 76
+      },
+      "native": {
+        "reached": 60,
+        "total": 63
+      }
+    },
+    "neutral-tone": {
+      "now": {
+        "reached": 39,
+        "total": 39
+      },
+      "native": {
+        "reached": 73,
+        "total": 73
+      }
+    },
+    "disabled": {
+      "now": {
+        "reached": 23,
+        "total": 24
+      },
+      "native": {
+        "reached": 22,
+        "total": 25
+      }
+    },
+    "inverse": {
+      "now": {
+        "reached": 19,
+        "total": 20
+      },
+      "native": {
+        "reached": 5,
+        "total": 5
+      }
+    },
+    "backdrop": {
+      "now": {
+        "reached": 1,
+        "total": 1
+      },
+      "native": {
+        "reached": 2,
+        "total": 2
+      }
+    },
+    "highlight": {
+      "now": {
+        "reached": 7,
+        "total": 7
+      },
+      "native": {
+        "reached": 28,
+        "total": 29
+      }
+    },
+    "hover-selected": {
+      "now": {
+        "reached": 66,
+        "total": 70
+      },
+      "native": {
+        "reached": 44,
+        "total": 46
+      }
+    },
+    "dark-mode": {
+      "now": {
+        "reached": 0,
+        "total": 0
+      },
+      "native": {
+        "reached": 0,
+        "total": 0
+      }
+    },
+    "border-width": {
+      "now": {
+        "reached": 71,
+        "total": 73
+      },
+      "native": {
+        "reached": 79,
+        "total": 81
+      }
+    },
+    "avatar-icon-shape": {
+      "now": {
+        "reached": 3,
+        "total": 3
+      },
+      "native": {
+        "reached": 6,
+        "total": 6
+      }
+    },
+    "tab-header-shape": {
+      "now": {
+        "reached": 2,
+        "total": 2
+      },
+      "native": {
+        "reached": 0,
+        "total": 0
+      }
+    },
+    "control-height": {
+      "now": {
+        "reached": 5,
+        "total": 5
+      },
+      "native": {
+        "reached": 19,
+        "total": 35
+      }
+    },
+    "tab-header-height": {
+      "now": {
+        "reached": 5,
+        "total": 5
+      },
+      "native": {
+        "reached": 0,
+        "total": 0
+      }
+    },
+    "icon-size": {
+      "now": {
+        "reached": 15,
+        "total": 25
+      },
+      "native": {
+        "reached": 19,
+        "total": 32
+      }
+    },
+    "line-height": {
+      "now": {
+        "reached": 28,
+        "total": 36
+      },
+      "native": {
+        "reached": 49,
+        "total": 51
+      }
+    },
+    "letter-spacing": {
+      "now": {
+        "reached": 2,
+        "total": 2
+      },
+      "native": {
+        "reached": 0,
+        "total": 1
+      }
+    },
+    "text-case": {
+      "now": {
+        "reached": 2,
+        "total": 2
+      },
+      "native": {
+        "reached": 0,
+        "total": 1
+      }
+    },
+    "shadow": {
+      "now": {
+        "reached": 31,
+        "total": 34
+      },
+      "native": {
+        "reached": 16,
+        "total": 31
+      }
+    },
+    "hover-press": {
+      "now": {
+        "reached": 7,
+        "total": 10
+      },
+      "native": {
+        "reached": 6,
+        "total": 6
+      }
+    },
+    "motion-speed": {
+      "now": {
+        "reached": 30,
+        "total": 42
+      },
+      "native": {
+        "reached": 0,
+        "total": 25
+      }
+    },
+    "motion-easing": {
+      "now": {
+        "reached": 37,
+        "total": 40
+      },
+      "native": {
+        "reached": 0,
+        "total": 25
+      }
+    },
+    "reduced-motion": {
+      "now": {
+        "reached": 0,
+        "total": 0
+      },
+      "native": {
+        "reached": 0,
+        "total": 0
+      }
+    },
+    "focus-ring": {
+      "now": {
+        "reached": 59,
+        "total": 60
+      },
+      "native": {
+        "reached": 32,
+        "total": 35
+      }
+    },
+    "cursor-underline": {
+      "now": {
+        "reached": 20,
+        "total": 21
+      },
+      "native": {
+        "reached": 0,
+        "total": 47
+      }
+    },
+    "object-icon-color": {
+      "now": {
+        "reached": 0,
+        "total": 0
+      },
+      "native": {
+        "reached": 0,
+        "total": 0
+      }
+    },
+    "fixed": {
+      "now": {
+        "reached": 0,
+        "total": 28
+      },
+      "native": {
+        "reached": 0,
+        "total": 30
+      }
+    }
+  },
+  "gaps": []
+}

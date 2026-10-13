@@ -72,7 +72,7 @@
   <div class="eyebrow">LEARN 09 · override</div>
   <h1>override와 공식 권고</h1>
   <p class="lead">기존 컴포넌트의 모양을 바꿀 때 새 컴포넌트를 만들지, 기존 컴포넌트의 CSS를 덮어쓸지 정리한다. Salesforce가 덮어쓰기를 권하지 않는 이유를 공식 자료로 확인하고, 세 가지 실험으로 직접 비교한다. 발표에서 "두 방식을 다 해 봤고, 이래서 공식적으로는 권하지 않는다"를 설명하는 것이 목표다.</p>
-  <div class="meta"><span>예상 1시간</span><span>선행: 00 개념 · 01 SLDS</span><span>2026-10-09 공식 문서 · 설치된 패키지 · 실측 기록으로 확인 · 2026-10-12 갱신 (10/9 org 클래스 규칙 실측)</span></div>
+  <div class="meta"><span>예상 1시간</span><span>선행: 00 개념 · 01 SLDS</span><span>2026-10-09 공식 문서 · 설치된 패키지 · 실측 기록으로 확인 · 2026-10-12 갱신 (10/9 org 클래스 규칙 실측) · 2026-10-13 갱신 (브리지와 override, 정적 반영 검사)</span></div>
 </header>
 
 <div class="callout key"><strong>표시 규칙</strong><span class="tag warn">미확인</span>은 공식 문서나 실측으로 확인하지 못한 것이다. <span class="tag warn">추정</span>은 공식 문서가 밝히지 않아 우리가 해석한 것이다. <span class="tag info">계획</span>은 설계만 있고 아직 구현하지 않은 것이다. 이 문서의 공식 자료 조사는 <a href="../docs/research/2026-10-09-slds2-customization.md">2026-10-09 조사 기록</a>에 원문 위치와 함께 있다.</div>
@@ -330,18 +330,19 @@ grep -n -- "--slds-s-button-radius-border:" node_modules/@salesforce-ux/design-s
     <li><b>기본 우선:</b> 기본은 Salesforce 모양 + 브랜드 색·로고다. 2~5는 브랜드 요청이 있을 때만 쓴다</li>
     <li><b>override는 opt-in이다:</b> <code>milvusOverride.css</code>는 프로젝트 소유이고 처음엔 비어 있다. LEX에서는 <code>loadBrand</code>가 <code>milvusBridge</code> → <code>milvusBrand</code> → <code>milvusOverride</code> 순서로 실어 override가 마지막에 이긴다(<code>c/milvusScript</code>, 2026-10-09 구현. 같은 날 org 프로브에서 세 link가 들어가는 것을 확인, 2026-10-12 갱신). VF에서는 <code>milvusHead</code>가 같은 순서로 싣는다 <span class="tag info">계획</span></li>
     <li><b>override 규칙:</b> <code>check --style</code>은 막지 않고 경고한다. hex 색, <code>!important</code>, <code>.slds-*</code>가 아닌 선택자, 브랜드 색(accent) hook 재정의가 경고 대상이다. <code>@font-face</code>·<code>@import</code>는 실패다(글꼴은 바꾸지 않는다). 검사 함수는 <code>checkOverrideCss</code>(<code>lib/rules.ts</code>)이고, <code>check --style</code>(Task 12)이 이 함수를 부른다. 고객 프로젝트에서 Claude가 <code>milvusOverride.css</code>를 고치면 hook이 <code>check --style</code>을 실행하고, 경고만 있으면 그 내용을 Claude에게 전달한다(<a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html#runbook">08 Claude Code</a>, 2026-10-12 갱신)</li>
+    <li><b>브리지와 override (2026-10-13 갱신):</b> 둘 다 클래스 규칙이라 공식 권고 밖이고, native 전환과 SLDS 변경에 약한 점도 같다(실험 B·C). 다른 점은 관리 방식이다. <code>milvusBridge.css</code>는 패키지가 SLDS 2 CSS에서 생성하고, 값은 <code>--milvus-*</code> 변수만 읽으며 기본값이 원래 값이다. 원본 선택자가 사라지면 생성과 <code>audit:brand</code>가 실패한다. <code>milvusOverride.css</code>는 프로젝트가 값을 직접 쓰고, 검사는 경고뿐이며 선택자 소실을 잡지 않는다(<a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html#bridge">01 SLDS 브리지</a>)</li>
     <li><b>알린다:</b> override를 쓸 때는 그 규칙이 native 전환과 Salesforce 업데이트에 약하다는 것을 사용자에게 말한다</li>
     <li><b>밀버스 컴포넌트는 기능이 없을 때만:</b> 모양만 바꾸려고 만들지 않는다. <code>milvusButton</code>은 실험 A의 비교 예시로 남는다</li>
   </ul>
-  <h4>깨짐을 먼저 알아채는 장치 <span class="tag info">계획</span> (첫 줄만 2026-10-09 구현)</h4>
+  <h4>깨짐을 먼저 알아채는 장치 (첫 두 줄 구현, 2026-10-13 갱신)</h4>
   <div class="table-wrap"><table>
     <tr><th>장치</th><th>무엇을 잡나</th><th>근거</th></tr>
     <tr><td><code>detectNativeShadow</code> 경고</td><td>org에서 밀버스 컴포넌트가 자기 템플릿 안의 <code>lightning-*</code> 호스트에 <code>data-render-mode="shadow"</code>가 있는지 보고, 있으면 개발 콘솔에 경고한다. native 전환이 시작된 것을 처음 알아채는 곳이다. 2026-10-09 갱신: <code>c/milvusScript</code>의 <code>detectNativeShadow</code>로 구현했다(Task 6). 설계 9.2는 <code>loadBrand</code>가 확인한다고 적었지만, 구현에서는 밀버스 컴포넌트가 첫 <code>renderedCallback</code>에서 이 함수를 부른다. org에서 울리는지는 아직 보지 않았다</td><td>설계 9.2 감지 1, 구현 계획 Task 6</td></tr>
-    <tr><td>정적 반영 검사</td><td>SLDS 2나 기본 컴포넌트 버전을 올릴 때 native 지원 목록, 새 하드코딩, hook 이름 변화, 브리지 선택자 소실을 기준 파일과 비교해 실패시킨다(실험 C의 사례 3·4)</td><td>설계 9.2 감지 2, 9.6의 1</td></tr>
+    <tr><td>정적 반영 검사</td><td>SLDS 2나 기본 컴포넌트 버전을 올릴 때 native 지원 목록, 새 하드코딩, hook 이름 변화, 브리지 선택자 소실을 기준 파일과 비교해 실패시킨다(실험 C의 사례 3·4). 2026-10-13 갱신: 구현했다(Task 14). <code>pnpm test</code>의 마지막 단계 <code>audit:brand</code>이고, 고정 목록 밖 빈틈이 생겨도 실패한다(<a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html#audit">00 개념 7절</a>)</td><td>설계 9.2 감지 2, 9.6의 1</td></tr>
     <tr><td>Storybook 확인</td><td>org와 같은 synthetic 빌드에 native 빌드를 더해 "전환 시 잃는 항목"을 보고, 반영 검사 페이지에서 브리지를 켜고 끄며 비교한다(실험 B를 컴포넌트 전체로 넓힌 것)</td><td>설계 9.2 대비, 9.6의 2</td></tr>
     <tr><td>릴리스 노트 확인</td><td>연 3회 Salesforce 릴리스마다 native shadow 항목을 사람이 확인한다</td><td>설계 9.2 감지 3</td></tr>
   </table></div>
-  <p class="sources">출처: <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (1장 기본 우선·opt-in override, 4.3 check, 5.1 층과 override 규칙, 5.5 싣는 순서, 7.2 hook, 9.2 native 전환 대비, 9.6 자동 확인)</a> (확인 2026-10-12) · <a href="../docs/research/2026-10-09-org-probe.md">org 프로브 2차 기록 3.1 (loadBrand의 세 link)</a> (확인 2026-10-12) · <a href="https://help.salesforce.com/s/articleView?id=001395244&amp;type=1">Salesforce Help — Salesforce Component Internals Are Protected (KB 001395244)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">npm — lightning-base-components</a> (설치본 button.js의 data-render-mode 확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (2.8 감지와 대비)</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (1장 기본 우선·opt-in override, 4.3 check, 5.1 층과 override 규칙, 5.5 싣는 순서, 5.6 브리지, 7.2 hook, 9.2 native 전환 대비, 9.6 자동 확인)</a> (확인 2026-10-13) · <a href="../docs/research/2026-10-09-org-probe.md">org 프로브 2차 기록 3.1 (loadBrand의 세 link)</a> (확인 2026-10-12) · <a href="https://help.salesforce.com/s/articleView?id=001395244&amp;type=1">Salesforce Help — Salesforce Component Internals Are Protected (KB 001395244)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/lightning-base-components">npm — lightning-base-components</a> (설치본 button.js의 data-render-mode 확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (2.8 감지와 대비)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="summary">
@@ -377,7 +378,7 @@ grep -n -- "--slds-s-button-radius-border:" node_modules/@salesforce-ux/design-s
 
 <footer class="doc-foot">
   <span>밀버스 디자인 시스템 · Learn 09</span>
-  <span>2026-10-09 기준, 2026-10-12 갱신(클래스 규칙 org 도달 실측, <code>init</code>·<code>check --style</code> 구현 상태). 공식 문서, 설치된 패키지(<code>@salesforce-ux/design-system-2</code> 2.264.2, <code>lightning-base-components</code> 1.28.19-alpha), <code>docs/research/</code>로 확인함</span>
+  <span>2026-10-09 기준, 2026-10-12 갱신(클래스 규칙 org 도달 실측, <code>init</code>·<code>check --style</code> 구현 상태), 2026-10-13 갱신(7절 브리지와 override, 정적 반영 검사 구현). 공식 문서, 설치된 패키지(<code>@salesforce-ux/design-system-2</code> 2.264.2, <code>lightning-base-components</code> 1.28.19-alpha), <code>docs/research/</code>로 확인함</span>
 </footer>
 </main>
 </div>

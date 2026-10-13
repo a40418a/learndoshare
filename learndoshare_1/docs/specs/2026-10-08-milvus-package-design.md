@@ -277,18 +277,22 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 움직임 시간·곡선 | `.slds-button`, `.slds-modal`, `.slds-backdrop`, `.slds-dropdown`, `.slds-popover`, 토글, path | SLDS 2의 transition·animation 217선언이 모두 값을 직접 쓴다. `--slds-g-duration-*`는 정의만 있고 읽는 곳이 0이다 |
 | 줄인 움직임 | `@media (prefers-reduced-motion: reduce)` | 처리하는 곳이 SLDS 2 CSS 1곳, 기본 컴포넌트 CSS 0곳. 브랜드 선택이 아니라 항상 켜 두는 접근성 규칙으로 넣는다 |
 | 컨트롤 높이 | `.slds-button`, `.slds-input`, `.slds-input_faux`, `.slds-select`, `.slds-radio_button`, `.slds-checkbox_button` | `line-height: 1.875rem` 고정 |
-| 입력창 테두리 두께 | `.slds-input`, `.slds-textarea` | `1px` 고정 |
+| 입력창 테두리 두께 | `.slds-input`, `.slds-textarea`, `.slds-input_faux`(읽기 전용 콤보박스) | `1px` 고정 |
 | Path 양 끝 반경 | `.slds-path__item:first-child`, `:last-child` | `2rem` 고정 |
 | 자간 | `button`, `input`, `select`, `textarea` | 브라우저 기본값으로 다시 초기화되어 상속이 끊긴다 (추정) |
-| 영문 대문자 제목 | `.slds-text-title_caps`, `.slds-section-title_divider` | `text-transform: uppercase` 고정 |
+| 영문 대문자 제목 | `.slds-text-title_caps`, `.slds-section-title_divider` | `text-transform: uppercase`, 자간 `0.0625rem` 고정. 자간은 브랜드 자간과 따로 `--milvus-caps-letter-spacing`으로 잇는다(2026-10-12 사용자 결정) |
 | 선택지 라벨 굵기 | `.slds-radio`, `.slds-checkbox`의 라벨 | `font-weight: normal` 고정 |
 | 커서, 링크 밑줄 | 비활성 요소, `a:hover` | cursor 78선언, 밑줄 14선언이 값을 직접 쓴다 |
 | 팝오버 꼬리 그림자 | `.slds-nubbin_*::after` | 내부 전용 hook(`--_slds-*`)만 있다 |
+| 세로 내비 선택 바탕 | `.slds-navigation-list_vertical .slds-is-active .slds-navigation-list-vertical__action` 등 | 옛 브랜드 파랑 `rgb(21, 137, 238, 0.1)` 고정(왼쪽 테두리는 브랜드 색을 따름). `--milvus-nav-selected-background`로 잇는다(2026-10-12 사용자 결정) |
 | 개체 아이콘 배경색 | `.slds-icon-standard-*` 등 973개 | 클래스마다 원래 색을 기본값으로 갖는 규칙을 생성한다 |
 | 컨트롤 안 아이콘 크기 | `.slds-button__icon`, `.slds-input__icon` | `0.875rem` 고정 |
-| 모달 너비 (원할 때만) | `.slds-modal__container` | 40 / 52.0625 / 75rem 고정 |
+| 정렬 아이콘 크기 | `.slds-is-sortable__icon` | `0.75rem` 고정. 컨트롤 안 아이콘과 크기 관계가 달라 `--milvus-sort-icon-size`로 따로 잇는다(2026-10-12 사용자 결정) |
+| 모달 너비 (원할 때만) | `.slds-modal__container`와 크기 클래스(`_small`·`_medium`·`_large`·`_full`) | 크기마다 너비·최대 너비, 최소 너비 20·40rem 고정. 변수는 `--milvus-modal-width-base`(크기 클래스 없음)·`-small`·`-medium`·`-large`·`-full`, `--milvus-modal-min-width`. 작은 화면의 full 모달은 바꾸지 않는다 |
 
-- **넣으면 안 되는 값:** 모달과 토스트는 움직임이 끝나는 이벤트(`transitionend`, `animationend`)를 기다려 닫힌다. 시간을 `0s`나 `none`으로 만들면 닫히지 않을 수 있어 최솟값은 `0.01ms`다. 스피너는 점별 지연이 1000ms 기준이라 시간을 바꾸면 순서가 어긋나므로 줄인 움직임 켜기·끄기만 다룬다
+- **넣으면 안 되는 값:** 모달과 토스트는 움직임이 끝나는 이벤트(`transitionend`, `animationend`)를 기다려 닫힌다. transition은 시간이 `0s`면 전환이 일어나지 않아 `transitionend`가 오지 않는다(animation은 `0s`여도 `animationend`가 온다). 그래서 닫히지 않을 수 있어 최솟값은 `0.01ms`다. 단위 없는 `0`은 `max()`를 무효로 만든다. 생성기는 모달·토스트만이 아니라 묶음에 드는 모든 시간을 `max(var(…), 0.01ms)`로 감싼다(2026-10-12). 스피너는 점별 지연이 1000ms 기준이라 시간을 바꾸면 순서가 어긋나므로 줄인 움직임 켜기·끄기만 다룬다
+- **생성 방식 (2026-10-12 Task 15):** 표의 "대상"은 예시이고, 생성기는 각 항목에 해당하는 SLDS 2 리터럴 선언을 모두 잇는다. 원본 선택자 목록과 `@media`·`@supports` 맥락을 그대로 복사하고, 움직임은 shorthand를 두고 longhand(`-duration`, `-timing-function`)만 정한다. 대상 선택자·속성·바꿀 값이 원본에서 사라지면 생성이 실패한다(Salesforce 구조 변경 감지)
+- **원래 이기던 규칙 다시 넣기:** 브리지는 SLDS 2 CSS보다 뒤에 들어오므로, 같은 선택자를 복사하면 우선순위(specificity)가 같은 원본 규칙을 모두 이긴다(예: `.slds-button__icon`을 이으면 뒤에서 이기던 `.slds-button__icon_large`가 진다). 그래서 원래 이기던 같은 우선순위 규칙을 원래 값 그대로 다시 넣는다(약 1,000규칙). 파일은 개체 아이콘 973규칙을 합쳐 약 350KB·gzip 33KB다(SLDS 2 CSS 약 1MB·gzip 110KB의 3분의 1, 브라우저가 캐시하는 정적 리소스). 한계: 그 선택자에 맞는 LEX 요소 전체가 npm SLDS 2(2.264.2) 값을 받는다. org가 다른 값을 내려주면 그 값이 덮인다. 문제가 보이면 다시 넣는 규칙을 `:where(대상 선택자)`로 좁히고, org가 내려주는 SLDS 버전과 비교하는 확인을 둔다(Task 25)
 - **위험:** 브리지는 지금 org(synthetic)에서 닿지만, 기본 컴포넌트가 native로 바뀌면 그 컴포넌트 안에는 닿지 않는다. 브리지 항목은 명세 페이지와 Storybook에 "native 전환 시 잃음"으로 표시하고 9.6의 검사로 감시한다
 
 ---
@@ -473,7 +477,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 
 **대비**
 - 두 모드가 읽는 hook을 함께 정의한다. 예: 표 배경(지금 `surface-container-1/-2`, native `neutral-base-100/-95`), 박스 테두리(지금 `border-1`, native `border-base-1/-4`), 모달 배경막(지금 `--slds-s-backdrop-color-background`, native `neutral-10-opacity-50`), 버튼 굵기(지금 `font-weight-4`, native `--slds-s-button-font-weight`), 입력창 높이(지금 브리지, native `--slds-s-input-sizing-height`)
-- native에서만 메울 수 있는 c hook 목록은 준비만 하고 금지를 유지한다: `--slds-c-card-shadow`, `--slds-c-tooltip-color-background`, `--slds-c-tooltip-text-color`, `--slds-c-tooltip-font-size`, `--slds-c-badge-radius-border`, `--slds-c-checkbox-toggle-radius-border`, `--slds-c-pill-radius-border`, `--slds-c-input-sizing-border`, `--slds-c-modalheader-heading-font-size`, `--slds-c-modalfooter-shadow`. 감지가 울리면 열지 사용자가 정한다
+- native에서만 메울 수 있는 c hook 목록은 준비만 하고 금지를 유지한다: `--slds-c-card-shadow`, `--slds-c-tooltip-color-background`, `--slds-c-tooltip-text-color`, `--slds-c-tooltip-font-size`, `--slds-c-badge-radius-border`, `--slds-c-checkbox-toggle-radius-border`, `--slds-c-pill-radius-border`, `--slds-c-input-sizing-border`, `--slds-c-modalheader-heading-font-size`, `--slds-c-modalfooter-shadow`, `--slds-c-pill-sizing-border`(2026-10-12 추가). 감지가 울리면 열지 사용자가 정한다
 - Storybook native 빌드: #14의 `nativeShadow` 플러그인을 환경변수로 켜는 두 번째 빌드로 되살려, 9.6 검사를 두 빌드에서 돌리고 "전환 시 잃는 항목"을 낸다(발표 뒤)
 
 ### 9.3 브랜드 명세 페이지에 추가할 항목
@@ -497,10 +501,11 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 모양 | 탭·페이지 헤더 모양 | "선택된 탭 밑줄을 2px로" | `navigation-sizing-border-*`, `navigation-radius-border`, `pageheader-radius-border`, `pageheader-sizing-border` | native tabBar는 고정 |
 | 크기 | 컨트롤 높이 | "버튼과 입력창을 40px로" | 버튼 `--slds-s-button-spacing-block`, 입력·선택·콤보는 브리지, native용 `--slds-s-input-sizing-height` | 브리지 없이 버튼만 키우면 폼에서 높이가 어긋난다 |
 | 크기 | 탭·헤더 높이 | "탭 바를 낮게" | `navigation-sizing-height`, `navigation-font-lineheight`, `header-sizing-height` | |
-| 크기 | 아이콘 크기 | "기본 아이콘을 36px로" | `--slds-s-icon-sizing`, `--slds-s-icon-spacing`, 컨트롤 안 아이콘은 브리지 | |
+| 크기 | 아이콘 크기 | "기본 아이콘을 36px로" | `--slds-s-icon-sizing`, `--slds-s-icon-spacing`, 컨트롤 안 아이콘·정렬 아이콘은 브리지 | 애니메이션 아이콘 부품은 고정 |
 | 글자 | 줄 간격 | "본문 줄 간격 1.6" | `font-line-height-base`, `-2`, `-1` | 컨트롤 안 줄 간격은 고정 |
 | 글자 | 자간 | "한글 자간 -0.02em" | `:root`의 `letter-spacing` + 브리지 | |
-| 글자 | 대소문자 | "영문 소제목을 대문자로 쓰지 마" | 브리지 | |
+| 글자 | 대소문자 | "영문 소제목을 대문자로 쓰지 마" | 브리지(대문자 변환 `--milvus-caps-transform`, 대문자 제목 자간 `--milvus-caps-letter-spacing`) | |
+| 크기 | 모달 너비 | "모달을 더 넓게" | 브리지(`--milvus-modal-width-*`, `--milvus-modal-min-width`) | 너비와 최대 너비를 한 변수가 정해 큰 값은 좁은 화면에서 넘칠 수 있다 |
 | 깊이 | 그림자 깊이 | "그림자 없이 평평하게" | `shadow-1~4`, 방향형 그림자. `shadow-5/-6`은 기본값 유지 | native 드롭다운·팝오버·툴팁은 고정 |
 | 깊이 | hover·눌림 효과 | "버튼이 떠오르지 않게" | 버튼 떠오름·그림자 s hook, `--slds-s-mark-shadow-checked` | native에는 떠오름이 없다 |
 | 움직임 | 속도 | "빠르고 경쾌하게", "차분하게" | 브리지의 `--milvus-motion-duration-fast`(0.1s 이하 규칙), `-medium`(0.15~0.2s), `-slow`(0.25~0.4s). 기본값은 규칙마다 원래 값 | 지금 org에서만. 모달·토스트 최소 0.01ms, 스피너 제외 |
@@ -508,7 +513,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 움직임 | 줄인 움직임 | "동작 줄이기를 켠 사람에게는 애니메이션 없이" | 브리지의 `prefers-reduced-motion` 규칙(항상 켬), 선택하면 항상 최소화 | |
 | 포커스 | 포커스 링 모양 | "포커스 링을 3px로 굵게" | 포커스 그림자 4종(5.2 조건), native용 s `*-shadow-focus` | 링 색은 브랜드 색을 따른다 |
 | 포커스 | 커서·링크 밑줄 | "링크에 밑줄 없이" | 브리지 | |
-| 아이콘 | 개체 아이콘 색 | "Account 아이콘을 브랜드 남색으로" | 브리지가 클래스마다 아이콘 배경 hook을 다시 정의(원래 색이 기본값) | 개체를 색으로 구분하던 단서가 사라질 수 있다 |
+| 아이콘 | 개체 아이콘 색 | "Account 아이콘을 브랜드 남색으로" | 브리지가 클래스마다 아이콘 배경 hook을 다시 정의(원래 색이 기본값). 하나씩은 `--milvus-icon-<종류>-<이름>`(lightning-icon `icon-name`의 `:`와 `_`를 `-`로, 예: `standard:user_role` → `--milvus-icon-standard-user-role`), 한 번에는 `--milvus-icon-color-all` | 개체를 색으로 구분하던 단서가 사라질 수 있다. 웰컴 매트 완료 배지는 의미 색으로 고정 |
 | 표시만 | Salesforce 고정 | "토스트를 10초 동안" | 입력 없음. 9.4 목록을 보여 준다 | |
 
 (hook 이름 앞의 `--slds-g-color-`, `--slds-g-` 등은 생략했다. 실제 이름은 5.2 표와 분석 원본에 있다)
@@ -517,6 +522,13 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 "모든 컴포넌트" 요구의 예외로 합의했다. 명세 페이지와 발표에 "바꿀 수 없음"으로 그대로 적는다. native 전환 뒤 생기는 고정 항목은 9.2의 감지가 울릴 때 c hook을 열지 다시 정한다.
 - **두 모드 모두 고정:** 아이콘 SVG 모양과 개체 아이콘 글리프의 흰색, z-index 층, 0·1이 아닌 투명도, 토스트 표시 시간(JS 상수 4800·9600ms), 스피너 모양, 색 선택기 색상환, Agentforce 영역, 이미지 위 어둡게 처리, 파괴·성공 버튼의 흰 글자, LEX 전역 헤더(org 테마가 원본)
 - **native 전환 뒤 생기는 고정:** 드롭다운·팝오버·툴팁 그림자, 툴팁 배경과 글자 크기, native `lightning-card` 그림자, 모달 반경, 배지·토글 15rem, 입력창 두께, 콤보박스 높이, `:focus` 위주 포커스 표시와 3px 글로우, 버튼 떠오름, 표 머리글·hover 회색, 검색 강조 `#ff0`, 모든 움직임(9.2의 c hook을 열면 일부 메울 수 있음)
+
+**2026-10-12 사용자 합의로 넓히고 더한 것.** Task 14 정적 검사와 Task 15 브리지 뒤에 남은 빈틈 604개(지금 270, native 341)를 사용자가 16개 묶음으로 하나씩 보고 정했다. 매처는 `lib/fixed-list.ts`에 있다.
+- **판정에서 뺀 것 (브랜드 항목이 아님):** 순차 지연(`*-delay`), em 들여쓰기·`auto` 정렬·`revert`, 숨긴 입력 1px·트리 표 버튼, 크기 hook으로 만든 원, hover의 회전·이동·확대 변형(떠오름이 섞인 값과 눌림 `:active`는 남김), `outline-offset`, 상대 글자 크기(`1em`·`%`), border로 그린 삼각형, 이미지·`transparent`·`currentColor`·시스템 색. 그리고 `:not(:disabled)`을 비활성으로 세던 오류를 고쳤다
+- **넓힌 라벨:** 아이콘 SVG·애니메이션 아이콘 모양과 개체 아이콘 글리프의 흰색 / 토스트 표시·등장 시간(JS 4800·9600ms, 등장 0.4s) / 드롭다운·팝오버·툴팁 그림자(꼬리 포함) / native 컨트롤 높이(콤보박스·버튼·range 입력) / native 포커스 표시(:focus 위주, 3px 글로우, Firefox 링·F6 강조)
+- **두 모드 모두 고정에 더함:** 시간 묶음 밖 움직임(아이콘·알림 애니메이션)과 프레임 애니메이션, 미세 간격(0.125rem 이하)과 특수 영역 간격, 특수 영역 줄 간격, 기본 컴포넌트 내부 값, 목록 머리글 포커스 모서리·읽기 전용 입력 모서리, 파괴·성공·인버스 버튼 hover 그림자, 색 선택기·패널 편집·아바타 이니셜 그림자, 이미지 포커스 그림자, 표 편집 셀·전역 내비 굵기, 팝오버 강조선 두께, timeline 항목 색, 테마 배경 위 반투명 글자, 글자 자름 페이드·색 선택기 그라데이션, 브레드크럼 눌림 축소. 세로 내비 선택 바탕은 고정 대신 브리지로 잇는다(5.6)
+- **native 전환 뒤 고정에 더함:** native 간격, native 탭 줄 간격, native 컨트롤·진행 링 안 아이콘 크기, native 모달 너비, native 반경(두께·간격 hook이나 리터럴, 툴팁·진행 링 포함), native 그림자, native 커서·링크 밑줄, native 글자(목록·표 머리글 굵기·대문자·자간, 모달 제목 크기), native pill 두께, native 기본 컴포넌트 색(동적 아이콘·표 체크박스 등)
+- 이 합의로 정적 검사의 빈틈이 0이 되면 `pnpm test`가 `audit:brand`를 함께 돌린다. 이후 새로 생기는 빈틈은 다시 합의가 필요하다
 
 ### 9.5 Storybook의 "Salesforce 원본과 읽는 hook" 보기
 - 데이터는 9.6 정적 검사가 빌드할 때 만든다(손으로 쓰지 않음)
