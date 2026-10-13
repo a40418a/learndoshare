@@ -108,3 +108,20 @@ test("REQUEST_SECTIONS는 입력이 있는 명세 항목마다 하나, 피드백
     ["피드백 색 / 성공", "피드백 색 / 경고", "피드백 색 / 오류", "피드백 색 / 정보"],
   );
 });
+
+// 손으로 고친 파일의 경계 사례(Task 19 리뷰 M5)
+test("BOM과 제목 앞 빈 줄, 절 제목과 '지금:' 사이 빈 줄을 견딘다", () => {
+  const md = "﻿\n\n# 브랜드 요청\n저장: 2026-10-14 15:20\n\n## 모서리\n\n지금: --slds-g-radius-border-2 0.5rem\n요청: 각지게\n";
+  const r = parseRequest(md);
+  assert.deepEqual(r.unknown, []);
+  assert.equal(r.savedAt, "2026-10-14 15:20");
+  assert.deepEqual(r.sections, [{ id: "radius", title: "모서리", current: "--slds-g-radius-border-2 0.5rem", request: "각지게" }]);
+  assert.equal(serializeRequest(r), "# 브랜드 요청\n저장: 2026-10-14 15:20\n\n## 모서리\n지금: --slds-g-radius-border-2 0.5rem\n요청: 각지게\n");
+});
+
+test("여러 줄 로고 요청은 줄바꿈 그대로 왕복한다", () => {
+  const r: BrandRequest = { sections: [{ id: "logo", title: "로고", request: "assets/logo.png\n흰 배경용은 assets/logo-white.png" }], unknown: [] };
+  const md = serializeRequest(r);
+  assert.ok(md.includes("## 로고\n요청: assets/logo.png\n흰 배경용은 assets/logo-white.png\n"), md);
+  assert.deepEqual(parseRequest(md).sections, r.sections);
+});

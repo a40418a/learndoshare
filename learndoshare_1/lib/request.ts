@@ -27,32 +27,39 @@ const TITLE = "# 브랜드 요청";
 
 export function parseRequest(md: string): BrandRequest {
   const r: BrandRequest = { sections: [], unknown: [] };
-  const text = md.replace(/\r\n?/g, "\n");
+  const text = md.replace(/^\uFEFF/, "").replace(/\r\n?/g, "\n");
   const first = text.search(/^## /m);
   const head = first < 0 ? text : text.slice(0, first);
   const blocks = first < 0 ? [] : text.slice(first).split(/^(?=## )/m);
 
-  // 머리: 첫 줄의 제목과 빈 줄은 다시 쓸 때 새로 만든다. 반영·저장 줄은 머리 어디에 있어도 읽는다
-  head.split("\n").forEach((line, i) => {
+  // 머리: 빈 줄이 아닌 첫 줄의 제목과 빈 줄은 다시 쓸 때 새로 만든다. 반영·저장 줄은 머리 어디에 있어도 읽는다
+  let firstLine = true;
+  for (const line of head.split("\n")) {
+    if (!line.trim()) continue;
+    const isTitle = firstLine && line.startsWith("# ");
+    firstLine = false;
     const m = /^(반영|저장):\s*(.*?)\s*$/.exec(line);
-    if ((i === 0 && line.startsWith("# ")) || !line.trim()) return;
+    if (isTitle) continue;
     if (m?.[1] === "반영") r.appliedAt = m[2];
     else if (m?.[1] === "저장") r.savedAt = m[2];
     else r.unknown.push(line);
-  });
+  }
 
   const ids = new Map(REQUEST_SECTIONS.map((s) => [s.title, s.id]));
   for (const block of blocks) {
     const [heading, ...body] = block.trimEnd().split("\n");
     const title = heading.slice(3).trim();
     const id = ids.get(title);
-    // 모르는 제목과 같은 제목의 둘째 절은 원문 그대로(안의 빈 줄 포함) 남긴다
+    // 모르는 제목과 같은 제목의 둘째 절은 원문 그대로(안의 빈 줄 포함) 남긴다.
+    // ponytail: 첫 절의 입력을 비우고 저장하면 다음에 읽을 때 둘째(옛) 절이 그 항목이 된다. 손으로 같은 제목을 두 번 쓴 경우만 생긴다
     if (!id || r.sections.some((s) => s.id === id)) {
       r.unknown.push(block.trimEnd());
       continue;
     }
+    while (body.length && !body[0].trim()) body.shift();
     const current = body[0]?.startsWith("지금:") ? body.shift()!.slice("지금:".length).trim() : undefined;
-    // ponytail: 요청 안에 `## `로 시작하는 줄이 있으면 다시 읽을 때 새 절이 된다. 문제가 되면 쓸 때 이스케이프한다
+    // ponytail: 요청 안에 `## `로 시작하는 줄이 있으면 다시 읽을 때 그 줄부터 새 절이 된다. 아는 제목(예: `## 로고`)이면 그 항목의 요청이 되고,
+    //           모르는 제목이면 알 수 없는 절로 남는다. 문제가 되면 쓸 때 줄 머리의 `## `를 이스케이프한다
     const request = body.join("\n").replace(/^요청:[ \t]*/, "").trim();
     r.sections.push(current === undefined ? { id, title, request } : { id, title, current, request });
   }

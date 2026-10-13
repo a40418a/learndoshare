@@ -20,6 +20,11 @@ const FEEDBACK_SWATCH: Record<string, [text: string, background: string]> = {
   info: ["--slds-g-color-on-info-1", "--slds-g-color-info-container-1"],
 };
 
+type Fields = Map<string, HTMLTextAreaElement>;
+
+/** 저장하지 않은 입력(절 id → 값). 툴바에서 브랜드를 바꾸면 스토리를 다시 그리므로 모듈에 둔다. 새로고침하면 사라진다 */
+const drafts = new Map<string, string>();
+
 const SAVE_ERRORS: Record<number, string> = {
   400: "요청 형식이 잘못되어 저장하지 못했습니다",
   403: "저장이 거부되었습니다. localhost로 연 프로젝트 Storybook(pnpm milvus storybook)에서만 저장합니다",
@@ -118,11 +123,9 @@ function valueTable(entries: [string, string][]): HTMLElement {
 
 const para = (text: string, className = "") => el("p", { className: `slds-m-top_x-small ${className}` }, text);
 
-function input(id: string, label: string, kind: SpecItem["input"], placeholder: string, inputs: Map<string, HTMLInputElement | HTMLTextAreaElement>) {
-  const field =
-    kind === "path"
-      ? el("input", { id: `milvus-spec-${id}`, type: "text", className: "slds-input", placeholder, disabled: true })
-      : el("textarea", { id: `milvus-spec-${id}`, className: "slds-textarea", placeholder, rows: id === "overall" ? 6 : 2, disabled: true });
+function input(id: string, label: string, kind: SpecItem["input"], placeholder: string, inputs: Fields) {
+  // 경로도 textarea다. 파일의 요청이 여러 줄이어도 줄바꿈을 잃지 않는다
+  const field = el("textarea", { id: `milvus-spec-${id}`, className: "slds-textarea", placeholder, rows: id === "overall" ? 6 : kind === "path" ? 1 : 2, disabled: true });
   inputs.set(id, field);
   return el(
     "div",
@@ -132,7 +135,7 @@ function input(id: string, label: string, kind: SpecItem["input"], placeholder: 
   );
 }
 
-function brandColorView(field: HTMLInputElement | HTMLTextAreaElement): HTMLElement {
+function brandColorView(field: HTMLTextAreaElement): HTMLElement {
   const { brand, b50, b40 } = brandNow();
   const color = brand.brandColor;
   const now = el(
@@ -153,7 +156,7 @@ function brandColorView(field: HTMLInputElement | HTMLTextAreaElement): HTMLElem
   return el("div", {}, now, preview);
 }
 
-function feedbackRow(kind: string, name: string, title: string, inputs: Map<string, HTMLInputElement | HTMLTextAreaElement>): HTMLElement {
+function feedbackRow(kind: string, name: string, title: string, inputs: Fields): HTMLElement {
   const [text, background] = FEEDBACK_SWATCH[kind];
   const [t, b] = [valueOf(text), valueOf(background)];
   const sample = el("span", { className: "slds-p-around_x-small" }, `${name} 메시지 Aa`);
@@ -178,7 +181,7 @@ function fixedView(): HTMLElement {
   );
 }
 
-function itemView(item: SpecItem, inputs: Map<string, HTMLInputElement | HTMLTextAreaElement>): HTMLElement {
+function itemView(item: SpecItem, inputs: Fields): HTMLElement {
   const heading = el("h4", { className: "slds-text-heading_small" }, item.label);
   const box = el("section", { className: "slds-box slds-m-top_small" }, heading, para(item.description));
   if (item.nativeLoss) {
@@ -217,36 +220,58 @@ function itemView(item: SpecItem, inputs: Map<string, HTMLInputElement | HTMLTex
 const pad = (n: number) => String(n).padStart(2, "0");
 const stamp = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 
+/** 요청 파일을 읽는다. 서버가 없으면(정적 빌드) JSON이 아니어서 던진다 */
+async function readRequestFile(): Promise<{ ok: boolean; status: number; error?: string; text: string | null; writable: boolean }> {
+  const res = await fetch(ENDPOINT);
+  const body = await res.json();
+  return { ok: res.ok, status: res.status, error: body.error, text: typeof body.text === "string" ? body.text : null, writable: !!body.writable };
+}
+
 export function renderBrandSpec(): HTMLElement {
-  const inputs = new Map<string, HTMLInputElement | HTMLTextAreaElement>();
-  let loaded: BrandRequest = { sections: [], unknown: [] };
+  const inputs: Fields = new Map();
+  // 연 때(또는 마지막 저장 때) 파일의 요청. 이것과 같은 입력은 사용자가 바꾸지 않은 것이다
+  let opened = new Map<string, string>();
 
   const fileStatus = el("p", { role: "status" }, "요청 파일을 읽는 중입니다");
-  const reason = el("div", { className: "slds-notify slds-notify_alert slds-alert_warning", role: "alert", hidden: true });
+  // hidden 속성은 slds-notify_alert의 display에 져서 slds-hide로 숨긴다
+  const reason = el("div", { className: "slds-notify slds-notify_alert slds-alert_warning slds-hide", role: "alert" });
   const saveButton = el("button", { type: "button", className: "slds-button slds-button_brand", disabled: true }, "저장");
   const saveMessage = el("span", { role: "status" });
   const toolbar = el("div", { className: "sb-row slds-p-vertical_small" }, saveButton, saveMessage);
   Object.assign(toolbar.style, { position: "sticky", top: "0", zIndex: "1", background: "var(--slds-g-color-surface-1, #fff)" });
 
   const { brand } = brandNow();
+  // 프로젝트 브랜드를 보고 있지 않으면(툴바가 SLDS 기본이거나 프로젝트 브랜드를 읽지 못함) 지금 값이 프로젝트 값이 아니어서 '지금:'을 적지 않는다
+  const notProject = brand !== brands[0] || !!brand.error;
   const page = el(
     "div",
     { className: "sb-stack" },
     el("h2", { className: "slds-text-heading_large" }, "브랜드 명세"),
     para("항목마다 원하는 것을 자연어로 적고 저장하면 프로젝트 루트의 milvus-brand-request.md가 된다. Claude에게 \"브랜드 요청 반영해줘\"라고 하면 milvus-brand skill이 이 파일을 읽어 반영한다. 빈 항목은 파일에 적지 않는다"),
-    para(`지금 값은 툴바에서 고른 브랜드(${brand.label}) 기준이다. 저장할 때 '지금:' 줄도 이 브랜드 값으로 적는다`, "slds-text-color_weak"),
+    para(`지금 값은 툴바에서 고른 브랜드(${brand.label}) 기준이다. 저장할 때 항목마다 '지금:' 줄에 이 값을 함께 적는다`, "slds-text-color_weak"),
     reason,
-    fileStatus,
-    toolbar,
   );
-  if (mode === "project" && brand !== brands[0]) {
-    page.append(el("div", { className: "slds-notify slds-notify_alert slds-alert_warning", role: "alert" }, `프로젝트 브랜드가 아닌 ${brand.label}을 보고 있습니다. 툴바에서 프로젝트 브랜드를 고르고 저장하세요`));
-  }
+  const warn = (text: string) => page.append(el("div", { className: "slds-notify slds-notify_alert slds-alert_warning", role: "alert" }, text));
+  if (mode === "project" && brand.error) warn("프로젝트 브랜드를 읽지 못해 지금 값은 SLDS 기본 값입니다(위 오류 알림 참고). 고치기 전에 저장하면 '지금:' 줄은 적지 않습니다");
+  else if (mode === "project" && notProject) warn(`프로젝트 브랜드가 아닌 ${brand.label}을 보고 있습니다. 이대로 저장하면 '지금:' 줄은 적지 않습니다. 함께 적으려면 툴바에서 프로젝트 브랜드를 고르세요`);
+  page.append(fileStatus, toolbar);
 
   for (const group of [...new Set(SPEC_ITEMS.map((i) => i.group))]) {
     page.append(el("h3", { className: "slds-text-heading_medium slds-m-top_large" }, group));
     for (const item of SPEC_ITEMS.filter((i) => i.group === group)) page.append(itemView(item, inputs));
   }
+  for (const [id, field] of inputs) {
+    field.addEventListener("input", () => (field.value === (opened.get(id) ?? "") ? drafts.delete(id) : drafts.set(id, field.value)));
+  }
+
+  /** 파일 r을 연 것으로 하고 입력마다 pick(id, 파일의 요청)을 넣는다 */
+  const fill = (r: BrandRequest, pick: (id: string, fromFile: string) => string) => {
+    opened = new Map(r.sections.map((s) => [s.id, s.request]));
+    for (const [id, field] of inputs) {
+      field.value = pick(id, opened.get(id) ?? "");
+      field.dispatchEvent(new Event("input"));
+    }
+  };
 
   const showFile = (r: BrandRequest) => {
     const parts = [r.savedAt ? `마지막 저장 ${r.savedAt}` : "저장 시각 없음", r.appliedAt ? `Claude 반영 ${r.appliedAt} (다시 저장하면 반영 표시를 지운다)` : "아직 반영 표시 없음"];
@@ -257,60 +282,74 @@ export function renderBrandSpec(): HTMLElement {
   const enable = (why?: string) => {
     for (const field of inputs.values()) field.disabled = !!why;
     saveButton.disabled = !!why;
-    reason.hidden = !why;
+    reason.classList.toggle("slds-hide", !why);
     reason.textContent = why ?? "";
   };
 
   void (async () => {
+    let file;
     try {
-      const res = await fetch(ENDPOINT);
-      const body = await res.json();
-      if (!res.ok) {
-        fileStatus.textContent = "";
-        return enable(`요청 파일을 읽지 못해 입력을 껐습니다: ${body.error ?? `HTTP ${res.status}`}`);
-      }
-      if (typeof body.text === "string") {
-        loaded = parseRequest(body.text);
-        for (const s of loaded.sections) {
-          const field = inputs.get(s.id);
-          if (field) field.value = s.request;
-          field?.dispatchEvent(new Event("input"));
-        }
-        showFile(loaded);
-      } else {
-        fileStatus.textContent = "milvus-brand-request.md가 아직 없습니다. 저장하면 만든다";
-      }
-      enable(body.writable ? undefined : "저장소 Storybook에서는 저장하지 않아 입력을 껐습니다. 고객 프로젝트에서 pnpm milvus storybook으로 열면 저장할 수 있습니다");
+      file = await readRequestFile();
     } catch {
       fileStatus.textContent = "";
-      enable("정적 빌드에는 저장 서버가 없어 입력을 껐습니다. 입력과 저장은 pnpm milvus storybook(개발 서버)에서 합니다");
+      return enable("정적 빌드에는 저장 서버가 없어 입력을 껐습니다. 입력과 저장은 pnpm milvus storybook(개발 서버)에서 합니다");
     }
+    if (!file.ok) {
+      fileStatus.textContent = "";
+      return enable(`요청 파일을 읽지 못해 입력을 껐습니다: ${file.error ?? `HTTP ${file.status}`}`);
+    }
+    if (!file.writable) {
+      fileStatus.textContent = "";
+      return enable("저장소 Storybook에서는 요청 파일을 읽거나 쓰지 않아 입력을 껐습니다. 고객 프로젝트에서 pnpm milvus storybook으로 열면 저장할 수 있습니다");
+    }
+    const r = file.text === null ? undefined : parseRequest(file.text);
+    // 툴바에서 브랜드를 바꿔 다시 그려도 저장하지 않은 입력은 남는다
+    fill(r ?? { sections: [], unknown: [] }, (id, fromFile) => drafts.get(id) ?? fromFile);
+    if (r) showFile(r);
+    else fileStatus.textContent = "milvus-brand-request.md가 아직 없습니다. 저장하면 만든다";
+    enable();
   })();
 
   saveButton.addEventListener("click", async () => {
-    const savedAt = stamp(new Date());
-    // 빈 항목은 빼고 반영 표시(appliedAt)는 지운다. 명세 항목이 아닌 줄·절(unknown)은 그대로 둔다(설계 6.1, 6.2의 6)
-    const sections = REQUEST_SECTIONS.flatMap((s) => {
-      const request = inputs.get(s.id)?.value.trim();
-      if (!request) return [];
-      const current = currentFor(s.id);
-      return [current ? { ...s, current, request } : { ...s, request }];
-    });
-    const text = serializeRequest({ savedAt, sections, unknown: loaded.unknown });
     saveButton.disabled = true;
     saveMessage.textContent = "저장하는 중입니다";
     try {
+      // 페이지를 연 뒤 편집기로 고친 파일을 덮지 않도록 저장 직전에 다시 읽는다.
+      // 바꾸지 않은 입력은 지금 파일의 요청을 따르고, 명세 항목이 아닌 줄·절도 지금 파일의 것을 쓴다
+      const file = await readRequestFile();
+      if (!file.ok) throw new Error(file.error ?? `HTTP ${file.status}`);
+      const fresh = file.text === null ? { sections: [], unknown: [] } : parseRequest(file.text);
+      const base = opened;
+      fill(fresh, (id, fromFile) => {
+        const mine = inputs.get(id)!.value;
+        return mine === (base.get(id) ?? "") ? fromFile : mine;
+      });
+
+      const savedAt = stamp(new Date());
+      // 빈 항목은 빼고 반영 표시(appliedAt)는 지운다(설계 6.1, 6.2의 6)
+      const sections = REQUEST_SECTIONS.flatMap((s) => {
+        const request = inputs.get(s.id)?.value.trim();
+        if (!request) return [];
+        const current = notProject ? undefined : currentFor(s.id);
+        return [current ? { ...s, current, request } : { ...s, request }];
+      });
+      const text = serializeRequest({ savedAt, sections, unknown: fresh.unknown });
       const res = await fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
       const body: { error?: string } = await res.json().catch(() => ({}));
       if (res.ok) {
-        loaded = parseRequest(text);
-        showFile(loaded);
+        const saved = parseRequest(text);
+        drafts.clear();
+        opened = new Map(saved.sections.map((s) => [s.id, s.request]));
+        showFile(saved);
         saveMessage.textContent = `저장했습니다(${savedAt}). Claude에게 "브랜드 요청 반영해줘"라고 하세요`;
       } else {
         saveMessage.textContent = `${SAVE_ERRORS[res.status] ?? `저장하지 못했습니다(HTTP ${res.status})`}${body.error ? `: ${body.error}` : ""}`;
       }
-    } catch {
-      saveMessage.textContent = "저장하지 못했습니다: 개발 서버에 연결할 수 없습니다. Storybook이 켜져 있는지 확인하세요";
+    } catch (e) {
+      saveMessage.textContent =
+        e instanceof TypeError || e instanceof SyntaxError
+          ? "저장하지 못했습니다: 개발 서버에 연결할 수 없습니다. Storybook이 켜져 있는지 확인하세요"
+          : `저장하지 못했습니다: 요청 파일을 다시 읽지 못했습니다(${(e as Error).message})`;
     } finally {
       saveButton.disabled = false;
     }

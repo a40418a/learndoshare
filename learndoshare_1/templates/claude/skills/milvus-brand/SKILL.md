@@ -13,6 +13,7 @@ description: 밀버스 디자인 시스템의 브랜드 요청(milvus-brand-requ
 
 1. **입력.** 프로젝트 루트의 `milvus-brand-request.md`를 읽는다. 없으면 채팅의 브랜드 설명을 쓴다. 자연어가 아니면 7장대로 값을 뽑는다
    - 파일 형식: `# 브랜드 요청`, `저장: …`, 항목마다 `## <항목>` 아래 `지금: …`(명세 페이지가 적은 당시 값)과 `요청: …`
+   - 절 제목 `<항목>`은 4장 표의 항목 이름(`SPEC_ITEMS`의 label)이다. 피드백 색만 종류마다 `## 피드백 색 / 성공`(경고·오류·정보)이다. `지금:` 줄은 없을 수 있고(로고, 전체 스타일 등), `요청:`은 여러 줄일 수 있다(다음 `## ` 줄 앞까지). 4장에 없는 제목의 절은 사용자 메모로 보고 그대로 둔다
 2. **브랜드 명세 표를 채팅으로 제안한다.** 파일은 아직 고치지 않는다. 칸: 항목 | 적용 값 | 쓰는 곳(hook·브리지 변수·파일) | 출처(요청 문장, 토큰 이름) | 확정/추정 | 반영하지 못하는 요구와 대안
    - 추정(이미지에서 읽은 색, 프리셋에서 고른 값)은 추정이라고 적는다
    - 2장 순서의 뒤 단계(브리지 변수, override)를 쓰는 행에는 그 한계를 함께 적는다
@@ -87,32 +88,32 @@ node --input-type=module -e 'import { SPEC_ITEMS } from "@a40418a/milvus-design-
 | 밀버스 컴포넌트 (`milvus-component`) | 그 컴포넌트가 읽는 `--milvus-*` | 새로 만들지 않는다 |
 | 글꼴 (`font`) | 없음 | 바꾸지 않는다. 요청이 오면 시스템 글꼴 고정이라고 답한다 |
 | 전체 스타일 (`overall`) | 7장 프리셋으로 나눠 각 항목 행에 반영한다 | 표에는 나눈 결과를 항목별로 적는다 |
-| 바탕·면 (`surface`) | `--slds-g-color-surface-1`~`-3`(`--slds-g-color-surface-2`가 앱 바탕), `--slds-g-color-surface-container-1`~`-3`, native용 `--slds-g-color-neutral-base-100`·`-95`·`-90` | `--slds-g-color-neutral-base-100`은 색 위 흰 글자로도 쓰여 흰색 가까이에서만 바꾼다 |
-| 글자색 (`text-color`) | `--slds-g-color-on-surface-3`(제목·본문), `--slds-g-color-on-surface-2`(입력값·라벨), `--slds-g-color-on-surface-1`(보조·placeholder) | 보조 아이콘도 `--slds-g-color-on-surface-1`을 쓴다 |
-| 테두리 (`border-color`) | `--slds-g-color-border-1`(구분선·카드), `--slds-g-color-border-2`(입력·버튼), native용 `--slds-g-color-border-base-1`·`--slds-g-color-border-base-4` | |
+| 바탕·면 색 (`surface`) | `--slds-g-color-surface-1`~`-3`(`--slds-g-color-surface-2`가 앱 바탕), `--slds-g-color-surface-container-1`~`-3`, native용 `--slds-g-color-neutral-base-100`·`-95`·`-90` | `--slds-g-color-neutral-base-100`은 색 위 흰 글자로도 쓰여 흰색 가까이에서만 바꾼다 |
+| 글자색 단계 (`text-color`) | `--slds-g-color-on-surface-3`(제목·본문), `--slds-g-color-on-surface-2`(입력값·라벨), `--slds-g-color-on-surface-1`(보조·placeholder) | 보조 아이콘도 `--slds-g-color-on-surface-1`을 쓴다 |
+| 테두리·구분선 (`border-color`) | `--slds-g-color-border-1`(구분선·카드), `--slds-g-color-border-2`(입력·버튼), native용 `--slds-g-color-border-base-1`·`--slds-g-color-border-base-4` | |
 | 회색 온도 (`neutral-tone`) | `--slds-g-color-neutral-base-0`~`--slds-g-color-neutral-base-100` 13단계와 의미 hook | 5장의 회색 단계표 |
-| 비활성 (`disabled`) | `--slds-g-color-disabled-container-1`·`-2`, `--slds-g-color-on-disabled-1`·`-2`, `--slds-g-color-border-disabled-1`·`-2`, `--slds-g-color-disabled-1`·`-2` | |
+| 비활성 상태 (`disabled`) | `--slds-g-color-disabled-container-1`·`-2`, `--slds-g-color-on-disabled-1`·`-2`, `--slds-g-color-border-disabled-1`·`-2`, `--slds-g-color-disabled-1`·`-2` | |
 | 어두운 면 (`inverse`) | `--slds-g-color-surface-inverse-1`·`-2`, `--slds-g-color-surface-container-inverse-1`·`-2`, `--slds-g-color-on-surface-inverse-1`·`-2`, `--slds-g-color-border-inverse-1`·`-2` | native 툴팁은 고정 |
 | 모달 배경막 (`backdrop`) | 두 줄을 함께 쓴다: `--slds-g-color-neutral-10-opacity-50: light-dark(color-mix(in oklab, <색>, transparent 20%), …);`(다크 값은 기본값 보기로 `--slds-s-backdrop-color-background`의 원래 다크 값을 옮긴다)와 `--slds-s-backdrop-color-background: var(--slds-g-color-neutral-10-opacity-50);` | g를 빼면 배경막 색이 정해지지 않는다. 불투명 값은 쓰지 않는다(페이지를 가린다). s hook에는 이 `var()` 말고 다른 값을 받지 않는다 |
 | 검색어 강조 (`highlight`) | `--slds-g-color-palette-yellow-90`·`--slds-g-color-palette-yellow-80` | native 일부 고정 |
 | hover·선택 바탕 (`hover-selected`) | `--slds-g-color-surface-container-2`·`-3`, `--slds-s-menu-item-color-background-active`, `--slds-s-table-row-color-background-selected`, `--slds-s-navigation-color-background-hover`, `--slds-s-pill-color-background-hover`, `--slds-s-button-color-background-hover`, 브리지 `--milvus-nav-selected-background`(세로 내비 선택 바탕) | 색 s hook 값은 `var(중립 g hook)` 하나. native에서는 2개만 닿는다 |
 | 다크 모드 (`dark-mode`) | 모든 색을 `light-dark()`로 | 다크 값은 기본값 |
 | 테두리 두께 (`border-width`) | `--slds-g-sizing-border-1`(1px), `--slds-g-sizing-border-2`(2px), native 버튼 `--slds-s-button-sizing-border`, 선택 상자·라디오 `--slds-s-input-sizing-border`, 브리지 `--milvus-input-border-width`(입력창) | |
-| 아바타·아이콘 모양 (`avatar-icon-shape`) | `--slds-s-avatar-radius-border`, `--slds-s-icon-radius-border` | |
-| 탭·헤더 모양 (`tab-header-shape`) | `--slds-s-navigation-sizing-border-active`, `--slds-s-navigation-sizing-border-hover`, `--slds-s-navigation-radius-border`, `--slds-s-pageheader-radius-border`, `--slds-s-pageheader-sizing-border` | native tabBar는 고정 |
+| 아바타·개체 아이콘 모양 (`avatar-icon-shape`) | `--slds-s-avatar-radius-border`, `--slds-s-icon-radius-border` | |
+| 탭·페이지 헤더 모양 (`tab-header-shape`) | `--slds-s-navigation-sizing-border-active`, `--slds-s-navigation-sizing-border-hover`, `--slds-s-navigation-radius-border`, `--slds-s-pageheader-radius-border`, `--slds-s-pageheader-sizing-border` | native tabBar는 고정 |
 | 컨트롤 높이 (`control-height`) | 버튼 `--slds-s-button-spacing-block`, 브리지 `--milvus-control-height`(입력·선택·콤보), native용 `--slds-s-input-sizing-height` | 버튼만 키우면 폼에서 높이가 어긋난다. 셋을 함께 정한다 |
 | 탭·헤더 높이 (`tab-header-height`) | `--slds-s-navigation-sizing-height`, `--slds-s-navigation-font-lineheight`, `--slds-s-header-sizing-height` | |
 | 아이콘 크기 (`icon-size`) | `--slds-s-icon-sizing`, `--slds-s-icon-spacing`, 브리지 `--milvus-control-icon-size`(버튼·입력창 안, 원래 0.875rem), `--milvus-sort-icon-size`(정렬, 원래 0.75rem) | |
 | 줄 간격 (`line-height`) | `--slds-g-font-line-height-base`(본문 1.5), `--slds-g-font-line-height-2`, `--slds-g-font-line-height-1` | 컨트롤 안 줄 간격은 고정 |
 | 자간 (`letter-spacing`) | `:root`의 `letter-spacing`과 브리지 `--milvus-letter-spacing`(button·input·select·textarea)에 같은 값 | |
 | 대소문자 (`text-case`) | 브리지 `--milvus-caps-transform`(대문자로 쓰지 않으려면 `none`), `--milvus-caps-letter-spacing` | |
-| 그림자 (`shadow`) | `--slds-g-shadow-1`~`-4`, 방향형 `--slds-g-shadow-block-start-1`~`-4`·`block-end`·`inline-start`·`inline-end`, 브리지 `--milvus-nubbin-shadow`(팝오버 꼬리) | 3장의 `-5`·`-6` 규칙. native 드롭다운·팝오버·툴팁은 고정 |
-| hover·눌림 (`hover-press`) | `--slds-s-button-brand-transform-hover`, `--slds-s-button-bordered-transform-hover`, `--slds-s-button-brand-shadow-hover`, `--slds-s-button-bordered-shadow-hover`, `--slds-s-button-shadow-hover`, `--slds-s-button-shadow-active`, `--slds-s-mark-shadow-checked` | native에는 떠오름이 없다 |
+| 그림자 깊이 (`shadow`) | `--slds-g-shadow-1`~`-4`, 방향형 `--slds-g-shadow-block-start-1`~`-4`·`block-end`·`inline-start`·`inline-end`, 브리지 `--milvus-nubbin-shadow`(팝오버 꼬리) | 3장의 `-5`·`-6` 규칙. native 드롭다운·팝오버·툴팁은 고정 |
+| hover·눌림 효과 (`hover-press`) | `--slds-s-button-brand-transform-hover`, `--slds-s-button-bordered-transform-hover`, `--slds-s-button-brand-shadow-hover`, `--slds-s-button-bordered-shadow-hover`, `--slds-s-button-shadow-hover`, `--slds-s-button-shadow-active`, `--slds-s-mark-shadow-checked` | native에는 떠오름이 없다 |
 | 속도 (`motion-speed`) | 브리지 `--milvus-motion-duration-fast`(원래 0.1s 이하인 규칙), `--milvus-motion-duration-medium`(0.15~0.2s), `--milvus-motion-duration-slow`(0.25~0.4s) | 아래 움직임 주의 |
 | 곡선 (`motion-easing`) | 브리지 `--milvus-motion-easing` | 스피너 제외 |
 | 줄인 움직임 (`reduced-motion`) | "동작 줄이기를 켠 사람만": 할 일 없음(브리지가 항상 처리한다). "모두 최소화": 세 시간 변수를 `0.01ms`로(속도 요청보다 우선) | |
-| 포커스 링 (`focus-ring`) | `--slds-g-shadow-outline-focus-1`, `--slds-g-shadow-outset-focus-1`, `--slds-g-shadow-inset-focus-1`, `--slds-g-shadow-inset-inverse-focus-1`, native용 `--slds-s-button-shadow-focus`, `--slds-s-input-shadow-focus`, `--slds-s-mark-shadow-focus` | 링 색은 브랜드 색을 따른다(3장 색 제한) |
-| 커서·밑줄 (`cursor-underline`) | 브리지 `--milvus-cursor-disabled`, `--milvus-link-decoration-hover`(밑줄 없이: `none`) | |
+| 포커스 링 모양 (`focus-ring`) | `--slds-g-shadow-outline-focus-1`, `--slds-g-shadow-outset-focus-1`, `--slds-g-shadow-inset-focus-1`, `--slds-g-shadow-inset-inverse-focus-1`, native용 `--slds-s-button-shadow-focus`, `--slds-s-input-shadow-focus`, `--slds-s-mark-shadow-focus` | 링 색은 브랜드 색을 따른다(3장 색 제한) |
+| 커서·링크 밑줄 (`cursor-underline`) | 브리지 `--milvus-cursor-disabled`, `--milvus-link-decoration-hover`(밑줄 없이: `none`) | |
 | 개체 아이콘 색 (`object-icon-color`) | 전체 `--milvus-icon-color-all`, 하나씩 `--milvus-icon-<종류>-<이름>` | 아래 |
 | Salesforce 고정 (`fixed`) | 없음 | 2장 목록을 보여 준다 |
 
