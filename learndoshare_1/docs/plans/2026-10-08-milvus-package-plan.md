@@ -509,7 +509,7 @@ test("override: @font-face와 @import는 오류", ...);
   - 움직임 4개: 전역 제약의 이름
   - 크기·모양: `--milvus-control-height`, `--milvus-input-border-width`, `--milvus-path-end-radius`, `--milvus-control-icon-size`, `--milvus-sort-icon-size`, `--milvus-modal-width-base`, `--milvus-modal-width-small`, `--milvus-modal-width-medium`, `--milvus-modal-width-large`, `--milvus-modal-width-full`, `--milvus-modal-min-width` (정렬 아이콘과 모달 너비 나머지는 2026-10-12 사용자 결정으로 Task 15에서 더함)
   - 글자: `--milvus-letter-spacing`, `--milvus-caps-transform`, `--milvus-caps-letter-spacing`, `--milvus-choice-label-weight`
-  - 커서·밑줄·그림자: `--milvus-cursor-disabled`, `--milvus-link-decoration-hover`, `--milvus-nubbin-shadow`
+  - 커서·밑줄·그림자·바탕: `--milvus-cursor-disabled`, `--milvus-link-decoration-hover`, `--milvus-nubbin-shadow`, `--milvus-nav-selected-background`(2026-10-12 사용자 결정으로 더함)
   - 아이콘: `--milvus-icon-color-all`
 - Produces (`lib/spec-items.ts`):
   - `type SpecItem`
