@@ -31,13 +31,19 @@ export default class MilvusButton extends LightningElement {
   custom = false;
   nativeChecked = false;
 
-  connectedCallback() {
-    // CSS 변수는 shadow 경계를 넘어 상속되므로 호스트에서 브랜드 util.css 값을 읽을 수 있다
+  async connectedCallback() {
+    this.readCustom();
+    // org에서는 첫 렌더가 브랜드 CSS보다 먼저라 loadBrand가 끝난 뒤 다시 읽는다(필드가 바뀌면 다시 렌더한다)
+    await loadBrand(this);
+    this.readCustom();
+  }
+
+  // CSS 변수는 shadow 경계를 넘어 상속되므로 호스트에서 브랜드 util.css 값을 읽을 수 있다
+  readCustom() {
     this.custom =
       getComputedStyle(this.template.host)
         .getPropertyValue("--milvus-button-custom")
         .trim() === "on";
-    loadBrand(this);
   }
 
   renderedCallback() {
