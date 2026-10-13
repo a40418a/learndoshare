@@ -35,6 +35,7 @@
     <li><a href="#gaps">base 컴포넌트의 빈틈</a></li>
     <li><a href="#themes">Themes and Branding</a></li>
     <li><a href="#button">브랜드 모양과 milvusButton</a></li>
+    <li><a href="#bridge">브리지: hook이 없는 항목</a></li>
     <li><a href="#criteria">컴포넌트 추가 기준</a></li>
     <li><a href="#quiz">스스로 점검</a></li>
     <li><a href="#refs">참고</a></li>
@@ -46,7 +47,7 @@
   <div class="eyebrow">LEARN 01 · 전체 기초</div>
   <h1>세일즈포스 디자인 시스템</h1>
   <p class="lead">SLDS가 무엇으로 이루어져 있는지, SLDS 2에서 무엇이 바뀌었는지, 그리고 밀버스가 SLDS 위에서 무엇을 추가하고 무엇을 건드리지 않는지 정리한다. 개념(디자인 토큰, styling hook, shadow DOM)을 처음 본다면 <a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html">00 개념</a>을 먼저 읽는다.</p>
-  <div class="meta"><span>예상 1.5시간</span><span>선행: 00 개념</span><span>2026-10-09 갱신 · 공식 문서와 패키지로 다시 확인</span><span>SLDS 사이트 표기 Fall '26 v3.4.1</span></div>
+  <div class="meta"><span>예상 1.5시간</span><span>선행: 00 개념</span><span>2026-10-09 갱신 · 공식 문서와 패키지로 다시 확인 · 2026-10-13 갱신 (브리지 절)</span><span>SLDS 사이트 표기 Fall '26 v3.4.1</span></div>
 </header>
 
 <section id="why">
@@ -56,10 +57,10 @@
   <p>우리 org는 <b>SLDS 2</b> 테마(<code>Milvus_DesignSystem</code>, <code>brands/Milvus_DesignSystem/theme.json</code>의 <code>designSystemVersion</code>이 <code>SLDS_v2</code>)를 쓴다. 인터넷 자료 상당수는 SLDS 1 기준이라, 그대로 따라 하면 SLDS 2에서 동작하지 않거나 가이드라인을 어기게 된다.</p>
   <div class="cards">
     <div class="card"><h4>무엇을 가져다 쓰나</h4><p>org 테마(브랜드 색·로고), base 컴포넌트(<code>lightning-*</code>), 블루프린트, styling hook</p></div>
-    <div class="card"><h4>무엇을 하지 않나</h4><p>컴포넌트 CSS에서 <code>--slds-g-*</code> 재정의, SLDS 클래스 덮어쓰기, 하드코딩 색. 지금 예외는 브랜드 <code>util.css</code> 하나뿐이다(<a href="#hooks">styling hook</a>). 클래스 규칙을 갖는 <code>milvusBridge.css</code>와 opt-in <code>milvusOverride.css</code>는 패키지 <code>templates/</code>의 빈 틀을 <code>init</code>이 프로젝트에 넣는다(Task 11). 브리지 규칙을 만드는 생성기는 <span class="tag info">계획</span>(Task 15)이다 (2026-10-12 갱신)</p></div>
+    <div class="card"><h4>무엇을 하지 않나</h4><p>컴포넌트 CSS에서 <code>--slds-g-*</code> 재정의, SLDS 클래스 덮어쓰기, 하드코딩 색. 지금 예외는 브랜드 <code>util.css</code> 하나뿐이다(<a href="#hooks">styling hook</a>). 클래스 규칙을 갖는 파일은 둘이다. <code>milvusBridge.css</code>는 패키지가 SLDS 2 CSS에서 생성해 관리하고(Task 15·16, <a href="#bridge">브리지</a>, 2026-10-13 갱신), opt-in <code>milvusOverride.css</code>는 <code>init</code>이 빈 틀을 프로젝트에 넣는다(Task 11)</p></div>
     <div class="card"><h4>무엇을 추가하나</h4><p>SLDS에 없는 기능을 맡는 밀버스 컴포넌트와 <code>--milvus-*</code> 변수. 모양만 바꾸려고 컴포넌트를 만들지 않는다 (2026-10-09 갱신)</p></div>
   </div>
-  <p class="sources">출처: <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_enhancedlex.htm&amp;type=5">Salesforce Help: Salesforce Cosmos Theme and SLDS 2 Availability</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2: Color Modes (Component Customization Layers)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC 개발자 가이드: Compare SLDS Versions</a> (확인 2026-10-09) · <a href="../README.md">README 1.3 원칙 (프로젝트 결정)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (기본 우선, opt-in override 결정), 3장 (init이 만드는 milvusBridge.css·milvusOverride.css), 5.1 (층), 5.6 (브리지 규칙은 패키지가 생성)</a> (확인 2026-10-12)</p>
+  <p class="sources">출처: <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_enhancedlex.htm&amp;type=5">Salesforce Help: Salesforce Cosmos Theme and SLDS 2 Availability</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2: Color Modes (Component Customization Layers)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC 개발자 가이드: Compare SLDS Versions</a> (확인 2026-10-09) · <a href="../README.md">README 1.3 원칙 (프로젝트 결정)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (기본 우선, opt-in override 결정), 3장 (init이 만드는 milvusBridge.css·milvusOverride.css), 5.1 (층), 5.6 (브리지 규칙은 패키지가 생성)</a> (확인 2026-10-13)</p>
 </section>
 
 <section id="parts">
@@ -244,7 +245,7 @@ pnpm exec slds-linter report force-app   <span class="c"># SARIF 보고서</span
     <tr><td>1</td><td>특별한 요구 없음, 또는 브랜드 색만 다르면 된다</td><td>Salesforce 기본 모양 그대로. org 테마의 브랜드 색·로고만 바꾼다. <code>lightning-button</code>이 accent 색을 따라간다</td><td><span class="tag ok">기본</span> 공식 기능, 코드 없음</td></tr>
     <tr><td>2</td><td>브랜드가 전체 모양을 바꾸길 원한다</td><td><code>util.css</code>의 <code>:root</code>에서 global hook 재정의. 예: <code>--slds-g-radius-border-pill</code>. 같은 hook을 읽는 모든 컴포넌트가 함께 바뀐다</td><td><span class="tag warn">공식 권고 밖</span> 요청이 있을 때만</td></tr>
     <tr><td>3</td><td>특정 컴포넌트 묶음만 바꾸고 싶다</td><td><code>util.css</code>에서 SLDS 2·기본 컴포넌트 CSS가 읽는 <code>--slds-s-*</code>(색은 hover·선택 바탕 6개만). 예: <code>--slds-s-button-radius-border</code></td><td><span class="tag warn">공식 권고 밖</span> Salesforce 내부용(private)으로 분류된 hook이다. native 전환 때 효과가 사라질 수 있다</td></tr>
-    <tr><td>4</td><td>hook이 아예 없는 항목(움직임 등)을 모든 컴포넌트에서 바꾼다</td><td>패키지의 <code>milvusBridge.css</code>(클래스 규칙, <code>--milvus-*</code>를 읽음). 브랜드는 브리지 변수 값만 정한다</td><td><span class="tag info">계획</span> 설계 5.6. 변수 이름은 <code>lib/bridge-vars.ts</code>에 정했고(2026-10-09), 규칙 생성기는 구현 전</td></tr>
+    <tr><td>4</td><td>hook이 아예 없는 항목(움직임 등)을 모든 컴포넌트에서 바꾼다</td><td>패키지의 <code>milvusBridge.css</code>(클래스 규칙, <code>--milvus-*</code>를 읽음). 브랜드는 브리지 변수 값만 정한다</td><td><span class="tag warn">공식 권고 밖</span> native 전환 시 잃는다. 설계 5.6. 생성기와 생성 결과는 Task 15·16에서 구현했다(2026-10-13 갱신, <a href="#bridge">브리지</a>)</td></tr>
     <tr><td>5</td><td>hook·브리지로 안 되는 기존 컴포넌트의 모양</td><td>프로젝트 소유 opt-in <code>milvusOverride.css</code>의 클래스 규칙. 마지막에 싣는다</td><td><span class="tag warn">공식 권고 밖</span> 마지막 수단. native 전환·업데이트에 약하다는 것을 알린다. 틀(<code>templates/</code>)과 검사 함수(<code>checkOverrideCss</code>)는 2026-10-09 구현. <code>init</code>이 설명 주석만 있는 틀을 프로젝트에 만들고(Task 11), <code>check --style</code>이 검사한다(Task 12, 2026-10-12 갱신). 설계 5.1</td></tr>
   </table></div>
   <p>모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다. 밀버스 컴포넌트는 SLDS에 기능이 없을 때만 만든다(2026-10-09 결정). 두 방식의 비교와 권하지 않는 이유는 <a href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html">09 override와 공식 권고</a>에 있다.</p>
@@ -283,7 +284,7 @@ pnpm exec slds-linter report force-app   <span class="c"># SARIF 보고서</span
     <tr><td>피드백 색 (성공·경고·오류·정보)</td><td>설계 5.3 표의 이름만(SLDS 2 CSS가 실제로 읽는 것). 글자색은 배경 위와 흰색 위에서 4.5:1 이상. 미달이면 같은 색조의 팔레트 40·30·20단계 중 처음 통과하는 색을 제안한다</td></tr>
     <tr><td>기본 컴포넌트 CSS에만 있는 g 이름 5개</td><td>native 전환 대비용. 지금은 효과가 없다</td></tr>
     <tr><td><code>--slds-s-*</code></td><td>SLDS 2 CSS나 기본 컴포넌트 CSS가 <code>var()</code>로 읽는 이름만. 색 s hook은 hover·선택 바탕 6개만, 값은 중립 g hook만 참조</td></tr>
-    <tr><td><code>--milvus-*</code></td><td>밀버스 컴포넌트(<code>.css</code>·<code>.ts</code>)나 <code>milvusBridge.css</code>가 읽는 이름만</td></tr>
+    <tr><td><code>--milvus-*</code></td><td>밀버스 컴포넌트(<code>.css</code>·<code>.js</code>)나 <code>milvusBridge.css</code>가 읽는 이름만. 개체 아이콘 변수는 아이콘마다 하나다(<a href="#bridge">브리지</a>, 2026-10-13 갱신)</td></tr>
     <tr><td>상속 속성 <code>letter-spacing</code></td><td>자간 하나만. 다른 일반 속성은 금지</td></tr>
   </table></div>
   <div class="table-wrap"><table>
@@ -316,7 +317,100 @@ pnpm exec slds-linter report force-app   <span class="c"># SARIF 보고서</span
 }</code></pre>
   <div class="callout warn"><strong>켠다면 감수할 대가</strong>블루프린트로 그리면 <code>lightning-button</code>이 해 주던 것(아이콘 배치, 비활성 처리, 접근성 속성 등)을 직접 맞춰야 한다. 지금 <code>milvusButton</code>은 이 대가를 보여 주는 비교 예시다. 브랜드 모양을 바꾸려고 운영에서 켜는 수단이 아니고, 모양 요청은 hook → 브리지 → <code>milvusOverride.css</code> 순으로 받는다(2026-10-09 갱신, <a href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html">09 override와 공식 권고</a> 실험 A). <span class="tag warn">미확인</span> SLDS 2 org 화면에서 블루프린트 버튼이 <code>lightning-button</code>과 완전히 같게 보이는지는 아직 org에서 나란히 비교하지 않았다.</div>
   <aside class="legacy"><strong>이전 설계 (2026-10-09 갱신)</strong>2026-09-26에는 브랜드 차이를 <code>brands/&lt;브랜드&gt;/root.css</code>(<code>--milvus-*</code> 변수만)에 두고, 고객사가 <code>lightning-button</code> 자체의 모양까지 원하면 opt-in 확장 계층 <code>brands/&lt;브랜드&gt;/override.css</code>(<code>milvus.config.json</code>의 <code>"overrides": true</code>일 때만 로드)에서 모양 관련 <code>--slds-g-*</code>만 재정의하려 했다. 2026-10-07(#11)에 둘을 <code>util.css</code> 하나로 합쳤고 override.css는 만들지 않았다. 앞으로 패키지에서는 이 파일이 <code>staticresources/milvusBrand.css</code>가 된다(설계 문서 맨 앞 "이 문서가 대체하는 것").</aside>
-  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC 개발자 가이드: SLDS Styling Hooks (Support Limitations, 클래스 덮어쓰기 안티패턴)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2: Color Modes (Implementation Rules)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm: @salesforce-ux/design-system-2</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/hookdefs.json">분석 자료: hookdefs.json (반경 hook 값)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (LEX loadStyle, VF)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 감사 종합 (native 전환, 브리지)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-slds.html">Visualforce 개발자 가이드: apex:slds (lightningStyleMode)</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_settings.htm&amp;type=5">Salesforce Help: User Interface Settings (Visualforce Settings)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/7708aa-styling-api">SLDS 2: Styling API (Component-level Styling Hooks, Developer Preview)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/eslint-plugin-slds">npm: @salesforce-ux/eslint-plugin-slds README (no-slds-private-var)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (10/9 opt-in override), 3장 (init이 만드는 파일), 4.3 (check --style), 5.1 (반영 순서, milvusOverride.css 규칙), 5.2·5.3 (util.css 규칙), 5.5·5.6 (loadBrand, milvusBridge.css 계획), 1장 10/9 D2·D3 (VF 팔레트, milvusBrandLoader)</a> (확인 2026-10-12) · <a href="../docs/research/2026-10-09-org-probe.md">org 프로브 2차 기록 3.1 (loadBrand), 3.8 (VF 설정)</a> (확인 2026-10-12) · <a href="../README.md">README 2장 (util.css 규칙 통합, 2026-10-09)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 감사 종합 2.1 (규칙 세 곳 불일치)</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/light-dark">MDN: light-dark()</a> (확인 2026-10-09) · <a href="https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html">W3C: Understanding SC 1.4.3 Contrast (Minimum), 4.5:1</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC 개발자 가이드: SLDS Styling Hooks (Support Limitations, 클래스 덮어쓰기 안티패턴)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2: Color Modes (Implementation Rules)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm: @salesforce-ux/design-system-2</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/hookdefs.json">분석 자료: hookdefs.json (반경 hook 값)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (LEX loadStyle, VF)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 감사 종합 (native 전환, 브리지)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-slds.html">Visualforce 개발자 가이드: apex:slds (lightningStyleMode)</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_settings.htm&amp;type=5">Salesforce Help: User Interface Settings (Visualforce Settings)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/7708aa-styling-api">SLDS 2: Styling API (Component-level Styling Hooks, Developer Preview)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/eslint-plugin-slds">npm: @salesforce-ux/eslint-plugin-slds README (no-slds-private-var)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (10/9 opt-in override), 3장 (init이 만드는 파일), 4.3 (check --style), 5.1 (반영 순서, milvusOverride.css 규칙), 5.2·5.3 (util.css 규칙), 5.5·5.6 (loadBrand, milvusBridge.css), 1장 10/9 D2·D3 (VF 팔레트, milvusBrandLoader)</a> (확인 2026-10-13) · <a href="../docs/research/2026-10-09-org-probe.md">org 프로브 2차 기록 3.1 (loadBrand), 3.8 (VF 설정)</a> (확인 2026-10-12) · <a href="../README.md">README 2장 (util.css 규칙 통합, 2026-10-09)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 감사 종합 2.1 (규칙 세 곳 불일치)</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/color_value/light-dark">MDN: light-dark()</a> (확인 2026-10-09) · <a href="https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html">W3C: Understanding SC 1.4.3 Contrast (Minimum), 4.5:1</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="bridge">
+  <h2>브리지: hook이 없는 항목 잇기</h2>
+  <h3>개념</h3>
+  <p>브리지는 CSS의 세 가지 규칙 위에 서 있다. 셋을 먼저 정리한다 (2026-10-13 작성).</p>
+  <ul>
+    <li><b>캐스케이드 순서:</b> 같은 요소의 같은 속성에 선언이 여럿이면 캐스케이드가 하나를 고른다. 비교 순서는 출처와 중요도(<code>!important</code>), 맥락, 요소에 직접 붙은 스타일, layer, 우선순위(specificity), 나타난 순서다. 앞의 기준이 모두 같으면 문서에서 나중에 나온 선언이 이긴다</li>
+    <li><b>우선순위(specificity):</b> 선택자의 ID, 클래스(속성 선택자·의사 클래스 포함), 타입(의사 요소 포함) 개수를 세 칸으로 센다. 예: 한 요소에 붙은 <code>.slds-button__icon</code>과 <code>.slds-button__icon_large</code>는 둘 다 0-1-0이라 문서에서 나중에 나온 규칙이 이긴다</li>
+    <li><b>사용자 정의 속성(custom property):</b> <code>--</code>로 만든 속성은 캐스케이드를 따르고 부모에서 상속된다. <code>var(--이름, 기본값)</code>의 두 번째 인자는 그 속성이 정해지지 않았을 때 쓰는 대체 값이다. 그래서 클래스 규칙이 값을 직접 갖지 않고 <code>var(--변수, 원래 값)</code>을 읽으면, 변수를 정하지 않은 화면은 원래 값 그대로다</li>
+  </ul>
+  <p>움직임을 다룰 때는 세 가지가 더 필요하다.</p>
+  <ul>
+    <li><code>@media (prefers-reduced-motion: reduce)</code>는 사용자가 기기에서 불필요한 움직임을 줄이는 설정을 켰는지 알려 준다. WCAG 2.3.3(AAA)은 상호작용으로 생기는 움직임을 끌 수 있게 하라고 하고, 이 미디어 쿼리를 충분한 기법(C39)으로 든다</li>
+    <li><code>max()</code>는 쉼표로 나눈 값 가운데 가장 큰 값을 쓴다. <code>&lt;time&gt;</code> 자리에도 쓸 수 있다. <code>max(var(--x, 0.1s), 0.01ms)</code>는 변수에 0을 넣어도 0.01ms 아래로 내려가지 않는다</li>
+    <li>transition은 지속 시간과 지연을 합한 값이 0s보다 커야 시작한다. 둘 다 0s면 transition이 없고 <code>transitionend</code>를 포함한 이벤트가 하나도 오지 않는다. animation은 지속 시간이 0s여도 시작·끝 이벤트를 보낸다고 스펙이 적는다. 다만 끝나기 전에 animation이 제거되면 <code>animationend</code>는 오지 않는다</li>
+  </ul>
+  <h3>Salesforce에서는</h3>
+  <h4>hook이 없는 항목이 생기는 이유</h4>
+  <ul>
+    <li><b>공식 범주가 정해져 있다:</b> SLDS 2 global hook은 색, 그림자, 테두리·반경, 글자(글꼴·크기·굵기·줄 간격), 간격, 크기 6개 범주로 나뉜다. 움직임, 커서, 대소문자, 자간 범주는 없다. hook 값은 SLDS가 정하고 Salesforce가 언제든 바꿀 수 있다</li>
+    <li><b>컴포넌트 hook은 SLDS 2에서 아직 지원하지 않는다:</b> 컴포넌트 하나만 바꾸는 <code>--slds-c-*</code>는 SLDS 2에서 쓸 수 없다(<a href="#hooks">styling hook</a>)</li>
+    <li><b>링크와 폼 요소는 따로 막혀 있다:</b> LWC 개발자 가이드의 Support Limitations는 링크(<code>lightning-breadcrumb</code>, <code>lightning-formatted-*</code> 등)와 폼 요소(<code>lightning-input-*</code>, <code>lightning-textarea</code> 등)를 custom property로 꾸미는 것을 지원하지 않는다고 적는다. 링크 밑줄, 입력창 두께가 여기에 걸린다</li>
+    <li><b>패키지 CSS에서 확인한 것:</b> <code>--slds-g-duration-*</code> 8개는 정의만 있고 읽는 곳이 0이다. 컨트롤 높이 <code>1.875rem</code>, 입력창 두께 <code>1px</code>, Path 양 끝 <code>2rem</code>, 대문자 제목 자간 <code>0.0625rem</code>, 세로 내비 선택 바탕 <code>rgb(21, 137, 238, 0.1)</code>은 값이 박혀 있다. 팝오버 꼬리 그림자는 내부 전용 <code>--_slds-*</code>만 읽는다. 개체 아이콘 배경은 규칙 973개(클래스 이름 1,087개)가 <code>--slds-c-icon-color-background</code>에 색을 직접 정한다(설치된 2.264.2)</li>
+    <li>이 항목들에 hook을 두지 않은 이유를 Salesforce가 밝힌 문서는 찾지 못했다 <span class="tag warn">미확인</span></li>
+  </ul>
+  <h4>클래스 덮어쓰기에 대한 공식 입장</h4>
+  <p>LWC 개발자 가이드의 Anti-Patterns는 SLDS 클래스의 속성을 덮어쓰는 것(예: <code>.slds-button { padding: 16px; }</code>)을 지원하지 않는다고 적는다. SLDS가 바뀌면 예상과 다른 결과가 날 수 있고, 기본 컴포넌트의 스타일 덮어쓰기는 문서화된 styling hook을 쓸 때만 지원한다. 브리지도 클래스 규칙이라 이 입장 밖에 있다.</p>
+  <h4>움직임이 끝나기를 기다리는 기본 컴포넌트</h4>
+  <p>설치된 <code>lightning-base-components</code> 1.28.19-alpha 소스를 읽으면 두 곳이 움직임의 끝 이벤트에 기대어 닫힌다.</p>
+  <ul>
+    <li><b>모달</b>(<code>modalBase.js</code>): 닫을 때 배경막의 <code>transitionend</code>를 기다린 뒤 닫힘을 끝낸다. 사용자가 동작 줄이기를 켰으면(<code>prefers-reduced-motion: reduce</code>) 기다리지 않는다</li>
+    <li><b>토스트</b>(<code>toast.html</code>·<code>toast.js</code>): 닫히는 중일 때 <code>animationend</code>에서 <code>close</code> 이벤트를 보낸다</li>
+  </ul>
+  <h3>밀버스에서는</h3>
+  <p><code>milvusBridge.css</code>는 hook이 없거나 허용된 hook이 없는 항목만 잇는 패키지 제공 클래스 규칙이다(설계 5.6). hook이 있는 항목은 계속 hook만 쓴다. 브랜드는 <code>milvusBrand.css</code>(util.css)의 <code>:root</code>에 아래 변수 값만 정한다. 대응 순서로는 hook 다음, <code>milvusOverride.css</code> 앞이다(<a href="#button">대응 순서</a> 4번).</p>
+  <div class="table-wrap"><table>
+    <tr><th>항목</th><th>변수 (<code>--milvus-</code> 뒤)</th><th>원래 값 (= 기본값)</th><th>대상과 hook이 없는 까닭</th></tr>
+    <tr><td>움직임 시간</td><td><code>motion-duration-fast</code>, <code>-medium</code>, <code>-slow</code></td><td>규칙마다 원래 값. fast는 0.1s 이하, medium은 0.15~0.2s, slow는 0.25~0.4s인 규칙</td><td>버튼, 모달, 배경막, 드롭다운, 팝오버, 토글, Path 등. duration hook을 읽는 곳이 0</td></tr>
+    <tr><td>움직임 곡선</td><td><code>motion-easing</code></td><td>규칙마다 원래 곡선(<code>linear</code>, <code>ease-in-out</code>, <code>cubic-bezier(…)</code> 등. 적지 않았으면 <code>ease</code>)</td><td>곡선 hook이 없다. 계단 곡선(<code>steps()</code>)은 바꾸지 않는다</td></tr>
+    <tr><td>줄인 움직임</td><td>(변수 없음, 항상 켬)</td><td>—</td><td><code>prefers-reduced-motion</code>을 처리하는 곳이 SLDS 2 CSS 1곳, 기본 컴포넌트 CSS 0곳</td></tr>
+    <tr><td>컨트롤 높이</td><td><code>control-height</code></td><td><code>1.875rem</code></td><td><code>.slds-button</code>, <code>.slds-input</code>, <code>.slds-input_faux</code>, <code>.slds-select</code>, 버튼형 라디오·체크박스의 <code>line-height</code>·높이에 고정</td></tr>
+    <tr><td>입력창 두께</td><td><code>input-border-width</code></td><td><code>1px</code></td><td><code>.slds-input</code>, <code>.slds-textarea</code>, <code>.slds-input_faux</code>(콤보박스)의 <code>border</code> 안에 고정. 폼 요소는 custom property 꾸미기 미지원</td></tr>
+    <tr><td>Path 양 끝 반경</td><td><code>path-end-radius</code></td><td><code>2rem</code></td><td><code>.slds-path__item</code>의 첫·마지막 항목에 고정</td></tr>
+    <tr><td>자간</td><td><code>letter-spacing</code></td><td><code>normal</code></td><td><code>button, input, optgroup, select, textarea</code>. util.css <code>:root</code>의 자간이 폼 컨트롤에서 상속이 끊긴다. 브라우저 기본 스타일이 다시 정하기 때문이라고 본다 <span class="tag warn">추정</span></td></tr>
+    <tr><td>대문자 제목</td><td><code>caps-transform</code>, <code>caps-letter-spacing</code></td><td><code>uppercase</code>, <code>0.0625rem</code></td><td><code>.slds-text-title_caps</code>, <code>.slds-section-title_divider</code>. 자간은 브랜드 자간과 따로 둔다(2026-10-12 사용자 결정)</td></tr>
+    <tr><td>선택지 라벨 굵기</td><td><code>choice-label-weight</code></td><td><code>normal</code></td><td>라디오·체크박스·토글 라벨에 고정</td></tr>
+    <tr><td>커서·링크 밑줄</td><td><code>cursor-disabled</code>, <code>link-decoration-hover</code></td><td><code>default</code> 또는 <code>not-allowed</code>, <code>underline</code></td><td>비활성 요소의 커서, <code>a:hover</code> 밑줄. 커서 hook이 없고 링크는 custom property 꾸미기 미지원</td></tr>
+    <tr><td>팝오버 꼬리 그림자</td><td><code>nubbin-shadow</code></td><td>원래 읽던 <code>var(--_slds-c-popover-*-nubbin-shadow)</code></td><td><code>.slds-nubbin_*::after</code>. 내부 전용 hook만 있다</td></tr>
+    <tr><td>세로 내비 선택 바탕</td><td><code>nav-selected-background</code></td><td><code>rgb(21, 137, 238, 0.1)</code></td><td>옛 브랜드 파랑이 고정(왼쪽 테두리는 브랜드 색을 따름). 2026-10-12 사용자 결정으로 고정 대신 브리지</td></tr>
+    <tr><td>개체 아이콘 색</td><td><code>icon-color-all</code>(전체), <code>icon-&lt;종류&gt;-&lt;이름&gt;</code>(하나)</td><td>클래스마다 원래 색(973규칙)</td><td><code>.slds-icon-standard-*</code> 등이 색을 직접 정한다. 변수 이름은 lightning-icon <code>icon-name</code>의 <code>:</code>와 <code>_</code>를 <code>-</code>로 바꾼 것. 예: <code>standard:user_role</code> → <code>--milvus-icon-standard-user-role</code></td></tr>
+    <tr><td>컨트롤 안 아이콘 크기</td><td><code>control-icon-size</code></td><td><code>0.875rem</code></td><td><code>.slds-button__icon</code>, <code>.slds-input__icon</code>에 고정</td></tr>
+    <tr><td>정렬 아이콘 크기</td><td><code>sort-icon-size</code></td><td><code>0.75rem</code></td><td><code>.slds-is-sortable__icon</code>. 컨트롤 안 아이콘과 크기 관계가 달라 따로 둔다(2026-10-12 사용자 결정)</td></tr>
+    <tr><td>모달 너비 (원할 때만)</td><td><code>modal-width-base</code>, <code>-small</code>, <code>-medium</code>, <code>-large</code>, <code>-full</code>, <code>modal-min-width</code></td><td>크기마다 원래 너비·최대 너비(예: medium <code>70%</code>·<code>75rem</code>), 최소 너비 <code>20rem</code>·<code>40rem</code></td><td><code>.slds-modal__container</code>와 크기 클래스. 작은 화면의 full 모달은 바꾸지 않는다</td></tr>
+  </table></div>
+  <h4>만드는 방법과 화면 불변</h4>
+  <ul>
+    <li><b>생성:</b> <code>scripts/bridge/generate.ts</code>(<code>pnpm bridge:generate</code>)가 설치된 SLDS 2 CSS에서 각 항목의 리터럴 선언을 모두 찾는다. 원본 선택자 목록과 <code>@media</code>·<code>@supports</code> 맥락을 그대로 복사하고, 움직임은 shorthand를 두고 <code>-duration</code>·<code>-timing-function</code>만 정한다. 결과는 패키지가 관리하는 <code>templates/force-app/main/default/staticresources/milvusBridge.css</code>다(설계 5.6 "생성 방식")</li>
+    <li><b>기본값 = 원래 값:</b> 브리지 규칙은 모두 <code>var(--milvus-*, 원래 값)</code>을 읽는다. 브랜드가 변수를 정하지 않으면 화면이 바뀌지 않는다. <code>tests/bridge.test.ts</code>가 생성된 모든 선언의 기본값이 같은 선택자·맥락의 SLDS 2 원본 값과 같은지 본다</li>
+    <li><b>원래 이기던 규칙 다시 넣기:</b> 브리지는 SLDS 2 CSS보다 뒤에 들어온다. 같은 선택자를 복사하면 우선순위가 같은 원본 규칙을 모두 이긴다. 예: <code>.slds-button__icon { width }</code>를 이으면, 원래 뒤에서 이기던 <code>.slds-button__icon_large</code>(같은 0-1-0)가 진다. 그러면 변수를 정하지 않아도 큰 버튼 아이콘이 작아진다. 그래서 원래 이기던 같은 우선순위 규칙을 원래 값 그대로 다시 넣는다(1,110규칙)</li>
+    <li><b>구조 변경 감지:</b> 대상 선택자·속성·바꿀 값이 원본에서 사라지면 생성이 실패한다. 이미 만든 파일의 선택자가 원본에서 사라지면 <code>pnpm test</code>의 <code>audit:brand</code>가 실패한다(<a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html#audit">00 개념 7절</a>)</li>
+  </ul>
+  <h4>움직임 규칙</h4>
+  <ul>
+    <li><b>최소 0.01ms:</b> 시간 묶음에 드는 모든 시간을 <code>max(var(--milvus-motion-duration-*, 원래 값), 0.01ms)</code>로 감싼다. 0을 넣으면 transition이 시작하지 않아 <code>transitionend</code>를 기다리는 모달이 닫히지 않을 수 있기 때문이다. animation은 스펙상 0s여도 끝 이벤트가 오지만, 선택자로 모달류를 고르지 않고 같은 규칙을 모든 시간에 쓴다. 0과 0.01ms는 눈으로 같다. lightning 토스트의 등장 0.4s는 기본 컴포넌트 CSS에 있어 생성기 입력 밖이고 "Salesforce 고정"이다</li>
+    <li><b>바꾸지 않는 시간:</b> 묶음 밖 시간(아이콘·알림 애니메이션 등)과 계단 곡선은 원래 값으로 둔다(고정). 스피너는 점마다 지연이 맞물려 있어 시간을 바꾸면 순서가 어긋난다. 그래서 시간 규칙에서 빼고 줄인 움직임만 다룬다</li>
+    <li><b>줄인 움직임:</b> 파일 끝에 <code>@media (prefers-reduced-motion: reduce)</code>를 항상 넣는다. transition·animation이 있는 원본 선택자 141개(스피너 포함)에 <code>transition-duration: 0.01ms; animation-duration: 0.01ms; animation-iteration-count: 1</code>을 준다. 원본과 같은 선택자를 파일 마지막에 두므로 원래 이기던 규칙보다 늦게 와서 이긴다. 브랜드 선택이 아니라 항상 켜 두는 접근성 규칙이다</li>
+  </ul>
+  <h4>한계</h4>
+  <ul>
+    <li><b>native 전환 시 잃는다:</b> 클래스 규칙은 native shadow 안으로 들어가지 않는다(<a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html#shadow">00 개념 5절</a>). 기본 컴포넌트가 native로 바뀌면 그 안에는 브리지가 닿지 않는다. 그래서 명세 항목에 "native 전환 시 잃음"을 표시하고(<code>lib/spec-items.ts</code>의 <code>nativeLoss</code>), 정적 검사의 native 열은 브리지 없이 센다</li>
+    <li><b>공식 권고 밖이다:</b> 위 Anti-Patterns가 말한 위험을 그대로 갖는다. SLDS 선택자나 값이 바뀌면 브리지가 효과를 잃거나 어긋날 수 있다. 위의 구조 변경 감지가 이것을 먼저 알리려는 장치다</li>
+    <li><b>npm 값으로 고정된다:</b> 기본값과 다시 넣은 규칙은 npm SLDS 2(2.264.2) 값이다. 그 선택자에 맞는 LEX 요소 전체가 이 값을 받는다. org가 클래스 규칙에 다른 값을 내려주면 그 값이 덮인다. 잰 표본에서 hook 기본값은 org와 npm이 같았지만(10/9 프로브 3.9), 클래스 규칙의 리터럴 값까지 같은지는 재지 않았다 <span class="tag warn">미확인</span>. 문제가 보이면 다시 넣는 규칙을 <code>:where(대상 선택자)</code>로 좁힌다(설계 5.6)</li>
+    <li><b>파일 크기:</b> 358,310바이트, gzip 33,491바이트다. 브리지 규칙 175개, 개체 아이콘 973규칙, 다시 넣은 원본 규칙 1,110개, 줄인 움직임 141규칙이다. SLDS 2 CSS(976KB, 압축 약 108KB)의 3분의 1쯤이고, 브라우저가 캐시하는 정적 리소스다. <code>loadBrand</code>가 있는 모든 페이지에 들어간다</li>
+    <li><b>org에서 직접 재지 않았다:</b> 클래스 규칙이 닿는 것은 10/9 프로브에서 <code>.slds-button</code> 한 줄로 확인했다(<code>lightning-button</code> 안과 표준 헤더 버튼 대부분, 더 구체적인 선택자가 이기는 버튼은 예외). 생성된 브리지 파일을 org에 올려 화면을 비교하지는 않았다 <span class="tag warn">미확인</span>. lightning-icon이 JS 색보다 이 hook을 먼저 읽는다는 것도 소스를 읽어 확인했을 뿐 org에서는 보지 않았다</li>
+    <li><b>개체 아이콘 색을 한 번에 바꾸면</b> 개체를 색으로 구분하던 단서가 사라진다(설계 9.3)</li>
+  </ul>
+  <h3>직접 확인하기</h3>
+<pre><code><span class="c"># learndoshare_1에서. 생성 결과가 저장소 파일과 같으면 git diff가 비어 있다</span>
+pnpm bridge:generate
+git diff --stat -- templates/force-app/main/default/staticresources/milvusBridge.css
+
+<span class="c"># 변수 하나가 어디서 읽히는지</span>
+grep -n -F -- "--milvus-control-height" templates/force-app/main/default/staticresources/milvusBridge.css
+
+<span class="c"># 줄인 움직임 규칙</span>
+grep -n "prefers-reduced-motion" templates/force-app/main/default/staticresources/milvusBridge.css
+
+<span class="c"># 모달이 transitionend를, 토스트가 animationend를 기다리는 곳</span>
+grep -n "transitionend" node_modules/lightning-base-components/src/lightning/modalBase/modalBase.js
+grep -n "animationend" node_modules/lightning-base-components/src/lightning/toast/toast.html</code></pre>
+  <p>Storybook은 아직 브리지 CSS를 싣지 않는다. 브리지를 켜고 끄며 비교하는 미리보기는 <span class="tag info">계획</span>이다(설계 9.5).</p>
+  <p class="sources">출처: <a href="https://www.w3.org/TR/css-cascade-5/">W3C — CSS Cascading and Inheritance Level 5, 6.1 Cascade Sorting Order</a> (확인 2026-10-13) · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascade/Specificity">MDN — Specificity</a> (확인 2026-10-13) · <a href="https://www.w3.org/TR/css-variables-1/">W3C — CSS Custom Properties for Cascading Variables Level 1 (Inherited: yes, var() 대체 값)</a> (확인 2026-10-13) · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties">MDN — Using CSS custom properties</a> (확인 2026-10-13) · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@media/prefers-reduced-motion">MDN — prefers-reduced-motion</a> (확인 2026-10-13) · <a href="https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html">W3C — Understanding SC 2.3.3 Animation from Interactions (AAA, C39)</a> (확인 2026-10-13) · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/max">MDN — max()</a> (확인 2026-10-13) · <a href="https://www.w3.org/TR/css-transitions-1/">W3C — CSS Transitions Level 1 (3 Starting of transitions: combined duration &gt; 0s)</a> (확인 2026-10-13) · <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/transitionend_event">MDN — transitionend event</a> (확인 2026-10-13) · <a href="https://www.w3.org/TR/css-animations-1/">W3C — CSS Animations Level 1 (3.3 animation-duration: 0s에도 시작·끝 이벤트)</a> (확인 2026-10-13) · <a href="https://developer.mozilla.org/en-US/docs/Web/API/Element/animationend_event">MDN — animationend event</a> (확인 2026-10-13) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/777f5a-global-styling-hooks">SLDS 2 — Global Styling Hooks (범주 6개)</a> (확인 2026-10-13) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC 개발자 가이드: SLDS Styling Hooks (Support Limitations: SLDS 2, 링크, 폼 요소)</a> (확인 2026-10-13) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-antipatterns.html">LWC 개발자 가이드: Anti-Patterns for Component Styling (SLDS 클래스 덮어쓰기 미지원)</a> (확인 2026-10-13) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm: @salesforce-ux/design-system-2</a> (설치된 2.264.2에서 고정 값 확인 2026-10-13) · <a href="https://www.npmjs.com/package/lightning-base-components">npm: lightning-base-components</a> (설치된 1.28.19-alpha의 modalBase·toast·animation 소스 확인 2026-10-13) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 5.6 (브리지 표, 넣으면 안 되는 값, 생성 방식, 다시 넣기, 위험), 9.3 (개체 아이콘 색 한계), 13장 (SLDS 2 CSS 976KB)</a> (확인 2026-10-13) · <a href="../docs/research/2026-10-09-org-probe.md">org 프로브 2차 기록 3.3 (클래스 규칙 도달), 3.9 (hook 기본값 org·npm 비교)</a> (확인 2026-10-13)</p>
 </section>
 
 <section id="criteria">
@@ -366,7 +460,7 @@ pnpm exec slds-linter report force-app   <span class="c"># SARIF 보고서</span
 
 <footer class="doc-foot">
   <span>밀버스 디자인 시스템 · Learn 01</span>
-  <span>2026-10-09 갱신 (M2: util.css 규칙을 설계 5.2·5.3과 <code>lib/rules.ts</code>로 통합). 2026-10-12 갱신 (M3: VF 설정·팔레트와 <code>loadBrand</code>의 10/9 org 실측, <code>check --style</code> 구현). 공식 문서와 <code>@salesforce-ux/design-system-2</code> 2.264.2, org 프로브 기록으로 확인함</span>
+  <span>2026-10-09 갱신 (M2: util.css 규칙을 설계 5.2·5.3과 <code>lib/rules.ts</code>로 통합). 2026-10-12 갱신 (M3: VF 설정·팔레트와 <code>loadBrand</code>의 10/9 org 실측, <code>check --style</code> 구현). 2026-10-13 갱신 (M4: 브리지 절, 브리지 구현 상태). 공식 문서와 <code>@salesforce-ux/design-system-2</code> 2.264.2, org 프로브 기록으로 확인함</span>
 </footer>
 </main>
 </div>
