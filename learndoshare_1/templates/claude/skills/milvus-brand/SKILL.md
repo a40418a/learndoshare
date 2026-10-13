@@ -62,7 +62,7 @@ description: 밀버스 디자인 시스템의 브랜드 요청(milvus-brand-requ
   - `neutral-base`는 SLDS 2와 기본 컴포넌트가 읽는 13단계만 쓴다: 0, 10, 20, 30, 40, 50, 60, 65, 70, 80, 90, 95, 100. 15·45·55단계는 읽는 곳이 없어 check가 막는다
   - 피드백 색: 4장 표의 이름만
   - `--slds-s-*` 중 이름에 `color`가 없는 것: SLDS 2 CSS나 기본 컴포넌트 CSS가 읽는 이름만
-  - 색 s hook 6개(배경막과 hover·선택 바탕): 값은 중립 g hook 하나(`var(--slds-g-color-…)`)만
+  - 색 s hook 6개: hover·선택 바탕 5개는 값이 중립 g hook 하나(`var(--slds-g-color-…)`)만, 배경막은 `var(--slds-g-color-neutral-10-opacity-50)`만(4장 배경막 행)
   - `--milvus-*`: 밀버스 컴포넌트나 `milvusBridge.css`가 읽는 이름만
   - 일반 속성은 `letter-spacing` 하나
 - **금지:** 브랜드 색 계열 `--slds-g-color-accent*`, `--slds-g-color-on-accent*`, `--slds-g-color-border-accent*`, `--slds-g-color-brand-base*`, `--slds-r-color-brand*`(색의 원본은 org 테마), 그 밖의 색 hook, `--slds-c-*`·`--sds-c-*`, 글꼴 `--slds-g-font-family*`, 읽는 곳이 없는 이름(오타)
@@ -85,17 +85,19 @@ node --input-type=module -e 'import { SPEC_ITEMS } from "@a40418a/milvus-design-
 | 피드백 색 (`feedback`) | 4장 표 | |
 | 컴포넌트별 조정 (`component`) | `--slds-s-button-radius-border`, `--slds-s-input-radius-border`, `--slds-s-container-radius-border`, `--slds-s-button-shadow`, `--slds-s-input-shadow`, `--slds-s-container-shadow`, 모달 너비 브리지 `--milvus-modal-width-base`·`--milvus-modal-width-small`·`--milvus-modal-width-medium`·`--milvus-modal-width-large`·`--milvus-modal-width-full`, `--milvus-modal-min-width` | 카드 그림자는 native `lightning-card`에 닿지 않는다. 모달 너비는 아래 |
 | 밀버스 컴포넌트 (`milvus-component`) | 그 컴포넌트가 읽는 `--milvus-*` | 새로 만들지 않는다 |
+| 글꼴 (`font`) | 없음 | 바꾸지 않는다. 요청이 오면 시스템 글꼴 고정이라고 답한다 |
+| 전체 스타일 (`overall`) | 7장 프리셋으로 나눠 각 항목 행에 반영한다 | 표에는 나눈 결과를 항목별로 적는다 |
 | 바탕·면 (`surface`) | `--slds-g-color-surface-1`~`-3`(`--slds-g-color-surface-2`가 앱 바탕), `--slds-g-color-surface-container-1`~`-3`, native용 `--slds-g-color-neutral-base-100`·`-95`·`-90` | `--slds-g-color-neutral-base-100`은 색 위 흰 글자로도 쓰여 흰색 가까이에서만 바꾼다 |
 | 글자색 (`text-color`) | `--slds-g-color-on-surface-3`(제목·본문), `--slds-g-color-on-surface-2`(입력값·라벨), `--slds-g-color-on-surface-1`(보조·placeholder) | 보조 아이콘도 `--slds-g-color-on-surface-1`을 쓴다 |
 | 테두리 (`border-color`) | `--slds-g-color-border-1`(구분선·카드), `--slds-g-color-border-2`(입력·버튼), native용 `--slds-g-color-border-base-1`·`--slds-g-color-border-base-4` | |
 | 회색 온도 (`neutral-tone`) | `--slds-g-color-neutral-base-0`~`--slds-g-color-neutral-base-100` 13단계와 의미 hook | 5장의 회색 단계표 |
 | 비활성 (`disabled`) | `--slds-g-color-disabled-container-1`·`-2`, `--slds-g-color-on-disabled-1`·`-2`, `--slds-g-color-border-disabled-1`·`-2`, `--slds-g-color-disabled-1`·`-2` | |
 | 어두운 면 (`inverse`) | `--slds-g-color-surface-inverse-1`·`-2`, `--slds-g-color-surface-container-inverse-1`·`-2`, `--slds-g-color-on-surface-inverse-1`·`-2`, `--slds-g-color-border-inverse-1`·`-2` | native 툴팁은 고정 |
-| 모달 배경막 (`backdrop`) | 지금 `--slds-s-backdrop-color-background`, native `--slds-g-color-neutral-10-opacity-50`에 같은 색 | s hook 값은 중립 g hook 하나만 받는다. 반투명 값을 그대로 넣을 수 없으면 표에 한계로 적고 사용자와 정한다 |
+| 모달 배경막 (`backdrop`) | 두 줄을 함께 쓴다: `--slds-g-color-neutral-10-opacity-50: light-dark(color-mix(in oklab, <색>, transparent 20%), …);`(다크 값은 기본값 보기로 `--slds-s-backdrop-color-background`의 원래 다크 값을 옮긴다)와 `--slds-s-backdrop-color-background: var(--slds-g-color-neutral-10-opacity-50);` | g를 빼면 배경막 색이 정해지지 않는다. 불투명 값은 쓰지 않는다(페이지를 가린다). s hook에는 이 `var()` 말고 다른 값을 받지 않는다 |
 | 검색어 강조 (`highlight`) | `--slds-g-color-palette-yellow-90`·`--slds-g-color-palette-yellow-80` | native 일부 고정 |
 | hover·선택 바탕 (`hover-selected`) | `--slds-g-color-surface-container-2`·`-3`, `--slds-s-menu-item-color-background-active`, `--slds-s-table-row-color-background-selected`, `--slds-s-navigation-color-background-hover`, `--slds-s-pill-color-background-hover`, `--slds-s-button-color-background-hover`, 브리지 `--milvus-nav-selected-background`(세로 내비 선택 바탕) | 색 s hook 값은 `var(중립 g hook)` 하나. native에서는 2개만 닿는다 |
 | 다크 모드 (`dark-mode`) | 모든 색을 `light-dark()`로 | 다크 값은 기본값 |
-| 테두리 두께 (`border-width`) | `--slds-g-sizing-border-1`(1px), `--slds-g-sizing-border-2`(2px), native 버튼 `--slds-s-button-sizing-border`, 브리지 `--milvus-input-border-width`(입력창) | |
+| 테두리 두께 (`border-width`) | `--slds-g-sizing-border-1`(1px), `--slds-g-sizing-border-2`(2px), native 버튼 `--slds-s-button-sizing-border`, 선택 상자·라디오 `--slds-s-input-sizing-border`, 브리지 `--milvus-input-border-width`(입력창) | |
 | 아바타·아이콘 모양 (`avatar-icon-shape`) | `--slds-s-avatar-radius-border`, `--slds-s-icon-radius-border` | |
 | 탭·헤더 모양 (`tab-header-shape`) | `--slds-s-navigation-sizing-border-active`, `--slds-s-navigation-sizing-border-hover`, `--slds-s-navigation-radius-border`, `--slds-s-pageheader-radius-border`, `--slds-s-pageheader-sizing-border` | native tabBar는 고정 |
 | 컨트롤 높이 (`control-height`) | 버튼 `--slds-s-button-spacing-block`, 브리지 `--milvus-control-height`(입력·선택·콤보), native용 `--slds-s-input-sizing-height` | 버튼만 키우면 폼에서 높이가 어긋난다. 셋을 함께 정한다 |
@@ -115,7 +117,7 @@ node --input-type=module -e 'import { SPEC_ITEMS } from "@a40418a/milvus-design-
 | Salesforce 고정 (`fixed`) | 없음 | 2장 목록을 보여 준다 |
 
 - **움직임:** 값에는 단위를 붙인다(`0.2s`, `150ms`). 브리지는 시간을 `max(var(--milvus-motion-duration-fast, 0.1s), 0.01ms)`처럼 감싸는데, 단위 없는 `0`은 `max()`를 무효로 만들어 모달·토스트가 닫히지 않을 수 있다(check가 막는다). 가장 짧은 값은 `0.01ms`다. 스피너는 시간을 바꾸지 않는다
-- **모달 너비:** 변수 하나가 그 크기의 `width`와 `max-width`를 함께 정한다(화면 48em 이상에서만). 큰 고정값은 좁은 화면에서 넘칠 수 있으니 `min(60rem, 90%)`처럼 쓴다. 원래 값: 기본 50%·최대 40rem, small 60%·52.0625rem, medium 70%·75rem, large 90%·제한 없음, full 90%. `--milvus-modal-min-width` 하나가 모든 크기의 최소 너비(원래 20rem, 크기 클래스는 40rem)를 바꾼다
+- **모달 너비:** 변수 하나가 그 크기의 `width`와 `max-width`를 함께 정한다(화면 48em 이상에서만. full은 `width`만 정하고 최대 너비는 제한 없음 그대로다). 큰 고정값은 좁은 화면에서 넘칠 수 있으니 `min(60rem, 90%)`처럼 쓴다. 원래 값: 기본 50%·최대 40rem, small 60%·52.0625rem, medium 70%·75rem, large 90%·제한 없음, full 90%. `--milvus-modal-min-width` 하나가 모든 크기의 최소 너비(원래 20rem, 크기 클래스는 40rem)를 바꾼다
 - **개체 아이콘:** 이름은 `lightning-icon`의 `icon-name`에서 `:`와 `_`를 `-`로 바꾼다. 예: `standard:account` → `--milvus-icon-standard-account`, `standard:user_role` → `--milvus-icon-standard-user-role`, `custom:custom110` → `--milvus-icon-custom-custom110`. 별칭 클래스 이름(`slds-icon-custom-110`)으로 만든 변수는 읽는 곳이 없다(check가 '읽는 곳 없음'으로 막는다). 개체를 색으로 구분하던 단서가 사라질 수 있다고 알린다
 
 ## 5. 색 계산
@@ -157,12 +159,14 @@ node --input-type=module -e 'import { SPEC_ITEMS } from "@a40418a/milvus-design-
 
 로고는 사용자가 준 파일만 쓴다(URL에서 내려받지 않는다). 요청 파일의 형식은 `요청: assets/logo.png`(프로젝트 루트 기준 경로)다.
 
-1. 파일을 `FA/contentassets/<이름>Logo.asset`으로 복사한다(`cp`)
+1. 폴더를 만들고(`mkdir -p force-app/main/default/contentassets`, 로고 없이 init했으면 없다) 파일을 `FA/contentassets/<이름>Logo.asset`으로 복사한다(`cp`)
 2. 메타를 쓴다. `pathOnClient`는 `<이름>Logo<원래 확장자>`가 된다
    ```bash
    node --input-type=module -e 'import { writeContentAssetMeta } from "@a40418a/milvus-design-system/dist/lib/branding.js"; process.stdout.write(writeContentAssetMeta(process.argv[1], process.argv[2]))' '<이름>' '<사용자가 준 파일 경로>' > 'force-app/main/default/contentassets/<이름>Logo.asset-meta.xml'
    ```
 3. BrandingSet에 `BRAND_IMAGE` 속성을 `/file-asset/<이름>Logo?v=1`로 둔다. 있으면 값만 바꾸고, 없으면 `BRAND_COLOR`와 같은 모양의 `<brandingSetProperty>`를 더한다. 다른 속성은 그대로 둔다
+
+로고를 같은 이름(`<이름>Logo`)으로 다시 바꾼 뒤에는 배포 후 org 화면에서 로고가 실제로 바뀌었는지 확인해 달라고 안내한다. 같은 이름의 자산을 다시 배포할 때 버전이 어떻게 되는지는 아직 확인하지 않았다.
 
 ## 7. 입력 형식 5종 (설계 6.4)
 
@@ -184,6 +188,6 @@ node --input-type=module -e 'import { SPEC_ITEMS } from "@a40418a/milvus-design-
 - **PDF·이미지:** PDF에 적힌 hex는 텍스트로 정확히 뽑는다. 이미지에서 읽은 색은 "추정"으로 표시하고 확인을 받는다
 - **URL:** `curl`로 HTML과 CSS를 `.milvus/`에 받아 CSS 변수와 색 빈도를 찾는다(WebFetch는 CSS가 빠진다). 로고는 내려받지 않고 사용자에게 파일을 받는다
   ```bash
-  curl -sL '<URL>' -o .milvus/site.html && grep -oE 'href="[^"]+\.css[^"]*"' .milvus/site.html
+  curl -sL --create-dirs '<URL>' -o .milvus/site.html && grep -oE 'href="[^"]+\.css[^"]*"' .milvus/site.html
   curl -sL '<CSS URL>' | grep -oiE '#[0-9a-f]{6}|#[0-9a-f]{3}|rgba?\([^)]*\)|--[a-z0-9-]+:[^;}]+' | tr 'A-F' 'a-f' | sort | uniq -c | sort -rn | head -40
   ```

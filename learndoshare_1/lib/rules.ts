@@ -58,7 +58,10 @@ const FEEDBACK_NAMES = new Set(
   Object.values(FEEDBACK_HOOKS).flatMap((k) => [k.text, k.onContainer, k.container, k.border, ...k.hover].filter((n) => n !== null)),
 );
 
-/** 기본 hover·선택 바탕 중 브랜드 틴트인 것을 중립으로 바꾸는 색 s hook. 값은 중립 g hook 하나만 참조한다 */
+/**
+ * 기본 hover·선택 바탕 중 브랜드 틴트인 것을 중립으로 바꾸는 색 s hook. 값은 중립 g hook 하나만 참조한다.
+ * 배경막(BACKDROP_S)만 예외로 native용 BACKDROP_G 하나만 참조한다
+ */
 export const COLOR_S_WHITELIST = [
   "--slds-s-backdrop-color-background",
   "--slds-s-menu-item-color-background-active",
@@ -79,6 +82,10 @@ export const LBC_ONLY_G = [
   "--slds-g-color-neutral-100-opacity-10",
   "--slds-g-color-neutral-100-opacity-50",
 ];
+
+// 모달 배경막: 지금 org가 읽는 s hook과 native가 읽는 g. 반투명 값은 g에 light-dark()로 두고 s는 g를 참조한다(설계 9.3, 판정 R32)
+const BACKDROP_S = "--slds-s-backdrop-color-background";
+const BACKDROP_G = "--slds-g-color-neutral-10-opacity-50";
 
 /** 중립 색. 값은 light-dark(라이트, 다크)로 쓴다 */
 export const NEUTRAL_COLOR_PATTERNS = [
@@ -160,13 +167,19 @@ function declProblem(name: string, value: string, ctx: RuleContext): [string, st
     if (!COLOR_S_WHITELIST.includes(name)) {
       return ["color-s-hook", `${name}: 색 s hook은 브랜드 색에 이어진 것이 많다. 쓸 수 있는 것은 ${COLOR_S_WHITELIST.join(", ")}뿐이다`];
     }
-    const ref = /^var\(\s*(--slds-g-color-[\w-]+)\s*\)$/.exec(value.trim());
-    return ref && isNeutral(ref[1])
+    const ref = /^var\(\s*(--slds-g-color-[\w-]+)\s*\)$/.exec(value.trim())?.[1];
+    // 배경막은 반투명이라 native용 g와 한 쌍으로만 쓴다(설계 9.3, 판정 R32). 불투명한 중립 hook은 페이지를 가린다
+    if (name === BACKDROP_S) {
+      return ref === BACKDROP_G
+        ? undefined
+        : ["color-s-hook", `${name}: 값은 var(${BACKDROP_G})만 쓴다. 반투명 색은 ${BACKDROP_G}에 light-dark(color-mix(…), …)로 함께 적는다`];
+    }
+    return ref && isNeutral(ref)
       ? undefined
       : ["color-s-hook", `${name}: 값은 중립 g hook 하나만 참조한다(예: var(--slds-g-color-surface-container-2))`];
   }
-  if (FEEDBACK_NAMES.has(name) || LBC_ONLY_G.includes(name)) return undefined;
-  if (isNeutral(name)) {
+  if (FEEDBACK_NAMES.has(name) || (LBC_ONLY_G.includes(name) && name !== BACKDROP_G)) return undefined;
+  if (isNeutral(name) || name === BACKDROP_G) {
     return /^light-dark\(/.test(value.trim())
       ? undefined
       : ["neutral-light-dark", `${name}: 중립 색은 light-dark(라이트, 다크)로 쓴다. 일반 값으로 쓰면 다크 모드 값이 사라진다`];

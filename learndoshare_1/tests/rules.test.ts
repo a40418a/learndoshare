@@ -103,7 +103,7 @@ test("LBC 전용 g 이름 --slds-g-color-border-base-1은 허용", () => {
 
 test("색 s hook은 화이트리스트 6개만, 값이 중립 g hook만 참조할 때 허용", () => {
   assert.equal(COLOR_S_WHITELIST.length, 6);
-  for (const name of COLOR_S_WHITELIST) {
+  for (const name of COLOR_S_WHITELIST.filter((n) => n !== "--slds-s-backdrop-color-background")) {
     assert.deepEqual(rulesOf(`${name}: var(--slds-g-color-surface-container-2);`), [], name);
   }
   for (const value of ["#eeeeee", "var(--slds-g-color-brand-base-90)", "var(--slds-g-color-surface-container-2, #eee)"]) {
@@ -112,6 +112,18 @@ test("색 s hook은 화이트리스트 6개만, 값이 중립 g hook만 참조�
   // 읽히는 이름이지만 화이트리스트 밖
   assert.ok(ctx.readSHooks.has("--slds-s-button-color-border"));
   assert.deepEqual(rulesOf("--slds-s-button-color-border: var(--slds-g-color-border-2);"), ["color-s-hook"]);
+});
+
+test("모달 배경막은 s hook이 native용 g를 참조하고 g에 light-dark 값을 두는 쌍만 허용 (판정 R32)", () => {
+  const g = "--slds-g-color-neutral-10-opacity-50: light-dark(color-mix(in oklab, #2e2e2e, transparent 40%), color-mix(in oklab, #f3f3f3, transparent 20%));";
+  const s = (value: string) => `--slds-s-backdrop-color-background: ${value};`;
+  assert.deepEqual(rulesOf(g + s("var(--slds-g-color-neutral-10-opacity-50)")), []);
+  // 불투명한 중립 g 참조(페이지를 가린다)와 직접 쓴 반투명 값은 거부한다
+  for (const value of ["var(--slds-g-color-palette-neutral-20)", "var(--slds-g-color-surface-container-2)", "light-dark(color-mix(in oklab, #000, transparent 50%), #000)"]) {
+    assert.deepEqual(rulesOf(g + s(value)), ["color-s-hook"], value);
+  }
+  // g는 중립 색처럼 light-dark()로 쓴다
+  assert.deepEqual(rulesOf("--slds-g-color-neutral-10-opacity-50: rgba(8, 7, 7, 0.6);"), ["neutral-light-dark"]);
 });
 
 test("--slds-s-label-spacing은 기본 컴포넌트가 읽으므로 허용, 아무도 읽지 않는 이름은 거부", () => {

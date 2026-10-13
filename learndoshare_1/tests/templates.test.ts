@@ -48,6 +48,11 @@ test("SKILL.md의 hook·브리지 변수 이름은 모두 SPEC_ITEMS에 있다",
   assert.deepEqual([...new Set(names)].filter((n) => !known.has(n) && !isIconVar(n)), []);
 });
 
+test("SKILL.md 4장 표의 행은 SPEC_ITEMS 항목과 1:1이다", () => {
+  const ids = [...skill.matchAll(/^\| [^|]*\(`([\w-]+)`\) \|/gm)].map((m) => m[1]);
+  assert.deepEqual(ids.toSorted(), SPEC_ITEMS.map((i) => i.id).toSorted());
+});
+
 test("SKILL.md는 'pnpm milvus deploy --yes'를 채팅 승인 뒤에만 실행하라고 적는다", () => {
   const yesLines = skill.split("\n").filter((l) => l.includes("pnpm milvus deploy --yes"));
   assert.ok(yesLines.length > 0);

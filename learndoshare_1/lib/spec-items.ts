@@ -323,9 +323,10 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     label: "테두리 두께",
     description: "기본 테두리(sizing-border-1)와 강조선(sizing-border-2)",
     examples: ["전체 테두리를 2px로"],
-    hooks: [g("sizing-border-1"), g("sizing-border-2"), s("button-sizing-border")],
+    hooks: [g("sizing-border-1"), g("sizing-border-2"), s("button-sizing-border"), s("input-sizing-border")],
     bridgeVars: [B["input-border-width"]],
-    limits: "--slds-s-button-sizing-border는 native 버튼용이다. 입력창 두께는 hook이 없어 브리지로 바꾼다",
+    limits:
+      "--slds-s-button-sizing-border는 native 버튼용이다. --slds-s-input-sizing-border는 선택 상자와 라디오만 읽는다. 입력창 두께는 hook이 없어 브리지로 바꾼다",
     input: "text",
   },
   {
