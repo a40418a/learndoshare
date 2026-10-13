@@ -33,6 +33,9 @@
     <li><a href="#features">기본 기능과 애드온</a></li>
     <li><a href="#assets">전역 CSS, 정적 파일, 로고</a></li>
     <li><a href="#build">빌드와 공유</a></li>
+    <li><a href="#modes">두 모드와 Vite 플러그인</a></li>
+    <li><a href="#spec">브랜드 명세 페이지</a></li>
+    <li><a href="#source">원본과 hook 보기</a></li>
     <li><a href="#project">우리 프로젝트 적용</a></li>
     <li><a href="#quiz">스스로 점검</a></li>
   </ol>
@@ -42,8 +45,8 @@
 <header class="hero">
   <div class="eyebrow">LEARN 03 · Phase 1·3 준비</div>
   <h1>스토리북</h1>
-  <p class="lead">밀버스 컴포넌트를 org 없이 보여 주는 카탈로그가 Storybook이다. 웹 컴포넌트용 설정, 스토리 작성법, 브랜드를 바꿔 보는 툴바까지 우리 프로젝트에 필요한 만큼만 정리한다.</p>
-  <div class="meta"><span>예상 1.5시간</span><span>선행: 02 LWC · 07 pnpm</span><span>2026-09-26 작성 · 2026-10-09 갱신</span></div>
+  <p class="lead">밀버스 컴포넌트를 org 없이 보여 주는 카탈로그가 Storybook이다. 웹 컴포넌트용 설정, 스토리 작성법, 브랜드를 바꿔 보는 툴바, 저장소·프로젝트 두 모드, 브랜드 명세 페이지, 컴포넌트별 "원본과 hook" 보기까지 우리 프로젝트에 필요한 만큼만 정리한다.</p>
+  <div class="meta"><span>예상 2시간</span><span>선행: 02 LWC · 07 pnpm</span><span>2026-09-26 작성 · 2026-10-09 갱신 · 2026-10-13 갱신 (M5: 두 모드, 명세 페이지, 원본과 hook)</span></div>
 </header>
 
 <section id="why">
@@ -100,16 +103,17 @@ pnpm dlx storybook@latest init --type web_components --builder vite \
     <tr><td><code>--yes</code></td><td>질문을 건너뛰고 모든 기능을 포함해 설치</td></tr>
     <tr><td><code>--no-dev</code></td><td>설치 후 개발 서버를 띄우지 않음</td></tr>
   </table></div>
-<pre data-file=".storybook/main.mjs (저장소, 줄임)"><code><span class="c">/** @type { import('@storybook/web-components-vite').StorybookConfig } */</span>
-export default {
+<pre data-file=".storybook/main.ts (저장소, 줄임)"><code>import type { StorybookConfig } from '@storybook/web-components-vite';
+
+const config: StorybookConfig = {
   framework: { name: '@storybook/web-components-vite', options: {} },
-  stories: ['../stories/**/*.mdx', '../stories/**/*.stories.js'],
+  stories: ['../stories/**/*.mdx', '../stories/**/*.stories.@(js|ts)'],
   addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
-  staticDirs: [{ from: '../brands', to: 'static/brands' }],
-};   <span class="c">// 10은 ESM 전용: module.exports 쓰지 않는다</span></code></pre>
-  <p class="c">저장소의 실제 파일은 <code>.storybook/main.mjs</code>다. 위는 manager 로고 설정(<code>managerHead</code>)과 텔레메트리 끄기를 뺀 것이다.</p>
+};
+export default config;   <span class="c">// 10은 ESM 전용: module.exports 쓰지 않는다</span></code></pre>
+  <p class="c">2026-10-13 갱신: 설정 파일 네 개(<code>main</code>, <code>preview</code>, <code>brand</code>, <code>manager</code>)를 <code>.mjs</code>·<code>.js</code>에서 <code>.ts</code>로 바꿨다(Task 17). Storybook 문서도 <code>main.ts</code>를 TypeScript로 쓴 ESM 모듈로 설명한다. 위는 두 모드 처리(<code>viteFinal</code>), manager 로고(<code>managerHead</code>), 텔레메트리 끄기를 뺀 것이다. 두 모드는 <a href="#modes">두 모드와 Vite 플러그인</a>에서 다룬다. 예전에 있던 <code>staticDirs: [{ from: '../brands', to: 'static/brands' }]</code>는 지웠다. 패키지에는 <code>brands/</code>가 없기 때문이다.</p>
   <div class="callout warn"><strong>pnpm hoisting 설정은 미리 넣지 않는다</strong>이 저장소는 hoisting 설정 없이 설치하고 실행한다 (<code>.npmrc</code> 없음). "Cannot find module"이 실제로 났을 때만 <a href="07-pnpm.html#hoist">07 pnpm · hoisting 문제 해결</a> 순서대로 <code>publicHoistPattern</code>을 좁게 추가한다. 설치 중 esbuild 빌드 승인 요청이 나오면 <code>pnpm approve-builds</code>(pnpm 10.1부터)로 승인한다. 저장소는 <code>package.json</code>의 <code>pnpm.onlyBuiltDependencies</code>에 esbuild를 넣어 두었다.</div>
-  <p class="sources">출처: <a href="https://storybook.js.org/docs/get-started/install">Storybook — Install (pnpm 탭: <code>pnpm create storybook@latest</code>)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/get-started/frameworks/web-components-vite">Storybook — Web components with Vite (설치, Vite ≥ 5)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/api/cli-options">Storybook — CLI options</a> (확인 2026-10-09) · <a href="https://pnpm.io/cli/create">pnpm create</a> (확인 2026-10-09) · <a href="https://pnpm.io/10.x/cli/dlx">pnpm dlx (10.x 문서)</a> (확인 2026-10-09) · <a href="https://pnpm.io/cli/pnx">pnpm pnx (최신 문서, 별칭 <code>pnpm dlx</code>·<code>pnpx</code>)</a> (확인 2026-10-09) · <a href="https://pnpm.io/cli/approve-builds">pnpm approve-builds</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://storybook.js.org/docs/get-started/install">Storybook — Install (pnpm 탭: <code>pnpm create storybook@latest</code>)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/get-started/frameworks/web-components-vite">Storybook — Web components with Vite (설치, Vite ≥ 5)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/configure/integration/typescript">Storybook — TypeScript (<code>main.ts</code>는 TypeScript로 쓴 ESM 모듈, <code>StorybookConfig</code>)</a> (확인 2026-10-13) · <a href="https://storybook.js.org/docs/api/cli-options">Storybook — CLI options</a> (확인 2026-10-09) · <a href="https://pnpm.io/cli/create">pnpm create</a> (확인 2026-10-09) · <a href="https://pnpm.io/10.x/cli/dlx">pnpm dlx (10.x 문서)</a> (확인 2026-10-09) · <a href="https://pnpm.io/cli/pnx">pnpm pnx (최신 문서, 별칭 <code>pnpm dlx</code>·<code>pnpx</code>)</a> (확인 2026-10-09) · <a href="https://pnpm.io/cli/approve-builds">pnpm approve-builds</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="csf">
@@ -180,36 +184,39 @@ export default {
   <div class="callout warn"><strong>옛 자료의 <code>globals</code>, <code>defaultValue</code></strong>preview의 <code>globals</code>는 8.2에서 deprecated, 9.0에서 삭제되고 <code>initialGlobals</code>로 바뀌었다. 초기값도 더 이상 <code>globalTypes.defaultValue</code>에서 오지 않는다 (<a href="https://github.com/storybookjs/storybook/blob/next/MIGRATION.md">MIGRATION.md</a>). <code>globalTypes</code>와 <code>initialGlobals</code>는 <code>.storybook/preview.*</code>에만 쓴다.</div>
 
   <h3>브랜드 decorator <span class="tag info">저장소 코드</span></h3>
-  <p>2026-10-09 갱신: 아래는 저장소 <code>.storybook/brand.js</code>와 <code>preview.js</code>를 줄인 것이다. 브랜드 폴더를 읽어 툴바 항목을 <b>자동으로</b> 만든다. Vite의 <code>import.meta.glob</code>은 파일 패턴에 맞는 모듈을 한 번에 가져오고, CSS에 <code>?inline</code>을 붙이면 페이지에 자동 주입하지 않고 CSS 문자열만 받는다.</p>
-<pre data-file=".storybook/brand.js (저장소, 줄임)"><code><span class="c">// brands/&lt;브랜드&gt;/theme.json (pnpm sync:theme이 만든다)</span>
-const themes = Object.values(
-  import.meta.glob('../brands/*/theme.json', { eager: true, import: 'default' })
-);
-export const brands = Object.fromEntries(themes.map((t) =&gt; [t.name, t]));
+  <p>2026-10-13 갱신: 아래는 저장소 <code>.storybook/brand.ts</code>와 <code>preview.ts</code>를 줄인 것이다(타입 생략). 브랜드 목록은 Vite 플러그인이 만드는 <b>가상 모듈</b> <code>virtual:milvus-brands</code>에서 온다. 저장소에서 띄우면 <code>brands/</code>의 데모 브랜드, 프로젝트에서 <code>pnpm milvus storybook</code>으로 띄우면 그 프로젝트의 브랜드다(<a href="#modes">두 모드와 Vite 플러그인</a>). 툴바 항목은 이 목록으로 <b>자동으로</b> 만든다.</p>
+<pre data-file=".storybook/brand.ts (저장소, 줄임)"><code><span class="c">// lib/storybook-plugin.ts가 모드에 맞게 만든 브랜드 목록. 첫 브랜드가 기본 브랜드다</span>
+import { brands, mode } from 'virtual:milvus-brands';
 
-<span class="c">// brands/&lt;브랜드&gt;/util.css 를 문자열로 받는다 (페이지에 자동 주입하지 않음)</span>
-export const utilCss = Object.fromEntries(
-  Object.entries(
-    import.meta.glob('../brands/*/util.css', { query: '?inline', import: 'default', eager: true })
-  ).map(([path, css]) =&gt; [path.split('/').at(-2), css])
-);
+const STYLES = [
+  ['milvus-brand-bridge', 'bridgeCss'],     <span class="c">// milvusBridge.css</span>
+  ['milvus-brand-util', 'utilCss'],         <span class="c">// util.css (프로젝트는 milvusBrand.css)</span>
+  ['milvus-brand-override', 'overrideCss'], <span class="c">// milvusOverride.css</span>
+];
 
 export function applyBrand(name) {
+  const brand = brands.find((b) =&gt; b.name === name) ?? brands[0];
   const root = document.documentElement;
-  <span class="c">// ① 브랜드 색: theme.json의 palette → :root의 --slds-r-color-brand-* (org 테마 흉내)</span>
+  <span class="c">// ① 브랜드 색: 팔레트 → :root의 --slds-r-color-brand-* (org 테마 흉내). 비면 SLDS 2 기본 팔레트</span>
   for (const prop of [...root.style])
     if (prop.startsWith('--slds-r-color-brand-')) root.style.removeProperty(prop);
-  for (const [step, color] of Object.entries(brands[name]?.palette ?? {}))
+  for (const [step, color] of Object.entries(brand.palette))
     root.style.setProperty(`--slds-r-color-brand-${step}`, color);
 
-  <span class="c">// ② 모양: 고른 브랜드의 util.css 하나만 문서 head에 (org의 loadStyle과 같은 위치)</span>
-  const style =
-    document.getElementById('milvus-brand-util') ??
-    document.head.appendChild(Object.assign(document.createElement('style'), { id: 'milvus-brand-util' }));
-  style.textContent = utilCss[name] ?? '';
+  <span class="c">// ② 브리지 → util.css → override 순서로 문서 head에 (org의 loadBrand와 같은 순서)</span>
+  for (const [id, key] of STYLES) {
+    const style =
+      document.getElementById(id) ??
+      document.head.appendChild(Object.assign(document.createElement('style'), { id }));
+    style.textContent = brand[key];
+  }
+  return brand;
 }</code></pre>
-<pre data-file=".storybook/preview.js (저장소, 줄임)"><code>import '@salesforce-ux/design-system-2/dist/css/bundled/slds2.cosmos.css';
-import { applyBrand, brands } from './brand.js';
+<pre data-file=".storybook/preview.ts (저장소, 줄임)"><code>import '@salesforce-ux/design-system-2/dist/css/bundled/slds2.cosmos.css';
+import { applyBrand, brands } from './brand.ts';
+
+const DEFAULT_BRAND = brands[0].name;
+const SOURCE_LABEL = { org: 'org', sample: '샘플', project: '프로젝트', slds: '기본' };
 
 export default {
   globalTypes: {
@@ -218,29 +225,31 @@ export default {
       toolbar: {
         title: '브랜드',
         icon: 'paintbrush',
-        items: Object.values(brands).map((t) =&gt; ({ value: t.name, title: t.label })),
+        items: brands.map((b) =&gt; ({ value: b.name, title: b.label, right: SOURCE_LABEL[b.source] })),
         dynamicTitle: true,
       },
     },
   },
-  initialGlobals: { brand: 'Milvus_DesignSystem' },
+  initialGlobals: { brand: DEFAULT_BRAND },
   decorators: [
     (story, context) =&gt; {
-      applyBrand(context.globals.brand ?? 'Milvus_DesignSystem');
+      <span class="c">// 브랜드를 읽지 못했으면 SLDS 기본으로 그리고 화면 위에 오류 알림을 보인다</span>
+      errorBanner(applyBrand(context.globals.brand ?? DEFAULT_BRAND).error);
       return story();
     },
   ],
 };</code></pre>
   <ul>
     <li>CSS 변수(custom property)는 부모에게서 상속되고, shadow 트리의 맨 위 요소는 호스트 요소에게서 상속받는다. 그래서 <code>:root</code>에 둔 값이 shadow DOM 안쪽 컴포넌트까지 닿는다</li>
-    <li><code>util.css</code>는 <code>:root</code>에 선언하므로 문서 전체에 적용된다. 그래서 <code>&lt;style&gt;</code> 하나의 내용을 바꿔 끼워 <b>한 번에 한 브랜드만</b> 둔다. 팔레트도 바꾸기 전에 지운다</li>
-    <li>glob의 <code>query: '?inline'</code>은 Vite 문서의 두 규칙(glob의 <code>query</code> 옵션, CSS <code>?inline</code>)을 합친 것이고, 저장소 <code>brand.js</code>가 실제로 이렇게 쓴다</li>
+    <li><code>util.css</code>는 <code>:root</code>에 선언하므로 문서 전체에 적용된다. 그래서 <code>&lt;style&gt;</code>의 내용을 바꿔 끼워 <b>한 번에 한 브랜드만</b> 둔다. 브리지·override도 같은 방식이고, 팔레트도 바꾸기 전에 지운다</li>
+    <li>툴바 항목 오른쪽에 브랜드의 출처를 적는다: <code>org</code>(<code>pnpm sync:theme</code>으로 가져온 브랜드), <code>샘플</code>, <code>프로젝트</code>, <code>기본</code>(비교용 SLDS 기본)</li>
     <li><code>paintbrush</code> 아이콘 이름은 설치된 storybook 10.6.0 manager 코드의 아이콘 표에 있다 (<code>PaintBrushIcon</code>, 로컬 확인). 아이콘은 <code>@storybook/icons</code> 패키지에서 온다. 공식 예제는 <code>circlehollow</code>와 <code>globe</code>를 쓴다</li>
     <li><b>기본 우선 (2026-10-09 결정):</b> <code>brands/Milvus_DesignSystem/</code>처럼 <code>util.css</code>가 없는 브랜드는 Salesforce 기본 모양에 브랜드 색만 바뀐다. 모양은 브랜드 요청이 있을 때만 바꾼다</li>
   </ul>
-  <aside class="legacy"><strong>이전 설계 (2026-10-09 갱신)</strong>예전 예시는 <code>brands/&lt;브랜드&gt;/root.css</code>에 <code>--milvus-*</code> 변수만 두고, <code>theme.json</code>의 <code>hooks</code>를 래퍼 <code>div</code>의 인라인 CSS 변수로 넣었다. root.css는 util.css 하나로 합쳤고(#11), 브랜드 색은 래퍼가 아니라 <code>:root</code>의 팔레트로 넣는다. accent hook이 <code>:root</code>에서 계산되기 때문이다 (<code>brand.js</code> 주석).</aside>
-  <div class="callout warn"><strong>시뮬레이션이다</strong>툴바로 브랜드를 바꿔도 org는 바뀌지 않는다. org가 브랜드 색에서 자동으로 만드는 팔레트는 API로 읽히지 않는다. 그래서 <code>pnpm sync:theme</code>이 우리 규칙(<code>lib/palette.ts</code>)으로 계산해 <code>theme.json</code>의 <code>palette</code>에 저장한다. 2026-10-08 org 프로브에서 활성화한 브랜드 색 <code>#2E7D32</code>의 LEX accent <code>#468244</code>가 이 규칙의 50단계와 같았다 (<a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>).</div>
-  <p class="sources">출처: <a href="https://storybook.js.org/docs/essentials/toolbars-and-globals?renderer=web-components">Storybook — Toolbars &amp; globals</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/writing-stories/decorators?renderer=web-components">Storybook — Decorators</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/faq">Storybook — FAQ (툴바 아이콘)</a> (확인 2026-10-09) · <a href="https://vite.dev/guide/features#glob-import">Vite — Glob import</a> (확인 2026-10-09) · <a href="https://vite.dev/guide/features#disabling-css-injection-into-the-page">Vite — CSS <code>?inline</code></a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties">MDN — Using CSS custom properties</a> (확인 2026-10-09) · <a href="https://www.w3.org/TR/css-scoping-1/">W3C — CSS Scoping 3.3.2 Inheritance</a> (확인 2026-10-09) · <a href="https://github.com/storybookjs/storybook/blob/next/MIGRATION.md">Storybook MIGRATION.md (preview <code>globals</code> 8.2 deprecated → <code>initialGlobals</code>, <code>globalTypes</code> defaultValue 미지원)</a> (확인 2026-10-09) · <a href="../README.md">README 3장 "읽히는 값" (자동 생성 팔레트는 API로 읽을 수 없다)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (기본 우선, 2026-10-09 결정)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (2026-10-08)</a> (확인 2026-10-09)</p>
+  <aside class="legacy"><strong>이전 설계 (2026-10-09 갱신)</strong>예전 예시는 <code>brands/&lt;브랜드&gt;/root.css</code>에 <code>--milvus-*</code> 변수만 두고, <code>theme.json</code>의 <code>hooks</code>를 래퍼 <code>div</code>의 인라인 CSS 변수로 넣었다. root.css는 util.css 하나로 합쳤고(#11), 브랜드 색은 래퍼가 아니라 <code>:root</code>의 팔레트로 넣는다. accent hook이 <code>:root</code>에서 계산되기 때문이다 (<code>brand.ts</code> 주석).</aside>
+  <aside class="legacy"><strong>이전 구현 (2026-10-13 갱신)</strong>2026-10-09의 <code>.storybook/brand.js</code>는 Vite의 <code>import.meta.glob('../brands/*/theme.json', { eager: true, import: 'default' })</code>로 브랜드를 읽고, <code>util.css</code>는 <code>query: '?inline'</code>을 붙여 페이지에 자동 주입하지 않고 CSS 문자열로 받았다. glob은 Vite 전용 기능이고 저장소 폴더 구조에 묶여 있어서, 패키지를 설치한 프로젝트의 <code>BrandingSet</code>과 정적 리소스를 읽을 수 없었다. 그래서 Vite 플러그인의 가상 모듈로 바꿨다(Task 17).</aside>
+  <div class="callout warn"><strong>시뮬레이션이다</strong>툴바로 브랜드를 바꿔도 org는 바뀌지 않는다. org가 브랜드 색에서 자동으로 만드는 팔레트는 API로 읽히지 않는다. 그래서 우리 규칙(<code>lib/palette.ts</code>의 <code>brandPalette</code>)으로 계산한다. 저장소 데모는 <code>pnpm sync:theme</code>이 계산해 <code>theme.json</code>의 <code>palette</code>에 저장한 값을 쓰고, 프로젝트 모드는 Storybook을 띄울 때 <code>BrandingSet</code>의 <code>BRAND_COLOR</code>로 계산한다(2026-10-13 갱신). 2026-10-08 org 프로브에서 활성화한 브랜드 색 <code>#2E7D32</code>의 LEX accent <code>#468244</code>가 이 규칙의 50단계와 같았다 (<a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>).</div>
+  <p class="sources">출처: <a href="https://storybook.js.org/docs/essentials/toolbars-and-globals?renderer=web-components">Storybook — Toolbars &amp; globals</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/writing-stories/decorators?renderer=web-components">Storybook — Decorators</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/faq">Storybook — FAQ (툴바 아이콘)</a> (확인 2026-10-09) · <a href="https://vite.dev/guide/api-plugin#importing-a-virtual-file">Vite — Plugin API, 가상 모듈</a> (확인 2026-10-13) · <a href="https://vite.dev/guide/features#glob-import">Vite — Glob import (이전 구현)</a> (확인 2026-10-09) · <a href="https://vite.dev/guide/features#glob-import-caveats">Vite — Glob import caveats (Vite 전용 기능)</a> (확인 2026-10-13) · <a href="https://vite.dev/guide/features#disabling-css-injection-into-the-page">Vite — CSS <code>?inline</code> (이전 구현)</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Cascading_variables/Using_custom_properties">MDN — Using CSS custom properties</a> (확인 2026-10-09) · <a href="https://www.w3.org/TR/css-scoping-1/">W3C — CSS Scoping 3.3.2 Inheritance</a> (확인 2026-10-09) · <a href="https://github.com/storybookjs/storybook/blob/next/MIGRATION.md">Storybook MIGRATION.md (preview <code>globals</code> 8.2 deprecated → <code>initialGlobals</code>, <code>globalTypes</code> defaultValue 미지원)</a> (확인 2026-10-09) · <a href="../README.md">README 3장 "읽히는 값" (자동 생성 팔레트는 API로 읽을 수 없다)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (기본 우선, 2026-10-09 결정), 4.2 (<code>milvus storybook</code>의 브랜드)</a> (확인 2026-10-13) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (2026-10-08)</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="features">
@@ -286,68 +295,235 @@ export const Clicked = {
   <h2>전역 CSS, 정적 파일, 로고</h2>
   <div class="table-wrap"><table>
     <tr><th>방법</th><th>무엇에 쓰나</th></tr>
-    <tr><td><code>preview.js</code>에서 CSS import</td><td>모든 스토리에 전역 적용. 저장소는 SLDS 2 CSS(<code>slds2.cosmos.css</code>)를 여기서 넣는다</td></tr>
+    <tr><td><code>preview.ts</code>에서 CSS import</td><td>모든 스토리에 전역 적용. 저장소는 SLDS 2 CSS(<code>slds2.cosmos.css</code>)를 여기서 넣는다</td></tr>
     <tr><td><code>.storybook/preview-head.html</code></td><td>미리보기 iframe의 <code>&lt;head&gt;</code>에 태그 삽입 (폰트 <code>&lt;link&gt;</code> 등)</td></tr>
     <tr><td><code>.storybook/preview-body.html</code></td><td>미리보기 iframe의 <code>&lt;body&gt;</code>에 태그 삽입</td></tr>
-    <tr><td><code>staticDirs</code></td><td>폴더를 그대로 서빙. <code>['../public']</code> 또는 <code>[{ from, to }]</code>. 저장소는 <code>[{ from: '../brands', to: 'static/brands' }]</code></td></tr>
+    <tr><td><code>staticDirs</code></td><td>폴더를 그대로 서빙. <code>['../public']</code> 또는 <code>[{ from, to }]</code>. 저장소는 쓰지 않는다(2026-10-13 갱신. 패키지에 <code>brands/</code>가 없어 지웠고, 첫 페이지 로고는 <code>import</code>로 읽는다)</td></tr>
+    <tr><td><code>managerHead</code></td><td>manager(사이드바) 쪽 <code>&lt;head&gt;</code>를 코드로 고친다. 형태는 <code>(head) =&gt; string</code>. 저장소는 기본 브랜드의 로고와 색을 <code>&lt;script&gt;</code>로 넣는다(아래)</td></tr>
   </table></div>
 
   <h3>사이드바 로고</h3>
   <p>Storybook 화면 왼쪽 위 로고와 제목은 manager 쪽 테마로 바꾼다. 공식 문서 Theming 페이지 기준 import 경로는 <code>storybook/manager-api</code>와 <code>storybook/theming</code>이다. 테마 객체는 합쳐지지 않고 통째로 바뀐다. <code>base</code>만 필수다.</p>
-<pre data-file=".storybook/manager.js (저장소, 줄임)"><code>import { addons } from 'storybook/manager-api';
+<pre data-file=".storybook/manager.ts (저장소, 줄임)"><code>import { addons } from 'storybook/manager-api';
 import { create } from 'storybook/theming';
 
-<span class="c">// main.mjs의 managerHead가 brands/Milvus_DesignSystem/theme.json 내용을 넣어 준다</span>
+<span class="c">// main.ts의 managerHead가 기본 브랜드의 로고(data URL)와 버튼 색(50단계)을 넣어 준다</span>
 const brand = window.MILVUS_BRAND ?? {};
 
 addons.setConfig({
   theme: create({
     base: 'light',                    <span class="c">// 필수. 나머지는 선택</span>
     brandTitle: '밀버스 디자인 시스템',
-    brandImage: brand.logo ? `static/brands/${brand.name}/${brand.logo}` : undefined,
-    colorPrimary: brand.brandColor,
+    brandImage: brand.logoUrl,
+    <span class="c">// 색이 없으면(오류 상태) 넘기지 않는다. undefined를 넘기면 기본 색까지 지워진다</span>
+    ...(brand.color &amp;&amp; { colorPrimary: brand.color, colorSecondary: brand.color }),
   }),
 });</code></pre>
-  <p>manager(사이드바)는 툴바의 브랜드 선택과 따로 돈다. 그래서 로고는 기본 브랜드 하나로 정한다. 저장소는 GitHub Pages 하위 경로에서도 열리도록 <b>상대 경로</b>(<code>static/brands/…</code>)를 쓴다. 공식 문서도 하위 경로에 배포할 때는 상대 경로를 쓰라고 한다. Theming 페이지는 절대 URL 예만 보여 주고 상대 경로 해석은 설명하지 않는다.</p>
-  <p class="sources">출처: <a href="https://storybook.js.org/docs/configure/story-rendering">Storybook — Story rendering (preview-head, preview-body)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/configure/integration/images-and-assets">Storybook — Images, fonts, and assets (staticDirs)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/configure/user-interface/theming">Storybook — Theming</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">@salesforce-ux/design-system-2 (npm, bundled CSS)</a> (확인 2026-10-09)</p>
+  <p>manager(사이드바)는 툴바의 브랜드 선택과 따로 돈다. 그래서 로고는 기본 브랜드(목록의 첫 브랜드) 하나로 정한다. 저장소 코드는 manager가 Vite 가상 모듈을 읽지 못한다고 보고(<code>main.ts</code> 주석), <code>managerHead</code>로 <code>window.MILVUS_BRAND = {"logoUrl":…,"color":…}</code>를 넣는다. 로고는 data URL이라 개발 서버, 정적 빌드, 사이드바가 같은 값을 쓴다. 대신 로고가 크면 번들도 그만큼 커진다(<code>lib/storybook-plugin.ts</code>의 <code>ponytail:</code> 주석). <code>managerHead</code>는 서버를 띄울 때 계산되므로, 프로젝트 로고·색을 바꾸면 미리보기는 바로 바뀌지만 사이드바는 Storybook을 다시 띄워야 바뀐다.</p>
+  <aside class="legacy"><strong>이전 구현 (2026-10-13 갱신)</strong>2026-10-09의 <code>manager.js</code>는 <code>staticDirs</code>로 서빙한 <code>static/brands/&lt;브랜드&gt;/&lt;로고&gt;</code>를 상대 경로로 읽었다(GitHub Pages 하위 경로 대비). 프로젝트의 로고는 <code>contentassets/*.asset</code>이라 정적 빌드에 복사되지 않아서 data URL로 바꿨다(Task 17).</aside>
+  <p class="sources">출처: <a href="https://storybook.js.org/docs/configure/story-rendering">Storybook — Story rendering (preview-head, preview-body)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/configure/integration/images-and-assets">Storybook — Images, fonts, and assets (staticDirs)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/api/main-config/main-config-manager-head">Storybook — main.js <code>managerHead</code> (<code>(head: string) =&gt; string</code>)</a> (확인 2026-10-13) · <a href="https://storybook.js.org/docs/configure/user-interface/theming">Storybook — Theming</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">@salesforce-ux/design-system-2 (npm, bundled CSS)</a> (확인 2026-10-13)</p>
 </section>
 
 <section id="build">
   <h2>빌드와 공유</h2>
 <pre><code>pnpm storybook                       <span class="c"># 저장소: pnpm build:lwc → storybook dev -p 6006</span>
 pnpm build-storybook                 <span class="c"># 저장소: pnpm build:lwc → storybook build -o storybook-static</span>
-pnpm exec storybook build -o out/sb  <span class="c"># 출력 폴더를 바꿀 때</span></code></pre>
-  <p><code>storybook-static</code>은 서버 없이 열리는 <b>정적 사이트</b>다. 아무 웹 서버나 정적 호스팅에 올리면 개발 환경이 없는 사람도 링크 하나로 카탈로그를 본다.</p>
+pnpm exec storybook build -o out/sb  <span class="c"># 출력 폴더를 바꿀 때</span>
+
+<span class="c"># 패키지를 설치한 프로젝트 (2026-10-13 갱신, Task 18)</span>
+pnpm milvus storybook                <span class="c"># LWC를 .milvus/lwc로 빌드 → 패키지 설정으로 storybook dev --host localhost</span>
+pnpm milvus storybook build          <span class="c"># 정적 빌드 → &lt;프로젝트&gt;/.milvus/storybook-static</span></code></pre>
+  <p><code>storybook-static</code>은 서버 없이 열리는 <b>정적 사이트</b>다. 아무 웹 서버나 정적 호스팅에 올리면 개발 환경이 없는 사람도 링크 하나로 카탈로그를 본다. 다만 정적 사이트에는 개발 서버가 없어서 브랜드 명세 페이지의 저장은 꺼진다(<a href="#spec">브랜드 명세 페이지</a>). 프로젝트의 정적 빌드 출력은 <code>init</code>이 <code>.gitignore</code>에 넣는 <code>.milvus/</code> 안이라 커밋되지 않는다.</p>
   <h3>참고할 만한 결과물</h3>
   <p>Salesforce SDS 컴포넌트를 Storybook으로 빌드한 사이트가 있다: <a href="https://sds-site-docs-1fea39e7763a.herokuapp.com">sds-site-docs-1fea39e7763a.herokuapp.com</a>. 2026-10-09에 그 사이트의 <code>index.json</code>을 보니 스토리가 719개(<code>Components/…</code> 아래 718개)였고, "LBC Examples" 묶음은 7개(Accordion, Badge, Button, Button Icon, Card, Data Table, Input), 그 안의 스토리는 25개였다 (2026-10-09 갱신: 이전에는 묶음이 25개라고 잘못 적었다). 이 수치는 2026-10-09에 <code>index.json</code>을 직접 받아 센 것이고, 측정 기록은 <code>docs/research/</code>에 없다. 사이트가 바뀌면 수치도 바뀐다. SLDS 카탈로그를 Storybook으로 만들면 어떤 모습이 되는지 보기에 좋다.</p>
   <div class="callout warn"><strong>공식 문서 사이트가 아니다</strong>위 사이트는 Salesforce 공식 문서가 아니고 누가 운영하는지도 적혀 있지 않다. SLDS 2 공식 문서는 <a href="https://www.lightningdesignsystem.com">lightningdesignsystem.com</a>이다. 규칙이나 토큰 값의 근거로는 공식 문서만 인용한다.</div>
-  <p class="sources">출처: <a href="https://storybook.js.org/docs/api/cli-options">Storybook — CLI options (dev -p, build -o)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/sharing/publish-storybook">Storybook — Publish Storybook</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com">Lightning Design System 2</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://storybook.js.org/docs/api/cli-options">Storybook — CLI options (dev -p, build -o)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/sharing/publish-storybook">Storybook — Publish Storybook</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 4.2 (<code>milvus storybook</code>)</a> (확인 2026-10-13) · <a href="https://www.lightningdesignsystem.com">Lightning Design System 2</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="modes">
+  <h2>두 모드와 Vite 플러그인 <span class="tag ok">구현</span></h2>
+  <p>2026-10-13 추가(Task 17·18). 같은 Storybook 설정(<code>.storybook/</code>)이 두 곳에서 돈다. 이 디자인 시스템 저장소에서 데모 브랜드를 보여 줄 때가 <b>저장소 모드</b>, 패키지를 설치한 고객 프로젝트에서 그 프로젝트의 브랜드를 보여 줄 때가 <b>프로젝트 모드</b>다. 모드를 가르는 것은 환경 변수 <code>MILVUS_PROJECT_DIR</code> 하나다.</p>
+
+  <h3>개념</h3>
+  <ul>
+    <li><b>Vite 플러그인</b>은 Vite가 모듈을 찾고(<code>resolveId</code>) 읽고(<code>load</code>) 개발 서버를 만들 때(<code>configureServer</code>) 끼어드는 객체다. Storybook의 Vite 빌더는 <code>main</code> 설정의 <code>viteFinal</code>에서 기본 Vite 설정을 받아 고친 설정을 돌려받는다. 공식 예는 <code>mergeConfig</code>로 합친다</li>
+    <li><b>가상 모듈</b>은 디스크에 없는 모듈이다. 플러그인이 <code>virtual:my-module</code> 같은 이름을 받아 코드를 만들어 준다. Vite 문서는 이것을 빌드 때의 정보를 보통의 ESM <code>import</code>로 소스에 넘기는 방법이라고 설명한다. 찾은 id 앞에 <code>\0</code>을 붙이는 것은 Rollup의 관례로, 다른 플러그인이 이 모듈을 처리하려 들지 않게 한다. 브라우저에서는 <code>/@id/__x00__…</code>로 보인다</li>
+    <li><b><code>configureServer</code></b>는 개발 서버에 미들웨어를 붙이는 데 가장 많이 쓰는 hook이다. 정적 빌드(production build)에서는 부르지 않는다. 같은 hook에서 파일 감시자와 모듈 그래프에 접근할 수 있고, 모듈을 무효화한 뒤 <code>server.ws.send({ type: 'full-reload' })</code>로 페이지를 다시 읽게 할 수 있다(Vite 문서의 <code>handleHotUpdate</code> 예)</li>
+    <li><b><code>server.fs.allow</code></b>는 개발 서버가 <code>/@fs/</code>로 내줄 수 있는 파일을 제한한다. 기본은 Vite가 찾은 작업 공간 루트다. 값을 직접 주면 이 자동 탐지가 꺼지므로 <code>searchForWorkspaceRoot</code>를 함께 넣는다</li>
+    <li><b>듣는 주소:</b> Vite 자체의 <code>server.host</code> 기본값은 <code>localhost</code>다. Storybook CLI 문서는 <code>--host</code>를 "<code>0.0.0.0</code>이면 모든 네트워크 인터페이스"라고만 적고 기본값은 적지 않는다. 설치된 storybook 10.6.0은 <code>--host</code>가 없으면 Node의 <code>listen</code>에 host 없이 넘기고(<code>dist/core-server/index.js</code>, 설치본 확인), Node는 host를 빼면 모든 주소(<code>::</code> 또는 <code>0.0.0.0</code>)에서 받는다</li>
+  </ul>
+
+  <h3>Salesforce에서는</h3>
+  <ul>
+    <li>Storybook에는 org가 없다. org에서 브랜드 색과 로고는 Setup의 Themes and Branding에서 만든 커스텀 테마가 정하고, Activate를 누르면 모든 사용자에게 적용된다(Help). 메타데이터로는 <code>BrandingSet</code>(<code>brandingSets/</code> 폴더)이고, <code>BRAND_COLOR</code>는 <code>#54C254</code> 같은 hex 문자열, <code>BRAND_IMAGE</code>는 로고 경로다(Metadata API)</li>
+    <li>org는 브랜드 색에서 팔레트를 만들어 쓰지만 그 결과는 API로 읽히지 않는다(<a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>). 그래서 두 모드 모두 같은 규칙(<code>lib/palette.ts</code>)으로 계산해 흉내 낸다</li>
+    <li>프로젝트 모드는 org에 배포할 파일 자체(<code>BrandingSet</code>, 정적 리소스 <code>milvusBrand.css</code>·<code>milvusBridge.css</code>·<code>milvusOverride.css</code>)를 읽는다. 배포 전에 보는 화면과 배포할 내용이 같은 원본에서 나온다는 뜻이다. Storybook은 org와 같게 모든 LWC를 synthetic shadow로 그린다(<a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html">04 통합</a>)</li>
+  </ul>
+
+  <h3>밀버스에서는</h3>
+  <div class="table-wrap"><table>
+    <tr><th></th><th>저장소 모드</th><th>프로젝트 모드</th></tr>
+    <tr><td>켜는 법</td><td>이 저장소에서 <code>pnpm storybook</code></td><td>고객 프로젝트에서 <code>pnpm milvus storybook</code>. CLI가 <code>MILVUS_PROJECT_DIR</code>에 프로젝트 폴더의 실경로를 넣는다</td></tr>
+    <tr><td>브랜드</td><td><code>brands/&lt;브랜드&gt;/</code>의 <code>theme.json</code>(팔레트, <code>pnpm sync:theme</code> 결과), <code>util.css</code>, 로고. 브리지·override는 <code>templates/force-app/main/default/staticresources/</code></td><td><code>milvus.config.json</code>의 브랜드 이름으로 <code>brandingSets/LEXTHEMING&lt;이름&gt;</code>을 읽는다. <code>BRAND_COLOR</code> → 팔레트, <code>BRAND_IMAGE</code> → 로고(<code>contentassets/</code>). util.css는 <code>staticresources/milvusBrand.css</code>, 브리지·override는 같은 폴더의 프로젝트 파일. 비교용 "SLDS 기본"이 둘째 항목이다</td></tr>
+    <tr><td>LWC 번들 (<code>@milvus/lwc</code>)</td><td><code>dist/lwc</code> (<code>pnpm build:lwc</code>)</td><td><code>&lt;프로젝트&gt;/.milvus/lwc</code> (프로젝트 LWC와 SLDS 카탈로그 예제, CLI가 빌드)</td></tr>
+    <tr><td>브랜드 명세 저장</td><td>하지 않는다(입력 꺼짐)</td><td>프로젝트 루트의 <code>milvus-brand-request.md</code></td></tr>
+  </table></div>
+<pre data-file=".storybook/main.ts (저장소, 두 모드 부분)"><code>const repoDir = fileURLToPath(new URL('..', import.meta.url));
+const projectDir = process.env.MILVUS_PROJECT_DIR;
+const options = projectDir ? { mode: 'project', repoDir, projectDir } : { mode: 'repo', repoDir };
+
+<span class="c">// config 안</span>
+viteFinal: (vite) =&gt;
+  mergeConfig(vite, {
+    plugins: [milvusStorybookPlugin(options)],
+    resolve: { alias: { '@milvus/lwc': projectDir ? join(projectDir, '.milvus/lwc') : join(repoDir, 'dist/lwc') } },
+    <span class="c">// allow를 직접 주면 Vite 기본값(작업 공간 루트)이 빠지므로 함께 넣는다</span>
+    ...(projectDir &amp;&amp; { server: { fs: { allow: [searchForWorkspaceRoot(vite.root ?? process.cwd()), projectDir] } } }),
+  }),</code></pre>
+
+  <h4><code>pnpm milvus storybook</code>이 하는 일 (<code>cli/storybook.ts</code>)</h4>
+  <ol>
+    <li>지금 폴더에서 위로 <code>sfdx-project.json</code>을 찾는다. <code>milvus.config.json</code>이 없으면 <code>pnpm milvus init</code>을 먼저 하라고 안내하고 1로 끝난다</li>
+    <li>프로젝트 LWC와 SLDS 카탈로그 예제를 <code>.milvus/lwc</code>로 빌드한다. 실패하면 Storybook을 띄우지 않는다</li>
+    <li>패키지 의존성에 든 storybook 실행 파일을 지금 실행 중인 node로 직접 실행한다. 셸 없이 인자 배열로 넘기므로 경로에 공백·한글이 있어도 된다. 고객 프로젝트에 storybook을 따로 설치하지 않아도 된다</li>
+    <li>인자는 <code>dev -c &lt;패키지 .storybook의 실경로&gt; --host localhost</code>, 정적 빌드면 <code>build -c … -o .milvus/storybook-static</code>이다. 작업 폴더가 프로젝트라 캐시와 오류 로그가 패키지가 아니라 프로젝트에 생긴다</li>
+    <li>부모에게만 오는 종료 신호(SIGTERM, SIGHUP)를 Storybook에 넘기고, Storybook의 종료 코드를 그대로 돌려준다. 신호로 끝나면 128+신호 번호(Ctrl-C는 130)다</li>
+  </ol>
+  <ul>
+    <li><b><code>-c</code>에 실경로:</b> pnpm의 <code>node_modules/&lt;패키지&gt;</code>는 <code>.pnpm/…</code> 안 실제 폴더를 가리키는 심볼릭 링크다. 링크 경로를 넘기면 미리보기가 빈 화면이 되어서, <code>.</code>·<code>..</code>·심볼릭 링크를 푼 경로(<code>realpath</code>)를 넘긴다(설계 4.2, Task 3 스파이크). <code>MILVUS_PROJECT_DIR</code>도 같은 이유로 실경로다</li>
+    <li><b><code>--host localhost</code>:</b> 위 개념대로 그냥 띄우면 모든 네트워크 주소에서 듣는다. 프로젝트 모드는 <code>server.fs.allow</code>에 프로젝트 폴더가 들어가므로, 같은 네트워크의 다른 PC에 프로젝트 파일이 열린다. 그래서 dev에는 항상 붙인다. 다른 PC에서 직접 읽어 보지는 않았다(설계 4.2). 정적 빌드는 서버가 없어 붙이지 않는다</li>
+  </ul>
+
+  <h4>플러그인 <code>lib/storybook-plugin.ts</code></h4>
+  <ul>
+    <li><b>가상 모듈 <code>virtual:milvus-brands</code>:</b> <code>mode</code>와 <code>brands</code>(이름, 라벨, 출처, 팔레트, 브랜드 색, util·브리지·override CSS 문자열, 로고 data URL, 오류)를 내보낸다. <code>brand.ts</code>가 이것을 import한다. 정적 빌드에서는 빌드 당시의 값이 번들에 들어간다</li>
+    <li><b>감시와 새로고침:</b> 저장소 모드는 <code>brands/</code>와 templates의 정적 리소스, 프로젝트 모드는 <code>milvus.config.json</code>, <code>brandingSets/</code>, <code>staticresources/</code>, <code>contentassets/</code>를 감시한다. 아직 없는 파일도 잡도록 폴더를 본다. 바뀌면 가상 모듈을 무효화하고 전체 새로고침을 보낸다. 그래서 Claude가 <code>milvusBrand.css</code>를 고치면 Storybook이 저절로 바뀐다(<a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html#brand-flow">08 브랜드 요청 → 반영 흐름</a>)</li>
+    <li><b>미들웨어 <code>/__milvus/brand-request</code>:</b> 명세 페이지가 요청 파일을 읽고(GET) 쓴다(POST). <a href="#spec">다음 절</a>에서 다룬다</li>
+    <li><b>오류:</b> 프로젝트 모드에서 <code>BrandingSet</code>이 없거나, <code>BRAND_COLOR</code>가 틀리거나, <code>milvusBrand.css</code>가 util.css 규칙(<code>lib/rules.ts</code>, 설계 5.2)을 어기면 프로젝트 브랜드 대신 오류를 담은 "SLDS 기본" 하나만 준다. 화면 위에 이유와 <code>pnpm milvus check --style</code> 안내가 뜬다(설계 4.2, 10장)</li>
+  </ul>
+  <p><span class="tag warn">미확인</span> npm에서 받은 패키지로 띄우는 확인(<code>node_modules</code> 안의 <code>preview.ts</code>·<code>manager.ts</code>와 <code>../lib/*.ts</code> import, 정적 빌드)은 아직 하지 않았다. 설계 14장의 미확인 항목이고 리허설에서 확인한다.</p>
+  <p class="sources">출처: <a href="https://vite.dev/guide/api-plugin#importing-a-virtual-file">Vite — Plugin API: 가상 모듈 (빌드 때 정보를 ESM import로, <code>\0</code> id는 <code>/@id/__x00__</code>)</a> (확인 2026-10-13) · <a href="https://vite.dev/guide/api-plugin#configureserver">Vite — Plugin API: <code>configureServer</code> (미들웨어, 감시자·모듈 그래프, production build에서는 부르지 않음)</a> (확인 2026-10-13) · <a href="https://vite.dev/guide/api-plugin#handlehotupdate">Vite — Plugin API: <code>handleHotUpdate</code> (<code>invalidateModule</code>, <code>full-reload</code>)</a> (확인 2026-10-13) · <a href="https://rollupjs.org/plugin-development/#conventions">Rollup — Plugin Development: Conventions (가상 모듈 id에 <code>\0</code>)</a> (확인 2026-10-13) · <a href="https://vite.dev/config/server-options#server-host">Vite — <code>server.host</code> (기본 <code>localhost</code>)</a> (확인 2026-10-13) · <a href="https://vite.dev/config/server-options#server-fs-allow">Vite — <code>server.fs.allow</code>, <code>searchForWorkspaceRoot</code></a> (확인 2026-10-13) · <a href="https://storybook.js.org/docs/builders/vite#configuration">Storybook — Vite builder: <code>viteFinal</code></a> (확인 2026-10-13) · <a href="https://storybook.js.org/docs/api/cli-options">Storybook — CLI options (<code>-c</code>, <code>--host</code>, <code>-o</code>)</a> (확인 2026-10-13) · <a href="https://www.npmjs.com/package/storybook?activeTab=versions">storybook (npm). host 동작의 근거는 설치본 10.6.0 <code>dist/core-server/index.js</code>의 <code>listen</code></a> (확인 2026-10-09) · <a href="https://nodejs.org/api/net.html#serverlistenport-host-backlog-callback">Node.js — <code>server.listen</code> (host를 빼면 <code>::</code> 또는 <code>0.0.0.0</code>)</a> (확인 2026-10-13) · <a href="https://nodejs.org/api/fs.html#fsrealpathpath-options-callback">Node.js — <code>fs.realpath</code> (<code>.</code>·<code>..</code>·심볼릭 링크를 풀어 정규 경로)</a> (확인 2026-10-13) · <a href="https://pnpm.io/symlinked-node-modules-structure">pnpm — Symlinked node_modules structure</a> (확인 2026-10-13) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.brand_create_custom_theme.htm&amp;type=5">Salesforce Help — Create a Custom Theme (Activate는 모든 사용자에게 적용)</a> (확인 2026-10-13) · <a href="https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_brandingset.htm">Metadata API — BrandingSet (<code>BRAND_COLOR</code>, <code>BRAND_IMAGE</code>)</a> (확인 2026-10-13) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 4.2 (<code>milvus storybook</code>, realpath, <code>--host localhost</code>, <code>server.fs.allow</code>), 10장 (오류), 14장 (미확인)</a> (확인 2026-10-13)</p>
+</section>
+
+<section id="spec">
+  <h2>브랜드 명세 페이지 <span class="tag ok">구현</span></h2>
+  <p>2026-10-13 추가(Task 19). Storybook 사이드바 <b>시작하기 / 브랜드 명세</b>는 "무엇을 바꿀 수 있고 지금 값은 무엇인가"를 보여 주고, 원하는 것을 받아 파일로 저장하는 페이지다. 저장한 파일은 Claude Code가 읽어 반영한다(<a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html#brand-flow">08 브랜드 요청 → 반영 흐름</a>).</p>
+
+  <h3>개념</h3>
+  <ul>
+    <li>브라우저의 페이지는 프로젝트 파일을 직접 쓸 수 없다. 그래서 페이지가 개발 서버에 요청을 보내고, 서버(Vite 미들웨어, 위 <code>configureServer</code>)가 파일을 쓴다. 정적 빌드에는 이 서버가 없다</li>
+    <li>개발 서버는 요청이 같은 PC의 그 페이지에서 왔는지 가려야 한다. 브라우저는 다른 출처(origin) 요청과, 같은 출처라도 POST 같은 요청에 <code>Origin</code> 헤더(scheme·호스트·포트)를 붙인다. 같은 출처의 GET·HEAD에는 붙이지 않는다(MDN)</li>
+    <li>문서 페이지 자동 생성(autodocs)을 전역으로 켰을 때 한 컴포넌트만 빼려면 그 meta의 <code>tags</code>에 <code>'!autodocs'</code>를 넣는다. 명세 페이지는 입력 폼이라 문서 탭에 같은 폼을 한 번 더 그리지 않으려고 이것을 쓴다</li>
+  </ul>
+
+  <h3>Salesforce에서는</h3>
+  <ul>
+    <li>공식으로 브랜드를 정하는 화면은 Setup의 Themes and Branding이다. 관리자가 색 팔레트와 로고 등을 정하고 Activate로 모든 사용자에게 적용한다(Help). 명세 페이지의 "브랜드 색"·"로고"는 이 값(<code>BrandingSet</code>의 <code>BRAND_COLOR</code>·<code>BRAND_IMAGE</code>)을 바꾸자는 요청이다</li>
+    <li>Salesforce는 입력한 브랜드 색을 그대로 쓰지 않고 접근성 있는 색으로 바꿔 쓴다(<a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html#themes">01 Themes and Branding</a>). 그래서 페이지는 입력 색과 실제 버튼 색(50단계), 링크 색(40단계)을 각각의 흰색 대비와 함께 보인다</li>
+    <li>SLDS 2 사이트의 Styling Hook Index는 global hook을 범주별로 이름과 라이트·다크 값으로 보여 준다. 값은 SLDS가 정하고 Salesforce가 언제든 바꿀 수 있으며, 고객 코드에서 global hook 값을 덮어쓰는 것은 지원하지 않는다고 적는다. 명세 페이지의 모양 항목 대부분은 이 hook을 바꾸자는 요청이라 공식 권고 밖이다(<a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html#hooks">01 styling hook</a>)</li>
+  </ul>
+
+  <h3>밀버스에서는</h3>
+  <ul>
+    <li><b>항목:</b> <code>lib/spec-items.ts</code>의 <code>SPEC_ITEMS</code>를 묶음별 카드로 그린다(설계 6.1, 9.3). 카드마다 설명, 한계, 지금 값, 요청 입력이 있다. 지금 값은 툴바에서 고른 브랜드를 적용한 <code>:root</code>의 계산값이고, 색은 <code>#RRGGBB</code>로 보인다. 정하지 않은 값은 "정하지 않음(SLDS 기본값 / Salesforce 원래 값)"이다</li>
+    <li><b>브랜드 색:</b> 요청에 <code>#RRGGBB</code>가 있으면 같은 팔레트 규칙으로 버튼·링크 색과 대비를 미리 계산해 보인다</li>
+    <li><b>피드백 색:</b> 성공·경고·오류·정보마다 견본, 글자·배경 값, 배경 위·흰색 위 대비</li>
+    <li><b>로고:</b> 지금 로고와 "프로젝트 루트 기준 상대 경로" 입력. URL에서 받지 않는다</li>
+    <li><b>native 전환 시 잃는 부분:</b> 브리지 변수를 쓰는 항목에 표시한다(<a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html#bridge">01 브리지</a>)</li>
+    <li><b>Salesforce 고정:</b> 바꿀 수 없는 항목(<code>lib/fixed-list.ts</code>, 설계 9.4)을 "두 모드 모두 고정"과 "native 전환 뒤 생기는 고정"으로 나눠 보인다. 입력은 없다</li>
+  </ul>
+  <h4>저장과 요청 파일</h4>
+  <ul>
+    <li>저장은 프로젝트 모드의 개발 서버에서만 된다. 저장소 모드와 정적 빌드에서는 입력이 꺼지고 이유가 뜬다</li>
+    <li>페이지를 열면 프로젝트 루트의 <code>milvus-brand-request.md</code>를 읽어 입력을 채운다. 저장하면 파일 전체를 다시 쓴다. 저장 직전에 파일을 다시 읽어서, 페이지를 연 뒤 편집기로 고친 내용 가운데 페이지에서 바꾸지 않은 항목은 파일 쪽을 따른다</li>
+    <li>빈 항목은 적지 않는다. <code>저장:</code> 시각을 적고, 툴바가 프로젝트 브랜드이면 항목마다 그 순간의 <code>지금:</code> 값을 함께 적는다. 다른 브랜드를 보고 있거나 프로젝트 브랜드를 읽지 못했으면 지금 값을 모르므로 파일에 있던 <code>지금:</code> 줄을 그대로 둔다(<code>saveRequest</code>). Claude가 적은 <code>반영:</code> 줄은 저장할 때 지운다. 명세 항목이 아닌 줄과 절(사람이 적은 메모 등)은 지우지 않고 남긴다(<code>lib/request.ts</code>)</li>
+  </ul>
+<pre data-file="milvus-brand-request.md (설계 6.1의 예)"><code># 브랜드 요청
+저장: 2026-10-14 15:20
+
+## 브랜드 색
+지금: #0176D3 (버튼 #2976CA, 링크 #1F5DA1)
+요청: 신뢰감 있는 딥그린
+
+## 로고
+요청: assets/logo.png
+
+## 피드백 색 / 성공
+지금: 글자 #056764, 배경 #ACF3E4
+요청: 글자 #1B5E20, 배경 #E8F5E9
+
+## 전체 스타일
+요청: 각지고 단단한 업무용 느낌, 촘촘하게</code></pre>
+  <h4>미들웨어의 안전장치</h4>
+  <ul>
+    <li>쓰는 파일은 프로젝트 루트의 <code>milvus-brand-request.md</code> 하나로 고정이다. 요청 본문의 경로나 파일 이름은 보지 않는다</li>
+    <li>읽기·쓰기 모두 같은 PC에서 온 요청만 받는다. 소켓 주소가 루프백이고, <code>Host</code>가 <code>localhost</code>·<code>127.0.0.1</code>·<code>[::1]</code>이고, <code>Origin</code>이 있으면 그것도 localhost 계열에 같은 포트여야 한다. 헤더는 클라이언트가 정하므로 소켓 주소를 먼저 본다(<code>isLocal</code> 주석)</li>
+    <li>본문은 1MB까지, <code>{ "text": "…" }</code> 형식의 JSON만 받는다. 넘으면 413, 형식이 틀리면 400, GET·POST 밖의 메서드는 405다</li>
+    <li>화면은 <code>textContent</code>·<code>value</code>로만 그린다. 입력에 HTML을 넣어도 해석되지 않는다</li>
+  </ul>
+  <p>저장이 안 되면(서버가 꺼졌거나 정적 사이트를 보고 있으면) 채팅에 요청을 직접 쓴다(설계 6.1의 대체 경로).</p>
+  <p class="sources">출처: <a href="https://vite.dev/guide/api-plugin#configureserver">Vite — Plugin API: <code>configureServer</code> (미들웨어, production build에서는 부르지 않음)</a> (확인 2026-10-13) · <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Origin">MDN — Origin 헤더 (scheme·호스트·포트, 붙는 요청)</a> (확인 2026-10-13) · <a href="https://storybook.js.org/docs/writing-docs/autodocs">Storybook — Automatic documentation (<code>!autodocs</code>로 빼기)</a> (확인 2026-10-13) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.brand_create_custom_theme.htm&amp;type=5">Salesforce Help — Create a Custom Theme</a> (확인 2026-10-13) · <a href="https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_brandingset.htm">Metadata API — BrandingSet</a> (확인 2026-10-13) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/98b493-styling-hook-index">SLDS 2 — Styling Hook Index (값은 SLDS가 정함, global hook 덮어쓰기 미지원)</a> (확인 2026-10-13) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 6.1 (명세 페이지, 요청 파일 형식, 대체 경로), 9.3 (추가 항목), 9.4 (Salesforce 고정)</a> (확인 2026-10-13)</p>
+</section>
+
+<section id="source">
+  <h2>원본과 hook 보기 <span class="tag ok">구현</span></h2>
+  <p>2026-10-13 추가(Task 21). 카탈로그(컴포넌트 / 기본)의 컴포넌트 페이지마다 마지막 스토리 <b>원본과 hook</b>이 있다. 이 컴포넌트에 어떤 hook이 어디서 닿고 무엇이 hook으로 안 바뀌는지를 Salesforce 원본 파일과 함께 보여 준다(설계 9.5). <span class="tag warn">진행 중</span> 화면 구성은 리뷰 반영으로 바뀌는 중이라 여기서는 기능만 적는다.</p>
+
+  <h3>개념</h3>
+  <ul>
+    <li><b>블루프린트:</b> SLDS가 정한 컴포넌트의 마크업과 클래스다. Salesforce 기본 컴포넌트는 블루프린트를 구현한다. 예를 들어 <code>lightning-button</code>은 buttons 블루프린트를 구현하고, org 테마에 따라 SLDS 1이나 SLDS 2 모양이 된다(Component Reference)</li>
+    <li><b>styling hook:</b> LWC 개발자 가이드는 styling hook을 SLDS 스타일시트 안의 자리표시자라고 설명한다. CSS 규칙이 <code>var(--hook, 기본값)</code>으로 읽는 이름이다. 그래서 "이 컴포넌트에 어떤 hook이 닿는가"는 원본 CSS의 <code>var()</code>를 따라가면 알 수 있다. 밀버스는 이 일을 정적 반영 검사로 한다(<a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html#audit">00 7절</a>)</li>
+    <li><b>필요할 때 불러오기:</b> 원본 파일은 수백 개라 처음부터 다 싣지 않는다. Vite는 import 경로 끝에 <code>?raw</code>를 붙이면 파일 내용을 문자열로 가져온다. 동적 <code>import()</code>는 모듈을 필요할 때 비동기로 불러오는 문법이고, Vite는 이것을 따로 나뉜 청크로 만든다</li>
+  </ul>
+
+  <h3>Salesforce에서는</h3>
+  <ul>
+    <li>공식 자료에서 hook을 보는 곳은 SLDS 2 사이트의 Styling Hook Index(global hook의 범주별 이름과 라이트·다크 값)와 Component Reference의 컴포넌트 페이지다. Component Reference의 <code>lightning-button</code> 페이지는 <code>--slds-c-button-*</code> 목록을 주지만 컴포넌트 hook은 SLDS 1에서만 지원된다고 적는다(<a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html#hooks">01 styling hook</a>)</li>
+    <li>SLDS 2에서 컴포넌트 하나가 어떤 g·s hook을 어느 선택자에서 읽는지 컴포넌트별로 보여 주는 공식 페이지는 찾지 못했다 <span class="tag warn">미확인</span>. 그래서 설치된 공식 패키지 원본에서 계산한다. <code>lightning-base-components</code> 1.28.19-alpha(기본 컴포넌트의 <code>html</code>·<code>js</code>·<code>css</code>와 native용 <code>*.slds.css</code>)와 <code>@salesforce-ux/design-system-2</code> 2.264.2(npm 설명상 <code>components/</code>에 컴포넌트별 원본 CSS가 있다)다</li>
+    <li>두 패키지의 <code>LICENSE.txt</code>는 같은 "Terms of Use"다(저작권 연도와 갱신일만 다르다). 소프트웨어를 복제하고 공개적으로 보여 주고 배포할 수 있게 허락하면서, 사본에는 이 약관을 함께 넣으라고 한다(설치본 확인). 그래서 원본을 보여 주는 곳에 약관 전문을 싣는다. 참고로 <code>package.json</code>의 <code>license</code> 칸은 <code>lightning-base-components</code>가 "MIT", <code>@salesforce-ux/design-system-2</code>가 "SEE LICENSE IN LICENSE.txt"다. 밀버스는 파일에 든 약관 전문을 따른다</li>
+    <li>원본을 고쳐도 org는 바뀌지 않는다. LWC 개발자 가이드는 SLDS 클래스와 기본 컴포넌트 내부가 앞으로 바뀔 수 있어 CSS 덮어쓰기를 지원하지 않는다고 적는다. 이 보기는 고치는 곳이 아니라 확인 근거다</li>
+  </ul>
+
+  <h3>밀버스에서는</h3>
+  <ul>
+    <li><b>데이터:</b> 카탈로그 생성(<code>scripts/generate-slds-catalog.ts</code>. <code>pnpm build:lwc</code>와 <code>prepack</code>이 부른다)이 정적 반영 검사(<code>scripts/audit</code>)의 판정을 다시 돌려 만든다. 손으로 쓰지 않으므로 <code>pnpm audit:brand</code>와 같은 계산이다. 판정은 출처(그 기본 컴포넌트 폴더의 자기 파일, 여러 기본 컴포넌트에 복사된 공용 파일, SLDS 2 블루프린트)를 나눠 보여 준다. 다른 컴포넌트와 함께 쓰는 판정이 이 컴포넌트 것처럼 보이지 않게 하려는 것이다</li>
+    <li><b>머리 요약:</b> <code>lightning-*</code> 이름, SLDS 블루프린트, native 지원 목록에 있는지(<a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html">04 통합</a>), 명세 항목마다 지금·native 상태(반영 / 일부 / 안 됨 / 해당 없음)</li>
+    <li><b>hook 표:</b> hook마다 종류(g / s / c / 기본 컴포넌트 전용 / 내부 전용 / 정의 없음), s hook이면 이어지는 g hook, 기본값(라이트·다크), 지금 브랜드 값(툴바를 따라 바뀜), 읽는 곳(지금·native), util.css로 바꿀 수 있는지, 명세 항목</li>
+    <li><b>hook이 닿지 않는 선언:</b> 속성과 값, 위치, 모드, 영향받는 명세 항목, 메우는 방법(브리지 변수 / Salesforce 고정 / 빈틈). JS에 박힌 값(개체 아이콘 색)은 icon·avatar 페이지에 따로 적는다. 카탈로그에 페이지가 없는 toast의 시간은 명세 페이지의 Salesforce 고정 목록에서 본다</li>
+    <li><b>원본:</b> 기본 컴포넌트 폴더의 <code>html</code>·<code>js</code>·<code>css</code>(native용 포함)와 SLDS 2 컴포넌트 CSS. 생성 파일에는 경로만 두고, 펼칠 때 <code>?raw</code> 동적 import로 불러와 hook과 하드코딩 값을 구분해 강조한다. 맨 위에 "원본은 고치는 대상이 아니라 확인 근거다. 고쳐도 Storybook만 바뀌고 org는 바뀌지 않는다"를 적는다</li>
+    <li><b>약관:</b> <b>시작하기 / Salesforce 이용 약관</b> 페이지와 원본 절 끝에 두 <code>LICENSE.txt</code>의 전문을 싣는다. 설치된 파일을 빌드할 때 읽으므로 손으로 옮겨 적은 문장이 없다(<code>stories/salesforce-source.js</code>)</li>
+    <li><span class="tag info">계획</span> 설계 9.5의 미리보기(기본·프로젝트·센티널 브랜드를 나란히, 브리지 켜고 끄기)는 아직 없다. 동적 반영 검사(설계 9.6의 2, Task 26)와 함께 다룬다</li>
+    <li><span class="tag warn">미확인</span> npm에서 받은 패키지로 띄운 프로젝트에서 원본 <code>?raw</code> 불러오기와 약관 읽기가 되는지는 아직 확인하지 않았다(위 <a href="#modes">두 모드</a>의 미확인과 같은 리허설에서 본다)</li>
+  </ul>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-button.html">Lightning Component Reference — lightning-button (buttons 블루프린트 구현, <code>--slds-c-button-*</code>는 SLDS 1 전용)</a> (확인 2026-10-13) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC 개발자 가이드 — SLDS Styling Hooks (hook은 스타일시트의 자리표시자, 기본 컴포넌트는 블루프린트를 구현, CSS 덮어쓰기 미지원)</a> (확인 2026-10-13) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/98b493-styling-hook-index">SLDS 2 — Styling Hook Index</a> (확인 2026-10-13) · <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm, 1.28.19-alpha). 약관의 근거는 설치본 <code>LICENSE.txt</code></a> (확인 2026-10-13) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">@salesforce-ux/design-system-2 (npm, 2.264.2, <code>components/</code>). 약관의 근거는 설치본 <code>LICENSE.txt</code></a> (확인 2026-10-13) · <a href="https://vite.dev/guide/assets#importing-asset-as-string">Vite — Importing asset as string (<code>?raw</code>)</a> (확인 2026-10-13) · <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import">MDN — <code>import()</code> (필요할 때 비동기로 불러오기)</a> (확인 2026-10-13) · <a href="https://vite.dev/guide/features#async-chunk-loading-optimization">Vite — Async chunk loading (동적 import는 나뉜 청크)</a> (확인 2026-10-13) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 9.5 (원본과 hook 보기, 약관), 9.6 (정적·동적 검사)</a> (확인 2026-10-13)</p>
 </section>
 
 <section id="project">
   <h2>우리 프로젝트 적용</h2>
-  <div class="callout project"><strong>Storybook이 맡는 역할 (2026-10-09 갱신)</strong>
-    <p>Storybook은 브랜드를 org에 배포하기 전에 <b>눈으로 확인하는 곳</b>이다. 기본 상태는 Salesforce 기본 모양에 브랜드 색과 로고만 바꾼 것이다.</p>
+  <div class="callout project"><strong>Storybook이 맡는 역할 (2026-10-13 갱신)</strong>
+    <p>Storybook은 브랜드를 org에 배포하기 전에 <b>눈으로 확인하고 요청을 받는 곳</b>이다. 기본 상태는 Salesforce 기본 모양에 브랜드 색과 로고만 바꾼 것이다.</p>
     <ol>
-      <li>관리자가 org Setup의 Themes and Branding에서 브랜드 색과 로고를 정한다</li>
-      <li><code>pnpm sync:theme</code>이 org 테마를 <code>brands/&lt;브랜드&gt;/theme.json</code>(브랜드 색, 계산한 팔레트)과 로고 파일로 가져온다 → 브랜드 툴바와 사이드바 로고에 반영</li>
-      <li>브랜드 요청이 있을 때만 <code>brands/&lt;브랜드&gt;/util.css</code>에 hook 값을 쓴다 → 같은 툴바로 바로 확인</li>
-      <li>컴포넌트는 "기본"(Salesforce 공식 예제를 그대로 컴파일한 카탈로그)과 "밀버스 추가"로 나뉜다</li>
+      <li>관리자가 org Setup의 Themes and Branding에서 브랜드 색과 로고를 정한다. 프로젝트에서는 <code>pnpm milvus init --from-org</code>가 그 테마를 <code>BrandingSet</code>으로 가져오고, 저장소 데모는 <code>pnpm sync:theme</code>이 <code>brands/&lt;브랜드&gt;/theme.json</code>으로 가져온다 → 브랜드 툴바와 사이드바 로고에 반영</li>
+      <li>프로젝트에서 <code>pnpm milvus storybook</code>을 띄워 <b>시작하기 / 브랜드 명세</b>에 요청을 적고 저장한다 → <code>milvus-brand-request.md</code> (<a href="#spec">브랜드 명세 페이지</a>)</li>
+      <li>Claude Code가 <code>milvus-brand</code> skill로 반영해 <code>milvusBrand.css</code>·<code>BrandingSet</code>을 고치면 Storybook이 저절로 다시 그린다 (<a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html#brand-flow">08</a>)</li>
+      <li>컴포넌트는 "기본"(Salesforce 공식 예제를 그대로 컴파일한 카탈로그, 페이지마다 <a href="#source">원본과 hook</a>)과 "밀버스 추가"로 나뉜다</li>
     </ol>
   </div>
   <div class="table-wrap"><table>
-    <tr><th>층</th><th>파일</th><th>Storybook에서 반영되는 곳</th></tr>
-    <tr><td>브랜드 색</td><td><code>brands/&lt;브랜드&gt;/theme.json</code>의 <code>palette</code></td><td><code>brand.js</code>가 <code>:root</code>의 <code>--slds-r-color-brand-*</code>로 넣는다</td></tr>
-    <tr><td>로고</td><td><code>brands/&lt;브랜드&gt;/logo.*</code></td><td><code>main.mjs</code>의 <code>managerHead</code> → <code>manager.js</code>의 <code>brandImage</code></td></tr>
-    <tr><td>모양 (요청이 있을 때만)</td><td><code>brands/&lt;브랜드&gt;/util.css</code></td><td><code>brand.js</code>가 문서 head의 <code>&lt;style id="milvus-brand-util"&gt;</code>로 넣는다. 지금 규칙(#18, PR #19)은 <code>:root</code>의 <code>--slds-g-*</code>, 색이 아닌 <code>--slds-s-*</code>, <code>--milvus-*</code>만 쓴다. 범위를 넓히는 계획은 <a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html#project">04 통합</a>에 있다</td></tr>
+    <tr><th>층</th><th>파일 (저장소 / 프로젝트)</th><th>Storybook에서 반영되는 곳</th></tr>
+    <tr><td>브랜드 색</td><td><code>brands/&lt;브랜드&gt;/theme.json</code>의 <code>palette</code> / <code>BrandingSet</code>의 <code>BRAND_COLOR</code>로 계산</td><td><code>brand.ts</code>가 <code>:root</code>의 <code>--slds-r-color-brand-*</code>로 넣는다</td></tr>
+    <tr><td>로고</td><td><code>brands/&lt;브랜드&gt;/logo.*</code> / <code>BRAND_IMAGE</code>가 가리키는 <code>contentassets/</code> 자산</td><td><code>main.ts</code>의 <code>managerHead</code> → <code>manager.ts</code>의 <code>brandImage</code>(data URL), 명세 페이지의 로고 항목</td></tr>
+    <tr><td>모양 (요청이 있을 때만)</td><td><code>brands/&lt;브랜드&gt;/util.css</code> / <code>staticresources/milvusBrand.css</code></td><td><code>brand.ts</code>가 문서 head의 <code>&lt;style id="milvus-brand-util"&gt;</code>로 넣는다. 쓸 수 있는 이름은 설계 5.2 규칙(<code>lib/rules.ts</code>, <a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html#button">01 규칙 표</a>)을 따른다</td></tr>
+    <tr><td>브리지·override</td><td><code>templates/…/milvusBridge.css</code>·<code>milvusOverride.css</code> / 프로젝트 <code>staticresources/</code>의 같은 파일</td><td><code>&lt;style id="milvus-brand-bridge"&gt;</code>(util.css 앞), <code>&lt;style id="milvus-brand-override"&gt;</code>(뒤)</td></tr>
   </table></div>
   <ul>
     <li>스토리는 <code>stories/helpers.js</code>의 <code>lwc(tag, Ctor, props)</code>로 LWC 요소를 만들어 돌려준다. <code>@api</code> 값은 property로 들어간다</li>
-    <li><code>preview.js</code>의 <code>tags: ['autodocs']</code>로 모든 스토리에 문서 페이지가 생긴다</li>
-    <li>다음 단계 <span class="tag info">계획</span> 패키지를 설치한 프로젝트에서 <code>pnpm milvus storybook</code>이 패키지 안의 설정으로 Storybook을 띄운다. 그때 util.css는 <code>staticresources/milvusBrand.css</code>다 (<a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서</a> 4.2). 아직 구현 전이다</li>
+    <li><code>preview.ts</code>의 <code>tags: ['autodocs']</code>로 모든 스토리에 문서 페이지가 생긴다. 명세 페이지만 <code>'!autodocs'</code>로 뺀다</li>
+    <li>사이드바 순서: 시작하기(첫 페이지, 브랜드 명세, Salesforce 이용 약관) → Foundations → 컴포넌트(기본, 밀버스 추가)</li>
+    <li>2026-10-13 갱신: 2026-10-09에 "다음 단계(계획)"로 적었던 <code>pnpm milvus storybook</code>은 구현됐다(Task 17·18, <a href="#modes">두 모드</a>)</li>
   </ul>
   <aside class="legacy"><strong>이전 설계 (2026-10-09 갱신)</strong>예전 계획은 L1 <code>theme.json</code>(색) / L2 <code>logo.png</code> / L3 <code>brands/&lt;브랜드&gt;/root.css</code>(<code>--milvus-*</code>만, <code>--slds-g-*</code>는 읽기만) 세 층이었다. 또 <code>scripts/create-project.mjs --brand X --components badge,button</code>로 브랜드·컴포넌트별 Storybook을 따로 만들려 했다. root.css는 util.css로 합쳤고, create-project.mjs는 <code>pnpm milvus init</code>(Task 11 구현, 2026-10-12 갱신)으로 바뀌었다.</aside>
-  <p class="sources">출처: <a href="https://storybook.js.org/docs/essentials/toolbars-and-globals?renderer=web-components">Storybook — Toolbars &amp; globals</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/configure/user-interface/theming">Storybook — Theming</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/configure/integration/images-and-assets">Storybook — staticDirs</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (BrandingSet, loadStyle 도달 범위)</a> (확인 2026-10-09) · <a href="../README.md">README 2장 (util.css 규칙, #18)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 기본 우선, 맨 앞 대체 표 (create-project.mjs → milvus init), 4.1 <code>milvus init</code>, 4.2 <code>milvus storybook</code></a> (확인 2026-10-12)</p>
+  <p class="sources">출처: <a href="https://storybook.js.org/docs/essentials/toolbars-and-globals?renderer=web-components">Storybook — Toolbars &amp; globals</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/configure/user-interface/theming">Storybook — Theming</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/writing-docs/autodocs">Storybook — Automatic documentation (<code>!autodocs</code>)</a> (확인 2026-10-13) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (BrandingSet, loadStyle 도달 범위)</a> (확인 2026-10-09) · <a href="../README.md">README 2장 (util.css 규칙, #18)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 기본 우선, 맨 앞 대체 표 (create-project.mjs → milvus init), 4.1 <code>milvus init</code>, 4.2 <code>milvus storybook</code>, 5.2 util.css 규칙, 6.1 명세 페이지, 9.5 원본과 hook</a> (확인 2026-10-13)</p>
 </section>
 
 <section id="quiz" class="quiz">
@@ -363,13 +539,19 @@ pnpm exec storybook build -o out/sb  <span class="c"># 출력 폴더를 바꿀 �
   <details><summary>Q5. 툴바에서 <code>Sample_Forest</code>를 골랐다가 <code>Milvus_DesignSystem</code>으로 돌아오면 각진 모서리가 남나?</summary>
     <p>남지 않는다. <code>applyBrand</code>가 <code>&lt;style id="milvus-brand-util"&gt;</code>의 내용을 새 브랜드의 util.css로 바꾸고(없으면 빈 문자열), 이전 팔레트도 지운 뒤 다시 넣는다.</p></details>
   <details><summary>Q6. 기획자에게 Storybook을 보여 주려면?</summary>
-    <p><code>pnpm build-storybook</code>으로 <code>storybook-static</code>을 만들어 정적 호스팅에 올리고 링크를 공유한다. 개발 서버나 org가 필요 없다.</p></details>
-  <p class="sources">출처: <a href="https://storybook.js.org/docs/releases/migration-guide-from-older-version">Storybook — Migration guide (8 → 9)</a> (확인 2026-10-09) · <a href="https://github.com/storybookjs/storybook/blob/next/MIGRATION.md">Storybook MIGRATION.md (addon-essentials 삭제, addon-docs 직접 설치, <code>initialGlobals</code>)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/writing-stories?renderer=web-components">Storybook — Writing stories (web components)</a> (확인 2026-10-09) · <a href="https://lit.dev/docs/templates/expressions/">Lit — Expressions (<code>.</code> property 바인딩)</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes">MDN — HTML attribute reference</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/essentials/toolbars-and-globals?renderer=web-components">Storybook — Toolbars &amp; globals (initialGlobals)</a> (확인 2026-10-09) · <a href="https://vite.dev/guide/features#disabling-css-injection-into-the-page">Vite — CSS <code>?inline</code></a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/sharing/publish-storybook">Storybook — Publish Storybook</a> (확인 2026-10-09)</p>
+    <p><code>pnpm build-storybook</code>으로 <code>storybook-static</code>을 만들어 정적 호스팅에 올리고 링크를 공유한다. 개발 서버나 org가 필요 없다. 다만 정적 사이트에서는 브랜드 명세 페이지의 입력이 꺼진다(저장할 서버가 없다).</p></details>
+  <details><summary>Q7. 같은 <code>.storybook/</code> 설정이 이 저장소와 고객 프로젝트에서 다른 브랜드를 보여 준다. 무엇으로 갈리나? (2026-10-13 추가)</summary>
+    <p>환경 변수 <code>MILVUS_PROJECT_DIR</code>다. <code>pnpm milvus storybook</code>이 프로젝트 실경로를 넣어 주면 <code>main.ts</code>가 프로젝트 모드로 플러그인을 만든다. 플러그인의 가상 모듈 <code>virtual:milvus-brands</code>가 저장소면 <code>brands/</code>, 프로젝트면 <code>BrandingSet</code>과 <code>staticresources/</code>에서 브랜드를 만든다. <code>brand.ts</code>는 어느 쪽이든 같은 모양의 목록을 받는다.</p></details>
+  <details><summary>Q8. 회의실의 다른 노트북에서 내 PC의 프로젝트 Storybook을 보여 주려고 IP 주소로 열었다. 왜 안 되고, 어떻게 보여 주나? (2026-10-13 추가)</summary>
+    <p><code>pnpm milvus storybook</code>은 개발 서버를 <code>--host localhost</code>로 띄운다. 프로젝트 모드는 프로젝트 폴더를 서빙할 수 있게 열어 두므로, 모든 네트워크 주소에서 들으면 같은 네트워크의 다른 PC에 프로젝트 파일이 열리기 때문이다. 보여 주려면 <code>pnpm milvus storybook build</code>로 정적 사이트를 만들어 공유한다. 요청 파일 저장(미들웨어)도 같은 PC에서 온 요청만 받는다.</p></details>
+  <details><summary>Q9. "원본과 hook"의 원본 탭에서 <code>button.css</code>를 보니 고치고 싶은 값이 있다. 그 파일을 고치면 org 버튼이 바뀌나? (2026-10-13 추가)</summary>
+    <p>바뀌지 않는다. 원본은 설치된 npm 패키지의 파일이고, org는 Salesforce가 내려주는 기본 컴포넌트를 쓴다. 고쳐도 내 Storybook만 바뀐다. 그 값이 hook으로 바뀌는지는 같은 페이지의 hook 표와 "hook이 닿지 않는 선언" 표에서 보고, 바꾸고 싶으면 브랜드 명세 페이지에 요청한다.</p></details>
+  <p class="sources">출처: <a href="https://storybook.js.org/docs/releases/migration-guide-from-older-version">Storybook — Migration guide (8 → 9)</a> (확인 2026-10-09) · <a href="https://github.com/storybookjs/storybook/blob/next/MIGRATION.md">Storybook MIGRATION.md (addon-essentials 삭제, addon-docs 직접 설치, <code>initialGlobals</code>)</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/writing-stories?renderer=web-components">Storybook — Writing stories (web components)</a> (확인 2026-10-09) · <a href="https://lit.dev/docs/templates/expressions/">Lit — Expressions (<code>.</code> property 바인딩)</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes">MDN — HTML attribute reference</a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/essentials/toolbars-and-globals?renderer=web-components">Storybook — Toolbars &amp; globals (initialGlobals)</a> (확인 2026-10-09) · <a href="https://vite.dev/guide/features#disabling-css-injection-into-the-page">Vite — CSS <code>?inline</code></a> (확인 2026-10-09) · <a href="https://storybook.js.org/docs/sharing/publish-storybook">Storybook — Publish Storybook</a> (확인 2026-10-09) · <a href="https://vite.dev/config/server-options#server-fs-allow">Vite — <code>server.fs.allow</code> (Q8)</a> (확인 2026-10-13) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC 개발자 가이드 — SLDS Styling Hooks (Q9: CSS 덮어쓰기 미지원)</a> (확인 2026-10-13) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 4.2 (Q7·Q8), 9.5 (Q9)</a> (확인 2026-10-13)</p>
 </section>
 
 <footer class="doc-foot">
   <span>밀버스 디자인 시스템 · Learn 03</span>
-  <span>2026-09-26 작성, 2026-10-09 갱신 (출처 확인, 브랜드 decorator·로고·프로젝트 적용을 지금 저장소에 맞춤). 버전 정보는 npm과 storybook.js.org 공식 문서로 확인함</span>
+  <span>2026-09-26 작성, 2026-10-09 갱신 (출처 확인, 브랜드 decorator·로고·프로젝트 적용을 지금 저장소에 맞춤), 2026-10-13 갱신 (M5: 설정 <code>.ts</code> 전환, 두 모드와 Vite 플러그인, 브랜드 명세 페이지, 원본과 hook 보기). 버전 정보는 npm과 storybook.js.org 공식 문서, Vite·Salesforce 내용은 vite.dev와 Salesforce 공식 문서로 확인함</span>
 </footer>
 </main>
 </div>

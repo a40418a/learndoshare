@@ -32,6 +32,7 @@
     <li><a href="#plugins">plugin과 marketplace</a></li>
     <li><a href="#hooks">hook과 permissions: 반드시 막아야 할 때</a></li>
     <li><a href="#runbook">밀버스 런북: init이 만드는 것</a></li>
+    <li><a href="#brand-flow">브랜드 요청 → 반영 흐름</a></li>
     <li><a href="#deploy">배포 형태 비교</a></li>
     <li><a href="#ponytail">Ponytail</a></li>
     <li><a href="#project">우리 프로젝트 적용</a></li>
@@ -45,7 +46,7 @@
   <div class="eyebrow">LEARN 08 · Phase 6 준비</div>
   <h1>Claude Code 런북</h1>
   <p class="lead">밀버스 디자인 시스템을 각 프로젝트의 Claude Code가 "런북"처럼 따라 쓰게 만드는 방법을 정리한다. CLAUDE.md, skill, plugin, hook, permissions의 차이와 과잉 구현을 줄이는 Ponytail 플러그인을 함께 다룬다.</p>
-  <div class="meta"><span>예상 1시간</span><span>선행: 03 Storybook · 05 테마 동기화 · 07 pnpm</span><span>2026-10-09 code.claude.com 공식 문서로 다시 확인 · 2026-10-12 갱신 (init, hook, 배포 뒤 할 일)</span></div>
+  <div class="meta"><span>예상 1시간</span><span>선행: 03 Storybook · 05 테마 동기화 · 07 pnpm</span><span>2026-10-09 code.claude.com 공식 문서로 다시 확인 · 2026-10-12 갱신 (init, hook, 배포 뒤 할 일) · 2026-10-13 갱신 (브랜드 요청 → 반영 흐름)</span></div>
 </header>
 
 <section id="why">
@@ -60,9 +61,9 @@
     <div class="arrow">→</div>
     <div class="step"><b>④ pnpm milvus deploy</b>배포 계획 확인 → 채팅 승인 → org에 적용</div>
   </div>
-  <p>이 네 단계를 Claude가 순서대로, 금지 사항을 지키며 수행하게 만드는 문서 묶음을 이 문서에서는 <b>런북</b>이라고 부른다. 위 흐름은 패키지·CLI 설계의 흐름이다(<a href="../docs/specs/2026-10-08-milvus-package-design.md">설계</a> 0장). 2026-10-12 갱신: ①의 <code>init</code>과 ③의 <code>check</code>, <code>.claude</code> 묶음의 permissions와 hook은 구현됐다(Task 11·12). 브랜드 명세 페이지, <code>milvus-brand</code> skill과 <code>milvus-design.md</code>의 내용, <code>deploy</code>는 <span class="tag info">계획</span>이다.</p>
+  <p>이 네 단계를 Claude가 순서대로, 금지 사항을 지키며 수행하게 만드는 문서 묶음을 이 문서에서는 <b>런북</b>이라고 부른다. 위 흐름은 패키지·CLI 설계의 흐름이다(<a href="../docs/specs/2026-10-08-milvus-package-design.md">설계</a> 0장). 2026-10-12 갱신: ①의 <code>init</code>과 ③의 <code>check</code>, <code>.claude</code> 묶음의 permissions와 hook은 구현됐다(Task 11·12). 2026-10-13 갱신: ②의 브랜드 명세 페이지(Task 19)와 ③의 <code>milvus-brand</code> skill·<code>milvus-design.md</code> 내용(Task 20)도 구현됐다. ④ <code>deploy</code>만 <span class="tag info">계획</span>(Task 22)이다. ②에서 ④까지는 <a href="#brand-flow">브랜드 요청 → 반영 흐름</a>에 자세히 적었다.</p>
   <div class="callout key"><strong>기본 우선 (2026-10-09 갱신)</strong>기본 상태는 Salesforce 기본 모양에 브랜드 색·로고만 바꾼 것이다. 색·로고는 공식 기능인 <code>BrandingSet</code> 메타데이터로 배포한다. <code>init</code> 직후 util.css(<code>milvusBrand.css</code>)는 비어 있고, 브랜드 요청이 있을 때만 모양을 바꾼다(설계 1장, 10/9 결정). 이전의 4단계 흐름은 <a href="#runbook">밀버스 런북: init이 만드는 것</a>의 "이전 설계"에 있다.</div>
-  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/skills">Claude Code — Skills</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (BrandingSet 배포, loadStyle 범위)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (0장 흐름, 1장 기본 우선, 4.1 init, 4.3 check, 7장 .claude 묶음)</a> (확인 2026-10-12)</p>
+  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/skills">Claude Code — Skills</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (BrandingSet 배포, loadStyle 범위)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (0장 흐름, 1장 기본 우선, 4.1 init, 4.3 check, 4.4 deploy, 6장 명세 페이지·skill, 7장 .claude 묶음)</a> (확인 2026-10-13)</p>
 </section>
 
 <section id="concepts">
@@ -74,11 +75,11 @@
     <tr><td>언제 컨텍스트에 들어가나</td><td>세션 시작 시 매번</td><td>평소엔 이름과 description만. 호출될 때 본문 전체</td><td>설치·활성화한 뒤 구성 요소별 규칙대로</td></tr>
     <tr><td>호출</td><td>자동</td><td>Claude가 description을 보고 자동으로, 또는 사용자가 <code>/이름</code></td><td>플러그인 skill은 <code>/플러그인:skill</code></td></tr>
     <tr><td>강제력</td><td>없음 (컨텍스트일 뿐)</td><td>없음</td><td>안에 든 hook은 강제 가능</td></tr>
-    <tr><td>밀버스에서 (2026-10-12 갱신)</td><td><code>init</code>이 <code>@milvus-design.md</code> 한 줄을 더해 밀버스 안내서를 불러온다(구현). 안내서 내용은 <span class="tag info">계획</span>(Task 20)</td><td><code>milvus-brand</code>: 브랜드 요청 반영 절차. <code>init</code>이 틀을 놓고, 내용은 <span class="tag info">계획</span>(Task 20)</td><td>쓰지 않는다. 마켓플레이스는 범위 밖 (설계 0장)</td></tr>
+    <tr><td>밀버스에서 (2026-10-13 갱신)</td><td><code>init</code>이 <code>@milvus-design.md</code> 한 줄을 더해 밀버스 안내서를 불러온다. 안내서는 8개 절, 200줄 이하(Task 20 구현)</td><td><code>milvus-brand</code>: 브랜드 요청 반영 절차. <code>init</code>이 복사하고, 내용은 Task 20 구현(<a href="#brand-flow">아래 흐름</a>)</td><td>쓰지 않는다. 마켓플레이스는 범위 밖 (설계 0장)</td></tr>
   </table></div>
   <div class="callout key"><strong>"지시"와 "강제"는 다르다</strong>공식 문서는 CLAUDE.md를 "강제되는 설정이 아니라 컨텍스트"로 설명하고, Claude의 판단과 무관하게 동작을 막으려면 <b>PreToolUse hook</b>을 쓰라고 안내한다. settings의 <b>permissions</b> 규칙(deny·ask)도 Claude의 판단과 무관하게 적용된다. 금지 목록 중 정말 치명적인 것은 hook이나 permissions로 한 번 더 막는다.</div>
   <p>예전의 커스텀 slash command(<code>.claude/commands/deploy.md</code>)는 skill에 통합됐다. <code>.claude/commands/deploy.md</code>와 <code>.claude/skills/deploy/SKILL.md</code>는 둘 다 <code>/deploy</code>를 만들고 똑같이 동작한다. 기존 command 파일은 계속 동작하지만 새로 만들 때는 skill을 쓴다.</p>
-  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/skills">Claude Code — Skills</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins">Claude Code — Plugins overview</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/permissions">Claude Code — Configure permissions</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (3장 init이 만드는 파일, 7.1 milvus-design.md)</a> (확인 2026-10-12)</p>
+  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/skills">Claude Code — Skills</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins">Claude Code — Plugins overview</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/permissions">Claude Code — Configure permissions</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (3장 init이 만드는 파일, 6.2 skill 흐름, 7.1 milvus-design.md)</a> (확인 2026-10-13)</p>
 </section>
 
 <section id="memory">
@@ -244,9 +245,9 @@ exit 0</code></pre>
   <p>2026-10-12 갱신. 이 절은 원래 "런북 설계 (계획)"이었다. 이제 <code>pnpm milvus init</code>이 아래 파일을 프로젝트에 만든다(Task 11, <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계</a> 3장·4.1·7장). 이 절은 Claude Code와 관련된 파일을 중심으로 다룬다.</p>
   <div class="table-wrap"><table>
     <tr><th>파일</th><th>구분</th><th>내용</th><th>지금 상태</th></tr>
-    <tr><td><code>milvus-design.md</code></td><td>관리</td><td>세팅 안내서이자 Claude 규칙. 200줄 이하. 준비물, 세팅 순서, 배포 뒤 사람이 할 일, 파일 지도, 디자인 규칙, 배포 안전장치</td><td>틀(주석 한 줄). 내용은 <span class="tag info">계획</span>(Task 20)</td></tr>
+    <tr><td><code>milvus-design.md</code></td><td>관리</td><td>세팅 안내서이자 Claude 규칙. 200줄 이하. 준비물, 세팅 순서, 배포 뒤 사람이 할 일, 파일 지도, 디자인 규칙, Claude에게 시키는 법, 배포 안전장치, 문제 해결</td><td>구현(Task 20, 2026-10-13 갱신. <code>templates/milvus-design.md</code>, 8개 절)</td></tr>
     <tr><td><code>CLAUDE.md</code></td><td>소유</td><td><code>@milvus-design.md</code> 한 줄을 더한다. 파일이 없으면 이 한 줄로 만든다</td><td>구현</td></tr>
-    <tr><td><code>.claude/skills/milvus-brand/SKILL.md</code></td><td>관리</td><td>브랜드 요청 → 브랜드 명세 표 제안 → 승인 → <code>BrandingSet</code>·<code>milvusBrand.css</code> 작성 → <code>pnpm milvus check</code></td><td>틀(주석 한 줄). 내용은 <span class="tag info">계획</span>(Task 20)</td></tr>
+    <tr><td><code>.claude/skills/milvus-brand/SKILL.md</code></td><td>관리</td><td>브랜드 요청 → 브랜드 명세 표 제안 → 승인 → <code>BrandingSet</code>·<code>milvusBrand.css</code> 작성 → <code>pnpm milvus check</code> → <code>반영:</code> 줄</td><td>구현(Task 20, 2026-10-13 갱신. <a href="#brand-flow">아래 흐름</a>)</td></tr>
     <tr><td><code>.claude/hooks/milvus-check.mjs</code></td><td>관리</td><td>util.css·override·브랜드 메타데이터를 고친 뒤 패키지 CLI의 <code>check --style</code>을 실행한다</td><td>구현(Task 12)</td></tr>
     <tr><td><code>.claude/settings.json</code></td><td>소유</td><td>아래 permissions와 hook을 기존 설정에 병합한다. 사용자가 넣은 항목은 지우거나 바꾸지 않는다</td><td>구현</td></tr>
     <tr><td><code>milvus.config.json</code></td><td>생성</td><td>설치된 패키지 버전, 대상 org 별칭, 브랜드 이름, VF 포함 여부, 밀버스 관리 파일 목록과 sha256</td><td>구현</td></tr>
@@ -353,7 +354,7 @@ exit 0</code></pre>
     <li><b>pnpm을 거치지 않는다:</b> <code>pnpm milvus check --style</code> 대신, 프로젝트의 <code>node_modules</code>에서 <code>@a40418a/milvus-design-system/package.json</code>을 찾아 그 패키지의 <code>dist/cli/index.js</code>를 지금 실행 중인 node(<code>process.execPath</code>)로 직접 실행한다. pnpm 기동 시간(약 0.3초)과 Windows에서 <code>pnpm.cmd</code>를 실행하려면 셸이 필요한 문제를 없앤다. 인자는 배열로 넘기고 셸을 쓰지 않는다. 찾는 시작 위치는 <code>CLAUDE_PROJECT_DIR</code>, 없으면 hook 입력의 <code>cwd</code>다. 패키지를 찾지 못하면 한국어 오류로 1이다</li>
     <li><b><code>check --style</code>이 보는 것:</b> util.css 규칙과 피드백 색 대비(설계 5.2·5.3), <code>milvusOverride.css</code>의 경고 규칙(5.1), <code>milvus.config.json</code> 브랜드의 <code>LEXTHEMING&lt;브랜드&gt;</code> BrandingSet의 <code>BRAND_COLOR</code> 형식(<code>#RRGGBB</code>). 다른 BrandingSet(Experience Cloud 사이트 등)은 보지 않는다. 정규식 수준이라 200ms 안에 끝난다(<code>tests/check.test.ts</code>)</li>
     <li><b>결과 전달:</b> 위 <a href="#hooks">PostToolUse 표</a>대로 나눈다. 고칠 것이 있으면 <code>check</code>가 2로 끝나고, hook은 stderr(고칠 값)를 그대로 넘기며 2로 끝난다. Claude가 그 값을 보고 고친다. <code>milvusOverride.css</code> 경고만 있으면 <code>check</code>는 0으로 끝나는데, 0이면 stderr가 Claude에게 가지 않는다. 그래서 hook이 경고 문장("공식 권고 밖" 포함)을 <code>additionalContext</code>로 stdout에 쓴다. 경고도 없으면 아무것도 쓰지 않는다</li>
-    <li>커밋된 설정의 hook은 팀원에게도 별도 동의 없이 실행되므로 hook은 하나만 둔다. 그 사실은 Task 20에서 <code>milvus-design.md</code>에 적는다(설계 7.2, <span class="tag info">계획</span>)</li>
+    <li>커밋된 설정의 hook은 팀원에게도 별도 동의 없이 실행되므로 hook은 하나만 둔다. 설계 7.2는 이 사실을 <code>milvus-design.md</code>에 적으라고 하지만, 2026-10-13의 템플릿(<code>templates/milvus-design.md</code>)에는 4절 파일 지도의 hook 파일 한 줄만 있고 이 문장은 없다</li>
   </ul>
 
   <h3>바뀐 hook 계획</h3>
@@ -374,7 +375,7 @@ exit 0</code></pre>
   </ul>
 
   <h3>배포 뒤 사람이 org에서 할 일</h3>
-  <p>메타데이터로 할 수 없어서 <code>deploy</code>가 대신하지 못하는 일이 둘 있다. <code>init</code>이 끝날 때 이 둘을 안내한다(VF 줄은 VF를 포함할 때만). <code>milvus-design.md</code>에는 Task 20에서 적는다(<span class="tag info">계획</span>, 설계 7.1, 결정 D2·D3).</p>
+  <p>메타데이터로 할 수 없어서 <code>deploy</code>가 대신하지 못하는 일이 둘 있다. <code>init</code>이 끝날 때 이 둘을 안내한다(VF 줄은 VF를 포함할 때만). <code>milvus-design.md</code> 3절에도 체크리스트로 적었고, <code>milvus-brand</code> skill은 배포가 끝나면 이 둘을 알린다(Task 20, 2026-10-13 갱신. 설계 7.1, 결정 D2·D3).</p>
   <ol>
     <li><b>VF를 쓰면:</b> Setup → User Interface → Visualforce Settings에서 "Use SLDS 2 for pages that include &lt;apex:slds&gt; when an SLDS 2 theme is active"를 켠다. Help에 따르면 이 설정을 켜고 SLDS 2 테마를 써야 <code>&lt;apex:slds&gt;</code>를 쓰는 VF 페이지가 SLDS 2 스타일시트를 쓴다. 2026-10-09 프로브에서 이 설정은 Metadata API로 읽거나 배포할 수 없었다(<a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html#vf">00 개념 6절</a>)</li>
     <li><b>앱 전체에 브랜드를 걸려면:</b> App Manager에서 앱마다 유틸리티 바에 <code>milvusBrandLoader</code>를 추가하고 "앱이 열릴 때 백그라운드로 로드"를 체크한다. 안 하면 밀버스 컴포넌트가 있는 페이지에만 브랜드 CSS가 들어간다. <code>deploy</code>는 고객 앱 메타데이터를 바꾸지 않는다(<a href="02-LWC%20%EA%B8%B0%EC%B4%88.html#shared">02 LWC</a>)</li>
@@ -382,6 +383,86 @@ exit 0</code></pre>
 
   <aside class="legacy"><strong>이전 설계 (2026-10-09 갱신)</strong>이 절은 원래 다른 런북을 설명했다. 흐름은 ① org 테마 → ② <code>pnpm sync:theme</code> → ③ Claude가 <code>brands/&lt;브랜드&gt;/root.css</code>의 허용 변수(<code>brands/ALLOWLIST.md</code>)만 수정 → ④ <code>node scripts/create-project.mjs</code>로 프로젝트 Storybook 생성이었다. skill은 <code>milvus-init</code> 하나, <code>lightning-button</code> 자체의 모양은 opt-in <code>override.css</code>로 바꾸는 안이었다. 지금은 <code>root.css</code>·<code>override.css</code>가 <code>milvusBrand.css</code>(util.css) 하나로, <code>create-project.mjs</code>가 <code>pnpm milvus init</code>으로, <code>milvus-init</code>이 <code>milvus-brand</code>로 바뀌었다. <code>pnpm sync:theme</code>은 디자인 시스템 저장소의 데모 브랜드에만 남고, 프로젝트에서는 <code>init --from-org</code>가 같은 일을 한다.</aside>
   <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project (@import, 외부 import 승인)</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/permissions">Claude Code — Configure permissions</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/hooks-guide">Claude Code — Automate actions with hooks</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/hooks">Claude Code — Hooks reference (PostToolUse 종료 코드, additionalContext, CLAUDE_PROJECT_DIR, cwd)</a> (확인 2026-10-12) · <a href="https://nodejs.org/api/module.html">Node.js — node:module API (module.createRequire)</a> (확인 2026-10-12) · <a href="https://nodejs.org/api/child_process.html">Node.js — Child process (Spawning .bat and .cmd files on Windows: 터미널 없이 실행되지 않아 셸이나 cmd.exe가 필요)</a> (확인 2026-10-12) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_settings.htm&amp;type=5">Salesforce Help — User Interface Settings (Visualforce Settings)</a> (확인 2026-10-12) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/use-config-for-utility-bar.html">LWC Developer Guide — Configure a Component for the Utility Bar</a> (확인 2026-10-12) · <a href="../docs/research/2026-10-09-org-probe.md">org 프로브 2차 기록 3.7 (유틸리티 바 백그라운드 로드), 3.8 (VF 설정, Metadata API에 없음)</a> (확인 2026-10-12) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (맨 앞 대체 표, 1장 D1~D3, 3장, 4.1 init, 4.3 check, 7.1·7.2, 14장)</a> (확인 2026-10-12) · <a href="../README.md">README 11장 (hook H2·H4·H7·H8), 4장 Phase 1</a> (확인 2026-10-09)</p>
+</section>
+
+<section id="brand-flow">
+  <h2>브랜드 요청 → 반영 흐름</h2>
+  <p>2026-10-13 추가. 명세 페이지에 적은 요청이 org 배포까지 가는 길이다. 명세 페이지(Task 19), <code>milvus-brand</code> skill과 <code>milvus-design.md</code>(Task 20), hook(Task 12)은 구현됐다. 마지막 <code>pnpm milvus deploy</code>는 <span class="tag info">계획</span>(Task 22)이라 설계대로 적는다.</p>
+  <div class="flow">
+    <div class="step"><b>① 저장</b>명세 페이지 → <code>milvus-brand-request.md</code></div>
+    <div class="arrow">→</div>
+    <div class="step"><b>② skill</b>"브랜드 요청 반영해줘" → 명세 표 제안 → 승인</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>③ 작성</b>반영 순서대로 파일을 고친다. 고칠 때마다 hook이 <code>check --style</code></div>
+    <div class="arrow">→</div>
+    <div class="step"><b>④ 확인</b><code>pnpm milvus check</code>, Storybook 자동 갱신, <code>반영:</code> 줄</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>⑤ 배포</b><code>deploy</code> 계획 → 채팅 승인 → <code>--yes</code>(한 번 더 물음)</div>
+  </div>
+
+  <h3>개념</h3>
+  <ul>
+    <li><b>파일로 넘긴다:</b> 명세 페이지(브라우저)와 Claude Code(터미널)는 서로를 직접 부르지 않는다. 프로젝트 루트의 Markdown 파일 하나를 사이에 둔다. 사람이 편집기로 열어 고칠 수도 있고 git으로 남길 수도 있다</li>
+    <li><b>skill:</b> <code>SKILL.md</code>에 적은 절차다. 평소에는 description만 컨텍스트에 있고, Claude가 description을 보고 지금 요청과 관련 있다고 판단하거나 사용자가 <code>/skill-name</code>으로 부르면 본문 전체가 들어온다. 프로젝트 skill은 <code>.claude/skills/&lt;이름&gt;/SKILL.md</code>에 둔다(<a href="#skills">skill 자세히</a>)</li>
+    <li><b>지시와 강제:</b> skill과 <code>milvus-design.md</code>는 Claude가 따르는 지시다. 반드시 지켜야 하는 것은 hook과 permissions가 맡는다. <code>PostToolUse</code> hook이 2로 끝나면 stderr가 Claude에게 가고(도구는 이미 실행됨), 0으로 끝난 hook의 stderr는 Claude가 보지 못한다. permissions 규칙은 deny → ask → allow 순서로 보고, Bash의 <code>ask</code> 규칙은 auto 모드에서도 묻는다</li>
+    <li><b>permissions 규칙의 한계:</b> Bash 규칙은 Claude가 쓴 명령 문자열에 맞춘다. 공식 문서는 같은 프로그램을 다른 형태로 부르면 규칙에 맞지 않으므로, deny·ask 규칙이 그 프로그램을 둘러싼 보안 경계는 아니라고 적는다. 그래서 밀버스는 <code>milvus deploy</code>의 실행 형태 4가지를 모두 ask에 넣고, 채팅 승인도 skill 절차로 따로 요구한다</li>
+  </ul>
+
+  <h3>Salesforce에서는</h3>
+  <p>반영 순서는 Salesforce가 공식으로 열어 둔 수단부터 쓰고, 공식 권고 밖의 수단은 뒤로 미룬다는 원칙이다. 판단의 자세한 근거는 <a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html#button">01 밀버스의 대응 순서</a>에 있다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>순서</th><th>수단</th><th>Salesforce 공식 입장</th></tr>
+    <tr><td>1</td><td>org 테마: <code>BrandingSet</code>의 <code>BRAND_COLOR</code>·<code>BRAND_IMAGE</code></td><td><span class="tag ok">공식 기능</span> Setup의 Themes and Branding에서 만드는 커스텀 테마다. Activate하면 모든 사용자에게 적용된다(Help). 메타데이터 <code>BrandingSet</code>으로 배포한다(Metadata API)</td></tr>
+    <tr><td>2</td><td>global hook <code>--slds-g-*</code></td><td><span class="tag warn">공식 권고 밖</span> 값은 SLDS가 정하고 Salesforce가 언제든 바꿀 수 있다. 고객 코드에서 덮어쓰는 것은 지원하지 않는다(Styling Hook Index)</td></tr>
+    <tr><td>3</td><td>컴포넌트 hook <code>--slds-s-*</code></td><td><span class="tag warn">공식 권고 밖</span> 공식 SLDS Linter가 내부용(private)으로 분류한다(<a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html#hooks">01 styling hook</a>). 공식 문서의 컴포넌트 hook <code>--slds-c-*</code>는 SLDS 2에서 아직 지원하지 않는다(LWC 개발자 가이드)</td></tr>
+    <tr><td>4</td><td>브리지 변수 <code>--milvus-*</code></td><td><span class="tag warn">공식 권고 밖</span> hook이 없는 항목을 패키지의 클래스 규칙이 잇는다(<a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html#bridge">01 브리지</a>). LWC 개발자 가이드는 SLDS 클래스 덮어쓰기를 지원하지 않는다고 적는다. native 전환 시 잃는다</td></tr>
+    <tr><td>5</td><td><code>milvusOverride.css</code></td><td><span class="tag warn">공식 권고 밖</span> 프로젝트가 직접 쓰는 클래스 규칙이다. 같은 이유로 마지막 수단이다(<a href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html">09</a>)</td></tr>
+  </table></div>
+
+  <h3>밀버스에서는</h3>
+  <h4>① 명세 페이지에서 저장</h4>
+  <p>프로젝트에서 <code>pnpm milvus storybook</code>을 띄우고 <b>시작하기 / 브랜드 명세</b>에 적어 저장하면 프로젝트 루트에 <code>milvus-brand-request.md</code>가 생긴다(형식과 저장 규칙은 <a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html#spec">03 브랜드 명세 페이지</a>). 저장이 안 되면 채팅에 직접 써도 된다.</p>
+  <h4>② <code>milvus-brand</code> skill이 읽고 표로 제안</h4>
+  <ul>
+    <li>Claude Code에 "브랜드 요청 반영해줘"라고 하면, skill의 description에 이 문장과 "버튼을 더 둥글게" 같은 예가 들어 있어 Claude가 skill을 불러올 수 있다. <code>/milvus-brand</code>로 직접 불러도 된다</li>
+    <li>skill은 요청 파일(없으면 채팅)을 읽는다. 절 제목은 명세 항목 이름이고, 모르는 제목의 절은 사용자 메모로 보고 그대로 둔다. 요청이 자연어가 아니면 입력 형식 5종(자연어, 디자인 토큰 JSON, Figma, PDF·이미지, URL)에 맞춰 값을 뽑는다(설계 6.4)</li>
+    <li>파일을 고치기 전에 <b>브랜드 명세 표</b>를 채팅으로 낸다. 칸은 항목, 적용 값, 쓰는 곳(hook·브리지 변수·파일), 출처, 확정/추정, 반영하지 못하는 요구와 대안이다. 이미지에서 읽은 색처럼 추정한 값은 추정이라고 적고, 4·5번 수단을 쓰는 행에는 한계를 함께 적는다</li>
+    <li><b>사용자 승인 전에는 파일을 쓰지 않는다.</b> 고칠 점을 들으면 표를 다시 낸다</li>
+  </ul>
+  <h4>③ 반영 순서대로 작성</h4>
+  <ul>
+    <li>앞 단계로 되는 요구를 뒤 단계로 풀지 않는다. 브랜드 색·로고는 <code>BrandingSet</code>(로고는 <code>contentassets/</code>에 복사하고 <code>BRAND_IMAGE</code>를 둔다), 모양·중립 색·피드백 색·브리지 변수 값은 <code>milvusBrand.css</code>의 <code>:root</code> 블록 하나에 쓴다. hook·브리지로 안 되는 모양만 <code>milvusOverride.css</code>에 쓰고 "공식 권고 밖"이라고 알린다</li>
+    <li>Salesforce 고정 항목(토스트 표시 시간, z-index, 아이콘 모양 등, 설계 9.4)은 바꿀 수 없다고 답하고 목록을 보여 준다. override로도 우회하지 않는다. 모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다</li>
+    <li>밀버스 관리 파일(<code>lwc/milvus*</code>, <code>milvusBridge.css</code>, <code>milvus-design.md</code>, 이 skill 등)은 고치지 않는다. <code>permissions.deny</code>의 <code>Edit(...)</code> 규칙도 막는다(<a href="#runbook">위 settings.json</a>)</li>
+  </ul>
+  <h4>④ hook이 검사하고 Claude가 고친다</h4>
+  <ul>
+    <li><code>milvusBrand.css</code>·<code>milvusOverride.css</code>·<code>brandingSets/</code>를 고칠 때마다 <code>PostToolUse</code> hook(<code>milvus-check.mjs</code>)이 <code>check --style</code>을 실행한다. util.css 규칙, 대비, <code>BRAND_COLOR</code> 형식을 어기면 2로 끝나고 고칠 값이 stderr로 Claude에게 간다. skill은 막히면 출력에 적힌 고칠 값대로 바로 고치라고 지시한다</li>
+    <li>override 경고만 있으면 0으로 끝나므로 hook이 경고를 <code>additionalContext</code>로 넘긴다(<a href="#hooks">위 PostToolUse 표</a>)</li>
+    <li>2026-10-13 추가(Task 20): 움직임 시간 변수(<code>--milvus-motion-duration-*</code>)에 단위 없는 숫자를 쓰면 막는다. 브리지의 <code>max()</code>가 무효가 되어 모달·토스트가 닫히지 않을 수 있기 때문이다(<a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html#bridge">01 브리지</a>)</li>
+  </ul>
+  <h4>⑤ 전체 검사와 반영 표시</h4>
+  <ul>
+    <li>다 쓰면 <code>pnpm milvus check</code>(전체: <code>--style</code> 항목, VF 팔레트 다시 만들기, 관리 파일 sha256 비교)를 실행한다. Storybook은 파일 감시로 저절로 다시 그린다(<a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html#modes">03 두 모드</a>). skill은 명세 페이지에서 화면을 확인해 달라고 안내한다</li>
+    <li>요청 파일의 제목 줄 바로 아래에 <code>반영: YYYY-MM-DD</code>를 적는다. 이미 있으면 날짜만 바꾸고, 다른 줄·빈 줄·알 수 없는 절은 지우거나 순서를 바꾸지 않는다. 명세 페이지는 이 날짜를 "Claude 반영"으로 보여 주고, 다음에 저장할 때 이 줄을 지운다. 그래서 이 줄이 있으면 "마지막 요청은 반영됐다", 없으면 "반영 전의 새 요청이 있다"로 읽는다</li>
+  </ul>
+<pre data-file="milvus-brand-request.md (반영 뒤 모양)"><code># 브랜드 요청
+반영: 2026-10-14
+저장: 2026-10-14 15:20
+
+## 브랜드 색
+…</code></pre>
+  <h4>⑥ 배포: 두 번의 승인, 두 단계의 배포 <span class="tag info">계획</span></h4>
+  <ul>
+    <li>배포는 사용자가 따로 요청했을 때만 한다. Claude는 먼저 <code>--yes</code> 없이 <code>pnpm milvus deploy</code>로 <b>계획</b>만 보여 준다. 대상 org, 지금 활성 테마 → 새 활성 테마, 배포 목록, "활성 테마 변경은 org 전체 사용자 화면에 적용됩니다" 경고가 나온다</li>
+    <li><b>승인 1 (채팅):</b> 사용자가 그 계획을 채팅에서 승인한 뒤에만 <code>pnpm milvus deploy --yes</code>를 실행한다(skill 지시)</li>
+    <li><b>승인 2 (permissions):</b> 이 명령은 <code>permissions.ask</code>의 <code>Bash(pnpm milvus deploy *)</code>에 걸려 Claude Code가 실행 전에 한 번 더 묻는다. Claude가 skill 지시를 놓쳐도 이 질문은 남는다</li>
+    <li><b>배포 1단계:</b> 밀버스 관련 메타데이터만 한 번의 배포로 올린다(프로젝트 전체가 아니다). 원자적이라 하나라도 실패하면 전부 롤백된다</li>
+    <li><b>배포 2단계:</b> 1단계가 성공했을 때만 활성 테마를 바꾼다(<code>LightningExperience</code> 설정의 <code>activeThemeName</code>). 1단계가 실패하면 실패 항목과 이유를 보여 주고 활성화하지 않는다</li>
+    <li>끝나면 확인용 <code>sf org open</code> 명령을 출력만 하고, 사람이 org에서 할 일 두 가지(<a href="#runbook">위</a>: VF 설정, <code>milvusBrandLoader</code>)를 알린다. 테마 색은 새로고침한 뒤에 보인다</li>
+  </ul>
+  <div class="callout warn"><strong>지금 상태 (2026-10-13)</strong>①~⑤의 파일과 코드는 구현됐다. 실제 Claude Code 세션에서 "브랜드 요청 반영해줘"로 skill이 불리는지는 아직 보지 않았다 <span class="tag warn">미확인</span>. <code>Edit</code> deny와 인자 없는 <code>pnpm milvus deploy</code>의 ask가 의도대로 걸리는지는 <code>learndoshare_2</code> 리허설(Task 23)에서 확인한다 <span class="tag warn">미확인</span>(설계 14장). ⑥의 <code>deploy</code> 명령은 아직 없다(Task 22, 설계 4.4).</div>
+  <p class="sources">출처: <a href="https://code.claude.com/docs/en/skills">Claude Code — Skills (description으로 자동 로드, <code>/skill-name</code>, 호출 전에는 description만 컨텍스트에, 프로젝트 skill 위치)</a> (확인 2026-10-13) · <a href="https://code.claude.com/docs/en/hooks">Claude Code — Hooks reference (PostToolUse 종료 코드 2는 stderr를 Claude에게, 0의 stderr는 보이지 않음, additionalContext)</a> (확인 2026-10-13) · <a href="https://code.claude.com/docs/en/permissions">Claude Code — Configure permissions (deny → ask → allow, auto 모드에서도 ask, Bash 규칙은 보안 경계가 아님)</a> (확인 2026-10-13) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.brand_create_custom_theme.htm&amp;type=5">Salesforce Help — Create a Custom Theme (Activate는 모든 사용자에게 적용)</a> (확인 2026-10-13) · <a href="https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/meta_brandingset.htm">Metadata API — BrandingSet (<code>BRAND_COLOR</code>, <code>BRAND_IMAGE</code>)</a> (확인 2026-10-13) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/98b493-styling-hook-index">SLDS 2 — Styling Hook Index (global hook 값은 SLDS가 정함, 덮어쓰기 미지원)</a> (확인 2026-10-13) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC 개발자 가이드 — SLDS Styling Hooks (SLDS 2는 <code>--slds-c-*</code> 미지원, SLDS 클래스 덮어쓰기 미지원)</a> (확인 2026-10-13) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (4.3 check, 4.4 deploy, 5.1 반영 순서, 6.1 요청 파일, 6.2 skill 흐름, 6.4 입력 형식, 7.1·7.2 .claude 묶음, 9.4 고정, 14장 미확인)</a> (확인 2026-10-13)</p>
 </section>
 
 <section id="deploy">
@@ -465,14 +546,14 @@ exit 0</code></pre>
 
 <section id="project">
   <h2>우리 프로젝트 적용</h2>
-  <div class="callout project"><strong>10/16 내용 동결까지 (2026-10-12 갱신)</strong>
+  <div class="callout project"><strong>10/16 내용 동결까지 (2026-10-13 갱신)</strong>
     <ul>
       <li><span class="tag ok">완료</span> GitHub Packages에 <code>v0.0.1</code>을 발행하고 토큰으로 설치되는 것을 확인했다(2026-10-09, <a href="07-pnpm.html#registry">07 pnpm</a>)</li>
       <li><span class="tag ok">완료</span> <code>init</code>과 <code>check</code>, <code>.claude</code> 묶음 복사와 <code>.claude/settings.json</code> 병합, hook(Task 11·12)</li>
+      <li><span class="tag ok">완료</span> <code>pnpm milvus storybook</code>과 두 모드(Task 17·18), 브랜드 명세 페이지와 요청 파일(Task 19), <code>milvus-brand</code> skill과 <code>milvus-design.md</code> 내용(Task 20), 컴포넌트별 원본과 hook 보기(Task 21, 리뷰 반영 중). 2026-10-13, <a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html#modes">03 Storybook</a>과 <a href="#brand-flow">위 흐름</a></li>
     </ul>
     <ol>
-      <li>permissions 규칙(<code>Edit</code> deny, 인자 없는 <code>pnpm milvus deploy</code>의 ask)을 실제 Claude Code 세션에서 확인한다: <code>learndoshare_2</code> 리허설(Task 23)</li>
-      <li>10/14: 브랜드 명세 페이지와 <code>milvus-brand</code> skill, <code>milvus-design.md</code> 내용(Task 19·20) <span class="tag info">계획</span></li>
+      <li>permissions 규칙(<code>Edit</code> deny, 인자 없는 <code>pnpm milvus deploy</code>의 ask)과 skill 호출을 실제 Claude Code 세션에서 확인한다: <code>learndoshare_2</code> 리허설(Task 23)</li>
       <li>10/15: <code>deploy</code> 리허설 <span class="tag info">계획</span></li>
       <li>10/16: <code>update</code>, 최종 발행, CLAUDE.md·README 정리 후 동결 <span class="tag info">계획</span></li>
       <li>Claude Code는 프로젝트 루트(이 저장소는 <code>learndoshare_1/</code>)에서 실행해 CLAUDE.md와 skill이 로드되는지 <code>/context</code>로 확인한다</li>
@@ -480,7 +561,7 @@ exit 0</code></pre>
     </ol>
   </div>
   <p>일정의 근거는 <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계</a> 12장이다. plugin marketplace 배포는 범위 밖이다(설계 0장).</p>
-  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project (/context)</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins/install">Install and manage plugins (설치 범위)</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (12장 일정, 0장 범위 밖, 13장 v0.0.1 발행·설치 확인, 14장 permissions 확인 항목)</a> (확인 2026-10-12)</p>
+  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project (/context)</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins/install">Install and manage plugins (설치 범위)</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (12장 일정, 0장 범위 밖, 13장 v0.0.1 발행·설치 확인, 14장 permissions 확인 항목)</a> (확인 2026-10-13)</p>
 </section>
 
 <section id="quiz" class="quiz">
@@ -501,7 +582,13 @@ exit 0</code></pre>
     <p>보지 못한다. 공식 문서에 따르면 0으로 끝난 hook의 stderr는 Claude가 보지 못하고 디버그 로그로만 확인할 수 있다. <code>PostToolUse</code>에서 Claude에게 stderr를 보여 주는 것은 종료 코드 2다. 그러나 override 경고는 막을 일이 아니라 0으로 끝내야 한다. 그래서 밀버스 hook은 경고가 있으면 stdout에 <code>{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"…"}}</code>를 쓴다(설계 7.2). Claude Code가 이 문자열을 system reminder로 도구 결과 옆에 넣는다. 고칠 값이 있을 때는 2로 끝나고 stderr를 넘긴다 (2026-10-12 추가).</p></details>
   <details><summary>Q8. <code>pnpm milvus init</code>이 아무 파일도 쓰지 않고 1로 끝났다. 무엇을 먼저 보나?</summary>
     <p>오류 문장을 읽고 사전 점검 순서대로 본다. 옵션(<code>--target-org</code>, <code>--brand</code>와 <code>--from-org</code> 중 하나, 브랜드 이름 규칙), Node 버전(22.18 이상, 23.x는 23.6 이상), <code>sfdx-project.json</code>과 기본 패키지 폴더 <code>force-app</code>, <code>.claude/settings.json</code>의 JSON 문법, <code>milvus.config.json</code> 버전과 설치된 패키지 버전(다르면 <code>update</code>), sf 설치와 org 로그인, <code>--from-org</code>라면 활성 테마가 SLDS 2 커스텀 테마인지. 점검이 하나라도 실패하면 아무것도 쓰지 않으므로 고친 뒤 다시 실행하면 된다 (2026-10-12 추가).</p></details>
-  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/hooks-guide">Claude Code — Automate actions with hooks</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/permissions">Claude Code — Configure permissions</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins/install">Install and manage plugins</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-dual-listbox.html">Lightning Component Reference — lightning-dual-listbox</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-select.html">Lightning Component Reference — lightning-select</a> (확인 2026-10-09) · <a href="https://github.com/DietrichGebert/ponytail">DietrichGebert/ponytail README (Q4 설치, Q5 사다리)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (Q6: 맨 앞 대체 표, 7.2 / Q7: 7.2 결과 전달 / Q8: 4.1 사전 점검)</a> (확인 2026-10-12) · <a href="../README.md">README 11장 (Q6: H2 세 층)</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/hooks">Claude Code — Hooks reference (Q7: 종료 코드, additionalContext)</a> (확인 2026-10-12)</p>
+  <details><summary>Q9. 명세 페이지에 "버튼을 각지게"라고 저장하고 Claude에게 "브랜드 요청 반영해줘"라고 했다. Claude가 곧바로 <code>milvusBrand.css</code>를 고치지 않고 표만 보여 준다. 잘못된 동작인가? (2026-10-13 추가)</summary>
+    <p>아니다. <code>milvus-brand</code> skill은 파일을 고치기 전에 브랜드 명세 표(적용 값, 쓰는 곳, 출처, 확정/추정, 못 하는 요구와 대안)를 내고 승인을 받으라고 지시한다. "각지게"는 global hook <code>--slds-g-radius-border-*</code>로 풀리는 요구라 2번 수단을 쓴다. 승인하면 Claude가 파일을 쓰고, hook이 <code>check --style</code>로 검사하고, 끝에 요청 파일에 <code>반영:</code> 줄을 적는다.</p></details>
+  <details><summary>Q10. "반영한 거 바로 org에 올려 줘"라고 했다. 몇 번 확인을 거치나? (2026-10-13 추가, <code>deploy</code>는 계획)</summary>
+    <p>두 번이다. Claude가 먼저 <code>--yes</code> 없는 <code>pnpm milvus deploy</code>로 계획(대상 org, 활성 테마 변화, 배포 목록, org 전체에 적용된다는 경고)을 보여 주고 채팅 승인을 받는다. 그다음 <code>pnpm milvus deploy --yes</code>를 실행할 때 <code>permissions.ask</code>가 한 번 더 묻는다. 배포 자체도 두 단계라서, 메타데이터 배포가 실패하면 활성 테마를 바꾸지 않는다.</p></details>
+  <details><summary>Q11. 요청 파일 맨 위의 <code>반영: 2026-10-14</code> 줄이 사라졌다. 누가 지웠고 무슨 뜻인가? (2026-10-13 추가)</summary>
+    <p>명세 페이지가 저장할 때 지운다. 마지막으로 반영한 뒤 새 요청이 저장됐다는 뜻이다. 다시 "브랜드 요청 반영해줘"라고 하면 skill이 새 요청을 반영하고 오늘 날짜로 그 줄을 다시 적는다.</p></details>
+  <p class="sources">출처: <a href="https://code.claude.com/docs/en/memory">Claude Code — How Claude remembers your project</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/hooks-guide">Claude Code — Automate actions with hooks</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/permissions">Claude Code — Configure permissions</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/plugins/install">Install and manage plugins</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-dual-listbox.html">Lightning Component Reference — lightning-dual-listbox</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-select.html">Lightning Component Reference — lightning-select</a> (확인 2026-10-09) · <a href="https://github.com/DietrichGebert/ponytail">DietrichGebert/ponytail README (Q4 설치, Q5 사다리)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (Q6: 맨 앞 대체 표, 7.2 / Q7: 7.2 결과 전달 / Q8: 4.1 사전 점검)</a> (확인 2026-10-12) · <a href="../README.md">README 11장 (Q6: H2 세 층)</a> (확인 2026-10-09) · <a href="https://code.claude.com/docs/en/hooks">Claude Code — Hooks reference (Q7: 종료 코드, additionalContext)</a> (확인 2026-10-12) · <a href="https://code.claude.com/docs/en/permissions">Claude Code — Configure permissions (Q10: ask 규칙)</a> (확인 2026-10-13) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/98b493-styling-hook-index">SLDS 2 — Styling Hook Index (Q9: global hook)</a> (확인 2026-10-13) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (Q9: 6.2·6.3 / Q10: 4.4·6.2 / Q11: 6.1·6.2)</a> (확인 2026-10-13)</p>
 </section>
 
 <section id="refs">
@@ -520,7 +607,7 @@ exit 0</code></pre>
 
 <footer class="doc-foot">
   <span>밀버스 디자인 시스템 · Learn 08</span>
-  <span>2026-10-09 갱신, 2026-10-12 갱신 (M3: <code>init</code> 사전 점검·병합·<code>milvus.config.json</code>·<code>--no-vf</code>, hook 직접 실행과 <code>additionalContext</code>, 배포 뒤 수동 작업). Claude Code 내용은 code.claude.com 공식 문서, Ponytail은 GitHub README·INSTALL.md로 확인함</span>
+  <span>2026-10-09 갱신, 2026-10-12 갱신 (M3: <code>init</code> 사전 점검·병합·<code>milvus.config.json</code>·<code>--no-vf</code>, hook 직접 실행과 <code>additionalContext</code>, 배포 뒤 수동 작업), 2026-10-13 갱신 (M5: 브랜드 요청 → 반영 흐름, skill·<code>milvus-design.md</code> 구현 반영, <code>deploy</code> 두 번의 승인). Claude Code 내용은 code.claude.com 공식 문서, Ponytail은 GitHub README·INSTALL.md로 확인함</span>
 </footer>
 </main>
 </div>
