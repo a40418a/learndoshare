@@ -222,7 +222,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 기본 컴포넌트 CSS에만 있는 g 이름 5개: `--slds-g-color-border-base-1`, `-4`, `--slds-g-color-neutral-10-opacity-50`, `--slds-g-color-neutral-100-opacity-10`, `-50` | native 전환 대비용. 지금은 효과가 없다 |
 | 피드백 색 hook | 5.3의 표에 있는 이름만 |
 | `--slds-s-*` 중 이름에 `color`가 없는 것 | **SLDS 2 CSS 또는 기본 컴포넌트 CSS가 `var()`로 읽는 이름**이어야 한다(읽는 곳이 없으면 효과가 없다) |
-| 색 `--slds-s-*` 6개: `backdrop-color-background`, `menu-item-color-background-active`, `table-row-color-background-selected`, `navigation-color-background-hover`, `pill-color-background-hover`, `button-color-background-hover` | 값은 중립 g hook만 참조한다. 기본 hover·선택 바탕의 상당수가 브랜드 틴트라서 "회색 hover" 같은 요청을 들어줄 경로다 |
+| 색 `--slds-s-*` 6개: `backdrop-color-background`, `menu-item-color-background-active`, `table-row-color-background-selected`, `navigation-color-background-hover`, `pill-color-background-hover`, `button-color-background-hover` | 값은 중립 g hook만 참조한다. 기본 hover·선택 바탕의 상당수가 브랜드 틴트라서 "회색 hover" 같은 요청을 들어줄 경로다. 배경막만 예외로 값이 정확히 `var(--slds-g-color-neutral-10-opacity-50)`이어야 하고, 그 g 이름을 `light-dark()`의 반투명 값으로 함께 정한다(native와 같은 값, 9.3. 2026-10-13 판정) |
 | `--milvus-*` | 밀버스 컴포넌트(`.css`·`.js`)나 `milvusBridge.css`가 읽는 이름 |
 | 상속 속성 `letter-spacing` | 자간 하나만. 다른 일반 속성은 금지 |
 
@@ -249,7 +249,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 (hook 이름 앞의 `--slds-g-color-`는 생략했다)
 
 - 테두리는 따로 정하지 않으면 글자색을 따른다(성공·오류만)
-- hover·active hook은 입력한 배경색에서 같은 색조의 한 단계 진한 색을 계산해 넣는다
+- hover·active hook은 같은 색조의 한 단계 진한 색을 계산해 넣는다. `*-container-2`는 입력한 배경색에서, `border-error-2`는 테두리색에서 계산한다(SLDS 기본값이 error-40 → error-30, 2026-10-13 Task 20 리뷰 확인)
 - 대비 검사: 글자색이 배경색 위와 흰색 위에서 모두 4.5:1 이상이어야 한다. 미달이면 막고, 같은 색조에서 기준을 넘는 색(우리 팔레트 규칙의 40단계)을 제안한다
 - 참고: SLDS 기본 피드백 팔레트는 40단계 글자가 90단계 배경 위에서 약 5.3:1, 흰색 위에서 약 6.7:1이다
 
