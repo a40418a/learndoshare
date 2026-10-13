@@ -53,7 +53,7 @@ export function managedFiles(pkgRoot: string, o: { vf: boolean }): ManagedFile[]
     files.push(
       { ...copy(`${FA}/components/milvusHead.component`, "managed"), optional: "vf" },
       { ...copy(`${FA}/components/milvusHead.component-meta.xml`, "managed"), optional: "vf" },
-      // check(전체)와 deploy가 지금 브랜드 색으로 다시 만든다. init은 milvusHead가 참조할 수 있게 틀을 놓는다(설계 3장)
+      // src(틀)는 init이 복사하지 않는다. init이 지금 브랜드 색 팔레트로 만들고, check(전체)와 deploy가 다시 만든다(설계 3장)
       { ...copy(`${RES}/milvusVf.css`, "generated"), optional: "vf" },
       { ...copy(`${RES}/milvusVf.resource-meta.xml`, "generated"), optional: "vf" },
     );

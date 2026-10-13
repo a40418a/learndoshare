@@ -108,12 +108,11 @@ test("--style은 200ms 안에 끝난다 (hooks-index.json 사용)", async () => 
 
 test("밀버스 관리 파일을 고치면 전체 check가 1이고 'pnpm milvus update --force'를 안내한다", async () => {
   await withProject(async (root) => {
-    // init 직후는 전체 check를 통과하고 아무 경고도 없다. 틀이던 milvusVf.css만 처음 한 번 팔레트로 다시 만든다
+    // init 직후는 전체 check를 통과하고 아무 경고도 없다. init이 milvusVf.css를 팔레트로 이미 만들어 다시 만들 것이 없다
     const clean = await check(root, false);
     assert.equal(clean.result.code, 0, clean.stderr);
     assert.equal(clean.stderr, "");
-    assert.deepEqual(clean.result.regenerated, [`${RES}/milvusVf.css`]);
-    assert.deepEqual((await check(root, false)).result.regenerated, []);
+    assert.deepEqual(clean.result.regenerated, []);
 
     const file = `${FA}/lwc/milvusScript/milvusScript.js`;
     appendFileSync(join(root, file), "\n// 직접 고침\n");

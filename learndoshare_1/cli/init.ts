@@ -8,6 +8,7 @@ import { parseArgs } from "node:util";
 import { isValidBrandName, logoAsset, readBranding, writeBrandingSet, writeContentAssetMeta, writeTheme } from "../lib/branding.ts";
 import { managedFiles, sha256 } from "../lib/managed.ts";
 import { addKeyIfMissing, appendLines, mergeSettings } from "../lib/merge.ts";
+import { buildMilvusVfCss } from "../lib/vf.ts";
 import { findProject, packageInfo, readConfig, runSf, writeConfig, type SfRunner } from "./context.ts";
 
 export type Op = {
@@ -22,6 +23,7 @@ export type Op = {
 
 const FA = "force-app/main/default";
 const DEFAULT_BRAND_COLOR = "#0176D3";
+const VF_CSS = `${FA}/staticresources/milvusVf.css`;
 // 설계 0장의 준비 두 줄. 토큰 값이 아니라 환경변수 이름이다
 const NPMRC = ["@a40418a:registry=https://npm.pkg.github.com", "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}"];
 const USAGE = "사용법: pnpm milvus init --target-org <별칭> (--brand <이름> | --from-org) [--no-vf]";
@@ -41,7 +43,13 @@ export function planInit(o: {
   orgBrand?: { brandingSet: string; theme: string; logo?: { asset: string; file: string; meta: string } };
 }): Op[] {
   const b = o.brand;
-  const ops: Op[] = managedFiles(o.pkgRoot, { vf: o.vf }).flatMap((f) => (f.src ? [{ kind: "copy" as const, dest: f.dest, src: f.src }] : []));
+  // milvusVf.css는 틀을 복사하지 않고 BrandingSet과 같은 브랜드 색(--from-org는 org 값, 아니면 기본색)의 팔레트로 바로 만든다(설계 3장 [생성]).
+  // 그래야 첫 check나 deploy 전에 프로젝트 전체를 배포해도 VF 팔레트가 Salesforce 기본색으로 나오지 않는다
+  const brandColor = o.orgBrand ? readBranding(o.orgBrand.brandingSet).brandColor : DEFAULT_BRAND_COLOR;
+  const ops: Op[] = managedFiles(o.pkgRoot, { vf: o.vf }).flatMap((f): Op[] => {
+    if (!f.src) return [];
+    return f.dest === VF_CSS ? [{ kind: "create", dest: f.dest, content: buildMilvusVfCss(brandColor) }] : [{ kind: "copy", dest: f.dest, src: f.src }];
+  });
   ops.push(
     { kind: "append-lines", dest: "CLAUDE.md", lines: ["@milvus-design.md"] },
     { kind: "merge-json", dest: ".claude/settings.json", value: JSON.parse(readFileSync(join(o.pkgRoot, "templates/claude/settings.json"), "utf8")) },
