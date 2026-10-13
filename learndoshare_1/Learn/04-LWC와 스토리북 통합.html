@@ -506,13 +506,16 @@ export const 기본 = {};</code></pre>
     </ul>
   </div>
   <p class="c">2026-10-09 갱신: 이전 문장 "SLDS global hook(<code>--slds-g-*</code>)은 읽기만 한다. 브랜드 전환은 <code>--milvus-*</code>로만 한다"는 #11·#18 결정으로 바뀌었다. 자세한 규칙은 <a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html#globals">03 Storybook</a>과 <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>에 있다.</p>
+  <h3>프로젝트에서 빌드 (2026-10-13 갱신)</h3>
+  <ul>
+    <li>2026-10-12까지 "다음 단계"로 적었던 <code>pnpm milvus storybook</code>은 구현됐다(Task 17·18). 고객 프로젝트의 LWC(<code>sfdxLwcModules</code>)와 SLDS 카탈로그 예제를 같은 <code>lib/lwc-build.ts</code>로 <code>&lt;프로젝트&gt;/.milvus/lwc</code>에 빌드하고, 패키지 안의 <code>.storybook/</code> 설정으로 Storybook을 띄운다. 스토리는 저장소와 같은 <code>@milvus/lwc</code> 이름으로 이 번들을 읽는다(<a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html#modes">03 두 모드</a>)</li>
+  </ul>
   <h3>다음 단계 <span class="tag info">계획</span></h3>
   <ul>
-    <li>패키지를 설치한 프로젝트에서 <code>pnpm milvus storybook</code>이 패키지 안의 설정으로 Storybook을 띄운다. 빌드 결과는 <code>.milvus/</code>에 둔다. 빌드 함수를 <code>lib/lwc-build.ts</code>로 옮기고 카탈로그 경로를 상대 경로로 바꾼 것(2026-10-09)이 그 준비다</li>
     <li>native 전환 대비용 두 번째 빌드(native)는 발표 뒤로 미룬다</li>
   </ul>
-  <p>근거는 <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서</a> 4.2·9.2·13장이다. 위 두 항목은 아직 구현 전이다. 플랫폼 모듈 대체는 2026-10-09에 구현해 이 목록에서 뺐다. TypeScript 타입 제거는 같은 날 만들었다가 LWC를 JS로 되돌리며 지웠다(Task 30, 2026-10-12 갱신).</p>
-  <p class="sources">출처: <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="../README.md">README 2장 (util.css 규칙, #11·#18, 2026-10-09 설계 5.2로 통합)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (기본 우선), 4.2·9.2·13장, 5.2·5.3 (util.css 규칙, 2026-10-09 구현), 1장 10/9 D1·D3 (LWC는 JS, milvusBrandLoader)</a> (확인 2026-10-12) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/ts.html">LWC Developer Guide — TypeScript (Developer Preview)</a> (확인 2026-10-12) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (2.1 규칙 세 곳 불일치)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (loadStyle)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-09-org-probe.md">org 프로브 2차 기록 3.1 (.ts LWC 배포 실패)</a> (확인 2026-10-12)</p>
+  <p>근거는 <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서</a> 4.2·9.2·13장이다. native 빌드는 아직 구현 전이다. 플랫폼 모듈 대체는 2026-10-09에 구현해 이 목록에서 뺐다. TypeScript 타입 제거는 같은 날 만들었다가 LWC를 JS로 되돌리며 지웠다(Task 30, 2026-10-12 갱신).</p>
+  <p class="sources">출처: <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="../README.md">README 2장 (util.css 규칙, #11·#18, 2026-10-09 설계 5.2로 통합)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (기본 우선), 4.2 (<code>milvus storybook</code>, 2026-10-13 구현)·9.2·13장, 5.2·5.3 (util.css 규칙, 2026-10-09 구현), 1장 10/9 D1·D3 (LWC는 JS, milvusBrandLoader)</a> (확인 2026-10-13) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/ts.html">LWC Developer Guide — TypeScript (Developer Preview)</a> (확인 2026-10-12) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (2.1 규칙 세 곳 불일치)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (loadStyle)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-09-org-probe.md">org 프로브 2차 기록 3.1 (.ts LWC 배포 실패)</a> (확인 2026-10-12)</p>
 </section>
 
 <section id="quiz" class="quiz">
@@ -538,7 +541,7 @@ export const 기본 = {};</code></pre>
 
 <footer class="doc-foot">
   <span>밀버스 디자인 시스템 · Learn 04</span>
-  <span>2026-09-26 작성, 2026-10-09 갱신 (출처 확인, 빌드 구조·shadow 모드·저장소 코드를 지금 저장소에 맞춤. M2: 빌드를 <code>lib/lwc-build.ts</code>로 옮김, TypeScript 타입 제거, 플랫폼 모듈 대체), 2026-10-12 갱신 (M3: 타입 제거 삭제, LWC는 JS, 카탈로그 생성기 <code>generateCatalog</code>(TS), <code>lightningBaseComponentsDir</code>). 모듈 해석 결과는 <code>@lwc/module-resolver</code> 실험, 패키지 내용은 설치된 패키지로 확인함</span>
+  <span>2026-09-26 작성, 2026-10-09 갱신 (출처 확인, 빌드 구조·shadow 모드·저장소 코드를 지금 저장소에 맞춤. M2: 빌드를 <code>lib/lwc-build.ts</code>로 옮김, TypeScript 타입 제거, 플랫폼 모듈 대체), 2026-10-12 갱신 (M3: 타입 제거 삭제, LWC는 JS, 카탈로그 생성기 <code>generateCatalog</code>(TS), <code>lightningBaseComponentsDir</code>), 2026-10-13 갱신 (M5: 프로젝트의 <code>pnpm milvus storybook</code> 빌드 구현). 모듈 해석 결과는 <code>@lwc/module-resolver</code> 실험, 패키지 내용은 설치된 패키지로 확인함</span>
 </footer>
 </main>
 </div>

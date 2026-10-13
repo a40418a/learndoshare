@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
-import { isValidBrandName, readBranding, writeBrandingSet, writeContentAssetMeta, writeTheme } from "../lib/branding.ts";
+import { isValidBrandName, logoAsset, readBranding, writeBrandingSet, writeContentAssetMeta, writeTheme } from "../lib/branding.ts";
 import { managedFiles, sha256 } from "../lib/managed.ts";
 import { addKeyIfMissing, appendLines, mergeSettings } from "../lib/merge.ts";
 import { findProject, packageInfo, readConfig, runSf, writeConfig, type SfRunner } from "./context.ts";
@@ -177,9 +177,8 @@ async function fetchOrgBrand(
   const { brandImage } = readBranding(brandingSet); // BRAND_COLOR가 없거나 #rrggbb가 아니면 던진다
   if (!brandImage) return { name, orgBrand: { brandingSet, theme } };
 
-  // 자산 이름은 경로와 sf 인자에 들어가므로 Salesforce API 이름 규칙(브랜드 이름과 같다)으로 검증한다
-  const asset = /^\/file-asset\/([^/?]+)(\?.*)?$/.exec(brandImage)?.[1];
-  if (!asset || !isValidBrandName(asset)) throw new Error(`BrandingSet의 로고 경로를 해석하지 못했습니다: ${brandImage}. --brand <이름>으로 실행하세요`);
+  const asset = logoAsset(brandImage);
+  if (!asset) throw new Error(`BrandingSet의 로고 경로를 해석하지 못했습니다: ${brandImage}. --brand <이름>으로 실행하세요`);
   const gotLogo = await retrieve("logo", [`ContentAsset:${asset}`]);
   const content = gotLogo(`contentassets/${asset}.asset`);
   const meta = gotLogo(`contentassets/${asset}.asset-meta.xml`)?.toString("utf8");

@@ -14,7 +14,20 @@
     "force-app/main/default/lwc/milvus*/*",
     "!force-app/**/__tests__",
     "audit/report.json",
-    "stories"
+    "stories",
+    ".storybook",
+    "lib/storybook-plugin.ts",
+    "lib/branding.ts",
+    "lib/contrast.ts",
+    "lib/hooks-index.ts",
+    "lib/palette.ts",
+    "lib/rules.ts",
+    "lib/request.ts",
+    "lib/spec-items.ts",
+    "lib/fixed-list.ts",
+    "lib/bridge-vars.ts",
+    "cli/context.ts",
+    "brands/Milvus_DesignSystem/logo.jpg"
   ],
   "repository": {
     "type": "git",

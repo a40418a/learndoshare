@@ -58,7 +58,10 @@ const FEEDBACK_NAMES = new Set(
   Object.values(FEEDBACK_HOOKS).flatMap((k) => [k.text, k.onContainer, k.container, k.border, ...k.hover].filter((n) => n !== null)),
 );
 
-/** 기본 hover·선택 바탕 중 브랜드 틴트인 것을 중립으로 바꾸는 색 s hook. 값은 중립 g hook 하나만 참조한다 */
+/**
+ * 기본 hover·선택 바탕 중 브랜드 틴트인 것을 중립으로 바꾸는 색 s hook. 값은 중립 g hook 하나만 참조한다.
+ * 배경막(BACKDROP_S)만 예외로 native용 BACKDROP_G 하나만 참조한다
+ */
 export const COLOR_S_WHITELIST = [
   "--slds-s-backdrop-color-background",
   "--slds-s-menu-item-color-background-active",
@@ -79,6 +82,10 @@ export const LBC_ONLY_G = [
   "--slds-g-color-neutral-100-opacity-10",
   "--slds-g-color-neutral-100-opacity-50",
 ];
+
+// 모달 배경막: 지금 org가 읽는 s hook과 native가 읽는 g. 반투명 값은 g에 light-dark()로 두고 s는 g를 참조한다(설계 9.3, 판정 R32)
+const BACKDROP_S = "--slds-s-backdrop-color-background";
+const BACKDROP_G = "--slds-g-color-neutral-10-opacity-50";
 
 /** 중립 색. 값은 light-dark(라이트, 다크)로 쓴다 */
 export const NEUTRAL_COLOR_PATTERNS = [
@@ -120,17 +127,19 @@ function focusShadowOk(value: string): boolean {
   );
 }
 
-// 선언 하나의 문제. [규칙, 메시지] 또는 undefined
-function declProblem(name: string, value: string, ctx: RuleContext): [string, string] | undefined {
+// 선언 하나의 문제. [규칙, 메시지] 또는 undefined. Storybook "원본과 hook" 보기(scripts/generate-slds-catalog.ts)도 hook마다 부른다
+export function declProblem(name: string, value: string, ctx: RuleContext): [string, string] | undefined {
   if (!name.startsWith("--")) {
     return ALLOWED_PLAIN_PROPS.includes(name)
       ? undefined
       : ["plain-prop", `${name}: :root의 일반 속성은 ${ALLOWED_PLAIN_PROPS.join(", ")}만 쓴다`];
   }
   if (name.startsWith("--milvus-")) {
-    return ctx.milvusVars.has(name)
-      ? undefined
-      : ["milvus-var", `${name}: 이 변수를 읽는 밀버스 컴포넌트나 milvusBridge.css가 없다(오타이거나 효과가 없다)`];
+    if (!ctx.milvusVars.has(name)) return ["milvus-var", `${name}: 이 변수를 읽는 밀버스 컴포넌트나 milvusBridge.css가 없다(오타이거나 효과가 없다)`];
+    // 브리지는 시간을 max(var(…), 0.01ms)로 감싼다. 단위 없는 숫자는 max()를 무효로 만들어 0.01ms 하한이 무너진다(설계 5.6)
+    return name.startsWith("--milvus-motion-duration-") && /^[+-]?[\d.]+$/.test(value)
+      ? ["motion-unit", `${name}: ${value} — 시간에는 단위를 붙인다(예: 0.01ms, 0.2s). 단위 없는 숫자는 브리지의 max()를 무효로 만들어 모달·토스트가 닫히지 않을 수 있다`]
+      : undefined;
   }
   if (/^--(slds|sds)-c-/.test(name)) {
     return ["c-hook", `${name}: --slds-c-*·--sds-c-*는 쓰지 않는다. SLDS 2 지원이 미확인이고 :root에 두면 모든 변형을 덮는다`];
@@ -158,13 +167,19 @@ function declProblem(name: string, value: string, ctx: RuleContext): [string, st
     if (!COLOR_S_WHITELIST.includes(name)) {
       return ["color-s-hook", `${name}: 색 s hook은 브랜드 색에 이어진 것이 많다. 쓸 수 있는 것은 ${COLOR_S_WHITELIST.join(", ")}뿐이다`];
     }
-    const ref = /^var\(\s*(--slds-g-color-[\w-]+)\s*\)$/.exec(value.trim());
-    return ref && isNeutral(ref[1])
+    const ref = /^var\(\s*(--slds-g-color-[\w-]+)\s*\)$/.exec(value.trim())?.[1];
+    // 배경막은 반투명이라 native용 g와 한 쌍으로만 쓴다(설계 9.3, 판정 R32). 불투명한 중립 hook은 페이지를 가린다
+    if (name === BACKDROP_S) {
+      return ref === BACKDROP_G
+        ? undefined
+        : ["color-s-hook", `${name}: 값은 var(${BACKDROP_G})만 쓴다. 반투명 색은 ${BACKDROP_G}에 light-dark(color-mix(…), …)로 함께 적는다`];
+    }
+    return ref && isNeutral(ref)
       ? undefined
       : ["color-s-hook", `${name}: 값은 중립 g hook 하나만 참조한다(예: var(--slds-g-color-surface-container-2))`];
   }
-  if (FEEDBACK_NAMES.has(name) || LBC_ONLY_G.includes(name)) return undefined;
-  if (isNeutral(name)) {
+  if (FEEDBACK_NAMES.has(name) || (LBC_ONLY_G.includes(name) && name !== BACKDROP_G)) return undefined;
+  if (isNeutral(name) || name === BACKDROP_G) {
     return /^light-dark\(/.test(value.trim())
       ? undefined
       : ["neutral-light-dark", `${name}: 중립 색은 light-dark(라이트, 다크)로 쓴다. 일반 값으로 쓰면 다크 모드 값이 사라진다`];
@@ -271,6 +286,13 @@ export function checkUtilCss(css: string, file: string, ctx: RuleContext): Issue
     add(
       "shadow-focus-keep",
       "--slds-g-shadow-4를 바꾸면 기본값이 var(--slds-g-shadow-4)인 --slds-g-shadow-5·-6(기본 컴포넌트의 포커스 표시)도 바뀐다. 두 값을 SLDS 2 기본 shadow-4 값으로 따로 적는다",
+    );
+  }
+
+  if (decls.has(BACKDROP_S) && !decls.has(BACKDROP_G)) {
+    add(
+      "backdrop-pair",
+      `${BACKDROP_S}만 있고 ${BACKDROP_G}가 없다. SLDS 2는 이 g를 정의하지 않아 배경막이 투명해진다. 두 줄을 함께 쓴다: ${BACKDROP_G}: light-dark(color-mix(…), …); ${BACKDROP_S}: var(${BACKDROP_G});`,
     );
   }
 

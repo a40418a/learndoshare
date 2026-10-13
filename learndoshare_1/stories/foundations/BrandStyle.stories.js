@@ -1,4 +1,4 @@
-import { brands, utilCss } from "../../.storybook/brand.js";
+import { brands, mode } from "../../.storybook/brand.ts";
 
 export default {
   title: "Foundations/브랜드 스타일 (util.css)",
@@ -11,7 +11,7 @@ export default {
 - **쓸 수 있는 것은 \`:root\`의 global hook(\`--slds-g-*\`), 컴포넌트 hook(\`--slds-s-*\`), 밀버스 컴포넌트가 읽는 \`--milvus-*\` 변수뿐이다.** 클래스 규칙은 쓰지 않는다
 - **global hook**은 같은 hook을 쓰는 컴포넌트 묶음을 함께 바꾼다. 예: \`--slds-g-radius-border-pill\`은 버튼, 토글, 필(pill), 경로(path), 원형 진행 표시줄의 반경을 함께 바꾼다. 뱃지는 \`radius-border-1\`을 쓰므로 바뀌지 않는다
 - **컴포넌트 hook**은 그 컴포넌트만 바꾼다. 예: \`--slds-s-button-radius-border\`는 버튼 반경만 바꾼다. 쓸 수 있는 이름은 아래 **영향 지도**의 오른쪽 열에 있다. 색 hook(\`--slds-s-*color*\`)은 브랜드 색에 이어진 것이 많아 쓰지 않는다
-- 컴포넌트 hook은 지금 org가 \`lightning-*\`를 synthetic shadow로 그려서 닿는다(2026-10-07 org 실측). npm 패키지가 156개를 native shadow 지원으로 지정해 두어 **native로 바뀌면 효과가 사라질 수 있다.** 그때도 유지해야 하는 모양은 밀버스 컴포넌트(\`--milvus-*\`)로 만든다 (예: \`컴포넌트/밀버스 추가/Button\`)
+- 컴포넌트 hook은 지금 org가 \`lightning-*\`를 synthetic shadow로 그려서 닿는다(2026-10-07 org 실측, 10/9 프로브에서 \`data-render-mode\` 0개). npm 패키지는 156개를 native shadow 지원으로 지정해 두었다. **native로 바뀌면 SLDS 전역 CSS(\`.slds-*\`) 안의 읽기 지점이 사라지고, 기본 컴포넌트의 native CSS가 직접 읽는 s 이름에만 닿는다**(추정, 실측 필요. 설계 9.1). hook·브리지로 안 되는 모양은 밀버스 컴포넌트를 새로 만들지 않고 opt-in \`milvusOverride.css\`(마지막 수단, 공식 권고 밖)로 바꾼다(2026-10-09 결정)
 - **브랜드 색은 바꾸지 않는다.** 색은 org Themes and Branding이 원본이고 \`pnpm sync:theme\`이 가져온다. \`pnpm test\`가 util.css 규칙을 검사한다
 - **공식 권고 밖이다.** SLDS는 global hook 재정의를 권하지 않는다. Salesforce 릴리스마다 Storybook과 org 화면을 다시 확인한다
 - org에서는 util.css를 정적 리소스로 올려 \`loadStyle\`로 문서에 넣는다. 이때 **같은 화면의 표준 Salesforce UI에도 적용된다**`
@@ -23,14 +23,17 @@ export default {
 export const 현재_브랜드 = {
   render: () => {
     const name = document.documentElement.dataset.milvusBrand;
-    const css = utilCss[name];
+    const brand = brands.find((b) => b.name === name);
+    const css = brand?.utilCss;
     const root = document.createElement("div");
     root.className = "sb-stack";
     const title = document.createElement("p");
     title.className = "slds-text-title_caps";
     title.textContent = css
-      ? `brands/${name}/util.css`
-      : `${brands[name]?.label ?? name}: util.css 없음 → SLDS 2 기본 모양`;
+      ? mode === "project"
+        ? "force-app/main/default/staticresources/milvusBrand.css"
+        : `brands/${name}/util.css`
+      : `${brand?.label ?? name}: util.css 없음 → SLDS 2 기본 모양`;
     root.append(title);
     if (css) {
       const pre = document.createElement("pre");

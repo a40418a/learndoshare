@@ -110,6 +110,9 @@ function scan(css: string, src: Decl["src"], file: string, compOf: (selector: st
   });
 }
 
+/** SLDS 블루프린트 이름: 선택자의 첫 .slds-<이름>에서 __·_ 앞부분. 없으면 (global) */
+export const blueprintOf = (sel: string) => /\.slds-([a-z0-9]+(?:-[a-z0-9]+)*)/.exec(sel)?.[1].split(/__|_/)[0] ?? "(global)";
+
 /** 컴포넌트 이름: SLDS 2는 선택자의 첫 .slds-<이름>(블루프린트), 기본 컴포넌트는 폴더 이름이다 */
 export function classify(o: { sldsCss: string; lbcFiles: LbcFile[] }): Decl[] {
   const hooks = new Map<string, string[]>();
@@ -118,8 +121,7 @@ export function classify(o: { sldsCss: string; lbcFiles: LbcFile[] }): Decl[] {
   });
   const sldsDefs = definitions([o.sldsCss]);
   const out: Decl[] = [];
-  const blueprint = (sel: string) => /\.slds-([a-z0-9]+(?:-[a-z0-9]+)*)/.exec(sel)?.[1].split(/__|_/)[0] ?? "(global)";
-  scan(o.sldsCss, "slds2", SLDS2_FILE, blueprint, (n) => hooks.get(n) ?? sldsDefs.get(n), out);
+  scan(o.sldsCss, "slds2", SLDS2_FILE, blueprintOf, (n) => hooks.get(n) ?? sldsDefs.get(n), out);
 
   // 기본 컴포넌트는 자기 폴더와 공통 sldsCommon의 정의를 본다. 문서의 hook 정의(:where(html))는 shadow 경계를 넘어 상속된다
   const byComp = Map.groupBy(o.lbcFiles, (f) => f.comp);
