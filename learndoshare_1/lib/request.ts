@@ -60,10 +60,25 @@ export function parseRequest(md: string): BrandRequest {
     const current = body[0]?.startsWith("지금:") ? body.shift()!.slice("지금:".length).trim() : undefined;
     // ponytail: 요청 안에 `## `로 시작하는 줄이 있으면 다시 읽을 때 그 줄부터 새 절이 된다. 아는 제목(예: `## 로고`)이면 그 항목의 요청이 되고,
     //           모르는 제목이면 알 수 없는 절로 남는다. 문제가 되면 쓸 때 줄 머리의 `## `를 이스케이프한다
-    const request = body.join("\n").replace(/^요청:[ \t]*/, "").trim();
+    const request = body.join("\n").trimStart().replace(/^요청:[ \t]*/, "").trim();
     r.sections.push(current === undefined ? { id, title, request } : { id, title, current, request });
   }
   return r;
+}
+
+/**
+ * 명세 페이지가 저장할 요청(설계 6.1, 6.2의 6). fresh는 저장 직전에 다시 읽은 파일, inputs는 절 id → 입력이다.
+ * 빈 입력은 빼고 반영 표시(appliedAt)는 지우고, 알 수 없는 줄·절은 fresh의 것을 쓴다.
+ * current가 없으면(지금 값을 모를 때) fresh의 '지금:' 줄을 그대로 둔다. 있으면 그 값을 쓴다(undefined면 '지금:' 없음)
+ */
+export function saveRequest(fresh: BrandRequest, inputs: Map<string, string>, savedAt: string, current?: (id: string) => string | undefined): BrandRequest {
+  const sections = REQUEST_SECTIONS.flatMap((s) => {
+    const request = inputs.get(s.id)?.trim();
+    if (!request) return [];
+    const now = current ? current(s.id) : fresh.sections.find((f) => f.id === s.id)?.current;
+    return [now ? { ...s, current: now, request } : { ...s, request }];
+  });
+  return { savedAt, sections, unknown: fresh.unknown };
 }
 
 export function serializeRequest(r: BrandRequest): string {

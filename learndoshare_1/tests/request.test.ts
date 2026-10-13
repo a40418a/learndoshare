@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseRequest, REQUEST_SECTIONS, serializeRequest, type BrandRequest } from "../lib/request.ts";
+import { parseRequest, REQUEST_SECTIONS, saveRequest, serializeRequest, type BrandRequest } from "../lib/request.ts";
 import { SPEC_ITEMS } from "../lib/spec-items.ts";
 
 // 설계 6.1의 예시 파일에 Claude가 적은 반영 줄(SKILL.md 1장 6단계: 제목 줄 바로 아래)을 더한 것
@@ -117,6 +117,35 @@ test("BOM과 제목 앞 빈 줄, 절 제목과 '지금:' 사이 빈 줄을 견�
   assert.equal(r.savedAt, "2026-10-14 15:20");
   assert.deepEqual(r.sections, [{ id: "radius", title: "모서리", current: "--slds-g-radius-border-2 0.5rem", request: "각지게" }]);
   assert.equal(serializeRequest(r), "# 브랜드 요청\n저장: 2026-10-14 15:20\n\n## 모서리\n지금: --slds-g-radius-border-2 0.5rem\n요청: 각지게\n");
+});
+
+test("'지금:'과 '요청:' 사이 빈 줄이 있어도 '요청:'을 뗀다", () => {
+  const r = parseRequest("# 브랜드 요청\n\n## 모서리\n지금: x\n\n요청: 각지게\n");
+  assert.deepEqual(r.sections, [{ id: "radius", title: "모서리", current: "x", request: "각지게" }]);
+});
+
+test("saveRequest: 빈 입력은 빼고 반영 표시는 지우며, 지금 값을 모르면 파일의 '지금:' 줄을 그대로 둔다", () => {
+  const fresh = parseRequest(`${EXAMPLE}\n## 회의 메모\n메모\n`);
+  const inputs = new Map([
+    ["brand-color", "신뢰감 있는 딥그린"],
+    ["radius", "각지게"],
+    ["logo", "  "],
+  ]);
+  // 지금 값을 모름(툴바가 프로젝트 브랜드가 아니거나 브랜드를 읽지 못함): 파일에 있던 '지금:'을 둔다
+  const kept = saveRequest(fresh, inputs, "2026-10-15 09:00");
+  assert.equal(kept.appliedAt, undefined);
+  assert.equal(kept.savedAt, "2026-10-15 09:00");
+  assert.deepEqual(kept.unknown, ["## 회의 메모\n메모"]);
+  assert.deepEqual(kept.sections, [
+    { id: "brand-color", title: "브랜드 색", current: "#0176D3 (버튼 #2976CA, 링크 #1F5DA1)", request: "신뢰감 있는 딥그린" },
+    { id: "radius", title: "모서리", request: "각지게" },
+  ]);
+  // 지금 값을 앎: 새로 계산한 값을 쓴다(undefined면 '지금:' 없음)
+  const fresh2 = saveRequest(fresh, inputs, "2026-10-15 09:00", (id) => (id === "radius" ? "--slds-g-radius-border-2 0.5rem" : undefined));
+  assert.deepEqual(fresh2.sections, [
+    { id: "brand-color", title: "브랜드 색", request: "신뢰감 있는 딥그린" },
+    { id: "radius", title: "모서리", current: "--slds-g-radius-border-2 0.5rem", request: "각지게" },
+  ]);
 });
 
 test("여러 줄 로고 요청은 줄바꿈 그대로 왕복한다", () => {

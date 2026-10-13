@@ -5,7 +5,7 @@ import { brands, mode } from "../../.storybook/brand.ts";
 import { contrastRatio } from "../../lib/contrast.ts";
 import { FIXED_ITEMS } from "../../lib/fixed-list.ts";
 import { brandPalette } from "../../lib/palette.ts";
-import { FEEDBACK_KINDS, parseRequest, REQUEST_SECTIONS, serializeRequest, type BrandRequest } from "../../lib/request.ts";
+import { FEEDBACK_KINDS, parseRequest, REQUEST_SECTIONS, saveRequest, serializeRequest, type BrandRequest } from "../../lib/request.ts";
 import { SPEC_ITEMS, type SpecItem } from "../../lib/spec-items.ts";
 
 const ENDPOINT = "/__milvus/brand-request";
@@ -241,7 +241,7 @@ export function renderBrandSpec(): HTMLElement {
   Object.assign(toolbar.style, { position: "sticky", top: "0", zIndex: "1", background: "var(--slds-g-color-surface-1, #fff)" });
 
   const { brand } = brandNow();
-  // 프로젝트 브랜드를 보고 있지 않으면(툴바가 SLDS 기본이거나 프로젝트 브랜드를 읽지 못함) 지금 값이 프로젝트 값이 아니어서 '지금:'을 적지 않는다
+  // 프로젝트 브랜드를 보고 있지 않으면(툴바가 SLDS 기본이거나 프로젝트 브랜드를 읽지 못함) 지금 값이 프로젝트 값이 아니어서 '지금:'을 새로 적지 않는다
   const notProject = brand !== brands[0] || !!brand.error;
   const page = el(
     "div",
@@ -252,8 +252,8 @@ export function renderBrandSpec(): HTMLElement {
     reason,
   );
   const warn = (text: string) => page.append(el("div", { className: "slds-notify slds-notify_alert slds-alert_warning", role: "alert" }, text));
-  if (mode === "project" && brand.error) warn("프로젝트 브랜드를 읽지 못해 지금 값은 SLDS 기본 값입니다(위 오류 알림 참고). 고치기 전에 저장하면 '지금:' 줄은 적지 않습니다");
-  else if (mode === "project" && notProject) warn(`프로젝트 브랜드가 아닌 ${brand.label}을 보고 있습니다. 이대로 저장하면 '지금:' 줄은 적지 않습니다. 함께 적으려면 툴바에서 프로젝트 브랜드를 고르세요`);
+  if (mode === "project" && brand.error) warn("프로젝트 브랜드를 읽지 못해 지금 값은 SLDS 기본 값입니다(위 오류 알림 참고). 고치기 전에 저장하면 '지금:' 줄은 새로 적지 않습니다(기존 줄은 그대로 둡니다)");
+  else if (mode === "project" && notProject) warn(`프로젝트 브랜드가 아닌 ${brand.label}을 보고 있습니다. 이대로 저장하면 '지금:' 줄은 새로 적지 않습니다(기존 줄은 그대로 둡니다). 새로 적으려면 툴바에서 프로젝트 브랜드를 고르세요`);
   page.append(fileStatus, toolbar);
 
   for (const group of [...new Set(SPEC_ITEMS.map((i) => i.group))]) {
@@ -322,18 +322,13 @@ export function renderBrandSpec(): HTMLElement {
       const base = opened;
       fill(fresh, (id, fromFile) => {
         const mine = inputs.get(id)!.value;
-        return mine === (base.get(id) ?? "") ? fromFile : mine;
+        return mine.trim() === (base.get(id) ?? "") ? fromFile : mine;
       });
 
       const savedAt = stamp(new Date());
-      // 빈 항목은 빼고 반영 표시(appliedAt)는 지운다(설계 6.1, 6.2의 6)
-      const sections = REQUEST_SECTIONS.flatMap((s) => {
-        const request = inputs.get(s.id)?.value.trim();
-        if (!request) return [];
-        const current = notProject ? undefined : currentFor(s.id);
-        return [current ? { ...s, current, request } : { ...s, request }];
-      });
-      const text = serializeRequest({ savedAt, sections, unknown: fresh.unknown });
+      // 프로젝트 브랜드를 보고 있지 않으면 지금 값을 모르므로 파일의 '지금:' 줄을 그대로 둔다
+      const values = new Map([...inputs].map(([id, field]) => [id, field.value]));
+      const text = serializeRequest(saveRequest(fresh, values, savedAt, notProject ? undefined : currentFor));
       const res = await fetch(ENDPOINT, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text }) });
       const body: { error?: string } = await res.json().catch(() => ({}));
       if (res.ok) {
