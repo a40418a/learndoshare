@@ -28,6 +28,11 @@ const VF_CSS = `${FA}/staticresources/milvusVf.css`;
 const NPMRC = ["@a40418a:registry=https://npm.pkg.github.com", "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}"];
 const USAGE = "사용법: pnpm milvus init --target-org <별칭> (--brand <이름> | --from-org) [--no-vf]";
 
+/** .claude/settings.json에 패키지 틀(설계 7.2)을 병합하는 op. init과 update가 같은 병합을 한다(설계 4.5) */
+export function settingsOp(pkgRoot: string): Op {
+  return { kind: "merge-json", dest: ".claude/settings.json", value: JSON.parse(readFileSync(join(pkgRoot, "templates/claude/settings.json"), "utf8")) };
+}
+
 /**
  * 프로젝트에 놓을 파일과 병합할 내용(설계 3장). root·targetOrg는 쓰지 않는다(경로는 루트 기준 상대 경로, 대상 org는 writeConfig가 기록).
  * orgBrand는 --from-org가 org에서 받아 검증한 테마·BrandingSet XML과 로고(자산 이름, 받은 파일, 메타 XML)다. 없으면 브랜드 이름과 기본색으로 만든다.
@@ -52,7 +57,7 @@ export function planInit(o: {
   });
   ops.push(
     { kind: "append-lines", dest: "CLAUDE.md", lines: ["@milvus-design.md"] },
-    { kind: "merge-json", dest: ".claude/settings.json", value: JSON.parse(readFileSync(join(o.pkgRoot, "templates/claude/settings.json"), "utf8")) },
+    settingsOp(o.pkgRoot),
     { kind: "add-key", dest: "package.json", key: "scripts.storybook", value: "milvus storybook" },
     { kind: "append-lines", dest: ".gitignore", lines: [".milvus/"] },
     // 밀버스 LWC는 JS라 tsconfig 줄은 넣지 않는다(10/9 D1)

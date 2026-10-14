@@ -191,6 +191,11 @@ force-app/main/default/
 - `--force`는 로컬 수정을 패키지 원본으로 덮어쓴다. 같은 버전에서 원래대로 되돌릴 때도 쓴다
 - `.claude/settings.json`은 `init`과 같은 병합을 다시 한다(새 버전이 추가한 permissions·hook 반영)
 - 성공하면 `milvus.config.json`의 버전과 sha256을 함께 바꾼다
+- 구현 판단(2026-10-14, #36)
+  - 로컬 수정 판단: 파일의 sha256이 `milvus.config.json`에 기록된 값과 다르면 충돌이다. 기록이 없는 경로(새 버전이 더한 관리 파일)에 다른 내용의 파일이 이미 있어도 사용자 파일이라 충돌이다. 파일이 없으면 잃을 수정이 없으므로 충돌이 아니라 복구한다
+  - [소유]와 [생성]은 바꾸지 않는다. `milvusVf.css`는 패키지에 틀만 있고 내용은 `check`·`deploy`가 지금 `BRAND_COLOR`로 다시 만든다. 틀로 덮어쓰면 브랜드 팔레트가 사라진다
+  - 새 패키지에서 사라진 관리 파일은 `managed`에서만 빼고 파일은 지우지 않는다. 지울지는 org에 배포된 것과 함께 사람이 정하도록 목록으로 안내한다
+  - 차이는 처음 달라진 줄과 줄 수만 보인다. `settings.json` 병합을 파일 쓰기보다 먼저 해서, 기존 `settings.json`이 깨졌으면 아무것도 바꾸지 않는다
 
 ---
 
@@ -388,6 +393,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
     ],
     "deny": [
       "Bash(sf org display)", "Bash(sf org display *)", "Bash(sf org open --url-only *)",
+      "Bash(sf org list --json)", "Bash(sf org list --json *)", "Bash(sf org list * --json)", "Bash(sf org list * --json *)",
       "Edit(/force-app/main/default/lwc/milvus*/**)",
       "Edit(/force-app/main/default/classes/utils/design/**)",
       "Edit(/force-app/main/default/components/milvusHead.component*)",
@@ -410,6 +416,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 - hook은 바뀐 파일이 `milvusBrand.css`, `milvusOverride.css`, `brandingSets/`일 때만 `check --style`을 실행한다. 프로젝트에서 패키지를 찾아 `dist/cli/index.js`를 node로 직접 실행한다(pnpm 기동 0.3초를 없애고 Windows의 shell 경고를 피한다, 10/9 판정)
 - 결과 전달(공식 문서 code.claude.com/docs/en/hooks, 2026-10-09 확인: PostToolUse가 0으로 끝나면 stderr는 디버그 로그로만 가고 Claude는 보지 못한다): 2로 끝나면 stderr를 그대로 넘겨 Claude가 고칠 값을 본다. 0인데 override 경고가 있으면 stdout에 `{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"…"}}`를 써서 Claude에게 알린다
 - 저장소 hook H2의 2·3층(개인정보 필드·`FIELDS(ALL)` 조회, 토큰을 출력하는 명령)도 프로젝트에 가져간다(10/9 판정). 토큰을 출력하는 `sf org display`와 `sf org open --url-only`는 `deny`로 막는다. 개인정보 필드와 `FIELDS(ALL)`는 명령 패턴으로 막을 수 없어 `milvus-design.md`의 규칙 문장으로 둔다
+- `sf org list --json`은 모든 org의 액세스 토큰을 출력하므로 `deny`로 막는다(#36. 2026-10-13 로컬 실측, sf 2.108.6: 출력의 org마다 `accessToken`이 있다). 일반 `sf org list`는 막지 않는다(4.4가 별칭 확인에 안내한다). `--json`이 맨 앞·가운데·맨 끝 어디에 와도 걸리게 네 규칙을 둔다. 근거는 공식 문서(code.claude.com/docs/en/permissions "Wildcard patterns", 2026-10-14 확인)의 표다: `*`는 공백을 포함한 아무 글자나 맞고 가운데에도 둘 수 있다(`Bash(git log * main)`), 끝의 ` *`가 유일한 와일드카드이면 인자 없는 명령도 맞는다, 와일드카드가 둘이면 끝의 ` *`는 빈 인자를 맞추지 않는다(`Bash(* --help *)`는 `npm --help`에 안 맞음). `tests/templates.test.ts`가 이 표를 옮긴 근사로 확인한다. 실제 Claude Code에서 막히는지는 14장. 같은 문서가 인자를 제한하는 Bash 규칙은 깨지기 쉽다고 경고한다: `sf org:list --json`, `sfdx force:org:list --json`, `sh -c` 안의 명령은 이 규칙에 걸리지 않는다
 - 커밋된 설정의 hook은 팀원에게 별도 동의 없이 실행되므로 hook은 하나만 두고 `milvus-design.md`에 적는다
 
 ---
@@ -661,6 +668,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 고객 프로젝트에서 pnpm이 `esbuild` 빌드 스크립트를 건너뛰는 것이 Storybook 정적 빌드·Vite에 영향을 주는가. 영향이 있으면 `init`이 `pnpm.onlyBuiltDependencies`에 `esbuild`를 더한다 | Task 11·18 |
 | `Bash(pnpm milvus deploy *)`가 인자 없는 명령에도 걸리는가 | Task 23 리허설(10/12 판정: 고객 프로젝트에서 Claude Code를 직접 띄워야 해서 M3 마무리에서 옮김) |
 | `Edit(...)` deny 규칙이 의도대로 막는가 | Task 23 리허설(같은 이유) |
+| `sf org list --json` deny 네 규칙이 실제 Claude Code에서 `--json` 위치와 상관없이 막고 `sf org list`는 막지 않는가. 공식 문서의 와일드카드 표로는 맞다(7.2) | 다음 리허설(고객 프로젝트에서 Claude Code를 직접 띄울 때) |
 | org `accent-2`의 다크 값(`#87aef7`)이 팔레트 70단계(`#8cb1f7`)와 다른 원인. 다크 모드가 범위 밖이라 지금 화면에는 영향이 없다(기록 3.9) | 다크 모드 검토 때 |
 | native에서 기본 컴포넌트 CSS가 직접 읽는 `--slds-s-*`에 `:root` 값이 닿는가 (9.1 전제 수정) | 발표 뒤 native 빌드 |
 | info 토스트에 피드백 색이 반영되는가(10/9 프로브에서 동시 표시 3개 제한으로 못 잼), `shadow-1`의 org 값이 npm 값과 같은가(구조만 기록) | 필요할 때 org 프로브(읽기만) |
