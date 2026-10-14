@@ -544,7 +544,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 - util.css와 브리지는 `loadBrand`를 부른 컴포넌트가 있는 페이지에 들어간다. 그런 컴포넌트가 없는 표준 레코드 페이지에는 org 테마 색만 적용된다
 - **해결 (10/9 실측, D3):** 앱 유틸리티 바에 화면 없는 LWC를 두고 백그라운드로 로드하게 하면(FlexiPage decorator `eager` = `true`), 유틸리티 패널을 열지 않아도 그 앱의 표준 화면(리드 목록)에 브랜드 CSS가 들어갔다. 잰 화면은 이것 하나다. 유틸리티 바는 앱의 모든 페이지에 붙으므로 다른 페이지도 같다고 본다. 다른 앱(판매)을 새로 불러오면 들어가지 않았다. 공식 문서의 "백그라운드 유틸리티 항목"(`lightning:backgroundUtilityItem`)은 Aura 전용이라 쓰지 않고, 보이는 유틸리티 항목의 백그라운드 로드를 쓴다([기록](../research/2026-10-09-org-probe.md) 3.7)
 - 패키지는 이 용도의 `milvusBrandLoader`(대상 `lightning__UtilityBar`, 빈 템플릿, `connectedCallback`에서 `loadBrand(this)`만)를 [관리] 파일로 넣는다. 앱에 붙이는 것은 사용자가 App Manager에서 앱마다 한다(유틸리티 항목 추가, "앱이 열릴 때 백그라운드로 로드" 체크). `deploy`는 고객 앱 메타데이터를 바꾸지 않는다
-- 10/14 리허설에서 App Manager로 유틸리티 항목 `milvusBrandLoader`를 붙이자 그 앱의 표준 리드 목록에 세 link가 들어가고 표준 버튼 반경·회색이 바뀌었다(13장). "App Manager로 붙이면 표준 화면에 들어가는가"는 해소했다(14장에서 뺌). 그때 "앱이 열릴 때 백그라운드로 로드" 체크 상태와 유틸리티 패널을 열었는지는 기록하지 않았다. 그래서 그 체크가 프로브의 decorator `eager`와 같은 설정인지는 여전히 **미확인**이다(14장)
+- 10/14 리허설에서 App Manager로 유틸리티 항목 `milvusBrandLoader`를 붙이자 그 앱의 표준 리드 목록에 세 link가 들어가고 표준 버튼 반경·회색이 바뀌었다(13장). "App Manager로 붙이면 표준 화면에 들어가는가"는 해소했다(14장에서 뺌). 같은 날 "앱이 열릴 때 백그라운드로 로드" 체크가 FlexiPage decorator `eager` = `true`로 저장되는 것도 확인했다. 체크가 꺼져 있으면 유틸리티 패널을 열 때까지 브랜드가 들어가지 않는다(13장)
 
 ### 9.8 분석 중 함께 발견한 것
 - `brands/Sample_Forest/util.css` 주석의 "버튼·뱃지 등 알약형"은 틀렸다. 뱃지는 `--slds-g-radius-border-1`을 읽는다
@@ -645,8 +645,10 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 잰 표본에서 npm `slds2.cosmos.css` 2.264.2의 hook 기본값은 org 런타임 값과 같다(중립 색, 피드백 색, 반경, 간격). 다른 것은 브랜드 계열(`accent-1`·`accent-2`·`brand-base-50`)뿐이고, org가 테마 브랜드 색의 팔레트를 넣기 때문이다 | 10/9 프로브와 로컬 비교 (기록 3.9) |
 | 설치본(tgz) 리허설: `init` 두 번의 결과 파일이 같고, `pnpm milvus storybook`(프로젝트 모드, `--host localhost`)에서 명세 페이지 저장 → skill대로 반영 → hook `check --style`(정상 0, 금지 값 2) → Storybook 즉시 갱신이 이어진다. `deploy --yes`는 1단계 13개 배포와 2단계 활성 테마 변경(`--metadata-dir`, `--single-package` 없음)이 성공한다 | 10/14 리허설 `learndoshare_1` |
 | BrandingSet `BRAND_COLOR` `#002554`(에어로케이 네이비)의 LEX `accent-1`은 50단계 `#5171c3`이다. 패키지 `brandPalette`·Storybook 계산과 같다 | 10/14 리허설 |
-| App Manager에서 유틸리티 항목으로 `milvusBrandLoader`를 붙이면 그 앱의 표준 리드 목록에 `milvusBridge`·`milvusBrand`·`milvusOverride` link가 이 순서로 들어가고, 표준 버튼 반경·회색이 브랜드 값으로 바뀐다(14장 App Manager 항목 해소. 체크 상태와 유틸리티 패널을 열었는지는 기록하지 않음, 9.7) | 10/14 리허설 |
-| 리허설 측정 뒤 활성 테마를 `Milvus_DesignSystem`으로 되돌렸다: `activeThemeName`만 담은 설정을 `--metadata-dir`로 배포(성공, `--single-package` 없음), LEX `accent-1`이 `#2976ca`로 돌아왔다. 같은 날 브리지를 줄인 뒤(5.6) 새 `milvusBridge`(111,364바이트)로 `deploy --yes`를 다시 실행해 활성 테마가 다시 `Rehearsal`이 되었다. 줄인 브리지로 목록 화면을 다시 잰 결과는 아직 적지 않았다 | 10/14 리허설 |
+| App Manager에서 유틸리티 항목으로 `milvusBrandLoader`를 붙이면 그 앱의 표준 리드 목록에 `milvusBridge`·`milvusBrand`·`milvusOverride` link가 이 순서로 들어가고, 표준 버튼 반경·회색이 브랜드 값으로 바뀐다(14장 App Manager 항목 해소) | 10/14 리허설 |
+| 리허설 측정 뒤 활성 테마를 `Milvus_DesignSystem`으로 되돌렸다: `activeThemeName`만 담은 설정을 `--metadata-dir`로 배포(성공, `--single-package` 없음), LEX `accent-1`이 `#2976ca`로 돌아왔다. 같은 날 브리지를 줄인 뒤(5.6) 새 `milvusBridge`(111,364바이트)로 `deploy --yes`를 다시 실행해 활성 테마가 다시 `Rehearsal`이 되었다 | 10/14 리허설 |
+| App Manager의 "앱이 열릴 때 백그라운드로 로드" 체크는 유틸리티 바 FlexiPage의 decorator `eager` = `true`로 저장된다(Tooling API `FlexiPage.Metadata` 조회). 체크가 꺼져 있으면 유틸리티 패널을 열기 전까지 로더가 만들어지지 않아 표준 화면에 브랜드가 들어가지 않고, 켜면 패널을 열지 않아도 리드 목록에 세 link가 들어간다(14장 항목 해소) | 10/14 리허설 |
+| 줄인 브리지(111,364바이트)에서 리드 목록 높이는 Salesforce 원래 값이다: 머리 버튼 그룹 30px, 툴바 검색 입력·아이콘 버튼 32px, 목록 선택·열 작업 24px. 컨트롤 높이 브리지가 텍스트 버튼만 높여 생기던 어긋남이 없어졌고, 브랜드 반경 2px는 모두 닿는다(5.6) | 10/14 리허설 |
 | VF: `milvusHead` 컴포넌트 안의 `<apex:slds/>`도 Visualforce Settings SLDS 2 설정의 대상이다(`slds-plus.css`). `<head>` 안 순서는 `slds-plus.css` → `milvusVf` → `milvusBridge` → `milvusBrand` → `milvusOverride`. `<body>`에 `slds-scope` 클래스가 자동으로 붙어 래퍼는 필요 없다. 브랜드 버튼 배경 `#2976ca`가 LEX와 같고, `milvusBrand`의 반경도 VF에 닿는다. 기본 아바타 이미지는 200으로 보인다(14장 VF 항목 4개 해소) | 10/14 Task 24 측정(페이지 2개, 둘 다 `<apex:page showHeader="false" sidebar="false" standardStylesheets="false">`) |
 
 ## 14. 미확인 (구현 중 확인할 것)
@@ -657,7 +659,6 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | `node_modules`의 `.storybook`으로 정적 빌드(`storybook build`, `milvus storybook build`)도 되는가. 개발 서버(`preview.ts`·`manager.ts`, `../lib/*.ts` import 포함)는 10/14 tgz 리허설에서 동작했다(13장) | 다음 tgz 리허설 |
 | pnpm 11.5.3 이후(10.x는 10.34.2 이후) 프로젝트 `.npmrc`의 `${…}` 치환을 하지 않는다는 pnpm.io 설명(Learn 07). 10.13.1에서는 치환이 동작했다(13장). 고객 프로젝트가 더 새 pnpm을 쓰면 토큰 줄은 `~/.npmrc`, 범위 레지스트리는 `pnpm-workspace.yaml`의 `registries`로 안내해야 한다 — 그 버전에서 실제 확인 | Task 20(milvus-design.md 설치 안내) 전 |
 | 고객 프로젝트에서 pnpm이 `esbuild` 빌드 스크립트를 건너뛰는 것이 Storybook 정적 빌드·Vite에 영향을 주는가. 영향이 있으면 `init`이 `pnpm.onlyBuiltDependencies`에 `esbuild`를 더한다 | Task 11·18 |
-| App Manager의 "앱이 열릴 때 백그라운드로 로드" 체크가 프로브의 decorator `eager`와 같은 설정인가. 10/14 리허설은 App Manager로 붙이면 들어간다는 것까지 확인했고, 체크 상태와 유틸리티 패널을 열었는지는 기록하지 않았다(9.7, 13장) | 다음 org 확인(읽기만) |
 | `Bash(pnpm milvus deploy *)`가 인자 없는 명령에도 걸리는가 | Task 23 리허설(10/12 판정: 고객 프로젝트에서 Claude Code를 직접 띄워야 해서 M3 마무리에서 옮김) |
 | `Edit(...)` deny 규칙이 의도대로 막는가 | Task 23 리허설(같은 이유) |
 | org `accent-2`의 다크 값(`#87aef7`)이 팔레트 70단계(`#8cb1f7`)와 다른 원인. 다크 모드가 범위 밖이라 지금 화면에는 영향이 없다(기록 3.9) | 다크 모드 검토 때 |
