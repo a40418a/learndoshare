@@ -78,7 +78,7 @@
 - **LWC는 JavaScript(`.js`)로 쓴다.** `.ts` LWC를 그대로 배포하면 org가 타입 검사로 거부한다
 - **`milvus` 접두사는 밀버스 전용이다.** 프로젝트 컴포넌트·변수에 `milvus`, `--milvus-`를 쓰지 않는다
 - 프로젝트 컴포넌트에서 브랜드 스타일이 필요하면 `c/milvusScript`의 `loadBrand(this)`를 부른다
-- 개인정보 필드(`Phone`, `Email`, 주소)와 `FIELDS(ALL)`는 조회하지 않는다. 액세스 토큰을 출력하는 명령(`sf org display`, `sf org open --url-only`)은 쓰지 않는다
+- 개인정보 필드(`Phone`, `Email`, 주소)와 `FIELDS(ALL)`는 조회하지 않는다. 액세스 토큰을 출력하는 명령(`sf org display`, `sf org open --url-only`·`-r`·`--json`, `sf org list --json`, `sf auth list --json`)과 `SF_CONTENT_TYPE=JSON`(모든 sf 출력을 JSON으로 바꾼다)은 쓰지 않는다. 별칭 확인은 `--json` 없는 `sf org list`로 한다
 
 ## 6. Claude에게 시키는 법
 

@@ -8,15 +8,17 @@ import { packageInfo } from "./context.ts";
 import { runDeploy } from "./deploy.ts";
 import { runInit } from "./init.ts";
 import { runStorybook } from "./storybook.ts";
+import { runUpdate } from "./update.ts";
 
 const USAGE =
-  "사용법: milvus --version | milvus init --target-org <별칭> (--brand <이름> | --from-org) [--no-vf] | milvus check [--style] | milvus storybook [build] | milvus deploy [--target-org <별칭>] [--yes]";
+  "사용법: milvus --version | milvus init --target-org <별칭> (--brand <이름> | --from-org) [--no-vf] | milvus check [--style] | milvus storybook [build] | milvus deploy [--target-org <별칭>] [--yes] | milvus update [--force]";
 
 export async function main(argv: string[]): Promise<number> {
   if (argv[0] === "init") return runInit(argv.slice(1));
   if (argv[0] === "check") return checkCommand(argv.slice(1));
   if (argv[0] === "storybook") return runStorybook(argv.slice(1));
   if (argv[0] === "deploy") return runDeploy(argv.slice(1));
+  if (argv[0] === "update") return runUpdate(argv.slice(1));
   // strict: false — 명령별 옵션(--target-org 등)은 각 명령이 읽는다
   const { values, positionals } = parseArgs({
     args: argv,

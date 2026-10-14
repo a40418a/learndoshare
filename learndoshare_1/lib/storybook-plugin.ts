@@ -2,7 +2,8 @@
 // - 저장소 모드: brands/<브랜드>/(theme.json, util.css, 로고)와 templates의 milvusBridge.css·milvusOverride.css
 // - 프로젝트 모드(MILVUS_PROJECT_DIR): milvus.config.json 브랜드의 BrandingSet(BRAND_COLOR → 팔레트, BRAND_IMAGE → 로고)과
 //   staticresources의 milvusBrand.css(util.css)·milvusBridge.css·milvusOverride.css. 비교용 "SLDS 기본"도 함께 준다
-// 가상 모듈 virtual:milvus-brands가 mode와 brands를 내보내고, /__milvus/brand-request가 명세 페이지의 요청 파일을 읽고 쓴다
+// 가상 모듈 virtual:milvus-brands가 mode와 brands를 내보내고, /__milvus/brand-request가 명세 페이지의 요청 파일을 읽고 쓴다.
+// 가상 모듈 virtual:milvus-sentinel은 반영 검사(설계 9.6의 2)의 센티널 브랜드를 내보낸다
 import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { extname, join, sep } from "node:path";
@@ -12,7 +13,9 @@ import { readConfig, type MilvusConfig } from "../cli/context.ts";
 import { logoAsset, readBranding } from "./branding.ts";
 import { loadRuleContext } from "./hooks-index.ts";
 import { brandPalette } from "./palette.ts";
-import { checkUtilCss } from "./rules.ts";
+import { BRAND_COLOR_PATTERNS, checkUtilCss } from "./rules.ts";
+import { sentinelCss, sentinelPlan } from "./sentinel.ts";
+import { SPEC_ITEMS } from "./spec-items.ts";
 
 export type BrandData = {
   name: string;
@@ -35,6 +38,8 @@ const REQUEST_FILE = "milvus-brand-request.md";
 const ENDPOINT = "/__milvus/brand-request";
 const VIRTUAL = "virtual:milvus-brands";
 const RESOLVED = `\0${VIRTUAL}`;
+const SENTINEL = "virtual:milvus-sentinel";
+const RESOLVED_SENTINEL = `\0${SENTINEL}`;
 const PKG_ROOT = fileURLToPath(new URL("..", import.meta.url));
 const MAX_BODY = 1_000_000;
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
@@ -134,6 +139,24 @@ export function loadBrands(o: PluginOptions): BrandData[] {
   return brandsFromProject(o.projectDir!, config);
 }
 
+/**
+ * 센티널 브랜드(lib/sentinel.ts). 허용 범위는 모드의 규칙 문맥으로 정한다(프로젝트 모드는 프로젝트의 밀버스 컴포넌트·milvusBridge.css가 읽는 --milvus-*).
+ * - sentinelHooks: [이름, 값 종류]. 반영 검사가 종류마다 계산값(지문)을 잰다
+ * - missing: 구별되는 값을 넣지 못한 hook과 이유. 페이지에 "센티널 없음"으로 보여 준다
+ * - brandColorHooks: 브랜드 색 계열 hook 이름. 반영 검사가 기본 브랜드에서 그 색을 재어, 바뀌지 않은 브랜드 색(org 테마가 원본)을 빈틈에서 뺀다
+ */
+export function sentinelModule(o: PluginOptions): string {
+  const ctx = loadRuleContext({ pkgRoot: PKG_ROOT, projectRoot: o.mode === "project" ? o.projectDir : undefined });
+  const plan = sentinelPlan(ctx, SPEC_ITEMS);
+  const exports = {
+    sentinelCss: sentinelCss(plan),
+    sentinelHooks: plan.decls.map((d) => [d.name, d.kind]),
+    missing: plan.missing,
+    brandColorHooks: [...ctx.readGHooks].filter((n) => BRAND_COLOR_PATTERNS.some((p) => p.test(n))),
+  };
+  return Object.entries(exports).map(([k, v]) => `export const ${k} = ${JSON.stringify(v)};\n`).join("");
+}
+
 const parseUrl = (url: string) => {
   try {
     return new URL(url);
@@ -211,8 +234,9 @@ export function milvusStorybookPlugin(o: PluginOptions): Plugin {
 
   return {
     name: "milvus-storybook",
-    resolveId: (id) => (id === VIRTUAL ? RESOLVED : undefined),
+    resolveId: (id) => (id === VIRTUAL ? RESOLVED : id === SENTINEL ? RESOLVED_SENTINEL : undefined),
     load(id) {
+      if (id === RESOLVED_SENTINEL) return sentinelModule(o);
       if (id !== RESOLVED) return;
       return `export const mode = ${JSON.stringify(o.mode)};\nexport const brands = ${JSON.stringify(loadBrands(o))};\n`;
     },
@@ -220,8 +244,10 @@ export function milvusStorybookPlugin(o: PluginOptions): Plugin {
       server.watcher.add(sources);
       const reload = (file: string) => {
         if (!sources.some((s) => file === s || file.startsWith(s + sep))) return;
-        const mod = server.moduleGraph.getModuleById(RESOLVED);
-        if (mod) server.moduleGraph.invalidateModule(mod);
+        for (const id of [RESOLVED, RESOLVED_SENTINEL]) {
+          const mod = server.moduleGraph.getModuleById(id);
+          if (mod) server.moduleGraph.invalidateModule(mod);
+        }
         server.ws.send({ type: "full-reload" });
       };
       for (const event of ["add", "change", "unlink"]) server.watcher.on(event, reload);

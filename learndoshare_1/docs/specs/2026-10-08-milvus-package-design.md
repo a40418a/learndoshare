@@ -187,10 +187,16 @@ force-app/main/default/
 7. 확인용 명령 `sf org open --target-org <별칭> --path <경로>`를 출력한다(실행하지 않음. `--url-only`는 토큰이 든 주소를 출력하므로 쓰지 않는다). LEX 테마 색은 새로고침 뒤에 반영된다(실측)
 
 ### 4.5 `update [--force]`
-- 설치된 새 버전의 밀버스 관리 파일을 반영한다. **전부 반영하거나 아무것도 바꾸지 않는다.** 로컬에서 고친 밀버스 관리 파일이 하나라도 있으면 차이를 보여 주고 아무것도 바꾸지 않은 채 종료 코드 1로 끝난다
+- 설치된 새 버전의 밀버스 관리 파일을 반영한다. **전부 반영하거나 아무것도 바꾸지 않는다**(쓰는 도중 권한·디스크 오류가 난 경우의 한계는 아래 구현 판단). 로컬에서 고친 밀버스 관리 파일이 하나라도 있으면 차이를 보여 주고 아무것도 바꾸지 않은 채 종료 코드 1로 끝난다
 - `--force`는 로컬 수정을 패키지 원본으로 덮어쓴다. 같은 버전에서 원래대로 되돌릴 때도 쓴다
 - `.claude/settings.json`은 `init`과 같은 병합을 다시 한다(새 버전이 추가한 permissions·hook 반영)
 - 성공하면 `milvus.config.json`의 버전과 sha256을 함께 바꾼다
+- 구현 판단(2026-10-14, #36)
+  - 로컬 수정 판단: 파일의 sha256이 `milvus.config.json`에 기록된 값과 다르면 충돌이다. 기록이 없는 경로(새 버전이 더한 관리 파일)에 다른 내용의 파일이 이미 있어도 사용자 파일이라 충돌이다. 파일이 없으면 잃을 수정이 없으므로 충돌이 아니라 복구한다
+  - [소유]와 [생성]은 바꾸지 않는다. `milvusVf.css`는 패키지에 틀만 있고 내용은 `check`·`deploy`가 지금 `BRAND_COLOR`로 다시 만든다. 틀로 덮어쓰면 브랜드 팔레트가 사라진다
+  - 새 패키지에서 사라진 관리 파일은 `managed`에서만 빼고 파일은 지우지 않는다. 지울지는 org에 배포된 것과 함께 사람이 정하도록 목록으로 안내한다
+  - 차이는 처음 달라진 줄과 줄 수만 보인다. `settings.json` 병합을 파일 쓰기보다 먼저 해서, 기존 `settings.json`이 깨졌으면 아무것도 바꾸지 않는다
+  - 한계: 쓰기 단계(settings 병합 뒤)에서 권한·디스크 오류가 나면 일부 파일만 바뀐다. 롤백은 하지 않는다. 먼저 바뀐 파일은 기록한 sha256과 같았거나(로컬 수정 없음) `--force`로 덮어쓰기에 동의한 것이라 잃는 수정이 없다. 이때 "일부 파일이 이미 바뀌었다, 원인을 고친 뒤 같은 명령을 다시 실행하라"고 안내하고 1로 끝난다. `milvus.config.json`을 마지막에 쓰므로 다시 실행하면 이미 쓴 파일은 새 원본과 같아 건너뛰고 나머지를 마친다(테스트로 고정)
 
 ---
 
@@ -387,7 +393,12 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
       "Bash(sf data create *)", "Bash(sf data delete *)", "Bash(sf data update *)", "Bash(sf data upsert *)", "Bash(sf apex run *)"
     ],
     "deny": [
-      "Bash(sf org display)", "Bash(sf org display *)", "Bash(sf org open --url-only *)",
+      "Bash(sf org display)", "Bash(sf org display *)",
+      "Bash(sf org open --url-only *)", "Bash(sf org open * --url-only)", "Bash(sf org open * --url-only *)",
+      "Bash(sf org open -r *)", "Bash(sf org open * -r)", "Bash(sf org open * -r *)",
+      "Bash(sf org open --json *)", "Bash(sf org open * --json)", "Bash(sf org open * --json *)",
+      "Bash(sf org list --json *)", "Bash(sf org list * --json)", "Bash(sf org list * --json *)",
+      "Bash(sf auth list --json *)", "Bash(sf auth list * --json)", "Bash(sf auth list * --json *)",
       "Edit(/force-app/main/default/lwc/milvus*/**)",
       "Edit(/force-app/main/default/classes/utils/design/**)",
       "Edit(/force-app/main/default/components/milvusHead.component*)",
@@ -409,7 +420,14 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 - `ask`는 auto 모드에서도 실행 전에 묻는다. 규칙 순서는 deny → ask → allow다(공식 문서)
 - hook은 바뀐 파일이 `milvusBrand.css`, `milvusOverride.css`, `brandingSets/`일 때만 `check --style`을 실행한다. 프로젝트에서 패키지를 찾아 `dist/cli/index.js`를 node로 직접 실행한다(pnpm 기동 0.3초를 없애고 Windows의 shell 경고를 피한다, 10/9 판정)
 - 결과 전달(공식 문서 code.claude.com/docs/en/hooks, 2026-10-09 확인: PostToolUse가 0으로 끝나면 stderr는 디버그 로그로만 가고 Claude는 보지 못한다): 2로 끝나면 stderr를 그대로 넘겨 Claude가 고칠 값을 본다. 0인데 override 경고가 있으면 stdout에 `{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"…"}}`를 써서 Claude에게 알린다
-- 저장소 hook H2의 2·3층(개인정보 필드·`FIELDS(ALL)` 조회, 토큰을 출력하는 명령)도 프로젝트에 가져간다(10/9 판정). 토큰을 출력하는 `sf org display`와 `sf org open --url-only`는 `deny`로 막는다. 개인정보 필드와 `FIELDS(ALL)`는 명령 패턴으로 막을 수 없어 `milvus-design.md`의 규칙 문장으로 둔다
+- 저장소 hook H2의 2·3층(개인정보 필드·`FIELDS(ALL)` 조회, 토큰을 출력하는 명령)도 프로젝트에 가져간다(10/9 판정). 토큰을 출력하는 `sf org display`와 `sf org open --url-only`는 `deny`로 막는다. `sf org open`은 `--url-only`(짧게 `-r`)와 `--json`일 때 front door URL을 출력하므로 옵션 위치와 상관없이 막는다(공식 소스 [plugin-org `orgOpenCommandBase.ts`](https://github.com/salesforcecli/plugin-org/blob/main/src/shared/orgOpenCommandBase.ts)의 `output = { orgId, url, username }`, 2026-10-14 확인). `deploy`가 출력하는 `sf org open --target-org … --path …`는 브라우저만 열어 막지 않는다. 환경 변수 `SF_CONTAINER_MODE`에서도 URL이 출력되지만 명령 패턴으로는 막을 수 없다. 개인정보 필드와 `FIELDS(ALL)`는 명령 패턴으로 막을 수 없어 `milvus-design.md`의 규칙 문장으로 둔다
+- `sf org list --json`과 `sf auth list --json`(= `sf org list auth --json`)은 모든 org의 액세스 토큰을 출력하므로 `deny`로 막는다(#36)
+  - 근거: 2026-10-13 로컬 실측(sf 2.108.6, 출력의 org마다 `accessToken`), 공식 소스 [plugin-org 5.9.30 `orgListUtil.ts`](https://github.com/salesforcecli/plugin-org/blob/5.9.30/src/shared/orgListUtil.ts)(복호화한 필드에서 `refreshToken`·`clientSecret`만 뺀다), [plugin-auth 3.9.8 `org/list/auth.ts`](https://github.com/salesforcecli/plugin-auth/blob/3.9.8/src/commands/org/list/auth.ts)(`AuthInfo.listAllAuthorizations()` 결과를 그대로 돌려준다. 별칭 `auth:list`), [sfdx-core 8.23.2 `authInfo.ts`](https://github.com/forcedotcom/sfdx-core/blob/8.23.2/src/org/authInfo.ts)(`accessToken`을 넣는다). 모두 2026-10-14 확인
+  - 두 플러그인의 `main`(2026-10-14)은 `SF_TEMP_SHOW_SECRETS`가 없으면 `accessToken`을 가린다. 어느 sf 버전부터인지는 미확인이고, 고객 프로젝트의 sf 버전을 알 수 없어 규칙을 유지한다
+  - `--json` 없는 `sf org list`·`sf auth list`는 막지 않는다. 표 출력에는 토큰이 없고, 4.4가 별칭 확인에 `sf org list`를 안내한다
+  - 규칙은 명령마다 세 개다(`--json *`, `* --json`, `* --json *`). 근거는 공식 문서(code.claude.com/docs/en/permissions "Wildcard patterns", 2026-10-14 확인)의 표다: `*`는 공백을 포함한 아무 글자나 맞고 가운데에도 둘 수 있다(`Bash(git log * main)`), 끝의 ` *`가 유일한 와일드카드이면 인자 없는 명령도 맞는다(그래서 `--json *`가 `sf org list --json`도 막는다), 와일드카드가 둘이면 끝의 ` *`는 빈 인자를 맞추지 않는다(`Bash(* --help *)`는 `npm --help`에 안 맞음). `tests/templates.test.ts`가 이 표를 옮긴 근사로 확인한다. 실제 Claude Code에서 막히는지는 14장
+  - 부수 효과: `sf org list * --json`은 토큰을 출력하지 않는 `sf org list limits|metadata|users … --json`도 막는다. `--json` 없이 쓰면 된다. `init`이 내부에서 부르는 `sf org list limits --json`은 Claude의 Bash 도구를 거치지 않아 영향이 없다
+  - **deny는 완전한 차단이 아니다.** 같은 문서가 인자를 제한하는 Bash 규칙은 깨지기 쉽다고 경고하고, deny는 앞의 환경변수 대입을 건너뛰고 맞춘다고 적는다. 그래서 다음은 걸리지 않는다: `SF_CONTENT_TYPE=JSON sf org list`([sf-plugins-core 12.2.4 `sfCommand.ts`](https://github.com/salesforcecli/sf-plugins-core/blob/12.2.4/src/sfCommand.ts)의 `jsonEnabled()`가 이 환경변수로 JSON을 낸다. 셸에 이 값이 설정되어 있으면 `--json` 없는 `sf org list`도 토큰을 낸다), 콜론 형식(`sf org:list --json`, `sf auth:list --json`, `sf force:auth:list --json`), `sfdx force:org:list --json`, `sh -c` 안의 명령. 이 부분은 `milvus-design.md`의 규칙 문장(강제력 없음)으로 둔다
 - 커밋된 설정의 hook은 팀원에게 별도 동의 없이 실행되므로 hook은 하나만 두고 `milvus-design.md`에 적는다
 
 ---
@@ -567,6 +585,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | `deploy` | 대상 org 없음, `check` 실패, sf 미설치·인증 만료 | 배포하지 않음 |
 | `deploy` | 일부 실패 | 실패 항목과 이유를 보여 주고 활성화 단계로 넘어가지 않음 |
 | `update` | 로컬에서 고친 밀버스 관리 파일 | 아무것도 바꾸지 않고 차이 표시, 종료 코드 1. `--force`로 덮어씀 |
+| `update` | 쓰는 도중 오류(권한·디스크) | 일부 반영. 그렇게 안내하고 종료 코드 1. 원인을 고친 뒤 같은 명령을 다시 실행하면 나머지를 마침(config를 마지막에 쓴다, 4.5) |
 
 ---
 
@@ -650,6 +669,8 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | App Manager의 "앱이 열릴 때 백그라운드로 로드" 체크는 유틸리티 바 FlexiPage의 decorator `eager` = `true`로 저장된다(Tooling API `FlexiPage.Metadata` 조회). 체크가 꺼져 있으면 유틸리티 패널을 열기 전까지 로더가 만들어지지 않아 표준 화면에 브랜드가 들어가지 않고, 켜면 패널을 열지 않아도 리드 목록에 세 link가 들어간다(14장 항목 해소) | 10/14 리허설 |
 | 줄인 브리지(111,364바이트)에서 리드 목록 높이는 Salesforce 원래 값이다: 머리 버튼 그룹 30px, 툴바 검색 입력·아이콘 버튼 32px, 목록 선택·열 작업 24px. 컨트롤 높이 브리지가 텍스트 버튼만 높여 생기던 어긋남이 없어졌고, 브랜드 반경 2px는 모두 닿는다(5.6) | 10/14 리허설 |
 | VF: `milvusHead` 컴포넌트 안의 `<apex:slds/>`도 Visualforce Settings SLDS 2 설정의 대상이다(`slds-plus.css`). `<head>` 안 순서는 `slds-plus.css` → `milvusVf` → `milvusBridge` → `milvusBrand` → `milvusOverride`. `<body>`에 `slds-scope` 클래스가 자동으로 붙어 래퍼는 필요 없다. 브랜드 버튼 배경 `#2976ca`가 LEX와 같고, `milvusBrand`의 반경도 VF에 닿는다. 기본 아바타 이미지는 200으로 보인다(14장 VF 항목 4개 해소) | 10/14 Task 24 측정(페이지 2개, 둘 다 `<apex:page showHeader="false" sidebar="false" standardStylesheets="false">`) |
+| 설치본 `update`(0.0.1 → 0.1.0 tgz, `learndoshare_2`): 버전을 올리면 바뀐 [관리] 파일(`milvus-design.md`, skill)만 갱신하고 `settings.json`에 새 deny 14개를 병합한다. [관리] 파일 하나를 고친 상태에서는 줄 단위 차이를 보여 주고 config까지 아무것도 바꾸지 않은 채 1로 끝난다. `--force`는 그 파일만 원본으로 되돌린다. [소유] 파일(`milvusBrand.css`, `milvusOverride.css`, BrandingSet)은 그대로이고 뒤의 `check`가 통과한다 | 10/14 M7 리허설 |
+| 저장소 `pnpm build:lwc`는 `node_modules` 안의 심볼릭 링크를 따라간 경로를 별개 모듈로 본다. 작업 폴더에 자기 참조 링크 `node_modules/node_modules`가 있으면 `@lwc/engine-dom`이 경로가 다른 사본으로 여러 번 번들되고, `lightning-*`이 "does not extends LightningElement"로 그려지지 않는다. 링크를 지우면 정상이다. 같은 Mac에서 새로 설치한 main·M7 소스는 정상이고, CI 배포본(GitHub Pages)도 정상이었다. 고객 빌드(`milvus storybook`, `npmFromPackage`)는 엔진을 절대 경로로 받아 이 영향이 없다 | 10/14 조사(`lwc-render-debug`) |
 
 ## 14. 미확인 (구현 중 확인할 것)
 
@@ -661,6 +682,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 고객 프로젝트에서 pnpm이 `esbuild` 빌드 스크립트를 건너뛰는 것이 Storybook 정적 빌드·Vite에 영향을 주는가. 영향이 있으면 `init`이 `pnpm.onlyBuiltDependencies`에 `esbuild`를 더한다 | Task 11·18 |
 | `Bash(pnpm milvus deploy *)`가 인자 없는 명령에도 걸리는가 | Task 23 리허설(10/12 판정: 고객 프로젝트에서 Claude Code를 직접 띄워야 해서 M3 마무리에서 옮김) |
 | `Edit(...)` deny 규칙이 의도대로 막는가 | Task 23 리허설(같은 이유) |
+| `sf org list --json`·`sf auth list --json` deny 규칙(명령마다 세 개)이 실제 Claude Code에서 `--json` 위치와 상관없이 막고 `--json` 없는 목록은 막지 않는가. 공식 문서의 와일드카드 표로는 맞다(7.2). 플러그인이 `accessToken`을 가리기 시작한 sf 버전 | 다음 리허설(고객 프로젝트에서 Claude Code를 직접 띄울 때) |
 | org `accent-2`의 다크 값(`#87aef7`)이 팔레트 70단계(`#8cb1f7`)와 다른 원인. 다크 모드가 범위 밖이라 지금 화면에는 영향이 없다(기록 3.9) | 다크 모드 검토 때 |
 | native에서 기본 컴포넌트 CSS가 직접 읽는 `--slds-s-*`에 `:root` 값이 닿는가 (9.1 전제 수정) | 발표 뒤 native 빌드 |
 | info 토스트에 피드백 색이 반영되는가(10/9 프로브에서 동시 표시 3개 제한으로 못 잼), `shadow-1`의 org 값이 npm 값과 같은가(구조만 기록) | 필요할 때 org 프로브(읽기만) |

@@ -4,7 +4,7 @@
 계획, 일정, 결정 사항은 `README.md`에 있고 규칙은 `../CONTRIBUTING.md`에 있다. 필요한 절만 찾아 읽는다.
 
 - Claude Code는 이 폴더(`learndoshare_1/`)에서 실행한다. git 루트는 상위 `learndoshare/`다
-- 이 문서는 **작업 방식**만 다룬다. 반드시 지켜야 하는 규칙은 hook이 강제한다 (README 11장)
+- 이 문서는 **작업 방식**만 다룬다. 고객 프로젝트에서는 패키지 템플릿의 `permissions.deny/ask`와 `check --style` hook이 규칙을 강제한다(README 11장). 이 저장소에는 커밋된 hook이 없고, 이 문서와 `pnpm test`가 규칙이다
 
 ---
 
@@ -32,7 +32,7 @@
 | 2 | 저장소에 이미 있는가? (`milvus*` 컴포넌트, `scripts/`, `brands/`) | 재사용한다 |
 | 3 | org 설정으로 되는가? (Themes and Branding의 색·로고) | 코드를 쓰지 않는다 |
 | 4 | SLDS가 제공하는가? (`lightning-*` base component → SLDS 블루프린트 클래스) | 그대로 쓴다 |
-| 5 | 브랜드 `util.css`로 되는가? (`brands/<브랜드>/util.css`의 `--slds-g-*`, `--slds-s-*`, 밀버스 컴포넌트의 `--milvus-*`) | 변수만 추가한다 |
+| 5 | 브랜드 `util.css`로 되는가? (이 저장소 `brands/<브랜드>/util.css`, 고객 프로젝트 `staticresources/milvusBrand.css`의 `--slds-g-*`, `--slds-s-*`, 밀버스 컴포넌트·`milvusBridge.css`가 읽는 `--milvus-*`) | 변수만 추가한다 |
 | 6 | 이미 설치된 의존성이나 Node/브라우저 기본 기능으로 되는가? | 그것을 쓴다 |
 | 7 | 그래도 안 되면 | 동작하는 최소 구현을 만든다 |
 
@@ -44,7 +44,7 @@
 
 - `milvusButton`: 비교 예시로 유지한다(2026-10-09, 설계 1장). 모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다. hook·브리지로 안 되는 모양은 opt-in `milvusOverride.css`(마지막 수단, 공식 권고 밖)로 바꾸고, 밀버스 컴포넌트는 SLDS에 기능이 없을 때만 만든다
 - `util.css`의 global hook·컴포넌트 hook 재정의: 공식 권고 밖이고 컴포넌트 hook은 native 전환 때 효과가 사라질 수 있다는 것을 알고 택했다 (README 2장, #18)
-- `pnpm sync:theme`, `create-project.mjs`, hook H1~H8, `milvus.config.json`
+- `pnpm milvus` CLI(`init`·`check`·`storybook`·`deploy`·`update`)와 `milvus.config.json`, 데모 브랜드용 `pnpm sync:theme`. 예전 계획의 `create-project.mjs`는 `init`으로 대체했다(설계 첫머리 "이 문서가 대체하는 것")
 - 표현/컨테이너 분리: 표현 컴포넌트에는 `@wire`, Apex, LDS를 넣지 않는다. 한 파일로 합치는 편이 짧더라도 합치지 않는다
 
 ### 절대 줄이지 않는 것
@@ -69,25 +69,30 @@
 | 위치 | 해도 되는 것 | 하면 안 되는 것 |
 | --- | --- | --- |
 | 컴포넌트 CSS | `var(--slds-g-*, fallback)`, `var(--slds-s-*, fallback)`, `var(--milvus-*, fallback)` 읽기 | hex 색, 브랜드 값, `--slds-c-*`, `--slds-g-*` 재정의, `.slds-*` 클래스 덮어쓰기 |
-| `brands/<브랜드>/util.css` | `:root` 블록 하나에: 이름에 color가 없는 `--slds-g-*`(반경, 간격, 크기, 글자, 그림자), 포커스 그림자 `--slds-g-shadow-*focus*`(값의 색은 `var(--slds-g-color-brand-base-15)`·`var(--slds-g-color-neutral-base-100)`만), 중립 색(`surface*`, `on-surface*`, `border-1/2`, `neutral-base-*`, `disabled*`, `*inverse*` 등. `light-dark()`로, 글자·면 4.5:1 이상), 피드백 색(설계 5.3 표의 이름만, 글자색은 배경·흰색 위 4.5:1 이상), 기본 컴포넌트만 읽는 g 이름 5개, SLDS 2 CSS나 기본 컴포넌트 CSS가 읽는 `--slds-s-*`(버튼만, 입력창만 등. 영향 지도 참고), 색 s hook 6개(hover·선택 바탕, 값은 중립 g hook 하나), 밀버스 컴포넌트나 `milvusBridge.css`가 읽는 `--milvus-*`, `letter-spacing`. 이 파일 하나로 모든 컴포넌트가 바뀐다 | 클래스 규칙, `@font-face`, 글꼴 `--slds-g-font-family*`, 브랜드 색 계열(`accent`·`on-accent`·`border-accent`·`brand-base`·`--slds-r-color-brand*`), 그 밖의 색 hook, `--slds-c-*`·`--sds-c-*`, 읽는 곳이 없는 이름(오타), 다른 일반 속성. `--slds-g-shadow-4`만 바꾸고 포커스에 쓰이는 `-5`·`-6`을 비워 두기 |
+| `brands/<브랜드>/util.css` | `:root` 블록 하나에: 이름에 color가 없는 `--slds-g-*`(반경, 간격, 크기, 글자, 그림자), 포커스 그림자 `--slds-g-shadow-*focus*`(값의 색은 `var(--slds-g-color-brand-base-15)`·`var(--slds-g-color-neutral-base-100)`만), 중립 색(`surface*`, `on-surface*`, `border-1/2`, `neutral-base-*`, `disabled*`, `*inverse*` 등. `light-dark()`로, 글자·면 4.5:1 이상), 피드백 색(설계 5.3 표의 이름만, 글자색은 배경·흰색 위 4.5:1 이상), 기본 컴포넌트만 읽는 g 이름 5개, SLDS 2 CSS나 기본 컴포넌트 CSS가 읽는 `--slds-s-*`(버튼만, 입력창만 등. 영향 지도 참고), 색 s hook 6개(hover·선택 바탕, 값은 중립 g hook 하나. 모달 배경막 `--slds-s-backdrop-color-background`만 값이 정확히 `var(--slds-g-color-neutral-10-opacity-50)`이고, 그 g를 `light-dark()`의 반투명 값으로 함께 쓴다), 밀버스 컴포넌트나 `milvusBridge.css`가 읽는 `--milvus-*`(움직임 시간 `--milvus-motion-duration-*`은 `0.01ms`·`0.2s`처럼 단위를 붙인다), `letter-spacing`. 이 파일 하나로 모든 컴포넌트가 바뀐다 | 클래스 규칙, `@font-face`, 글꼴 `--slds-g-font-family*`, 브랜드 색 계열(`accent`·`on-accent`·`border-accent`·`brand-base`·`--slds-r-color-brand*`), 그 밖의 색 hook, `--slds-c-*`·`--sds-c-*`, 읽는 곳이 없는 이름(오타), 뺀 브리지 변수(`REMOVED_BRIDGE_VARS`), 다른 일반 속성. `--slds-g-shadow-4`만 바꾸고 포커스에 쓰이는 `-5`·`-6`을 비워 두기. 배경막 s hook만 쓰고 g를 비워 두기(`backdrop-pair`, 배경막이 투명해진다). 움직임 시간에 단위 없는 숫자(`motion-unit`, 브리지의 `max()`가 무효가 되어 모달·토스트가 닫히지 않을 수 있다) |
 | `brands/<브랜드>/theme.json`, `logo.*` | 없음 (`pnpm sync:theme`만 생성) | 직접 편집 |
 
 - util.css 규칙의 원본은 설계 5.2·5.3이고 `lib/rules.ts`가 구현한다. 저장소의 `brands/<브랜드>/util.css`는 `pnpm test:brands`(`scripts/check-brands.ts`)가 검사한다
+- **2026-10-14 결정 (설계 5.6, 9.4)**
+  - LEX 컨트롤 높이(텍스트 버튼·입력 1.875rem)는 Salesforce 고정이다. 리허설에서 컨트롤 높이 브리지가 목록·헤더 툴바의 2rem 고정 아이콘 버튼과 어긋나 뺐다(`lib/fixed-list.ts`의 `lex-control-height`)
+  - 같은 날 뺀 브리지 변수(`lib/rules.ts`의 `REMOVED_BRIDGE_VARS`: 컨트롤 높이, Path 양 끝 반경, 컨트롤·정렬 아이콘 크기, 폼 요소 자간, 선택지 라벨 굵기, 비활성 커서, 링크 hover 밑줄, 팝오버 꼬리 그림자, 개체 아이콘 `--milvus-icon-*`)는 쓰지 않는다. 읽는 곳이 없어 검사(`milvus-var`)가 "이 줄을 지운다"고 막는다
 - 패키지 설계에서는 hook으로 안 되는 모양을 위한 opt-in `staticresources/milvusOverride.css`(클래스 규칙, 처음엔 비어 있음)가 생긴다(계획 Task 8). 이 파일은 hex 색, `!important`, `.slds-*`가 아닌 선택자, 브랜드 색 hook 재정의를 경고만 하고 `@font-face`·`@import`만 막는다(설계 5.1)
 - 브랜드 요구가 들어오면 org 테마(색·로고) → `util.css`의 global hook(전체 모양) → `util.css`의 컴포넌트 hook(특정 컴포넌트) → 브리지 변수(hook이 없는 항목) → `milvusOverride.css`(마지막 수단, 공식 권고 밖) 순으로 제안한다. override를 쓸 때는 native 전환·Salesforce 업데이트에 약하다는 것을 알린다. 모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다(설계 5.1)
 - 커스텀 변수 접두사는 `--milvus-`만 쓴다
 
 ## 4. 검증 명령
 
-아직 스크립트가 없는 명령은 해당 Phase에서 만든다. 없으면 없다고 보고하고, 있는 척하지 않는다.
+`package.json`의 스크립트만 적는다. 없는 명령은 없다고 보고하고, 있는 척하지 않는다. CI(`.github/workflows/storybook.yml`)는 `pnpm lint`, `pnpm test`, `pnpm build-storybook`을 실행한다.
 
-| 명령 | 확인하는 것 | 생기는 시점 |
-| --- | --- | --- |
-| `pnpm lint` | ESLint (+ SLDS Linter) | 지금 있음, SLDS Linter는 Phase 8 |
-| `pnpm test:unit` | Jest (`sfdx-lwc-jest`) | 지금 있음 |
-| `pnpm build:lwc` | Rollup으로 LWC 컴파일 | Phase 2 |
-| `pnpm storybook` / `pnpm exec storybook build` | Storybook 실행, 정적 빌드 | Phase 1~2 |
-| `pnpm sync:theme` | org 테마 → `brands/` | Phase 4 |
+| 명령 | 확인하는 것 |
+| --- | --- |
+| `pnpm lint` | ESLint (`force-app/**/lwc/**/*.js`). SLDS Linter는 없다 |
+| `pnpm test` | 아래를 차례로 실행한다: `typecheck`(`tsc --noEmit`) → `test:unit` → `test:node`(`node --test tests/**/*.test.ts`) → `test:brands`(`brands/*/util.css` 규칙) → `test:learn`(`Learn/` 출처·legacy 검사) → `audit:brand` |
+| `pnpm test:unit` | LWC Jest (`sfdx-lwc-jest`) |
+| `pnpm build-storybook` | `build:lwc`(카탈로그 생성 + Rollup LWC 빌드) 뒤 Storybook 정적 빌드(`storybook-static/`) |
+| `pnpm audit:brand` | 정적 반영 검사(설계 9.6). 기준 파일과 달라지거나 고정 목록에 없는 빈틈이 있으면 실패한다 |
+| `pnpm bridge:generate` | SLDS 2 CSS에서 `templates/.../staticresources/milvusBridge.css`를 다시 만든다(검사가 아니라 생성) |
+| `pnpm sync:theme` | org 테마 → `brands/<테마>/`(데모 브랜드용, sf 조회) |
 
 UI 변경은 Storybook에서 해당 브랜드로 직접 확인한다. 가능하면 org 화면과 비교한다.
 
@@ -96,7 +101,7 @@ UI 변경은 Storybook에서 해당 브랜드로 직접 확인한다. 가능하�
 - **pnpm만 쓴다.** `npm`, `npx`, `yarn`은 쓰지 않는다. 문서 예제에 `npx`가 나오면 `pnpm exec`(설치됨)나 `pnpm dlx`(미설치)로 바꾼다
 - **sf CLI:** 조회(`data query`, `sobject describe`, `project retrieve`, `lightning dev`)는 자유롭게 한다. 배포, 삭제, 데이터 변경, `apex run`은 실행 전에 대상 org와 명령을 보여 주고 승인을 받는다
 - 개인정보 필드(`Phone`, `Email`, 주소)나 `FIELDS(ALL)`는 조회하지 않는다
-- `sf org display`처럼 **액세스 토큰을 출력하는 명령은 직접 실행하지 않는다.** 토큰이 필요한 작업(로고 다운로드 등)은 script 안에서 처리하고 토큰을 출력하지 않는다
+- `sf org display`, `sf org list --json`·`sf auth list --json`(모든 org의 `accessToken`), `sf org open --url-only`·`-r`·`--json`(토큰이 든 주소)처럼 **액세스 토큰을 출력하는 명령은 직접 실행하지 않는다.** 토큰이 필요한 작업(로고 다운로드 등)은 script 안에서 처리하고 토큰을 출력하지 않는다
 - `.sfdx/`, `.sf/`, `.env`, `package-lock.json`은 커밋하지 않는다
 - 공개 저장소(`a40418a/learndoshare`)다. 이슈·PR·커밋에 org ID와 인증 정보를 쓰지 않는다
 - `.vscode/settings.json`은 사용자의 개인 설정이다. 요청 없이 커밋하지 않는다
@@ -107,14 +112,16 @@ UI 변경은 Storybook에서 해당 브랜드로 직접 확인한다. 가능하�
 - 확인하지 못한 것은 문서에 **미확인**으로 표시한다. README의 확정 / 미확인 / 미정 구분을 유지한다
 - 새로 확인한 사실은 README 3장("현재까지 확인된 사실")에 반영한다
 
-## 7. 현재 위치 (2026-09-26 기준)
+## 7. 현재 위치 (2026-10-14 기준)
+
+작업은 [패키지 설계](docs/specs/2026-10-08-milvus-package-design.md)와 [구현 계획](docs/plans/2026-10-08-milvus-package-plan.md)의 마일스톤(M0~M7)을 따른다.
 
 | 날짜 | 이정표 |
 | --- | --- |
-| 9/28 | Phase 1 기반 셋업 시작 |
-| **10/2** | ★ go/no-go: `lightning-*`이 Storybook에서 렌더되는가 |
+| 10/8~10/14 | M0~M6 병합: PR #23, #25, #27, #29, #32, #33, #35 |
+| 10/14~ | M7 진행 중(이슈 #36): `update`, 동적 반영 검사, 문서 정리, 최종 발행 |
 | **10/16** | ★ 내용 동결. 이후 기능 추가 없음 |
 | **10/23** | 발표 |
 
-- 일정이 밀리면 README 5.2의 컷 라인 순서대로 뺀다
-- 작업을 시작할 때 README 4장에서 현재 Phase의 체크리스트와 완료 기준을 확인한다
+- 일정이 밀리면 설계 12장(계획 "빼는 순서")의 순서대로 뺀다
+- 작업을 시작할 때 계획에서 해당 Task의 단계와 확인 방법을 확인한다

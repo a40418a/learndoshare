@@ -17,6 +17,7 @@ export const SOURCE_DOMAINS = [
   "github.com/salesforce",
   "github.com/salesforce-ux",
   "github.com/forcedotcom",
+  "github.com/salesforcecli", // Salesforce CLI(sf) 공식 플러그인 소스
   "www.npmjs.com",
   "nodejs.org",
   "www.typescriptlang.org",

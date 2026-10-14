@@ -1,8 +1,15 @@
 // Storybook에는 org가 없다. 이 파일은 org Themes and Branding과 loadBrand(밀버스 LWC)가 하는 일을 흉내 낸다(시뮬레이션).
 // 브랜드 데이터는 lib/storybook-plugin.ts가 만든다(저장소: brands/, 프로젝트: BrandingSet과 staticresources)
 import { brands, mode } from "virtual:milvus-brands";
+import { sentinelCss } from "virtual:milvus-sentinel";
 
 export { brands, mode };
+
+/**
+ * 반영 검사(시작하기/반영 검사, 설계 9.6의 2)의 센티널 브랜드 이름. 기본 브랜드의 팔레트·브리지·override에 util.css만 센티널로 바꾼다.
+ * 툴바에는 없고 스토리 URL의 globals=brand:milvus-sentinel로만 연다. 이름에 -가 있어 브랜드 이름과 겹치지 않는다
+ */
+export const SENTINEL = "milvus-sentinel";
 
 const STYLES = [
   ["milvus-brand-bridge", "bridgeCss"],
@@ -12,7 +19,10 @@ const STYLES = [
 
 /** 브랜드를 문서에 적용하고 적용한 브랜드를 돌려준다. 없는 이름이면 첫 브랜드(기본 브랜드)다 */
 export function applyBrand(name: string) {
-  const brand = brands.find((b) => b.name === name) ?? brands[0];
+  const brand =
+    name === SENTINEL
+      ? { ...brands[0], name: SENTINEL, label: "센티널", utilCss: sentinelCss }
+      : (brands.find((b) => b.name === name) ?? brands[0]);
   // accent hook은 :root에서 계산되므로 팔레트도 :root에 둬야 반영된다 (org도 문서 루트에 테마를 적용한다)
   const root = document.documentElement;
   for (const prop of [...root.style]) {

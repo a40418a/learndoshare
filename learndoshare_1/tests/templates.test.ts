@@ -33,6 +33,30 @@ test("milvus-design.md 4절에 커밋된 hook은 팀원에게도 별도 동의 �
   assert.match(s4, /hook은 `milvus-check\.mjs` 하나만 둔다/);
 });
 
+// Claude Code 권한 규칙의 Bash 와일드카드를 옮긴 근사(code.claude.com/docs/en/permissions "Wildcard patterns", 확인 2026-10-14):
+// `*`는 공백을 포함한 아무 글자나 맞고, 와일드카드가 끝의 ` *` 하나뿐이면 인자 없는 명령도 맞는다
+const bashRule = (rule: string) => {
+  const body = /^Bash\((.*)\)$/.exec(rule)?.[1];
+  if (body === undefined) return undefined;
+  const re = body.split("*").map((s) => s.replace(/[.+?^${}()|[\]\\]/g, "\\$&")).join(".*");
+  return new RegExp(`^${body.endsWith(" *") && body.indexOf("*") === body.length - 1 ? `${re.slice(0, -3)}( .*)?` : re}$`);
+};
+
+test("settings.json deny는 토큰을 출력하는 sf org display·sf org open --url-only(-r)·--json·sf org list --json·sf auth list --json을 옵션 위치와 상관없이 막고, --json 없는 목록은 막지 않는다", () => {
+  const deny: string[] = JSON.parse(read("claude/settings.json")).permissions.deny;
+  const rules = deny.map(bashRule).filter((r) => r !== undefined);
+  const denied = (cmd: string) => rules.some((r) => r.test(cmd));
+  const tokenCommands = ["sf org display", "sf org display --json", "sf org list --json", "sf org list --json --all", "sf org list --all --json"];
+  tokenCommands.push("sf org list --all --json --skip-connection-status", "sf org list auth --json", "sf auth list --json", "sf auth list --loglevel warn --json", "sf auth list --loglevel warn --json --dev-debug");
+  // sf org open은 --url-only(-r)와 --json에서 front door URL을 출력한다(plugin-org src/shared/orgOpenCommandBase.ts의 output)
+  tokenCommands.push("sf org open --url-only", "sf org open --target-org x --url-only", "sf org open -o x --url-only --path /home", "sf org open -r -o x", "sf org open -o x -r", "sf org open -o x -r -p /home");
+  tokenCommands.push("sf org open --json", "sf org open -o x --json", "sf org open -o x --json --path /home");
+  for (const cmd of tokenCommands) assert.ok(denied(cmd), cmd);
+  // 설계 4.4: 대상 org가 없으면 sf org list로 별칭을 확인하라고 안내한다. 표 출력에는 토큰이 없다.
+  // deploy가 출력하는 확인 명령 sf org open --path …는 브라우저만 연다
+  for (const cmd of ["sf org list", "sf org list --all", "sf auth list", "sf org open --target-org x --path /lightning/page/home"]) assert.ok(!denied(cmd), cmd);
+});
+
 test("SKILL.md frontmatter에 name과 description이 있다", () => {
   const fm = /^---\n([\s\S]*?)\n---\n/.exec(skill)?.[1] ?? "";
   assert.match(fm, /^name: milvus-brand$/m);

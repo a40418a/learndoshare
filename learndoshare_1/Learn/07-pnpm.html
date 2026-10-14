@@ -35,6 +35,7 @@
     <li><a href="#husky">husky와 pnpm</a></li>
     <li><a href="#registry">GitHub Packages에서 설치</a></li>
     <li><a href="#milvus">밀버스 설치 준비와 pnpm milvus</a></li>
+    <li><a href="#update">새 버전 반영 (update)</a></li>
     <li><a href="#quiz">스스로 점검</a></li>
     <li><a href="#refs">참고</a></li>
   </ol>
@@ -45,7 +46,7 @@
   <div class="eyebrow">LEARN 07 · Phase 1 준비</div>
   <h1>pnpm 핵심 정리</h1>
   <p class="lead">밀버스는 pnpm만 쓴다. npm에 익숙한 사람이 pnpm에서 걸리는 지점, 특히 Storybook을 설치할 때 문제가 되는 부분을 중심으로 정리한다.</p>
-  <div class="meta"><span>예상 1시간</span><span>2026-10-09 기준 pnpm 최신 12.10.1</span><span>로컬 설치 10.13.1 · Node 24.4.1</span><span>2026-10-14 갱신 (<code>deploy</code> 구현)</span></div>
+  <div class="meta"><span>예상 1시간</span><span>2026-10-09 기준 pnpm 최신 12.10.1</span><span>로컬 설치 10.13.1 · Node 24.4.1</span><span>2026-10-14 갱신 (<code>deploy</code> 구현, M7 <code>update</code>와 최종 버전 0.1.0)</span></div>
 </header>
 
 <section id="why">
@@ -240,19 +241,55 @@ security add-generic-password -a "$USER" -s milvus-npm-token -w</code></pre>
 <pre data-file="터미널 (SFDX 프로젝트 루트)"><code>pnpm add -D @a40418a/milvus-design-system
 pnpm milvus --version
 pnpm milvus init --target-org &lt;별칭&gt; --brand &lt;이름&gt;</code></pre>
-  <p>발행은 두 번(설치 경로 확인용 <code>v0.0.1</code>, 10/16 최종)만 하고, 그 사이 리허설은 <code>pnpm pack</code>으로 만든 tgz를 <code>pnpm add -D &lt;tgz&gt;</code>로 설치한다(설계 2장).</p>
+  <p>발행은 두 번만 한다(설계 2장). 설치 경로 확인용 <code>0.0.1</code>은 2026-10-09에 발행했다. 최종 버전은 <code>0.1.0</code>이다. 저장소 <code>package.json</code>의 <code>version</code>을 0.1.0으로 올렸고, 10/16에 태그 <code>v0.1.0</code>을 push해 발행할 예정이다. 아직 발행하지 않았다(2026-10-14 갱신). 발행 workflow는 태그가 아니라 <code>package.json</code>의 <code>version</code>으로 발행한다. 그 사이 리허설은 <code>pnpm pack</code>으로 만든 tgz를 <code>pnpm add -D &lt;tgz&gt;</code>로 설치한다.</p>
   <h3><code>pnpm milvus</code>는 어떻게 실행되나</h3>
   <ul>
     <li>패키지의 <code>package.json</code>에 <code>"bin": { "milvus": "dist/cli/index.js" }</code>가 있다. pnpm은 설치할 때 프로젝트의 <code>node_modules/.bin/milvus</code>를 만든다</li>
     <li><code>milvus</code>는 pnpm 명령이 아니다. pnpm 문서는 알 수 없는 명령을 받으면 먼저 같은 이름의 스크립트를 찾고, 없으면 그 명령을 셸 명령으로 실행한다고 적는다(<code>pnpm exec</code>와 같은 방식). 그래서 <code>package.json</code>에 스크립트가 없어도 <code>pnpm milvus &lt;명령&gt;</code>이 설치된 CLI를 실행한다. <code>pnpm exec milvus &lt;명령&gt;</code>도 같다</li>
     <li>pnpm이 만든 <code>milvus</code> 실행 파일은 실제 경로의 <code>dist/cli/index.js</code>를 실행한다(설계 13장, 2026-10-09 스파이크). Node는 <code>node_modules</code> 안의 <code>.ts</code>를 실행하지 않으므로 CLI는 <code>dist/</code>에 JS로 빌드해 발행한다(설계 2장)</li>
-    <li>지금 있는 명령은 <code>--version</code>, <code>init</code>, <code>check [--style]</code>(Task 10~12), <code>storybook [build]</code>(Task 18), <code>deploy [--target-org &lt;별칭&gt;] [--yes]</code>(Task 22)이다. 2026-10-14 갱신: <code>deploy</code>는 구현했고, tgz로 설치한 프로젝트에서 메타데이터 배포와 활성 테마 변경 두 단계가 모두 성공했다(설계 13장, <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html#deploy">05 테마 동기화</a>). <code>update</code>는 <span class="tag info">계획</span>이다. <code>init</code>이 <code>package.json</code>에 <code>"storybook": "milvus storybook"</code>을 더하므로 <code>pnpm storybook</code>으로도 띄운다. <code>storybook</code>은 고객 프로젝트에 storybook을 따로 설치하지 않고 패키지 의존성의 실행 파일을 쓴다(<a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html#modes">03 두 모드</a>)</li>
+    <li>지금 있는 명령은 <code>--version</code>, <code>init</code>, <code>check [--style]</code>(Task 10~12), <code>storybook [build]</code>(Task 18), <code>deploy [--target-org &lt;별칭&gt;] [--yes]</code>(Task 22)이다. 2026-10-14 갱신: <code>deploy</code>는 구현했고, tgz로 설치한 프로젝트에서 메타데이터 배포와 활성 테마 변경 두 단계가 모두 성공했다(설계 13장, <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html#deploy">05 테마 동기화</a>). <code>update [--force]</code>도 구현했다(Task 25, 2026-10-14 갱신, <a href="#update">아래 절</a>). <code>init</code>이 <code>package.json</code>에 <code>"storybook": "milvus storybook"</code>을 더하므로 <code>pnpm storybook</code>으로도 띄운다. <code>storybook</code>은 고객 프로젝트에 storybook을 따로 설치하지 않고 패키지 의존성의 실행 파일을 쓴다(<a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html#modes">03 두 모드</a>)</li>
     <li>예외: Claude Code hook은 pnpm을 거치지 않고 패키지의 <code>dist/cli/index.js</code>를 node로 직접 실행한다. pnpm 기동 시간을 줄이고 Windows에서 셸이 필요한 문제를 피하려는 것이다(<a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html#runbook">08 Claude Code</a>)</li>
   </ul>
   <h3><code>init</code>이 프로젝트 <code>.npmrc</code>에 더하는 두 줄</h3>
   <p><code>init</code>은 프로젝트 <code>.npmrc</code>에 위 두 줄이 없으면 더한다. 팀원도 같은 준비를 하게 하려는 것이다(설계 3장). 토큰 값이 아니라 환경 변수 이름 <code>${NODE_AUTH_TOKEN}</code>만 쓴다. 이 저장소의 pnpm 10.13.1은 프로젝트 <code>.npmrc</code>의 이 이름을 치환해 설치했다(설계 13장). 다만 <a href="#registry">위 절</a>대로 pnpm 11.5.3부터(10.x는 10.34.2부터)는 프로젝트 <code>.npmrc</code>의 인증 값에 있는 <code>${...}</code>를 풀지 않는다. 고객 프로젝트가 더 새 pnpm을 쓰면 토큰 줄을 <code>~/.npmrc</code>로 옮겨야 한다. 그 버전에서 실제로 어떻게 되는지는 <span class="tag warn">미확인</span>이다(설계 14장, <code>milvus-design.md</code> 설치 안내를 쓰기 전에 확인).</p>
   <div class="callout warn"><strong><code>esbuild</code> 빌드 스크립트 경고</strong>설치할 때 pnpm 10.13.1이 <code>esbuild</code> 빌드 스크립트를 건너뛰었다고 경고한다(<a href="#builds">빌드 스크립트 승인</a>). Storybook의 <code>.ts</code> 설정 변환은 동작했다(설계 13장). 정적 빌드에 영향이 있는지는 <span class="tag warn">미확인</span>이고(설계 14장), 영향이 있으면 <code>init</code>이 <code>pnpm.onlyBuiltDependencies</code>에 <code>esbuild</code>를 더한다.</div>
   <p class="sources">출처: <a href="https://pnpm.io/10.x/pnpm-cli">pnpm 10.x — pnpm CLI (알 수 없는 명령: 스크립트를 찾고, 없으면 셸 명령으로 실행)</a> (확인 2026-10-12) · <a href="https://pnpm.io/cli/exec">pnpm exec</a> (확인 2026-10-09) · <a href="https://nodejs.org/api/typescript.html">Node.js — Modules: TypeScript (node_modules 아래의 TypeScript 파일은 처리하지 않음)</a> (확인 2026-10-12) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09) · <a href="https://pnpm.io/10.x/npmrc">pnpm 10.x — .npmrc (${NAME} 치환, 10.34.2 제한)</a> (확인 2026-10-09) · <a href="https://pnpm.io/npmrc">pnpm — Auth &amp; Registry Settings (11.5.3 제한)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (0장 준비, 2장 bin·engines·발행, 3장 .npmrc, 4장 명령, 4.1 사전 점검, 4.2 storybook, 4.4 deploy, 13장 설치·실행 경로 확인과 10/14 리허설, 14장 새 pnpm·esbuild 미확인)</a> (확인 2026-10-14)</p>
+</section>
+
+<section id="update">
+  <h2>새 버전 반영: <code>pnpm milvus update</code> <span class="tag ok">구현</span></h2>
+  <p>2026-10-14 추가. 패키지 버전을 올리는 일과 프로젝트에 복사된 밀버스 파일을 올리는 일은 다른 일이다(<a href="../docs/specs/2026-10-08-milvus-package-design.md">설계</a> 4.5, 코드 <code>cli/update.ts</code>).</p>
+  <h3>왜 따로 필요한가</h3>
+  <ul>
+    <li><code>pnpm add -D @a40418a/milvus-design-system@&lt;버전&gt;</code>은 <code>node_modules</code> 안의 패키지와 <code>package.json</code>·lockfile을 바꾼다. pnpm 문서의 <code>pnpm add sax@3.0.0</code>처럼 버전을 지정해 설치한다</li>
+    <li>그런데 <code>init</code>은 밀버스 LWC, <code>milvusBridge.css</code>, <code>milvus-design.md</code>, skill, hook을 프로젝트 폴더에 <b>복사</b>했다. org에 배포되는 것은 <code>node_modules</code>가 아니라 프로젝트의 <code>force-app/</code> 아래 소스이기 때문이다(설계 3장). 복사본은 pnpm이 관리하지 않으므로 새 버전을 설치해도 그대로다. 이 복사본을 설치된 버전에 맞추는 명령이 <code>update</code>다</li>
+    <li>무엇을 복사했고 그때 내용이 무엇이었는지는 <code>milvus.config.json</code>의 <code>managed</code>(경로와 패키지 원본의 sha256)가 기억한다. <code>update</code>는 이 기록으로 "패키지가 놓은 그대로인가, 사람이 고쳤는가"를 가른다</li>
+  </ul>
+  <h3>동작</h3>
+  <div class="table-wrap"><table>
+    <tr><th>경우</th><th>동작</th></tr>
+    <tr><td>[관리] 파일이 패키지가 놓은 그대로다(sha256이 기록과 같다)</td><td>새 원본으로 바꾼다</td></tr>
+    <tr><td>[관리] 파일을 로컬에서 고쳤다(기록과 다르다). 또는 새 버전이 더한 관리 파일 경로에 다른 내용의 파일이 이미 있다</td><td>충돌이다. <code>--force</code>가 없으면 파일마다 처음 달라진 줄과 줄 수를 보여 주고 <b>아무 파일도 바꾸지 않은 채</b> 종료 코드 1로 끝난다(전부 반영하거나 아무것도 바꾸지 않는다)</td></tr>
+    <tr><td><code>--force</code></td><td>충돌 파일도 패키지 원본으로 덮어쓴다. 같은 버전에서 원래대로 되돌릴 때도 쓴다</td></tr>
+    <tr><td>[관리] 파일이 없다</td><td>잃을 수정이 없으므로 복구한다</td></tr>
+    <tr><td>[소유] 파일(<code>milvusBrand.css</code>, <code>milvusOverride.css</code>, <code>BrandingSet</code>, 테마, 로고)</td><td>바꾸지 않는다. <code>--force</code>여도 그대로다</td></tr>
+    <tr><td>[생성] 파일 <code>milvusVf.css</code></td><td>바꾸지 않는다. 패키지에는 틀만 있고, 내용은 <code>check</code>·<code>deploy</code>가 지금 <code>BRAND_COLOR</code>로 다시 만든다. 틀로 덮어쓰면 브랜드 팔레트가 사라진다</td></tr>
+    <tr><td>새 패키지에서 사라진 관리 파일</td><td><code>managed</code>에서만 빼고 파일은 지우지 않는다. 목록으로 알려 준다</td></tr>
+    <tr><td><code>.claude/settings.json</code></td><td><code>init</code>과 같은 병합을 다시 해 새 permissions·hook을 더한다. 기존 파일이 깨진 JSON이면 파일을 쓰기 전에 멈춰 아무것도 바뀌지 않는다</td></tr>
+  </table></div>
+  <p>성공하면 <code>milvus.config.json</code>의 <code>version</code>과 <code>managed</code>를 새 값으로 쓴다. 이 파일을 마지막에 쓰므로, 도중에 디스크 오류가 나도 다시 실행하면 남은 파일을 마저 반영한다(코드의 <code>ponytail:</code> 주석).</p>
+<pre data-file="터미널 (고객 프로젝트 루트)"><code>pnpm add -D @a40418a/milvus-design-system@0.1.0
+pnpm milvus update          <span class="c"># 고친 관리 파일이 있으면 차이만 보여 주고 1로 끝난다</span>
+pnpm milvus update --force  <span class="c"># 고친 내용을 버리고 패키지 원본으로 덮어쓴다</span>
+pnpm milvus deploy          <span class="c"># org 반영. 계획을 보고 승인한 뒤 --yes</span></code></pre>
+  <h3>Salesforce와의 관계</h3>
+  <ul>
+    <li><code>update</code>는 프로젝트 파일만 바꾸고 org는 바꾸지 않는다. 바꾼 파일이 있으면 "<code>pnpm milvus deploy</code>로 계획을 확인하라"고 안내한다. 배포는 계획 확인과 승인을 거친다(<a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html#deploy">05 테마 동기화</a>)</li>
+    <li>사라진 관리 파일을 지우지 않는 이유: 프로젝트에서 파일을 지워도 org에 이미 배포된 컴포넌트는 남는다. Metadata API에서 org의 컴포넌트를 지우려면 지울 컴포넌트를 적은 <code>destructiveChanges.xml</code>을 넣어 따로 배포해야 한다. 활성 Lightning 페이지에 올라간 컴포넌트는 이 방법으로도 지울 수 없고, 먼저 Lightning App Builder에서 그 페이지를 비활성화해야 한다. 그 컴포넌트를 쓰는 화면이 있을 수 있어 지울지는 사람이 정한다</li>
+    <li>[관리] 파일을 고치지 말라는 규칙은 고객 프로젝트의 <code>permissions.deny</code>(<code>Edit(...)</code>)로 Claude에게 강제하도록 설정했다. 실제 Claude Code에서 막히는지는 재지 않았다 <span class="tag warn">미확인</span>(설계 14장). 다른 경로로 바뀐 것은 <code>check</code>의 sha256 비교가 잡는다(<a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html#runbook">08 Claude Code</a>). <code>update</code>의 충돌 판단도 같은 기록을 쓴다</li>
+  </ul>
+  <p><code>tests/update.test.ts</code>가 로컬 수정 감지(아무것도 바꾸지 않음), <code>--force</code>, 사라진 관리 파일, settings 병합, <code>milvusVf.css</code> 보존, [소유] 파일 보존을 확인한다. 설치본의 버전을 올려 실제로 갱신해 본 기록은 없다 <span class="tag warn">미확인</span>. 0.1.0을 발행하기 전이라 레지스트리에서 받은 두 버전 사이의 <code>update</code>는 시험하지 못했다.</p>
+  <p class="sources">출처: <a href="https://pnpm.io/10.x/cli/add">pnpm 10.x — pnpm add (sax@3.0.0: 버전 지정)</a> (확인 2026-10-14) · <a href="https://developer.salesforce.com/docs/atlas.en-us.264.0.api_meta.meta/api_meta/meta_deploy_deleting_files.htm">Metadata API — Deleting Components from an Organization (destructiveChanges.xml로 하는 배포, 활성 Lightning 페이지의 컴포넌트는 먼저 페이지를 비활성화)</a> (확인 2026-10-14) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (3장 [관리]·[소유]·[생성], 4.3 check, 4.5 update와 구현 판단, 7.2 permissions)</a> (확인 2026-10-14)</p>
 </section>
 
 <section id="quiz" class="quiz">
@@ -271,7 +308,9 @@ pnpm milvus init --target-org &lt;별칭&gt; --brand &lt;이름&gt;</code></pre>
     <p>GitHub Packages의 npm 레지스트리는 공개 패키지라도 설치에 토큰이 필요하다. <code>read:packages</code> 권한의 personal access token (classic)을 <code>NODE_AUTH_TOKEN</code>에 넣고, 토큰 줄은 <code>~/.npmrc</code>에 둔다.</p></details>
   <details><summary>Q7. 프로젝트 <code>package.json</code>에 <code>milvus</code> 스크립트가 없는데 <code>pnpm milvus init</code>이 실행된다. 왜인가?</summary>
     <p><code>milvus</code>는 pnpm 명령이 아니다. pnpm은 알 수 없는 명령을 받으면 같은 이름의 스크립트를 먼저 찾고, 없으면 셸 명령으로 실행한다. 패키지의 <code>bin</code>이 <code>node_modules/.bin/milvus</code>를 만들었으므로 그 CLI가 실행된다. <code>pnpm exec milvus init</code>과 같다 (2026-10-12 추가).</p></details>
-  <p class="sources">출처: <a href="https://pnpm.io/cli/exec">pnpm exec</a> (확인 2026-10-09) · <a href="https://pnpm.io/cli/approve-builds">pnpm approve-builds</a> (확인 2026-10-09) · <a href="https://pnpm.io/settings/node-modules">pnpm — Node-Modules &amp; Hoisting Settings</a> (확인 2026-10-09) · <a href="https://pnpm.io/migration">pnpm — Migrating from v10 (Q4)</a> (확인 2026-10-09) · <a href="https://pnpm.io/blog/releases/11.0">pnpm 11.0 release (Q2, strictDepBuilds 기본값)</a> (확인 2026-10-09) · <a href="https://pnpm.io/supply-chain-security">pnpm — Mitigating supply chain attacks</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09) · <a href="https://pnpm.io/10.x/pnpm-cli">pnpm 10.x — pnpm CLI (Q7)</a> (확인 2026-10-12)</p>
+  <details><summary>Q8. <code>pnpm add -D</code>로 밀버스 새 버전을 설치했는데 프로젝트의 <code>milvusButton.js</code>는 그대로다. 왜이고, 무엇을 하나?</summary>
+    <p>pnpm은 <code>node_modules</code>의 패키지만 바꾼다. <code>milvusButton.js</code>는 <code>init</code>이 <code>force-app/</code>에 복사한 [관리] 파일이라 pnpm이 관리하지 않는다. <code>pnpm milvus update</code>로 새 원본을 반영하고, org에는 <code>pnpm milvus deploy</code>로 올린다. 그 파일을 직접 고쳤다면 <code>update</code>는 아무것도 바꾸지 않고 1로 끝난다. 고친 내용을 버려도 되면 <code>--force</code>를 붙인다 (2026-10-14 추가).</p></details>
+  <p class="sources">출처: <a href="https://pnpm.io/cli/exec">pnpm exec</a> (확인 2026-10-09) · <a href="https://pnpm.io/cli/approve-builds">pnpm approve-builds</a> (확인 2026-10-09) · <a href="https://pnpm.io/settings/node-modules">pnpm — Node-Modules &amp; Hoisting Settings</a> (확인 2026-10-09) · <a href="https://pnpm.io/migration">pnpm — Migrating from v10 (Q4)</a> (확인 2026-10-09) · <a href="https://pnpm.io/blog/releases/11.0">pnpm 11.0 release (Q2, strictDepBuilds 기본값)</a> (확인 2026-10-09) · <a href="https://pnpm.io/supply-chain-security">pnpm — Mitigating supply chain attacks</a> (확인 2026-10-09) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09) · <a href="https://pnpm.io/10.x/pnpm-cli">pnpm 10.x — pnpm CLI (Q7)</a> (확인 2026-10-12) · <a href="https://pnpm.io/10.x/cli/add">pnpm 10.x — pnpm add (Q8)</a> (확인 2026-10-14) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 4.5 update (Q8)</a> (확인 2026-10-14)</p>
 </section>
 
 <section id="refs">
@@ -288,7 +327,7 @@ pnpm milvus init --target-org &lt;별칭&gt; --brand &lt;이름&gt;</code></pre>
 
 <footer class="doc-foot">
   <span>밀버스 디자인 시스템 · Learn 07</span>
-  <span>2026-10-09 갱신, 2026-10-12 갱신 (M3: 밀버스 설치 준비와 <code>pnpm milvus</code>), 2026-10-13 갱신 (M5: <code>storybook</code> 명령 구현), 2026-10-14 갱신 (M6: <code>deploy</code> 구현과 리허설). 버전 정보는 <code>pnpm view</code>와 공식 문서로 확인함</span>
+  <span>2026-10-09 갱신, 2026-10-12 갱신 (M3: 밀버스 설치 준비와 <code>pnpm milvus</code>), 2026-10-13 갱신 (M5: <code>storybook</code> 명령 구현), 2026-10-14 갱신 (M6: <code>deploy</code> 구현과 리허설), 2026-10-14 갱신 (M7: <code>update</code> 절, 최종 버전 0.1.0 발행 예정). 버전 정보는 <code>pnpm view</code>와 공식 문서로 확인함</span>
 </footer>
 </main>
 </div>

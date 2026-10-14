@@ -1,6 +1,6 @@
 {
   "name": "@a40418a/milvus-design-system",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "밀버스 디자인 시스템 (SFDX + LWC + Storybook)",
   "type": "module",
   "bin": {
@@ -26,6 +26,8 @@
     "lib/spec-items.ts",
     "lib/fixed-list.ts",
     "lib/bridge-vars.ts",
+    "lib/sentinel.ts",
+    "lib/reflect.ts",
     "cli/context.ts",
     "brands/Milvus_DesignSystem/logo.jpg"
   ],
