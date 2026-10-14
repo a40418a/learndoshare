@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { readBranding } from "../lib/branding.ts";
 import { readConfig, runSf, type SfRunner } from "../cli/context.ts";
 import { applyOps, planInit, runInit } from "../cli/init.ts";
+import { buildMilvusVfCss } from "../lib/vf.ts";
 
 const pkgRoot = fileURLToPath(new URL("..", import.meta.url));
 const version = JSON.parse(readFileSync(join(pkgRoot, "package.json"), "utf8")).version;
@@ -157,7 +158,13 @@ test("두 번 실행해도 파일 내용과 milvus.config.json이 같다", async
     }
     assert.deepEqual(readBranding(read(root, `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`)), { brandColor: "#0176D3" });
     assert.match(read(root, `${FA}/lightningExperienceThemes/Acme.lightningExperienceTheme-meta.xml`), /<defaultBrandingSet>LEXTHEMINGAcme</);
-    assert.ok(existsSync(join(root, `${FA}/staticresources/milvusVf.css`)));
+    // VF는 기본 포함이다: milvusHead(+meta)와 milvusVf(+meta)를 놓는다
+    for (const f of ["components/milvusHead.component", "components/milvusHead.component-meta.xml", "staticresources/milvusVf.css", "staticresources/milvusVf.resource-meta.xml"]) {
+      assert.ok(existsSync(join(root, `${FA}/${f}`)), f);
+    }
+    // milvusVf.css는 틀이 아니라 init이 BrandingSet과 같은 기본색(#0176D3)의 팔레트로 바로 만든다. 두 번째 init은 건너뛴다
+    assert.equal(read(root, `${FA}/staticresources/milvusVf.css`), buildMilvusVfCss("#0176D3"));
+    assert.ok(second.stdout.includes(`${FA}/staticresources/milvusVf.css`) && /건너뛴 파일/.test(second.stdout));
     // 배포 뒤 사람이 org에서 할 일(10/9 D2·D3)을 안내한다
     assert.match(first.stdout, /milvusBrandLoader/);
     assert.match(first.stdout, /Visualforce Settings/);
@@ -266,6 +273,8 @@ test("--from-org는 활성 테마 이름을 브랜드로 쓰고, org 파일을 �
     assert.equal(read(root, `${FA}/brandingSets/LEXTHEMINGAcme_Org.brandingSet-meta.xml`), ORG_BRANDING);
     assert.ok(readFileSync(join(root, `${FA}/contentassets/acme_logo_1.asset`)).equals(LOGO));
     assert.equal(read(root, `${FA}/contentassets/acme_logo_1.asset-meta.xml`), ORG_LOGO_META);
+    // milvusVf.css는 org BrandingSet의 BRAND_COLOR(#2E7D32)의 팔레트다(기본색이 아니다)
+    assert.equal(read(root, `${FA}/staticresources/milvusVf.css`), buildMilvusVfCss("#2E7D32"));
     assert.deepEqual(Object.keys(snapshot(root)).filter((p) => p.includes("contentassets/")), [
       `${FA}/contentassets/acme_logo_1.asset`,
       `${FA}/contentassets/acme_logo_1.asset-meta.xml`,

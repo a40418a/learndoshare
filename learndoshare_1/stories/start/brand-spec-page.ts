@@ -186,7 +186,7 @@ function itemView(item: SpecItem, inputs: Fields): HTMLElement {
   const box = el("section", { className: "slds-box slds-m-top_small" }, heading, para(item.description));
   if (item.nativeLoss) {
     heading.append(" ", el("span", { className: "slds-badge slds-theme_warning" }, "브리지 부분은 native 전환 시 잃음"));
-    const all = item.hooks.length === 0 && item.id !== "letter-spacing";
+    const all = item.hooks.length === 0;
     box.append(para(`${all ? "이 항목은 브리지로만 바뀐다." : "이 항목 중 브리지 변수로 바꾸는 부분만 해당한다."} 기본 컴포넌트가 native shadow로 바뀌면 ${item.bridgeVars.join(", ")}의 효과가 사라진다(설계 5.6)`, "slds-text-color_weak"));
   }
   if (item.limits) box.append(para(`한계: ${item.limits}`, "slds-text-color_weak"));
@@ -204,12 +204,6 @@ function itemView(item: SpecItem, inputs: Fields): HTMLElement {
   } else if (item.id === "fixed") {
     box.append(fixedView());
   } else {
-    if (item.id === "object-icon-color") {
-      box.append(
-        para("변수 이름: lightning-icon icon-name `종류:이름`에서 `:`와 `_`를 `-`로 바꾼다. 예: standard:account → --milvus-icon-standard-account, standard:user_role → --milvus-icon-standard-user-role, custom:custom110 → --milvus-icon-custom-custom110"),
-        para("별칭 클래스 이름(slds-icon-custom-110)으로 만든 변수(--milvus-icon-custom-110)는 읽는 곳이 없어 check가 막는다", "slds-text-color_weak"),
-      );
-    }
     const entries = valueEntries(item);
     if (entries.length) box.append(valueTable(entries));
     if (item.input !== "none") box.append(input(item.id, `${item.label} 요청`, item.input, placeholder, inputs));

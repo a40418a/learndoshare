@@ -299,9 +299,9 @@ function viewOf(comp: string, tag: string, a: Audit) {
   const ICON_JS = `lightning/iconUtils의 iconColors.js에 개체 아이콘 배경색 ${a.iconColors}개가 박혀 있다`;
   const js =
     comp === "icon"
-      ? [`${ICON_JS}. icon.js가 인라인 스타일 --sds-c-icon-color-background: var(--slds-c-icon-color-background, <색>)으로 넣는다. 메우는 방법: 브리지가 클래스마다 --slds-c-icon-color-background를 정의한다(--milvus-icon-*, 지금만)`]
+      ? [`${ICON_JS}. icon.js가 인라인 스타일 --sds-c-icon-color-background: var(--slds-c-icon-color-background, <색>)으로 넣는다. Salesforce 고정: 개체 아이콘 배경색`]
       : comp === "avatar"
-        ? [`${ICON_JS}. avatar.js가 대체 아이콘 이니셜 배경을 background-color: var(--slds-c-icon-color-background, <색>)으로 넣는다. 메우는 방법: 브리지(--milvus-icon-*, 지금만)`]
+        ? [`${ICON_JS}. avatar.js가 대체 아이콘 이니셜 배경을 background-color: var(--slds-c-icon-color-background, <색>)으로 넣는다. Salesforce 고정: 개체 아이콘 배경색`]
         : [];
 
   return {

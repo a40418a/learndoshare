@@ -72,9 +72,10 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 | 10/9 | **opt-in override.** 기존 컴포넌트(`lightning-button` 등)의 모양을 hook·브리지로 바꿀 수 없으면, 새 밀버스 컴포넌트를 만들지 않고 프로젝트 소유 `milvusOverride.css`의 클래스 규칙으로 바꾼다. 공식 권고 밖임을 알고 쓴다. 밀버스 컴포넌트는 기능이 없을 때만 만든다(기존 `milvusButton`은 비교 예시로 유지). 비권고 이유와 실험은 Learn 09에 정리한다 | 사용자 요청. 모양만 바꾸려고 컴포넌트를 새로 만드는 것은 비효율적이다. 지금 org는 synthetic이라 클래스 규칙이 닿을 것으로 본다. 10/8 프로브는 `:root`의 hook 두 개만 넣었고 클래스 규칙은 넣지 않았다. 이 판단은 10/7 synthetic 실측과 LWC 개발자 가이드 Mixed Shadow Mode 설명에서 나온 것이다(2026-10-09 정정, Learn 09 2절). 같은 날 프로브로 클래스 규칙이 닿는 것을 확인했다(13장). native 전환·마크업 변경 때 깨질 수 있다는 것을 발표에서 직접 보여 준다 |
 | 10/9 | SLDS 2(Cosmos) org를 기준으로 한다. SLDS 1 테마 org 지원은 발표 뒤 검토한다(#22) | 사용자 선택. SLDS 1은 컴포넌트 hook(`--slds-c-*`)이 공식이고 VF가 그대로 맞는 장점이 있지만, org 테마는 고객사가 고르는 설정이고 새 org 기본은 SLDS 2다(Essentials 제외). 지금까지의 실측·Storybook·팔레트가 모두 SLDS 2 기준이다 |
 | 10/9 | **D1 LWC는 JS.** 밀버스 저장소와 고객 프로젝트 모두 LWC(밀버스 컴포넌트, `milvusScript`, `milvusBrandLoader`)는 `.js`로 쓴다. CLI·`lib`·스크립트·Storybook 설정·node 테스트는 `.ts`를 유지한다. `init`은 고객 `sfdx-project.json`의 `defaultLwcLanguage`를 바꾸지 않는다. 고객 `lwc/tsconfig.json`, `@types/jest`, `tsconfig.lwc.base.json`, `lwc-platform.d.ts`는 필요 없다 | 사용자 선택. org가 `.ts` LWC를 타입 검사해 `this.template`·`this.dispatchEvent`를 거부했고(LWC1539), 공식 문서는 배포 전에 JS로 변환하라고 한다(8장, 13장). CLI 쪽은 org에 올라가지 않고 Node가 `.ts`를 직접 실행한다 |
-| 10/9 | **D2 VF는 공식 설정 + 팔레트.** Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켜고, `<apex:slds/>` + 팔레트 CSS(`milvusVf`, 약 620바이트) + `milvusBridge`·`milvusBrand`·`milvusOverride`로 VF를 LEX와 맞춘다. SLDS 2 CSS 전체 사본(약 1MB)은 쓰지 않는다. 정적 리소스 이름은 `milvusVf` 그대로다 | 사용자 선택. 설정을 켜면 SLDS 2가 되지만 org 테마 팔레트는 들어오지 않고, 팔레트를 더하면 LEX와 같았다(13장). 단 프로브는 직접 만든 `<head>` 안의 `<apex:slds/>`와 `slds-scope` 래퍼로 쟀다. `<c:milvusHead/>`(컴포넌트 안의 `<apex:slds/>`) 구성은 Task 24에서 잰다(5.5, 14장). 이 설정은 Metadata API로 읽거나 배포할 수 없어 고객 org에서 Setup으로 직접 켠다. `deploy`와 `milvus-design.md`가 안내한다. 학습 org는 켜 둔 상태로 둔다 |
+| 10/9 | **D2 VF는 공식 설정 + 팔레트.** Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켜고, `<apex:slds/>` + 팔레트 CSS(`milvusVf`, 약 620바이트) + `milvusBridge`·`milvusBrand`·`milvusOverride`로 VF를 LEX와 맞춘다. SLDS 2 CSS 전체 사본(약 1MB)은 쓰지 않는다. 정적 리소스 이름은 `milvusVf` 그대로다 | 사용자 선택. 설정을 켜면 SLDS 2가 되지만 org 테마 팔레트는 들어오지 않고, 팔레트를 더하면 LEX와 같았다(13장). 단 프로브는 직접 만든 `<head>` 안의 `<apex:slds/>`와 `slds-scope` 래퍼로 쟀다. `<c:milvusHead/>`(컴포넌트 안의 `<apex:slds/>`) 구성은 2026-10-14에 쟀다(5.5, 13장). 이 설정은 Metadata API로 읽거나 배포할 수 없어 고객 org에서 Setup으로 직접 켠다. `deploy`와 `milvus-design.md`가 안내한다. 학습 org는 켜 둔 상태로 둔다 |
 | 10/9 | **D3 앱 전체 브랜드.** 화면 없는 LWC `milvusBrandLoader`(대상 `lightning__UtilityBar`, `loadBrand(this)`만)를 패키지에 넣는다. 앱에 붙이는 것은 사용자가 App Manager에서 한다(유틸리티 항목 추가, "앱이 열릴 때 백그라운드로 로드" 체크). `deploy`는 고객 앱 메타데이터를 바꾸지 않는다 | 사용자 선택. 유틸리티 항목의 백그라운드 로드만으로 그 앱의 표준 화면(리드 목록)에 브랜드 CSS가 들어갔다(9.7, 13장) |
 | 10/9 | **D4 TS 배포 단계 없음.** `deploy`에 TS → JS 변환 단계를 넣지 않는다 | LWC가 JS이므로 필요 없다 |
+| 10/14 | **앱 빌더 노출은 로더 하나.** 밀버스 부품(`milvusBadge`, `milvusButton`, `milvusMultiSelect`)과 `milvusScript`는 `isExposed`를 `false`로 두어 앱 빌더에 노출하지 않는다. 노출하는 밀버스 LWC는 `milvusBrandLoader`(대상 `lightning__UtilityBar` 하나)뿐이다 | 사용자 지적. 10/14 리허설에서 부품이 앱 빌더 목록에 나왔다. 부품은 다른 LWC 안에서 쓰는 것이다 |
 
 ---
 
@@ -177,7 +178,7 @@ force-app/main/default/
 - sha256이 다르면 `pnpm milvus update --force`로 되돌리라고 안내한다
 
 ### 4.4 `deploy [--target-org <별칭>] [--yes]`
-1. 대상 org: `--target-org` → `milvus.config.json` 순서로 정한다. sf 기본 org는 쓰지 않는다. 정해지지 않으면 로그인된 org 목록을 보여 주고 멈춘다
+1. 대상 org: `--target-org` → `milvus.config.json` 순서로 정한다. sf 기본 org는 쓰지 않는다. 정해지지 않으면 `sf org list`로 별칭을 확인하라고 안내하고 멈춘다(org 목록을 직접 출력하면 org ID가 함께 나오므로 출력하지 않는다, 2026-10-13 구현 판단. `sf org list --json`은 모든 org의 액세스 토큰을 출력하므로 안내하지 않는다)
 2. 전체 `check`를 실행한다. 실패하면 멈춘다. 이때 `milvusVf.css`를 다시 만든다(`BRAND_COLOR`로 계산한 팔레트 `:root{--slds-r-color-brand-5~95}`만, 약 620바이트, `text/css`. SLDS 2 CSS 사본은 넣지 않는다, 10/9 D2)
 3. `sf`가 없거나 대상 org 로그인이 만료되었으면 멈춘다
 4. **계획 출력:** 대상 org, 지금 활성 테마 → 새 활성 테마, 배포 목록, 경고("활성 테마 변경은 org 전체 사용자 화면에 적용됩니다"). VF 사용 시 안내도 낸다: VF 페이지가 SLDS 2로 그려지려면 Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켜야 한다. 이 설정은 메타데이터로 읽을 수 없어 `deploy`가 확인하지 못한다. `--yes`가 없으면 여기서 끝난다. 사람이 터미널에서 실행했고 `--yes`가 없으면 y/N을 묻는다
@@ -262,9 +263,9 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 ### 5.5 LEX와 VF에 util.css를 거는 방법
 - **LEX:** 밀버스 컴포넌트가 나타날 때 `milvusScript`의 `loadBrand(this)`가 `loadStyle`로 `milvusBridge`, `milvusBrand`, `milvusOverride`를 차례로 문서 head에 넣는다. 같은 페이지의 표준 UI와 `body`에 붙는 모달·토스트까지 바뀐다(실측). 프로젝트 컴포넌트도 같은 함수를 부를 수 있다
 - **LEX 앱 전체:** 화면 없는 `milvusBrandLoader`를 앱의 유틸리티 바에 넣고 "앱이 열릴 때 백그라운드로 로드"를 켜면, 커스텀 컴포넌트가 없는 표준 화면에도 들어간다. 다른 앱에는 들어가지 않는다(10/9 실측, 잰 화면은 리드 목록 하나, 9.7). 붙이는 것은 사용자가 App Manager에서 한다(10/9 D3). 로더가 없는 앱의 표준 화면에는 테마 색만 적용된다
-- **VF:** 고객 org에서 Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켠다(Metadata API로 읽거나 배포할 수 없음). 페이지에 `<c:milvusHead/>`를 넣는다(이 구성 자체는 아직 재지 않았다, 아래). `milvusHead`는 `<apex:slds/>`를 넣고, `milvusVf`(팔레트), `milvusBridge`, `milvusBrand`, `milvusOverride` 순서로 `<apex:stylesheet>`를 넣는다(10/9 D2). 설정을 켠 `<apex:slds/>`는 SLDS 2이지만 팔레트가 Salesforce 기본(`#066afe`)이라 `milvusVf`가 필요하다. 설정이 꺼져 있으면 SLDS 1로 그려지고 util.css가 효과가 없다(10/9 실측, 13장)
-  - 잰 형태와 다르다: 10/9 프로브 페이지는 `applyHtmlTag="false"`로 직접 만든 `<head>` 안에 `<apex:slds/>`를 두고 본문 전체를 `<div class="slds-scope">`로 감쌌다. util.css와 팔레트는 측정 때 link로 붙였다. `<c:milvusHead/>` 구성에서 (1) 컴포넌트 안의 `<apex:slds/>`도 설정의 SLDS 2 전환 대상인지, (2) `slds-scope` 래퍼가 필요한지, (3) `<apex:slds/>`와 `<apex:stylesheet>`가 어떤 순서로 출력되는지는 재지 않았다(**미확인**, 14장). Task 24 Step 4에서 래퍼가 있는 페이지와 없는 페이지를 모두 잰다. 래퍼가 필요하면 여기와 7.1(`milvus-design.md`)에 적는다
-- 한계: 10/8 방식(SLDS 2 CSS 사본)은 사본이 참조하는 기본 아바타 이미지(`../../public/*.png`)가 패키지에 없다는 한계가 있었다. `<apex:slds/>`는 org의 스타일시트를 쓰지만 아바타 이미지가 보이는지는 재지 않았다(**미확인**, 14장)
+- **VF:** 고객 org에서 Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켠다(Metadata API로 읽거나 배포할 수 없음). 페이지에 `<c:milvusHead/>`를 넣는다(2026-10-14 측정, 아래). `milvusHead`는 `<apex:slds/>`를 넣고, `milvusVf`(팔레트), `milvusBridge`, `milvusBrand`, `milvusOverride` 순서로 `<apex:stylesheet>`를 넣는다(10/9 D2). 설정을 켠 `<apex:slds/>`는 SLDS 2이지만 팔레트가 Salesforce 기본(`#066afe`)이라 `milvusVf`가 필요하다. 설정이 꺼져 있으면 SLDS 1로 그려지고 util.css가 효과가 없다(10/9 실측, 13장)
+  - 2026-10-14 측정(`<apex:page showHeader="false" sidebar="false" standardStylesheets="false">`에 `<c:milvusHead/>`, `applyHtmlTag`·`applyBodyTag`는 기본값, 직접 만든 `<head>` 없음. 래퍼 없는 페이지와 `slds-scope` 래퍼 페이지): (1) 컴포넌트 안의 `<apex:slds/>`도 설정의 대상이라 `slds-plus.css`가 들어온다, (2) `<body>`에 `slds-scope`가 자동으로 붙어 래퍼는 필요 없다(apex:slds 문서: `showHeader="false"`·`applyBodyTag="true"`이면 `<body>`에 붙는다. `showHeader="true"`이면 페이지 내용에 붙는다고 적지만 재지 않았다), (3) `<head>` 안 순서는 `slds-plus.css` → `milvusVf` → `milvusBridge` → `milvusBrand` → `milvusOverride`다. 브랜드 버튼 배경이 LEX와 같다(13장)
+- 아바타: `<apex:slds/>`는 org의 스타일시트를 쓰므로 기본 아바타 이미지가 보인다(200, 2026-10-14 측정). 10/8 방식(SLDS 2 CSS 사본)의 아바타 한계는 없어졌다
 
 ### 5.6 `milvusBridge.css` — hook이 없는 항목을 잇는 클래스 규칙 (제한적 허용)
 - hook이 0개이거나 허용된 hook이 없는 항목만 다룬다. hook이 있는 항목은 계속 hook만 쓴다
@@ -275,24 +276,15 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 항목 | 대상 (예) | 근거 |
 | --- | --- | --- |
 | 움직임 시간·곡선 | `.slds-button`, `.slds-modal`, `.slds-backdrop`, `.slds-dropdown`, `.slds-popover`, 토글, path | SLDS 2의 transition·animation 217선언이 모두 값을 직접 쓴다. `--slds-g-duration-*`는 정의만 있고 읽는 곳이 0이다 |
-| 줄인 움직임 | `@media (prefers-reduced-motion: reduce)` | 처리하는 곳이 SLDS 2 CSS 1곳, 기본 컴포넌트 CSS 0곳. 브랜드 선택이 아니라 항상 켜 두는 접근성 규칙으로 넣는다 |
-| 컨트롤 높이 | `.slds-button`, `.slds-input`, `.slds-input_faux`, `.slds-select`, `.slds-radio_button`, `.slds-checkbox_button` | `line-height: 1.875rem` 고정 |
 | 입력창 테두리 두께 | `.slds-input`, `.slds-textarea`, `.slds-input_faux`(읽기 전용 콤보박스) | `1px` 고정 |
-| Path 양 끝 반경 | `.slds-path__item:first-child`, `:last-child` | `2rem` 고정 |
-| 자간 | `button`, `input`, `select`, `textarea` | 브라우저 기본값으로 다시 초기화되어 상속이 끊긴다 (추정) |
-| 영문 대문자 제목 | `.slds-text-title_caps`, `.slds-section-title_divider` | `text-transform: uppercase`, 자간 `0.0625rem` 고정. 자간은 브랜드 자간과 따로 `--milvus-caps-letter-spacing`으로 잇는다(2026-10-12 사용자 결정) |
-| 선택지 라벨 굵기 | `.slds-radio`, `.slds-checkbox`의 라벨 | `font-weight: normal` 고정 |
-| 커서, 링크 밑줄 | 비활성 요소, `a:hover` | cursor 78선언, 밑줄 14선언이 값을 직접 쓴다 |
-| 팝오버 꼬리 그림자 | `.slds-nubbin_*::after` | 내부 전용 hook(`--_slds-*`)만 있다 |
+| 영문 대문자 제목 | `.slds-text-title_caps`, `.slds-section-title_divider` | `text-transform: uppercase`, 자간 `0.0625rem` 고정. 자간은 `--milvus-caps-letter-spacing`으로 잇는다(2026-10-12 사용자 결정) |
 | 세로 내비 선택 바탕 | `.slds-navigation-list_vertical .slds-is-active .slds-navigation-list-vertical__action` 등 | 옛 브랜드 파랑 `rgb(21, 137, 238, 0.1)` 고정(왼쪽 테두리는 브랜드 색을 따름). `--milvus-nav-selected-background`로 잇는다(2026-10-12 사용자 결정) |
-| 개체 아이콘 배경색 | `.slds-icon-standard-*` 등 973개 | 클래스마다 원래 색을 기본값으로 갖는 규칙을 생성한다 |
-| 컨트롤 안 아이콘 크기 | `.slds-button__icon`, `.slds-input__icon` | `0.875rem` 고정 |
-| 정렬 아이콘 크기 | `.slds-is-sortable__icon` | `0.75rem` 고정. 컨트롤 안 아이콘과 크기 관계가 달라 `--milvus-sort-icon-size`로 따로 잇는다(2026-10-12 사용자 결정) |
 | 모달 너비 (원할 때만) | `.slds-modal__container`와 크기 클래스(`_small`·`_medium`·`_large`·`_full`) | 크기마다 너비·최대 너비, 최소 너비 20·40rem 고정. 변수는 `--milvus-modal-width-base`(크기 클래스 없음)·`-small`·`-medium`·`-large`·`-full`, `--milvus-modal-min-width`. 작은 화면의 full 모달은 바꾸지 않는다 |
 
-- **넣으면 안 되는 값:** 모달과 토스트는 움직임이 끝나는 이벤트(`transitionend`, `animationend`)를 기다려 닫힌다. transition은 시간이 `0s`면 전환이 일어나지 않아 `transitionend`가 오지 않는다(animation은 `0s`여도 `animationend`가 온다). 그래서 닫히지 않을 수 있어 최솟값은 `0.01ms`다. 단위 없는 `0`은 `max()`를 무효로 만든다. 생성기는 모달·토스트만이 아니라 묶음에 드는 모든 시간을 `max(var(…), 0.01ms)`로 감싼다(2026-10-12). 스피너는 점별 지연이 1000ms 기준이라 시간을 바꾸면 순서가 어긋나므로 줄인 움직임 켜기·끄기만 다룬다
+- **2026-10-14 사용자 결정으로 뺀 브리지:** 컨트롤 높이, 줄인 움직임 규칙, Path 양 끝 반경, 컨트롤 안·정렬 아이콘 크기, 폼 요소 자간, 선택지 라벨 굵기, 비활성 커서, 링크 hover 밑줄, 팝오버 꼬리 그림자, 개체 아이콘 배경색(973규칙). 리허설(에어로케이 브랜드, `learndoshare_1`)에서 컨트롤 높이 브리지가 모든 `.slds-button`에 걸려 목록·헤더 툴바의 2rem 고정 아이콘 버튼과 어긋났다(텍스트 버튼 32→40px, 아이콘 버튼은 상자 32px에 줄 높이 38px, 전역 헤더 검색창 40px). 클래스 규칙인 브리지는 범위를 가리지 않아 같은 위험이 있다고 보고 꼭 필요한 것만 남겼다. 뺀 항목은 "Salesforce 고정"(9.4)이다. 줄인 움직임은 Salesforce 기본 처리에 맡긴다(브랜드가 "모두 최소화"를 원하면 움직임 시간 변수를 `0.01ms`로 정한다)
+- **넣으면 안 되는 값:** 모달과 토스트는 움직임이 끝나는 이벤트(`transitionend`, `animationend`)를 기다려 닫힌다. transition은 시간이 `0s`면 전환이 일어나지 않아 `transitionend`가 오지 않는다(animation은 `0s`여도 `animationend`가 온다). 그래서 닫히지 않을 수 있어 최솟값은 `0.01ms`다. 단위 없는 `0`은 `max()`를 무효로 만든다. 생성기는 모달·토스트만이 아니라 묶음에 드는 모든 시간을 `max(var(…), 0.01ms)`로 감싼다(2026-10-12). 스피너는 점별 지연이 1000ms 기준이라 시간을 바꾸면 순서가 어긋나므로 움직임 브리지에서 뺀다(줄인 움직임 브리지 규칙도 2026-10-14에 뺐다)
 - **생성 방식 (2026-10-12 Task 15):** 표의 "대상"은 예시이고, 생성기는 각 항목에 해당하는 SLDS 2 리터럴 선언을 모두 잇는다. 원본 선택자 목록과 `@media`·`@supports` 맥락을 그대로 복사하고, 움직임은 shorthand를 두고 longhand(`-duration`, `-timing-function`)만 정한다. 대상 선택자·속성·바꿀 값이 원본에서 사라지면 생성이 실패한다(Salesforce 구조 변경 감지)
-- **원래 이기던 규칙 다시 넣기:** 브리지는 SLDS 2 CSS보다 뒤에 들어오므로, 같은 선택자를 복사하면 우선순위(specificity)가 같은 원본 규칙을 모두 이긴다(예: `.slds-button__icon`을 이으면 뒤에서 이기던 `.slds-button__icon_large`가 진다). 그래서 원래 이기던 같은 우선순위 규칙을 원래 값 그대로 다시 넣는다(약 1,000규칙). 파일은 개체 아이콘 973규칙을 합쳐 약 350KB·gzip 33KB다(SLDS 2 CSS 약 1MB·gzip 110KB의 3분의 1, 브라우저가 캐시하는 정적 리소스). 한계: 그 선택자에 맞는 LEX 요소 전체가 npm SLDS 2(2.264.2) 값을 받는다. org가 다른 값을 내려주면 그 값이 덮인다. 문제가 보이면 다시 넣는 규칙을 `:where(대상 선택자)`로 좁히고, org가 내려주는 SLDS 버전과 비교하는 확인을 둔다(Task 25)
+- **원래 이기던 규칙 다시 넣기:** 브리지는 SLDS 2 CSS보다 뒤에 들어오므로, 같은 선택자를 복사하면 우선순위(specificity)가 같은 원본 규칙을 모두 이긴다(예: `.slds-button__icon`을 이으면 뒤에서 이기던 `.slds-button__icon_large`가 진다). 그래서 원래 이기던 같은 우선순위 규칙을 원래 값 그대로 다시 넣는다. 10/14 제거 뒤 파일은 111,364바이트(gzip 11,715)이고 다시 넣은 규칙은 812개다(제거 전 358,310바이트·gzip 33,474, 다시 넣은 규칙 1,110개). 한계: 그 선택자에 맞는 LEX 요소 전체가 npm SLDS 2(2.264.2) 값을 받는다. org가 다른 값을 내려주면 그 값이 덮인다. 문제가 보이면 다시 넣는 규칙을 `:where(대상 선택자)`로 좁히고, org가 내려주는 SLDS 버전과 비교하는 확인을 둔다(Task 25)
 - **위험:** 브리지는 지금 org(synthetic)에서 닿지만, 기본 컴포넌트가 native로 바뀌면 그 컴포넌트 안에는 닿지 않는다. 브리지 항목은 명세 페이지와 Storybook에 "native 전환 시 잃음"으로 표시하고 9.6의 검사로 감시한다
 
 ---
@@ -382,7 +374,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 5. 디자인 규칙: 판단 순서, util.css 규칙(5.2), 색은 `BrandingSet`에서만, LWC는 JavaScript(`.js`, 10/9 D1), `milvus` 접두사는 밀버스 전용
 6. Claude에게 시키는 법: 예시 문장, skill 이름
 7. 배포 안전장치: 배포는 `pnpm milvus deploy`로만, 계획 확인 후 `--yes`, 활성 테마는 org 전체에 적용, 테마 반영은 새로고침 후
-8. 업데이트와 문제 해결: `milvus update`(`--force`), GitHub 토큰 오류, VF는 `<c:milvusHead/>`(`slds-scope` 래퍼가 필요한지는 Task 24 측정 뒤 적는다, 5.5), 프로젝트 전체 배포로 `milvusHead`를 올릴 때는 `milvusVf.css`가 커밋되어 있어야 함, VF가 SLDS 1(버튼 반경 4px)로 보이면 위 VF 설정 확인, 표준 화면에 브랜드가 안 보이면 `milvusBrandLoader` 백그라운드 로드 확인
+8. 업데이트와 문제 해결: `milvus update`(`--force`), GitHub 토큰 오류, VF는 `<c:milvusHead/>`(`showHeader="false"` 페이지에서는 `<body>`에 `slds-scope`가 자동으로 붙어 래퍼가 필요 없다, 2026-10-14 측정. `applyBodyTag`·`applyHtmlTag`를 `false`로 두면 직접 넣는다), 프로젝트 전체 배포로 `milvusHead`를 올릴 때는 `milvusVf.css`가 커밋되어 있어야 함, VF가 SLDS 1(버튼 반경 4px)로 보이면 위 VF 설정 확인, 표준 화면에 브랜드가 안 보이면 `milvusBrandLoader` 백그라운드 로드 확인
 
 ### 7.2 `.claude/settings.json` (병합할 내용)
 
@@ -465,6 +457,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 
 **결론**
 - hook만으로는 "모든 컴포넌트"를 채울 수 없다. 지금 org에서는 hook(5.2)과 `milvusBridge.css`(5.6)로 거의 모든 컴포넌트에 닿는다
+- (2026-10-14) 위 표의 "메우는 방법"에서 컨트롤 높이, Path, 자간(폼 요소), 꼬리 그림자, 커서·밑줄, 개체 아이콘 색, 컨트롤 안 아이콘 크기의 브리지는 리허설 뒤 사용자 결정으로 뺐다(5.6). 이 항목은 9.4 고정이다
 - native로 바뀌면 브리지는 사라지고 hook 비율도 떨어진다. 그래서 native 전환을 자동으로 감지하고(9.2), 끝까지 바꿀 수 없는 것은 "Salesforce 고정" 목록(9.4)으로 합의한다
 - 전제 수정: "native에서는 `--slds-s-*`가 닿지 않는다"는 지나친 서술이다. 기본 컴포넌트 원본 어디에도 `--slds-s-*`를 다시 정의하는 곳이 없어서, 기본 컴포넌트의 native CSS가 직접 읽는 s 이름에는 닿을 가능성이 높다(추정). README와 검사 스크립트 주석을 고친다
 
@@ -476,7 +469,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 3. Salesforce 릴리스(연 3회)마다 릴리스 노트의 native shadow 항목을 사람이 확인한다
 
 **대비**
-- 두 모드가 읽는 hook을 함께 정의한다. 예: 표 배경(지금 `surface-container-1/-2`, native `neutral-base-100/-95`), 박스 테두리(지금 `border-1`, native `border-base-1/-4`), 모달 배경막(지금 `--slds-s-backdrop-color-background`, native `neutral-10-opacity-50`), 버튼 굵기(지금 `font-weight-4`, native `--slds-s-button-font-weight`), 입력창 높이(지금 브리지, native `--slds-s-input-sizing-height`)
+- 두 모드가 읽는 hook을 함께 정의한다. 예: 표 배경(지금 `surface-container-1/-2`, native `neutral-base-100/-95`), 박스 테두리(지금 `border-1`, native `border-base-1/-4`), 모달 배경막(지금 `--slds-s-backdrop-color-background`, native `neutral-10-opacity-50`), 버튼 굵기(지금 `font-weight-4`, native `--slds-s-button-font-weight`), 입력창 높이(지금 고정, native `--slds-s-input-sizing-height`)
 - native에서만 메울 수 있는 c hook 목록은 준비만 하고 금지를 유지한다: `--slds-c-card-shadow`, `--slds-c-tooltip-color-background`, `--slds-c-tooltip-text-color`, `--slds-c-tooltip-font-size`, `--slds-c-badge-radius-border`, `--slds-c-checkbox-toggle-radius-border`, `--slds-c-pill-radius-border`, `--slds-c-input-sizing-border`, `--slds-c-modalheader-heading-font-size`, `--slds-c-modalfooter-shadow`, `--slds-c-pill-sizing-border`(2026-10-12 추가). 감지가 울리면 열지 사용자가 정한다
 - Storybook native 빌드: #14의 `nativeShadow` 플러그인을 환경변수로 켜는 두 번째 빌드로 되살려, 9.6 검사를 두 빌드에서 돌리고 "전환 시 잃는 항목"을 낸다(발표 뒤)
 
@@ -499,21 +492,21 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 모양 | 테두리 두께 | "전체 테두리를 2px로" | `sizing-border-1/-2`, native 버튼 `--slds-s-button-sizing-border` | 입력창은 브리지 |
 | 모양 | 아바타·개체 아이콘 모양 | "프로필 사진을 둥근 사각으로" | `--slds-s-avatar-radius-border`, `--slds-s-icon-radius-border` | |
 | 모양 | 탭·페이지 헤더 모양 | "선택된 탭 밑줄을 2px로" | `navigation-sizing-border-*`, `navigation-radius-border`, `pageheader-radius-border`, `pageheader-sizing-border` | native tabBar는 고정 |
-| 크기 | 컨트롤 높이 | "버튼과 입력창을 40px로" | 버튼 `--slds-s-button-spacing-block`, 입력·선택·콤보는 브리지, native용 `--slds-s-input-sizing-height` | 브리지 없이 버튼만 키우면 폼에서 높이가 어긋난다 |
+| 크기 | 컨트롤 높이 | "버튼 안쪽 위아래 여백을 조금 넉넉하게" | 버튼 안쪽 여백 `--slds-s-button-spacing-block`, native용 `--slds-s-input-sizing-height` | LEX 텍스트 컨트롤 높이(1.875rem)는 Salesforce 고정(2026-10-14). 목록·헤더 툴바가 2rem 고정 아이콘 버튼과 섞여 있어 바꾸면 어긋난다 |
 | 크기 | 탭·헤더 높이 | "탭 바를 낮게" | `navigation-sizing-height`, `navigation-font-lineheight`, `header-sizing-height` | |
-| 크기 | 아이콘 크기 | "기본 아이콘을 36px로" | `--slds-s-icon-sizing`, `--slds-s-icon-spacing`, 컨트롤 안 아이콘·정렬 아이콘은 브리지 | 애니메이션 아이콘 부품은 고정 |
+| 크기 | 아이콘 크기 | "기본 아이콘을 36px로" | `--slds-s-icon-sizing`, `--slds-s-icon-spacing` | 컨트롤 안 아이콘·정렬 아이콘 크기와 애니메이션 아이콘 부품은 고정(2026-10-14) |
 | 글자 | 줄 간격 | "본문 줄 간격 1.6" | `font-line-height-base`, `-2`, `-1` | 컨트롤 안 줄 간격은 고정 |
-| 글자 | 자간 | "한글 자간 -0.02em" | `:root`의 `letter-spacing` + 브리지 | |
+| 글자 | 자간 | "한글 자간 -0.02em" | `:root`의 `letter-spacing` | 폼 요소(button·input·select·textarea)에는 상속이 끊겨 닿지 않는다(브리지 제거, 2026-10-14) |
 | 글자 | 대소문자 | "영문 소제목을 대문자로 쓰지 마" | 브리지(대문자 변환 `--milvus-caps-transform`, 대문자 제목 자간 `--milvus-caps-letter-spacing`) | |
 | 크기 | 모달 너비 | "모달을 더 넓게" | 브리지(`--milvus-modal-width-*`, `--milvus-modal-min-width`) | 너비와 최대 너비를 한 변수가 정해 큰 값은 좁은 화면에서 넘칠 수 있다 |
 | 깊이 | 그림자 깊이 | "그림자 없이 평평하게" | `shadow-1~4`, 방향형 그림자. `shadow-5/-6`은 기본값 유지 | native 드롭다운·팝오버·툴팁은 고정 |
 | 깊이 | hover·눌림 효과 | "버튼이 떠오르지 않게" | 버튼 떠오름·그림자 s hook, `--slds-s-mark-shadow-checked` | native에는 떠오름이 없다 |
 | 움직임 | 속도 | "빠르고 경쾌하게", "차분하게" | 브리지의 `--milvus-motion-duration-fast`(0.1s 이하 규칙), `-medium`(0.15~0.2s), `-slow`(0.25~0.4s). 기본값은 규칙마다 원래 값 | 지금 org에서만. 모달·토스트 최소 0.01ms, 스피너 제외 |
 | 움직임 | 곡선 | "부드럽게 감속하며" | 브리지의 `--milvus-motion-easing` | 속도와 같다 |
-| 움직임 | 줄인 움직임 | "동작 줄이기를 켠 사람에게는 애니메이션 없이" | 브리지의 `prefers-reduced-motion` 규칙(항상 켬), 선택하면 항상 최소화 | |
+| 움직임 | 줄인 움직임 | "애니메이션을 모두 최소화" | 움직임 시간 변수 세 개를 `0.01ms`로 | "켠 사람만"은 Salesforce 기본 처리에 맡긴다(브리지 규칙 제거, 2026-10-14) |
 | 포커스 | 포커스 링 모양 | "포커스 링을 3px로 굵게" | 포커스 그림자 4종(5.2 조건), native용 s `*-shadow-focus` | 링 색은 브랜드 색을 따른다 |
-| 포커스 | 커서·링크 밑줄 | "링크에 밑줄 없이" | 브리지 | |
-| 아이콘 | 개체 아이콘 색 | "Account 아이콘을 브랜드 남색으로" | 브리지가 클래스마다 아이콘 배경 hook을 다시 정의(원래 색이 기본값). 하나씩은 `--milvus-icon-<종류>-<이름>`(lightning-icon `icon-name`의 `:`와 `_`를 `-`로, 예: `standard:user_role` → `--milvus-icon-standard-user-role`), 한 번에는 `--milvus-icon-color-all` | 개체를 색으로 구분하던 단서가 사라질 수 있다. 웰컴 매트 완료 배지는 의미 색으로 고정 |
+| 표시만 | 커서·링크 밑줄 | 없음 | 입력 없음 | Salesforce 고정(브리지 제거, 2026-10-14) |
+| 표시만 | 개체 아이콘 색 | 없음 | 입력 없음 | Salesforce 고정(개체 아이콘 색 브리지 973규칙 제거, 2026-10-14) |
 | 표시만 | Salesforce 고정 | "토스트를 10초 동안" | 입력 없음. 9.4 목록을 보여 준다 | |
 
 (hook 이름 앞의 `--slds-g-color-`, `--slds-g-` 등은 생략했다. 실제 이름은 5.2 표와 분석 원본에 있다)
@@ -529,6 +522,8 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 - **두 모드 모두 고정에 더함:** 시간 묶음 밖 움직임(아이콘·알림 애니메이션)과 프레임 애니메이션, 미세 간격(0.125rem 이하)과 특수 영역 간격, 특수 영역 줄 간격, 기본 컴포넌트 내부 값, 목록 머리글 포커스 모서리·읽기 전용 입력 모서리, 파괴·성공·인버스 버튼 hover 그림자, 색 선택기·패널 편집·아바타 이니셜 그림자, 이미지 포커스 그림자, 표 편집 셀·전역 내비 굵기, 팝오버 강조선 두께, timeline 항목 색, 테마 배경 위 반투명 글자, 글자 자름 페이드·색 선택기 그라데이션, 브레드크럼 눌림 축소. 세로 내비 선택 바탕은 고정 대신 브리지로 잇는다(5.6)
 - **native 전환 뒤 고정에 더함:** native 간격, native 탭 줄 간격, native 컨트롤·진행 링 안 아이콘 크기, native 모달 너비, native 반경(두께·간격 hook이나 리터럴, 툴팁·진행 링 포함), native 그림자, native 커서·링크 밑줄, native 글자(목록·표 머리글 굵기·대문자·자간, 모달 제목 크기), native pill 두께, native 기본 컴포넌트 색(동적 아이콘·표 체크박스 등)
 - 이 합의로 정적 검사의 빈틈이 0이 되면 `pnpm test`가 `audit:brand`를 함께 돌린다. 이후 새로 생기는 빈틈은 다시 합의가 필요하다
+
+**2026-10-14 사용자 결정(리허설 뒤 브리지 제거, 5.6)으로 더한 것.** 두 모드 모두 고정: LEX 컨트롤 높이(텍스트 버튼·입력 1.875rem), Path 양 끝 반경, 컨트롤·정렬 아이콘 크기(버튼·입력창 안 0.875rem, 표 정렬 0.75rem), 폼 요소 자간(button·input·select·textarea), 선택지 라벨 굵기(라디오·체크박스·토글), 비활성 커서·링크 밑줄(native 커서·링크 밑줄을 합침), 팝오버 꼬리 그림자(native 팝업 그림자에서 꼬리를 떼어 옮김), 개체 아이콘 배경색. 브리지를 뺀 직후 생긴 빈틈 73개를 이 항목들이 흡수해 다시 0이다
 
 ### 9.5 Storybook의 "Salesforce 원본과 읽는 hook" 보기
 - 데이터는 9.6 정적 검사가 빌드할 때 만든다(손으로 쓰지 않음)
@@ -549,7 +544,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 - util.css와 브리지는 `loadBrand`를 부른 컴포넌트가 있는 페이지에 들어간다. 그런 컴포넌트가 없는 표준 레코드 페이지에는 org 테마 색만 적용된다
 - **해결 (10/9 실측, D3):** 앱 유틸리티 바에 화면 없는 LWC를 두고 백그라운드로 로드하게 하면(FlexiPage decorator `eager` = `true`), 유틸리티 패널을 열지 않아도 그 앱의 표준 화면(리드 목록)에 브랜드 CSS가 들어갔다. 잰 화면은 이것 하나다. 유틸리티 바는 앱의 모든 페이지에 붙으므로 다른 페이지도 같다고 본다. 다른 앱(판매)을 새로 불러오면 들어가지 않았다. 공식 문서의 "백그라운드 유틸리티 항목"(`lightning:backgroundUtilityItem`)은 Aura 전용이라 쓰지 않고, 보이는 유틸리티 항목의 백그라운드 로드를 쓴다([기록](../research/2026-10-09-org-probe.md) 3.7)
 - 패키지는 이 용도의 `milvusBrandLoader`(대상 `lightning__UtilityBar`, 빈 템플릿, `connectedCallback`에서 `loadBrand(this)`만)를 [관리] 파일로 넣는다. 앱에 붙이는 것은 사용자가 App Manager에서 앱마다 한다(유틸리티 항목 추가, "앱이 열릴 때 백그라운드로 로드" 체크). `deploy`는 고객 앱 메타데이터를 바꾸지 않는다
-- App Manager의 "앱이 열릴 때 백그라운드로 로드" 체크가 프로브에서 쓴 decorator `eager`와 같은지는 **미확인**이다(14장)
+- 10/14 리허설에서 App Manager로 유틸리티 항목 `milvusBrandLoader`를 붙이자 그 앱의 표준 리드 목록에 세 link가 들어가고 표준 버튼 반경·회색이 바뀌었다(13장). "App Manager로 붙이면 표준 화면에 들어가는가"는 해소했다(14장에서 뺌). 같은 날 "앱이 열릴 때 백그라운드로 로드" 체크가 FlexiPage decorator `eager` = `true`로 저장되는 것도 확인했다. 체크가 꺼져 있으면 유틸리티 패널을 열 때까지 브랜드가 들어가지 않는다(13장)
 
 ### 9.8 분석 중 함께 발견한 것
 - `brands/Sample_Forest/util.css` 주석의 "버튼·뱃지 등 알약형"은 틀렸다. 뱃지는 `--slds-g-radius-border-1`을 읽는다
@@ -648,22 +643,24 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | VF Visualforce Settings의 SLDS 2 설정을 켜면 `<apex:slds/>`가 `slds-plus.css`(SLDS 2)로 바뀐다. 그러나 팔레트는 Salesforce 기본(`accent-1`·`brand-base-50` = `#066afe`)이고 org 테마 브랜드 색은 들어오지 않는다. util.css를 더하면 중립·피드백이 바뀌고, 팔레트 CSS(약 620바이트)를 더하면 브랜드 버튼이 `#2976ca`로 LEX와 같다. 10/8 방식(SLDS 2 사본 + 팔레트 + util.css)도 LEX와 같다. 잰 페이지는 `applyHtmlTag="false"`로 직접 만든 `<head>` 안에 `<apex:slds/>`, 본문은 `slds-scope` 래퍼, util.css·팔레트는 측정 때 link로 붙였다(`milvusHead` 구성은 14장) | 10/9 프로브 (기록 3.8) |
 | 위 VF 설정은 Metadata API로 읽거나 배포할 수 없다. `UserInterfaceSettings` 문서(API 68.0)에 필드가 없고, org의 Settings 168종을 모두 받아도 없다 | Metadata API 문서, org 조회 (10/9) |
 | 잰 표본에서 npm `slds2.cosmos.css` 2.264.2의 hook 기본값은 org 런타임 값과 같다(중립 색, 피드백 색, 반경, 간격). 다른 것은 브랜드 계열(`accent-1`·`accent-2`·`brand-base-50`)뿐이고, org가 테마 브랜드 색의 팔레트를 넣기 때문이다 | 10/9 프로브와 로컬 비교 (기록 3.9) |
+| 설치본(tgz) 리허설: `init` 두 번의 결과 파일이 같고, `pnpm milvus storybook`(프로젝트 모드, `--host localhost`)에서 명세 페이지 저장 → skill대로 반영 → hook `check --style`(정상 0, 금지 값 2) → Storybook 즉시 갱신이 이어진다. `deploy --yes`는 1단계 13개 배포와 2단계 활성 테마 변경(`--metadata-dir`, `--single-package` 없음)이 성공한다 | 10/14 리허설 `learndoshare_1` |
+| BrandingSet `BRAND_COLOR` `#002554`(에어로케이 네이비)의 LEX `accent-1`은 50단계 `#5171c3`이다. 패키지 `brandPalette`·Storybook 계산과 같다 | 10/14 리허설 |
+| App Manager에서 유틸리티 항목으로 `milvusBrandLoader`를 붙이면 그 앱의 표준 리드 목록에 `milvusBridge`·`milvusBrand`·`milvusOverride` link가 이 순서로 들어가고, 표준 버튼 반경·회색이 브랜드 값으로 바뀐다(14장 App Manager 항목 해소) | 10/14 리허설 |
+| 리허설 측정 뒤 활성 테마를 `Milvus_DesignSystem`으로 되돌렸다: `activeThemeName`만 담은 설정을 `--metadata-dir`로 배포(성공, `--single-package` 없음), LEX `accent-1`이 `#2976ca`로 돌아왔다. 같은 날 브리지를 줄인 뒤(5.6) 새 `milvusBridge`(111,364바이트)로 `deploy --yes`를 다시 실행해 활성 테마가 다시 `Rehearsal`이 되었다 | 10/14 리허설 |
+| App Manager의 "앱이 열릴 때 백그라운드로 로드" 체크는 유틸리티 바 FlexiPage의 decorator `eager` = `true`로 저장된다(Tooling API `FlexiPage.Metadata` 조회). 체크가 꺼져 있으면 유틸리티 패널을 열기 전까지 로더가 만들어지지 않아 표준 화면에 브랜드가 들어가지 않고, 켜면 패널을 열지 않아도 리드 목록에 세 link가 들어간다(14장 항목 해소) | 10/14 리허설 |
+| 줄인 브리지(111,364바이트)에서 리드 목록 높이는 Salesforce 원래 값이다: 머리 버튼 그룹 30px, 툴바 검색 입력·아이콘 버튼 32px, 목록 선택·열 작업 24px. 컨트롤 높이 브리지가 텍스트 버튼만 높여 생기던 어긋남이 없어졌고, 브랜드 반경 2px는 모두 닿는다(5.6) | 10/14 리허설 |
+| VF: `milvusHead` 컴포넌트 안의 `<apex:slds/>`도 Visualforce Settings SLDS 2 설정의 대상이다(`slds-plus.css`). `<head>` 안 순서는 `slds-plus.css` → `milvusVf` → `milvusBridge` → `milvusBrand` → `milvusOverride`. `<body>`에 `slds-scope` 클래스가 자동으로 붙어 래퍼는 필요 없다. 브랜드 버튼 배경 `#2976ca`가 LEX와 같고, `milvusBrand`의 반경도 VF에 닿는다. 기본 아바타 이미지는 200으로 보인다(14장 VF 항목 4개 해소) | 10/14 Task 24 측정(페이지 2개, 둘 다 `<apex:page showHeader="false" sidebar="false" standardStylesheets="false">`) |
 
 ## 14. 미확인 (구현 중 확인할 것)
 
 | 항목 | 확인 시점 |
 | --- | --- |
 | Vite 개발 서버 미들웨어로 요청 파일을 저장할 수 있는가. POST 미들웨어 응답까지는 확인했다(13장) | Task 17 테스트 |
-| `node_modules`의 `.storybook`에서 `preview.ts`·`manager.ts`(manager 번들러), `../lib/*.ts` import, 정적 빌드(`storybook build`, `milvus storybook --build`)도 되는가. Task 3 스파이크는 `main.ts`·형제 `.ts`·스토리·addon만 쟀다 | Task 17 후 tgz 리허설 |
+| `node_modules`의 `.storybook`으로 정적 빌드(`storybook build`, `milvus storybook build`)도 되는가. 개발 서버(`preview.ts`·`manager.ts`, `../lib/*.ts` import 포함)는 10/14 tgz 리허설에서 동작했다(13장) | 다음 tgz 리허설 |
 | pnpm 11.5.3 이후(10.x는 10.34.2 이후) 프로젝트 `.npmrc`의 `${…}` 치환을 하지 않는다는 pnpm.io 설명(Learn 07). 10.13.1에서는 치환이 동작했다(13장). 고객 프로젝트가 더 새 pnpm을 쓰면 토큰 줄은 `~/.npmrc`, 범위 레지스트리는 `pnpm-workspace.yaml`의 `registries`로 안내해야 한다 — 그 버전에서 실제 확인 | Task 20(milvus-design.md 설치 안내) 전 |
 | 고객 프로젝트에서 pnpm이 `esbuild` 빌드 스크립트를 건너뛰는 것이 Storybook 정적 빌드·Vite에 영향을 주는가. 영향이 있으면 `init`이 `pnpm.onlyBuiltDependencies`에 `esbuild`를 더한다 | Task 11·18 |
 | `Bash(pnpm milvus deploy *)`가 인자 없는 명령에도 걸리는가 | Task 23 리허설(10/12 판정: 고객 프로젝트에서 Claude Code를 직접 띄워야 해서 M3 마무리에서 옮김) |
 | `Edit(...)` deny 규칙이 의도대로 막는가 | Task 23 리허설(같은 이유) |
-| App Manager의 유틸리티 항목 속성 "앱이 열릴 때 백그라운드로 로드"(Load in background when app opens) 체크가 10/9 프로브에서 쓴 FlexiPage decorator `eager` = `true`와 같은 설정인가. `milvus-design.md`가 App Manager 경로로 안내하므로 화면에서 체크한 뒤 `milvusBrandLoader`가 동작하는지 본다(9.7) | Task 23 리허설 |
-| VF `milvusHead` 컴포넌트 안의 `<apex:slds/>`도 Visualforce Settings SLDS 2 설정의 대상("pages that include `<apex:slds>`")이 되는가. 10/9 프로브는 페이지에 직접 둔 `<apex:slds/>`만 쟀다(5.5) | Task 24 Step 4 |
-| SLDS 2(`slds-plus.css`)에서도 VF 본문에 `slds-scope` 래퍼가 필요한가. 프로브 페이지는 래퍼가 있었다. 필요하면 5.5·7.1에 적는다 | Task 24 Step 4 (래퍼 있는 페이지와 없는 페이지) |
-| `milvusHead` 안의 `<apex:slds/>`와 `<apex:stylesheet>` 4개가 어떤 순서로 출력되는가. 프로브는 util.css·팔레트를 측정 때 link로 뒤에 붙였다 | Task 24 Step 4 |
-| 설정을 켠 `<apex:slds/>`에서 SLDS 2 CSS가 참조하는 기본 아바타 이미지가 보이는가(5.5, 기록 3.8) | Task 24 Step 4 |
 | org `accent-2`의 다크 값(`#87aef7`)이 팔레트 70단계(`#8cb1f7`)와 다른 원인. 다크 모드가 범위 밖이라 지금 화면에는 영향이 없다(기록 3.9) | 다크 모드 검토 때 |
 | native에서 기본 컴포넌트 CSS가 직접 읽는 `--slds-s-*`에 `:root` 값이 닿는가 (9.1 전제 수정) | 발표 뒤 native 빌드 |
 | info 토스트에 피드백 색이 반영되는가(10/9 프로브에서 동시 표시 3개 제한으로 못 잼), `shadow-1`의 org 값이 npm 값과 같은가(구조만 기록) | 필요할 때 org 프로브(읽기만) |

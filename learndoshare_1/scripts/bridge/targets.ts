@@ -1,11 +1,13 @@
 // 브리지 대상 (설계 5.6 표).
 // 선택자는 SLDS 2 CSS 규칙의 선택자 목록을 그대로 쓴다(부분마다 공백을 하나로 줄여 ", "로 잇는다).
-// 선언이 많은 항목(움직임 217선언, 비활성 커서, 링크 hover 밑줄, 팝오버 꼬리 그림자, 개체 아이콘 색 973규칙)은 설치된 SLDS 2 CSS에서 모으고, 나머지는 손으로 적는다
+// 선언이 많은 움직임(217선언)은 설치된 SLDS 2 CSS에서 모으고, 나머지는 손으로 적는다.
+// 2026-10-14 사용자 결정으로 컨트롤 높이, Path 양 끝 반경, 컨트롤·정렬 아이콘 크기, 폼 요소 자간, 선택지 라벨 굵기, 비활성 커서, 링크 hover 밑줄,
+// 팝오버 꼬리 그림자, 개체 아이콘 색은 잇지 않는다(lib/fixed-list.ts의 고정 항목). 줄인 움직임 규칙도 넣지 않는다(Salesforce 기본에 맡긴다)
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { list, parse, type Rule } from "postcss";
+import { list } from "postcss";
 import { BRIDGE_VARS } from "../../lib/bridge-vars.ts";
 import { classify } from "../audit/classify.ts";
 
@@ -14,9 +16,8 @@ import { classify } from "../audit/classify.ts";
  * - property: 브리지가 정하는 속성. 움직임 longhand는 원본 shorthand에서 값을 꺼낸다
  * - min: 값을 max(var(…), min)으로 감싼다
  * - token: 값 전체가 아니라 이 값만 변수로 바꾼다(calc 안, border shorthand 안)
- * - initial: 원본에 선언이 없을 때 쓰는 브라우저 기본값. 이것이 있을 때만 새 선언을 넣는다
  */
-export type BridgeTarget = { id: string; selectors: string[]; property: string; varName: string; min?: string; token?: string; initial?: string };
+export type BridgeTarget = { id: string; selectors: string[]; property: string; varName: string; min?: string; token?: string };
 
 /** 선택자 목록을 비교용 문자열로 바꾼다 */
 export const selectorKey = (selector: string) => list.comma(selector).map((s) => s.replace(/\s+/g, " ").trim()).join(", ");
@@ -70,33 +71,8 @@ const modal = (size: string) => `.slds-modal_${size} .slds-modal__container, .sl
 
 // 손으로 적는 대상(설계 5.6 표의 "대상")
 const LISTED: BridgeTarget[] = [
-  // 버튼(드롭다운 아이콘 버튼 포함)·입력·선택·버튼형 라디오·체크박스의 1.875rem. 선택은 높이 calc 안의 값만 바꿔 다른 컨트롤과 같이 움직인다
-  T(
-    "control-height",
-    [
-      ".slds-button",
-      ".slds-button_icon-more, .slds-button--icon-more",
-      ".slds-button_icon-container-more, .slds-button--icon-container-more",
-      ".slds-input",
-      ".slds-input_faux, .slds-input--faux",
-      ".slds-radio_button, .slds-radio--button",
-      ".slds-checkbox_button, .slds-checkbox--button",
-    ],
-    "line-height",
-  ),
-  T("control-height", [".slds-select"], "height", { token: "1.875rem" }),
-  T("control-height", [".slds-select[size], .slds-select[multiple]", ".slds-input_height, .slds-input--height"], "min-height", { token: "1.875rem" }),
   // lightning-combobox(선택형)는 slds-input 대신 slds-input_faux만 붙인다
   T("input-border-width", [".slds-input", ".slds-input_faux, .slds-input--faux", ".slds-textarea"], "border", { token: "1px" }),
-  T("path-end-radius", [".slds-path__item:first-child"], "border-start-start-radius"),
-  T("path-end-radius", [".slds-path__item:first-child"], "border-end-start-radius"),
-  T("path-end-radius", [".slds-path__item:last-child"], "border-start-end-radius"),
-  T("path-end-radius", [".slds-path__item:last-child"], "border-end-end-radius"),
-  T("control-icon-size", [".slds-button__icon, .slds-button__icon_stateful, .slds-button__icon--stateful", ".slds-input-has-icon .slds-input__icon"], "width"),
-  T("control-icon-size", [".slds-button__icon, .slds-button__icon_stateful, .slds-button__icon--stateful", ".slds-input-has-icon .slds-input__icon"], "height"),
-  // 표 머리글 정렬 아이콘(0.75rem). 컨트롤 안 아이콘(0.875rem)과 크기가 달라 따로 둔다
-  T("sort-icon-size", [".slds-is-sortable__icon"], "width"),
-  T("sort-icon-size", [".slds-is-sortable__icon"], "height"),
   // 모달 너비(@media (min-width: 48em) 안). 너비와 최대 너비를 같은 변수로 잇는다(브랜드 값이 그대로 너비가 된다).
   // base는 크기 클래스가 없는 모달, medium은 lightning-modal 기본 크기
   T("modal-width-base", [".slds-modal__container"], "width"),
@@ -111,21 +87,9 @@ const LISTED: BridgeTarget[] = [
   T("modal-width-full", [modal("full")], "width", { token: "90%" }),
   T("modal-min-width", [".slds-modal__container"], "min-width"),
   T("modal-min-width", ["small", "medium", "large", "full"].map(modal), "min-width", { token: "40rem" }),
-  // 폼 컨트롤은 브라우저 기본 스타일이 letter-spacing을 normal로 다시 정해 :root의 자간이 상속되지 않는다(SLDS 2에는 선언이 없다)
-  T("letter-spacing", ["button, input, optgroup, select, textarea"], "letter-spacing", { initial: "normal" }),
   // 대문자 제목은 넓은 자간(0.0625rem)이 있어 브랜드 자간과 따로 둔다
   T("caps-transform", [".slds-text-title_caps, .slds-text-title--caps", ".slds-section-title_divider, .slds-section-title--divider"], "text-transform"),
   T("caps-letter-spacing", [".slds-text-title_caps, .slds-text-title--caps", ".slds-section-title_divider, .slds-section-title--divider"], "letter-spacing"),
-  T(
-    "choice-label-weight",
-    [
-      ".slds-radio .slds-form-element__label",
-      ".slds-checkbox .slds-checkbox__label .slds-form-element__label",
-      // lightning-input type=toggle의 라벨
-      ".slds-checkbox_toggle .slds-form-element__label, .slds-checkbox--toggle .slds-form-element__label",
-    ],
-    "font-weight",
-  ),
   // 세로 내비 선택 바탕(2026-10-12 결정). 원본 선택자 목록에 같은 부분이 두 번 있어 그대로 둔다
   T(
     "nav-selected-background",
@@ -147,10 +111,8 @@ const LISTED: BridgeTarget[] = [
 
 // 바꾸지 않는 움직임: 스피너(점별 지연이 1000ms 기준), Agentforce 영역(고정 목록)
 const MOTION_EXCLUDED = /spinner|subtheme-agentic/;
-// 비활성 조건이 :not() 밖에 있는 선택자. :not(:disabled)·:not(.slds-disabled-text)는 활성 상태다
-const DISABLED = (selector: string) => list.comma(selector).some((p) => /disabled/i.test(p.replace(/:not\((?:[^()]|\([^()]*\))*\)/g, "")));
 
-/** 설치된 SLDS 2 CSS에서 선언이 많은 항목의 대상을 모은다. hook·키워드 값은 브랜드가 이미 바꾸거나 바꿀 것이 없어 뺀다 */
+/** 설치된 SLDS 2 CSS에서 움직임 대상을 모은다. hook·키워드 값은 브랜드가 이미 바꾸거나 바꿀 것이 없어 뺀다 */
 function collect(sldsCss: string): BridgeTarget[] {
   const sel = new Map<string, Set<string>>();
   const add = (id: string, property: string, key: string, extra: Partial<BridgeTarget> = {}) => {
@@ -168,12 +130,6 @@ function collect(sldsCss: string): BridgeTarget[] {
         if (id) add(id, `${base}-duration`, key, { min: "0.01ms" });
       }
       if (longhand("timing-function").some(isSmoothEasing)) add("motion-easing", `${base}-timing-function`, key);
-    } else if (d.prop === "cursor" && DISABLED(d.selector)) {
-      add("cursor-disabled", "cursor", key);
-    } else if (/^text-decoration(-line)?$/.test(d.prop) && /:hover/.test(d.selector) && /underline/.test(d.value)) {
-      add("link-decoration-hover", d.prop, key);
-    } else if (d.prop === "box-shadow" && /nubbin/.test(d.selector)) {
-      add("nubbin-shadow", "box-shadow", key);
     }
   }
   return [...sel].map(([k, keys]) => {
@@ -182,26 +138,4 @@ function collect(sldsCss: string): BridgeTarget[] {
   });
 }
 
-/**
- * 개체 아이콘 배경색: SLDS 2가 클래스마다 정한 --slds-c-icon-color-background.
- * 같은 규칙을 전체 변수, 개체 변수 순으로 감싸 var(--milvus-icon-<종류>-<이름>, var(--milvus-icon-color-all, <원래 값>))이 된다.
- * 개체 변수 이름은 규칙의 첫 클래스(lightning-icon이 붙이는 이름)에서 온다. 별칭(.slds-icon-custom-110)은 같은 변수를 따른다
- */
-function objectIcons(sldsCss: string): BridgeTarget[] {
-  const property = "--slds-c-icon-color-background";
-  const rules: Rule[] = [];
-  parse(sldsCss).walkRules((r) => {
-    if (r.selectors.every((s) => /^\.slds-icon-(standard|custom|action)-[\w-]+$/.test(s)) && r.some((d) => d.type === "decl" && d.prop === property)) rules.push(r);
-  });
-  const key = (r: Rule) => selectorKey(r.selector);
-  return [
-    T("icon-color-all", rules.map(key), property),
-    ...rules.map((r) => {
-      const id = r.selectors[0].slice(".slds-".length);
-      return { id, selectors: [key(r)], property, varName: `--milvus-${id}` };
-    }),
-  ];
-}
-
-const slds2 = readSlds2Css();
-export const BRIDGE_TARGETS: BridgeTarget[] = [...LISTED, ...collect(slds2), ...objectIcons(slds2)];
+export const BRIDGE_TARGETS: BridgeTarget[] = [...LISTED, ...collect(readSlds2Css())];

@@ -104,6 +104,21 @@ export const NEUTRAL_COLOR_PATTERNS = [
 /** :root에 둘 수 있는 일반(상속) 속성 */
 export const ALLOWED_PLAIN_PROPS = ["letter-spacing"];
 
+/** 2026-10-14 사용자 결정으로 milvusBridge.css에서 뺀 변수(설계 5.6). "-"로 끝나는 이름은 앞부분이다(개체 아이콘 973개 --milvus-icon-<종류>-<이름>) */
+export const REMOVED_BRIDGE_VARS = [
+  "--milvus-control-height",
+  "--milvus-path-end-radius",
+  "--milvus-control-icon-size",
+  "--milvus-sort-icon-size",
+  "--milvus-letter-spacing",
+  "--milvus-choice-label-weight",
+  "--milvus-cursor-disabled",
+  "--milvus-link-decoration-hover",
+  "--milvus-nubbin-shadow",
+  "--milvus-icon-",
+];
+const removedBridgeVar = (name: string) => REMOVED_BRIDGE_VARS.some((n) => name === n || (n.endsWith("-") && name.startsWith(n)));
+
 // 포커스 링 그림자 값 안에 쓸 수 있는 색. 색의 원본은 org 테마다
 const FOCUS_COLORS = ["--slds-g-color-brand-base-15", "--slds-g-color-neutral-base-100"];
 
@@ -135,7 +150,11 @@ export function declProblem(name: string, value: string, ctx: RuleContext): [str
       : ["plain-prop", `${name}: :root의 일반 속성은 ${ALLOWED_PLAIN_PROPS.join(", ")}만 쓴다`];
   }
   if (name.startsWith("--milvus-")) {
-    if (!ctx.milvusVars.has(name)) return ["milvus-var", `${name}: 이 변수를 읽는 밀버스 컴포넌트나 milvusBridge.css가 없다(오타이거나 효과가 없다)`];
+    if (!ctx.milvusVars.has(name)) {
+      return removedBridgeVar(name)
+        ? ["milvus-var", `${name}: 이 변수를 읽는 밀버스 컴포넌트나 milvusBridge.css가 없다. 2026-10-14 브리지에서 뺐다(Salesforce 고정, 설계 5.6). 이 줄을 지운다`]
+        : ["milvus-var", `${name}: 이 변수를 읽는 밀버스 컴포넌트나 milvusBridge.css가 없다(오타이거나 효과가 없다)`];
+    }
     // 브리지는 시간을 max(var(…), 0.01ms)로 감싼다. 단위 없는 숫자는 max()를 무효로 만들어 0.01ms 하한이 무너진다(설계 5.6)
     return name.startsWith("--milvus-motion-duration-") && /^[+-]?[\d.]+$/.test(value)
       ? ["motion-unit", `${name}: ${value} — 시간에는 단위를 붙인다(예: 0.01ms, 0.2s). 단위 없는 숫자는 브리지의 max()를 무효로 만들어 모달·토스트가 닫히지 않을 수 있다`]

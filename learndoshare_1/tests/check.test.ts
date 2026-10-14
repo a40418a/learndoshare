@@ -9,6 +9,7 @@ import { checkCommand, runCheck } from "../cli/check.ts";
 import { runInit } from "../cli/init.ts";
 import { suggestPassingText } from "../lib/contrast.ts";
 import { hooksIndexFromSource } from "../lib/hooks-index.ts";
+import { buildMilvusVfCss } from "../lib/vf.ts";
 
 const pkgRoot = fileURLToPath(new URL("..", import.meta.url));
 const FA = "force-app/main/default";
@@ -107,7 +108,7 @@ test("--style은 200ms 안에 끝난다 (hooks-index.json 사용)", async () => 
 
 test("밀버스 관리 파일을 고치면 전체 check가 1이고 'pnpm milvus update --force'를 안내한다", async () => {
   await withProject(async (root) => {
-    // init 직후는 전체 check를 통과하고 아무 경고도 없다
+    // init 직후는 전체 check를 통과하고 아무 경고도 없다. init이 milvusVf.css를 팔레트로 이미 만들어 다시 만들 것이 없다
     const clean = await check(root, false);
     assert.equal(clean.result.code, 0, clean.stderr);
     assert.equal(clean.stderr, "");
@@ -131,6 +132,44 @@ test("밀버스 관리 파일을 고치면 전체 check가 1이고 'pnpm milvus 
     const noConfig = await check(root, false);
     assert.equal(noConfig.result.code, 1);
     assert.match(noConfig.stderr, /pnpm milvus init/);
+  });
+});
+
+test("BRAND_COLOR를 바꾼 뒤 전체 check는 milvusVf.css를 갱신하고 0", async () => {
+  await withProject(async (root) => {
+    const vf = `${RES}/milvusVf.css`;
+    const set = `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`;
+    const original = readFileSync(join(root, set), "utf8");
+    write(root, set, original.replace("#0176D3", "#2E7D32"));
+    const r = await check(root, false);
+    assert.equal(r.result.code, 0, r.stderr);
+    assert.deepEqual(r.result.regenerated, [vf]);
+    assert.equal(readFileSync(join(root, vf), "utf8"), buildMilvusVfCss("#2E7D32"));
+    // milvusVf는 [생성]이라 sha256 기록 대상이 아니다. 다시 실행해도 관리 파일 검사에 걸리지 않고 바뀔 것도 없다
+    const again = await check(root, false);
+    assert.equal(again.result.code, 0, again.stderr);
+    assert.deepEqual(again.result.regenerated, []);
+
+    // --style(hook)은 파일을 쓰지 않는다
+    write(root, vf, "/* 직접 */\n");
+    assert.deepEqual((await check(root, true)).result.regenerated, []);
+    assert.equal(readFileSync(join(root, vf), "utf8"), "/* 직접 */\n");
+
+    // BRAND_COLOR를 읽을 수 없으면 실패하고 파일은 그대로다
+    write(root, set, original.replace("#0176D3", "#abc"));
+    const bad = await check(root, false);
+    assert.equal(bad.result.code, 1);
+    assert.deepEqual(bad.result.regenerated, []);
+    assert.equal(readFileSync(join(root, vf), "utf8"), "/* 직접 */\n");
+
+    // config.vf가 거짓이면 다시 만들지 않는다
+    write(root, set, original);
+    const file = join(root, "milvus.config.json");
+    writeFileSync(file, JSON.stringify({ ...JSON.parse(readFileSync(file, "utf8")), vf: false }));
+    const off = await check(root, false);
+    assert.equal(off.result.code, 0, off.stderr);
+    assert.deepEqual(off.result.regenerated, []);
+    assert.equal(readFileSync(join(root, vf), "utf8"), "/* 직접 */\n");
   });
 });
 

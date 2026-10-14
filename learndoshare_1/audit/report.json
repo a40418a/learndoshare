@@ -58,7 +58,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       }
     },
@@ -618,15 +618,15 @@
         "native": "reached"
       },
       "control-height": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "reached"
       },
       "icon-size": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "line-height": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "hover-press": {
@@ -646,7 +646,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "fixed"
       }
     },
@@ -1344,7 +1344,7 @@
         "native": "n/a"
       },
       "control-height": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "shadow": {
@@ -1368,7 +1368,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       }
     },
@@ -1406,7 +1406,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       }
     },
@@ -1858,7 +1858,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "fixed": {
@@ -1884,7 +1884,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       }
     },
@@ -2292,7 +2292,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "fixed": {
@@ -2362,7 +2362,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "fixed": {
@@ -2492,7 +2492,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       }
     },
@@ -3602,7 +3602,7 @@
         "native": "reached"
       },
       "control-height": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "icon-size": {
@@ -3622,7 +3622,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "fixed": {
@@ -3640,7 +3640,7 @@
         "native": "n/a"
       },
       "icon-size": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "fixed": {
@@ -3958,7 +3958,7 @@
         "native": "n/a"
       },
       "icon-size": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       }
     },
@@ -4026,7 +4026,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       }
     },
@@ -4730,7 +4730,7 @@
         "native": "n/a"
       },
       "shadow": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       }
     },
@@ -4878,7 +4878,7 @@
     },
     "path": {
       "radius": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "density": {
@@ -6714,7 +6714,7 @@
         "native": "n/a"
       },
       "control-height": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "hover-press": {
@@ -6734,7 +6734,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       }
     },
@@ -7080,7 +7080,7 @@
         "native": "reached"
       },
       "control-height": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "line-height": {
@@ -7100,7 +7100,7 @@
         "native": "reached"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "fixed"
       }
     },
@@ -7280,7 +7280,7 @@
         "native": "reached"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "fixed"
       }
     },
@@ -7390,7 +7390,7 @@
         "native": "reached"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "fixed"
       }
     },
@@ -7730,7 +7730,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       }
     },
@@ -7926,7 +7926,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       }
     },
@@ -8032,7 +8032,7 @@
         "native": "reached"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "fixed"
       }
     },
@@ -8342,7 +8342,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       }
     },
@@ -8892,7 +8892,7 @@
         "native": "n/a"
       },
       "cursor-underline": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       }
     },
@@ -9008,7 +9008,7 @@
     },
     "radius": {
       "now": {
-        "reached": 58,
+        "reached": 57,
         "total": 64
       },
       "native": {
@@ -9218,7 +9218,7 @@
     },
     "control-height": {
       "now": {
-        "reached": 5,
+        "reached": 0,
         "total": 5
       },
       "native": {
@@ -9238,7 +9238,7 @@
     },
     "icon-size": {
       "now": {
-        "reached": 15,
+        "reached": 12,
         "total": 25
       },
       "native": {
@@ -9248,7 +9248,7 @@
     },
     "line-height": {
       "now": {
-        "reached": 28,
+        "reached": 27,
         "total": 36
       },
       "native": {
@@ -9278,7 +9278,7 @@
     },
     "shadow": {
       "now": {
-        "reached": 31,
+        "reached": 30,
         "total": 34
       },
       "native": {
@@ -9338,7 +9338,7 @@
     },
     "cursor-underline": {
       "now": {
-        "reached": 20,
+        "reached": 0,
         "total": 21
       },
       "native": {

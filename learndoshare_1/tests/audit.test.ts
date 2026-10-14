@@ -4,7 +4,7 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { classify } from "../scripts/audit/classify.ts";
-import { buildReport } from "../scripts/audit/report.ts";
+import { buildReport, fixedItemsOf } from "../scripts/audit/report.ts";
 import { runAudit, type Sources } from "../scripts/audit/run.ts";
 import { SPEC_ITEMS } from "../lib/spec-items.ts";
 import { FIXED_ITEMS } from "../lib/fixed-list.ts";
@@ -86,7 +86,8 @@ test("브리지가 덮는 리터럴은 bridge, FIXED_ITEMS에 맞으면 fixed, �
   assert.deepEqual(byComponent.spinner["motion-easing"], { now: "fixed", native: "n/a" });
   assert.deepEqual(byComponent.button.radius, { now: "reached", native: "reached" });
   assert.deepEqual(byComponent.button.density, { now: "reached", native: "n/a" });
-  assert.deepEqual(byComponent.button["control-height"], { now: "gap", native: "n/a" });
+  // .slds-button의 1.875rem은 LEX 컨트롤 높이 고정이다(2026-10-14 합의)
+  assert.deepEqual(byComponent.button["control-height"], { now: "fixed", native: "n/a" });
   assert.deepEqual(byComponent.button["icon-size"], { now: "gap", native: "n/a" });
   assert.deepEqual(byComponent.spinner["motion-speed"], { now: "fixed", native: "n/a" });
   assert.deepEqual(byComponent.badge.fixed, { now: "fixed", native: "n/a" });
@@ -95,7 +96,6 @@ test("브리지가 덮는 리터럴은 bridge, FIXED_ITEMS에 맞으면 fixed, �
   assert.deepEqual(byComponent.spinner.typography, { now: "gap", native: "n/a" });
   assert.deepEqual(gaps, [
     { comp: "button", item: "motion-easing", selector: ".slds-button", prop: "transition", value: "border 0.1s linear" },
-    { comp: "button", item: "control-height", selector: ".slds-button", prop: "line-height", value: "1.875rem" },
     { comp: "spinner", item: "typography", selector: ".slds-spinner", prop: "font-size", value: "2rem" },
     { comp: "button", item: "icon-size", selector: ".slds-button__icon", prop: "width", value: "0.875rem" },
   ]);
@@ -116,7 +116,7 @@ test("고정 목록에 없는 gap이 있으면 --check가 1", () => {
   assert.equal(runAudit(["--write"], sources(), dir).code, 0);
   const result = runAudit(["--check"], sources(), dir);
   assert.equal(result.code, 1);
-  assert.match(result.message, /고정 목록에 없는 빈틈 4개/);
+  assert.match(result.message, /고정 목록에 없는 빈틈 3개/);
 });
 
 test("브리지는 항목에 맞는 longhand만 덮는다. 선택자 목록의 일부만 덮으면 bridge가 아니다", () => {
@@ -316,17 +316,88 @@ test("2026-10-12 합의 고정 항목은 그 묶음만 흡수하고 비슷한 �
   assert.deepEqual(byComponent.toast["motion-speed"], { now: "fixed", native: "n/a" });
 });
 
+// 2026-10-14 사용자 합의: 컨트롤 높이 브리지를 빼면서 다시 빈틈이 된 SLDS 2 선언(브리지가 잇던 선택자 목록 그대로)만 고정이다
+test("LEX 컨트롤 높이 고정은 브리지가 잇던 1.875rem 선언만 흡수하고 비슷한 다른 선언은 빈틈으로 남긴다", () => {
+  const sldsCss = `
+    .slds-button { line-height: 1.875rem; }
+    .slds-button_icon-more, .slds-button--icon-more { line-height: 1.875rem; }
+    .slds-button_icon-container-more,.slds-button--icon-container-more { line-height: 1.875rem; }
+    .slds-input { line-height: 1.875rem; }
+    .slds-input_faux,.slds-input--faux { line-height: 1.875rem; }
+    .slds-radio_button,.slds-radio--button { line-height: 1.875rem; }
+    .slds-checkbox_button,.slds-checkbox--button { line-height: 1.875rem; }
+    .slds-select { height: calc(1.875rem + (1px * 2)); }
+    .slds-select[size], .slds-select[multiple] { min-height: calc(1.875rem + (1px * 2)); }
+    .slds-button_icon { line-height: 1.875rem; }
+    .slds-form .slds-button { line-height: 1.875rem; }
+    .slds-button { line-height: 2rem; }
+    .slds-input { min-height: calc(1.875rem + (1px * 2)); }
+    .slds-select { line-height: 1.875rem; }`;
+  const { gaps } = buildReport(classify({ sldsCss, lbcFiles: [] }), SPEC_ITEMS, "", FIXED_ITEMS);
+  assert.deepEqual(gaps.map((g) => `${g.selector} { ${g.prop}: ${g.value} } ${g.item}`), [
+    ".slds-button_icon { line-height: 1.875rem } line-height",
+    ".slds-form .slds-button { line-height: 1.875rem } control-height",
+    ".slds-button { line-height: 2rem } control-height",
+    ".slds-input { min-height: calc(1.875rem + (1px * 2)) } control-height",
+    ".slds-select { line-height: 1.875rem } control-height",
+  ]);
+  // native 버튼 1.875rem은 기존 native 항목(combobox-height)만 맞는다
+  const [native] = classify({
+    sldsCss: "",
+    lbcFiles: [{ comp: "calendar", file: "lightning-base-components/src/lightning/calendar/calendar.slds.css", css: `:host([data-render-mode="shadow"]) .slds-button { line-height: 1.875rem; }` }],
+  });
+  assert.deepEqual(fixedItemsOf(native, FIXED_ITEMS).map((f) => f.id), ["combobox-height"]);
+});
+
+// 2026-10-14 사용자 합의: 브리지 10종을 빼면서 다시 빈틈이 된 선언(아래 위쪽)만 고정이다. 아래쪽은 비슷하지만 남아야 하는 선언이다
+test("브리지를 뺀 고정 항목은 그 선언만 흡수하고 비슷한 다른 선언은 빈틈으로 남긴다", () => {
+  const sldsCss = `
+    .slds-path__item:first-child { border-start-start-radius: 2rem; border-end-start-radius: 2rem; }
+    .slds-path__item:last-child { border-start-end-radius: 2rem; border-end-end-radius: 2rem; }
+    .slds-button__icon, .slds-button__icon_stateful, .slds-button__icon--stateful { width: 0.875rem; height: 0.875rem; }
+    .slds-input-has-icon .slds-input__icon { width: 0.875rem; }
+    .slds-is-sortable__icon { width: 0.75rem; height: 0.75rem; }
+    .slds-radio .slds-form-element__label { font-weight: 700; }
+    .slds-button[disabled], .slds-button:disabled { cursor: default; }
+    .slds-select[disabled], .slds-select.slds-is-disabled { cursor: not-allowed; }
+    a:hover, a:focus-visible { text-decoration: underline; }
+    .slds-context-bar__label-action:focus-visible, .slds-context-bar__label-action:focus-visible:hover { text-decoration: var(--_slds-c-globalnavigation-font-decoration-focus, underline); }
+    .slds-nubbin_top::after,.slds-nubbin--top::after { box-shadow: var(--_slds-c-popover-top-nubbin-shadow); }
+
+    .slds-path__item { border-radius: 2rem; }
+    .slds-button__icon_large { width: 1.5rem; }
+    .slds-input-has-icon .slds-input__icon { height: 0.75rem; }
+    .slds-form-element__label { font-weight: 700; }
+    .slds-b:disabled { cursor: pointer; }
+    .slds-c:hover { text-decoration: line-through; }
+    .slds-popover { box-shadow: 0 2px 3px red; }`;
+  const { gaps } = buildReport(classify({ sldsCss, lbcFiles: [] }), SPEC_ITEMS, "", FIXED_ITEMS);
+  assert.deepEqual(gaps.map((g) => `${g.selector} { ${g.prop}: ${g.value} } ${g.item}`), [
+    ".slds-path__item { border-radius: 2rem } radius",
+    ".slds-button__icon_large { width: 1.5rem } icon-size",
+    ".slds-input-has-icon .slds-input__icon { height: 0.75rem } icon-size",
+    ".slds-form-element__label { font-weight: 700 } typography",
+    ".slds-b:disabled { cursor: pointer } cursor-underline",
+    ".slds-c:hover { text-decoration: line-through } cursor-underline",
+    ".slds-popover { box-shadow: 0 2px 3px red } shadow",
+  ]);
+  // native 꼬리 그림자는 새 항목이 맡고 드롭다운·팝오버·툴팁 그림자(popup-shadow)에서는 뺐다
+  const [nubbin] = classify({
+    sldsCss: "",
+    lbcFiles: [{ comp: "helptext", file: "lightning-base-components/src/lightning/helptext/helptext.slds.css", css: `:host([data-render-mode="shadow"]) .slds-nubbin_top::after { box-shadow: 0 0 1px red; }` }],
+  });
+  assert.deepEqual(fixedItemsOf(nubbin, FIXED_ITEMS).map((f) => f.id), ["nubbin-shadow", "native-shadow"]);
+});
+
 test("--check는 기준 대비 새 하드코딩, hook 변화, native 목록 변화, 브리지 선택자 소실에서 1", () => {
   const dir = join(tmp, "기준");
-  // custom property만 정의하는 원본 규칙(개체 아이콘 색)을 덮는 브리지는 소실이 아니다
+  // custom property만 정의하는 원본 규칙을 덮는 브리지는 소실이 아니다(합성 예)
   const base: Sources = {
     sldsCss: `.slds-badge { z-index: 100; border-radius: var(--slds-g-radius-border-1); }
-      .slds-icon-standard-account { --slds-c-icon-color-background: rgb(88, 103, 232); }`,
+      .slds-a { --slds-c-a-color-background: rgb(88, 103, 232); }`,
     lbcFiles: [],
     bridgeCss: `.slds-badge { transition-duration: var(--milvus-motion-duration-fast, 0s); }
-      .slds-icon-standard-account {
-        --slds-c-icon-color-background: var(--milvus-icon-standard-account, var(--milvus-icon-color-all, rgb(88, 103, 232)));
-      }`,
+      .slds-a { --slds-c-a-color-background: var(--milvus-x, rgb(88, 103, 232)); }`,
     nativeList: ["lightning-badge"],
   };
   assert.equal(runAudit(["--write"], base, dir).code, 0);

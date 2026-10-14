@@ -6,7 +6,6 @@ import { SPEC_ITEMS } from "../lib/spec-items.ts";
 const read = (path: string) => readFileSync(new URL(`../templates/${path}`, import.meta.url), "utf8");
 const design = read("milvus-design.md");
 const skill = read("claude/skills/milvus-brand/SKILL.md");
-const bridgeCss = read("force-app/main/default/staticresources/milvusBridge.css");
 
 // 설계 7.1의 8개 절
 const SECTIONS = ["이 프로젝트의 밀버스 설정", "준비물", "세팅 순서", "파일 지도", "디자인 규칙", "Claude에게 시키는 법", "배포 안전장치", "업데이트와 문제 해결"];
@@ -43,16 +42,14 @@ test("SKILL.md frontmatter에 name과 description이 있다", () => {
 });
 
 test("SKILL.md의 hook·브리지 변수 이름은 모두 SPEC_ITEMS에 있다", () => {
-  // SPEC_ITEMS의 hooks·bridgeVars와 설명·한계 문장에 나오는 이름(포커스 링 색, 개체 아이콘 예시)
+  // SPEC_ITEMS의 hooks·bridgeVars와 설명·한계 문장에 나오는 이름(포커스 링 색)
   const known = new Set(JSON.stringify(SPEC_ITEMS).match(/--[\w-]+/g));
   // 예외 1: 5.2 규칙 설명에만 나오는 이름. shadow-4를 바꾸면 포커스 표시가 쓰는 -5·-6을 따로 적는다
   for (const n of ["--slds-g-shadow-5", "--slds-g-shadow-6"]) known.add(n);
-  // 예외 2: 개체 아이콘 하나씩의 변수는 milvusBridge.css가 실제로 읽는 이름이어야 한다
-  const isIconVar = (n: string) => n.startsWith("--milvus-icon-") && bridgeCss.includes(`var(${n},`);
-  // 패턴(`--slds-c-*`, `--milvus-icon-<종류>-<이름>`)은 빼고 완성된 이름만 본다
+  // 패턴(`--slds-c-*`)은 빼고 완성된 이름만 본다
   const names = skill.match(/--(?:slds|sds|milvus)-[\w-]*\w(?![\w*<-])/g) ?? [];
   assert.ok(names.length > 50, `${names.length}개`);
-  assert.deepEqual([...new Set(names)].filter((n) => !known.has(n) && !isIconVar(n)), []);
+  assert.deepEqual([...new Set(names)].filter((n) => !known.has(n)), []);
 });
 
 // 이름은 요청 파일의 절 제목(SPEC_ITEMS.label, lib/request.ts)과 같아야 skill이 절을 항목에 맞춘다

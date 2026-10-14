@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
     <apiVersion>67.0</apiVersion>
-    <isExposed>true</isExposed>
+    <isExposed>false</isExposed>
     <masterLabel>Milvus Button</masterLabel>
-    <description
-  >브랜드 util.css에 따라 lightning-button과 브랜드 버튼을 자동으로 전환하는 버튼</description>
-    <targets>
-        <target>lightning__AppPage</target>
-        <target>lightning__RecordPage</target>
-        <target>lightning__HomePage</target>
-    </targets>
+    <description>브랜드 util.css에 따라 lightning-button과 브랜드 버튼을 자동으로 전환하는 버튼. 다른 LWC 안에서 쓰는 부품이라 앱 빌더에 노출하지 않는다</description>
 </LightningComponentBundle>

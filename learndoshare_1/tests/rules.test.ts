@@ -199,6 +199,16 @@ test("--milvus-*는 milvusVars에 있을 때만 허용", () => {
   assert.deepEqual(rulesOf("--milvus-button-font-wieght: 700;"), ["milvus-var"]);
 });
 
+test("2026-10-14 브리지에서 뺀 변수는 milvus-var 메시지에 그 이유를 붙인다(개체 아이콘 변수 포함, 오타는 붙이지 않는다)", () => {
+  const messages = (body: string) => check(`:root {\n${body}\n}`).map((i) => `${i.rule} ${i.message}`);
+  for (const name of ["--milvus-control-height", "--milvus-path-end-radius", "--milvus-icon-color-all", "--milvus-icon-standard-account"]) {
+    const [m] = messages(`${name}: 1px;`);
+    assert.match(m, /^milvus-var /, name);
+    assert.ok(m.includes("2026-10-14 브리지에서 뺐다(Salesforce 고정, 설계 5.6)"), m);
+  }
+  assert.doesNotMatch(messages("--milvus-button-font-wieght: 700;")[0], /2026-10-14/);
+});
+
 test("움직임 시간 변수는 단위가 있어야 한다(단위 없는 0은 브리지의 max()를 무효로 만든다, 설계 5.6)", () => {
   const motion: RuleContext = { ...ctx, milvusVars: new Set(["--milvus-motion-duration-fast"]) };
   const rules = (value: string) => checkUtilCss(`:root { --milvus-motion-duration-fast: ${value}; }`, "util.css", motion).map((i) => i.rule);

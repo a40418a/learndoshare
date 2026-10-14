@@ -1,10 +1,11 @@
-// "Salesforce 고정" 목록 (설계 9.4, 2026-10-08 사용자 합의. 2026-10-12 남은 빈틈 묶음 ①~⑯ 사용자 합의로 더함). 모든 방법을 써도 바꿀 수 없어 명세 페이지와 발표에 "바꿀 수 없음"으로 적는다.
+// "Salesforce 고정" 목록 (설계 9.4, 2026-10-08 사용자 합의. 2026-10-12 남은 빈틈 묶음 ①~⑯, 2026-10-14 컨트롤 높이와 브리지 10종을 뺀 사용자 결정으로 더함). 모든 방법을 써도 바꿀 수 없어 명세 페이지와 발표에 "바꿀 수 없음"으로 적는다.
 // 새 항목을 넣으려면 사용자 합의가 필요하다(설계 9.6의 4)
 // 브라우저(Storybook 명세 페이지)에서도 import하므로 Node 모듈을 쓰지 않는다
 
 /**
  * - mode: both는 지금(synthetic)과 native 모두, native는 기본 컴포넌트가 native shadow로 바뀐 뒤에만 고정이다(native 판정에서만 맞춘다)
- * - match: 정적 반영 검사(Task 14)가 빈틈 선언을 이 항목으로 볼 조건. 주어진 조건을 모두 만족하면 맞는다. 여러 개면 그중 하나라도 맞으면 맞는다
+ * - match: 정적 반영 검사(Task 14)가 빈틈 선언을 이 항목으로 볼 조건. 주어진 조건을 모두 만족하면 맞는다. 여러 개면 그중 하나라도 맞으면 맞는다.
+ *   빈 배열이면 맞는 선언이 없다(검사에 들어오는 CSS 선언이 없는 고정을 목록에 보여 주기만 한다)
  *   - selector: `<컴포넌트 이름> <선택자>`에 맞춘다. 기본 컴포넌트의 native CSS 선택자에는 클래스가 없는 경우가 많다([part='input'])
  *   - property: 속성 이름이 같거나 그 longhand다(transition → transition-duration, background → background-color). 여러 개면 그중 하나
  *   - value: 값(공백을 하나로 줄인 것)이 맞는다
@@ -148,9 +149,63 @@ export const FIXED_ITEMS: FixedItem[] = [
   },
   { id: "fade-gradient", label: "글자 자름 페이드·색 선택기 그라데이션", mode: "both", match: { selector: /\.slds-truncate::after|\.slds-color-picker__custom-range::before/, property: "background", value: /linear-gradient\(/ } },
 
-  // native 전환 뒤 생기는 고정 (9.2의 c hook을 열면 일부 메울 수 있음)
+  // 2026-10-14 사용자 합의: 컨트롤 높이 브리지를 뺐다. LEX 목록·헤더 툴바가 32px 아이콘 버튼과 텍스트 버튼을 섞어 두어
+  // 높이를 바꾸면 어긋난다(리허설 실측). 브리지가 잇던 SLDS 2 선택자 목록 전체와 그 값에만 맞춘다
+  {
+    id: "lex-control-height",
+    label: "LEX 컨트롤 높이(텍스트 버튼·입력 1.875rem)",
+    mode: "both",
+    match: [
+      {
+        selector:
+          /^\S+ \.slds-(button(_icon(-container)?-more,\s*\.slds-button--icon(-container)?-more)?|input(_faux,\s*\.slds-input--faux)?|radio_button,\s*\.slds-radio--button|checkbox_button,\s*\.slds-checkbox--button)$/,
+        property: "line-height",
+        value: /^1\.875rem$/,
+      },
+      { selector: /^\S+ \.slds-select(\[size\],\s*\.slds-select\[multiple\])?$/, property: ["height", "min-height"], value: /^calc\(1\.875rem \+ \(1px \* 2\)\)$/ },
+    ],
+  },
+  // 2026-10-14 사용자 합의: 브리지 10종을 뺐다. 브리지가 잇던 선언만 맞춘다(움직임·입력창 두께·모달 너비·대문자 제목·세로 내비 선택 바탕 브리지는 남는다)
+  { id: "path-end-radius", label: "Path 양 끝 반경", mode: "both", match: { selector: /^\S+ \.slds-path__item:(first|last)-child$/, property: RADIUS } },
+  {
+    id: "control-sort-icon-size",
+    label: "컨트롤·정렬 아이콘 크기(버튼·입력창 안 0.875rem, 표 정렬 0.75rem)",
+    mode: "both",
+    match: [
+      { selector: /^\S+ (\.slds-button__icon,\s*\.slds-button__icon_stateful,\s*\.slds-button__icon--stateful|\.slds-input-has-icon \.slds-input__icon)$/, property: ["width", "height"], value: /^0\.875rem$/ },
+      { selector: /^\S+ \.slds-is-sortable__icon$/, property: ["width", "height"], value: /^0\.75rem$/ },
+    ],
+  },
+  // 브라우저 기본 스타일이 폼 요소의 letter-spacing을 normal로 다시 정한다. SLDS 2에는 선언이 없다
+  { id: "form-letter-spacing", label: "폼 요소 자간(button·input·select·textarea)", mode: "both", match: [] },
+  // SLDS 2 값은 키워드(normal)라 검사에 들어오지 않는다. 값이 바뀌어 들어오면 이 선택자만 맞춘다
+  {
+    id: "choice-label-weight",
+    label: "선택지 라벨 굵기(라디오·체크박스·토글)",
+    mode: "both",
+    match: {
+      selector: /^\S+ (\.slds-radio \.slds-form-element__label|\.slds-checkbox \.slds-checkbox__label \.slds-form-element__label|\.slds-checkbox_toggle \.slds-form-element__label,\s*\.slds-checkbox--toggle \.slds-form-element__label)$/,
+      property: "font-weight",
+    },
+  },
+  // 비활성 조건이 든 선택자의 default·not-allowed 커서, hover·focus 밑줄
+  {
+    id: "disabled-cursor-link-underline",
+    label: "비활성 커서·링크 밑줄",
+    mode: "both",
+    match: [
+      { selector: /disabled/i, property: "cursor", value: /^(default|not-allowed)$/ },
+      { selector: /:hover|:focus/, property: "text-decoration", value: /underline/ },
+    ],
+  },
   // nubbin은 팝오버·드롭다운의 꼬리다
-  { id: "popup-shadow", label: "드롭다운·팝오버·툴팁 그림자(꼬리 포함)", mode: "native", match: { selector: /dropdown|popover|tooltip|bubble|nubbin/i, property: "box-shadow" } },
+  { id: "nubbin-shadow", label: "팝오버 꼬리 그림자", mode: "both", match: { selector: /nubbin/i, property: "box-shadow" } },
+  // SLDS 2가 클래스마다 정한 --slds-c-icon-color-background(사용자 정의 속성)와 lightning/iconUtils의 JS 색 표. 둘 다 검사에 들어오지 않는다
+  { id: "object-icon-background", label: "개체 아이콘 배경색", mode: "both", match: [] },
+
+  // native 전환 뒤 생기는 고정 (9.2의 c hook을 열면 일부 메울 수 있음)
+  // 꼬리(nubbin) 그림자는 위 nubbin-shadow가 두 모드 모두 맡는다(2026-10-14)
+  { id: "popup-shadow", label: "드롭다운·팝오버·툴팁 그림자", mode: "native", match: { selector: /dropdown|popover|tooltip|bubble/i, property: "box-shadow" } },
   { id: "tooltip-background", label: "툴팁 배경", mode: "native", match: { selector: /tooltip|bubble/i, property: "background" } },
   { id: "tooltip-font-size", label: "툴팁 글자 크기", mode: "native", match: { selector: /tooltip|bubble/i, property: "font-size" } },
   { id: "card-shadow", label: "native lightning-card 그림자", mode: "native", match: { selector: /card/i, property: "box-shadow" } },
@@ -199,7 +254,7 @@ export const FIXED_ITEMS: FixedItem[] = [
     ],
   },
   { id: "native-shadow", label: "native 그림자", mode: "native", match: { property: ["box-shadow", "text-shadow"] } },
-  { id: "native-cursor-underline", label: "native 커서·링크 밑줄", mode: "native", match: { property: ["cursor", "text-decoration"], value: /^(default|not-allowed)$|underline/ } },
+  // native 커서·링크 밑줄(2026-10-12)은 위 disabled-cursor-link-underline(both)이 그 native 선언을 모두 맡아 합쳤다(2026-10-14)
   // 목록 옵션 머리글 700, 쌓인 표의 머리글(th::before) 대문자·자간, 모달 제목 크기(c hook --slds-c-modalheader-heading-font-size, 2026-10-12 결정으로 넓힘)
   {
     id: "native-typography",
