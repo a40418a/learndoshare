@@ -6,7 +6,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { FIXED_ITEMS } from "../lib/fixed-list.ts";
 import { loadRuleContext } from "../lib/hooks-index.ts";
-import { cellStatus, fixedOf, hookItems, itemScore, judgeProbe, UNMATCHED_FIXED, type JudgeContext, type Probe } from "../lib/reflect.ts";
+import { cellLabel, cellStatus, fixedOf, hookItems, itemScore, judgeProbe, UNMATCHED_FIXED, type JudgeContext, type Probe } from "../lib/reflect.ts";
 import { checkUtilCss, COLOR_S_WHITELIST } from "../lib/rules.ts";
 import { buildSentinelUtilCss, sentinelPlan } from "../lib/sentinel.ts";
 import { SPEC_ITEMS } from "../lib/spec-items.ts";
@@ -158,7 +158,11 @@ test("계산값 변화를 명세 항목에 대응시킨다: 지문, 속성 묶�
   ]);
   const statuses = ["기본/Button", "기본/Card", "기본/Icon", "기본/Input", "없음"].map((c) => cellStatus(table.get(c)?.get("radius")));
   assert.deepEqual(statuses, ["반영", "일부", "고정", "고정", ""]);
-  assert.deepEqual(itemScore(table, "radius"), { reached: 1, total: 4 });
+  // 칸 글자는 "원본과 hook" 보기처럼 개수를 함께 보인다. hook이 닿고 고정이 섞인 칸은 고정이 아니라 일부다
+  const labels = ["기본/Button", "기본/Card", "기본/Icon", "기본/Input", "없음"].map((c) => cellLabel(table.get(c)?.get("radius")));
+  assert.deepEqual(labels, ["반영 (hook 2)", "일부 (hook 1 · 빈틈 1)", "고정 (고정 3)", "일부 (hook 4 · 고정 1)", ""]);
+  // 9.6의 4 판정(reached)은 hook이 닿고 빈틈이 없는 컴포넌트를 센다(고정은 합의된 예외). strict는 정적 검사와 같은 셈이다
+  assert.deepEqual(itemScore(table, "radius"), { reached: 2, strict: 1, total: 4 });
 });
 
 test("센티널과 관계없는 변화는 반영으로 세지 않는다: 다른 무리의 지문, 레이아웃 값", () => {
@@ -176,19 +180,20 @@ test("센티널과 관계없는 변화는 반영으로 세지 않는다: 다른 
 
 // 설계 9.4 고정 목록의 두 모드 항목마다 대표 계산값이 그 항목으로 맞는지, 아니면 동적 검사로 맞출 수 없다고 적었는지 확인한다
 const FIXED_PROBES: Record<string, Partial<Probe>> = {
-  "toast-duration": { comp: "기본/Toast", selector: "div.slds-notify.slds-notify_toast.fix-notify_toast_animation", prop: "animation-duration", base: "0.4s" },
+  // 원본 매처는 컴포넌트 폴더 이름으로 시작한다(^toast …). 요소를 shadow에 둔 컴포넌트 태그로 맞춘다
+  "toast-duration": { comp: "기본/Toast", host: "lightning-toast", selector: "div.slds-notify.slds-notify_toast.fix-notify_toast_animation", prop: "animation-duration", base: "0.4s" },
   spinner: { comp: "기본/Spinner", selector: "div.slds-spinner__dot-a::before", prop: "animation-duration", base: "1s" },
   "color-picker-hue": { comp: "기본/Input", selector: "div.slds-color-picker__hue-slider", prop: "background-color", base: "rgb(1, 2, 3)" },
   agentforce: { comp: "기본/Card", selector: "div.slds-card.slds-subtheme-agentic", prop: "padding-top", base: "12px" },
   "image-scrim": { comp: "기본/File", selector: "div.slds-file__title.slds-file__title_scrim", prop: "background-color", base: "rgba(0, 0, 0, 0.5)" },
   "destructive-success-text": { selector: "button.slds-button.slds-button_success", prop: "color", base: "rgb(255, 255, 255)" },
   "global-header": { comp: "기본/Header", selector: "div.slds-global-header", prop: "background-color", base: "rgb(1, 2, 3)" },
-  // 애니메이션 아이콘의 svg는 클래스가 없다. 조상(context)의 .slds-icon-ellie로 맞춘다
-  "motion-out-of-band": { comp: "기본/Dynamic Icon", context: "lightning-dynamic-icon span.slds-icon-ellie", selector: "svg", prop: "animation-duration", base: "1.2s" },
+  // 애니메이션 아이콘의 svg는 클래스가 없다. 바로 위 부모의 .slds-icon-ellie로 맞춘다
+  "motion-out-of-band": { comp: "기본/Dynamic Icon", context: ["lightning-dynamic-icon", "span.slds-icon-ellie"], selector: "svg", prop: "animation-duration", base: "1.2s" },
   // 원본은 padding-block(논리 속성). 계산값은 padding-top 4.8px로 나온다
   "spacing-fine": { comp: "기본/Input", selector: "button.slds-button.slds-color-picker__summary-button.slds-button_icon[part='color-picker-button']", prop: "padding-top", base: "4.8px" },
   "line-height-special": { comp: "기본/Datepicker", selector: "table.slds-datepicker__month", prop: "line-height", base: "20px" },
-  "lbc-internal": { comp: "기본/Combobox", selector: "div.fix-slds-dropdown_lightning", prop: "margin-top", base: "4px" },
+  "lbc-internal": { comp: "기본/Combobox", host: "lightning-base-combobox", selector: "div.fix-slds-dropdown_lightning", prop: "margin-top", base: "4px" },
   "focus-readonly-radius": { comp: "기본/Textarea", selector: "textarea.slds-textarea[readonly]", prop: "border-top-left-radius", base: "4px" },
   "misc-shadow": { comp: "기본/Avatar", selector: "abbr.slds-avatar__initials", prop: "box-shadow", base: "rgb(1, 2, 3) 0px 1px 2px 0px" },
   "image-focus-shadow": { comp: "기본/File", selector: "a.slds-file.slds-file_card:focus", state: "focus", prop: "box-shadow", base: "rgb(1, 2, 3) 0px 0px 3px 0px" },
@@ -196,11 +201,12 @@ const FIXED_PROBES: Record<string, Partial<Probe>> = {
   // 원본은 border-block-start-width(논리 속성). 계산값은 border-top-width 4px로 나온다
   "popover-accent-width": { comp: "기본/Popup", selector: "section.slds-popover.slds-popover_brand-top", prop: "border-top-width", base: "4px" },
   "timeline-color": { comp: "기본/Timeline", selector: "div.slds-timeline__item_expandable.slds-timeline__item_call::before", prop: "background-color", base: "rgb(1, 2, 3)" },
-  "theme-translucent-text": { comp: "기본/Card", context: "div.slds-theme_shade", selector: "a", prop: "color", base: "rgba(255, 255, 255, 0.75)" },
+  "theme-translucent-text": { comp: "기본/Card", context: ["div.slds-theme_shade"], selector: "a", prop: "color", base: "rgba(255, 255, 255, 0.75)" },
   "lex-control-height": { selector: "button.slds-button.slds-button_neutral[part='button']", prop: "line-height", base: "30px" },
-  "path-end-radius": { comp: "기본/Path", selector: "li.slds-path__item.slds-is-complete", prop: "border-top-left-radius", base: "15px" },
+  // 원본은 `^\S+ .slds-path__item:first-child$`다. 컴포넌트 폴더 이름과 구조 상태(nth)로 맞춘다
+  "path-end-radius": { comp: "기본/Progress Indicator", host: "lightning-progress-indicator", nth: [":first-child"], selector: "lightning-progress-step.slds-path__item.slds-is-complete", prop: "border-top-left-radius", base: "15px" },
   "form-letter-spacing": { selector: "button.slds-button", prop: "letter-spacing", base: "normal" },
-  "choice-label-weight": { comp: "기본/Radio Group", context: "span.slds-radio label.slds-radio__label", selector: "span.slds-form-element__label", prop: "font-weight", base: "400" },
+  "choice-label-weight": { comp: "기본/Radio Group", context: ["span.slds-radio", "label.slds-radio__label"], selector: "span.slds-form-element__label", prop: "font-weight", base: "400" },
   "nubbin-shadow": { comp: "기본/Popup", selector: "section.slds-popover.slds-nubbin_left::before", prop: "box-shadow", base: "rgb(1, 2, 3) 1px 1px 2px 0px" },
   "object-icon-background": { comp: "기본/Icon", selector: "span.slds-icon_container.slds-icon-standard-account", prop: "background-color", base: "rgb(1, 2, 3)" },
 };
@@ -214,4 +220,20 @@ test("설계 9.4 두 모드 고정 항목은 계산값으로 맞거나, 맞출 �
   // 목록에 없는 이름이 남지 않았다
   const ids = new Set(FIXED_ITEMS.map((f) => f.id));
   assert.deepEqual([...Object.keys(FIXED_PROBES), ...Object.keys(UNMATCHED_FIXED)].filter((id) => !ids.has(id)), []);
+});
+
+test("고정은 합의한 범위에서만 맞는다: 조상에만 그 클래스가 있거나 다른 컴포넌트면 고정이 아니다", () => {
+  const no = (o: Partial<Probe>) => assert.equal(fixedOf(probe(o), FIXED_ITEMS)?.id, undefined, JSON.stringify(o));
+  // 꼬리 팝오버 본문 안 버튼의 하드코딩 그림자: nubbin-shadow가 아니다(빈틈으로 남는다)
+  const inPopover = { comp: "기본/Popup", context: ["section.slds-popover.slds-nubbin_left", "div.slds-popover__body"], selector: "button.slds-button.slds-button_neutral" };
+  no({ ...inPopover, prop: "box-shadow", base: "rgb(1, 2, 3) 0px 2px 2px 0px" });
+  assert.deepEqual(judge({ ...inPopover, prop: "box-shadow", base: "rgb(1, 2, 3) 0px 2px 2px 0px", sentinel: "rgb(1, 2, 3) 0px 2px 2px 0px" }), ["shadow:gap"]);
+  // 강조 팝오버 본문 안 입력창의 두께, Agentforce 카드 안 버튼의 padding, datepicker 안 요소의 줄 간격
+  no({ context: ["section.slds-popover.slds-popover_brand-top"], selector: "input.slds-input[type='text']", prop: "border-top-width", base: "2px" });
+  no({ context: ["div.slds-card.slds-subtheme-agentic"], selector: "button.slds-button", prop: "padding-left", base: "12px" });
+  no({ context: ["div.slds-datepicker"], selector: "span.slds-day", prop: "line-height", base: "32px" });
+  // lbc-internal은 합의한 8개 컴포넌트(baseCombobox 등)만이다. textarea의 fix- 클래스는 아니다
+  no({ host: "lightning-textarea", selector: "div.fix-slds-form-element", prop: "margin-top", base: "4px" });
+  // Path 가운데 항목(첫째·마지막 자식이 아님)의 반경은 path-end-radius가 아니다
+  no({ host: "lightning-progress-indicator", selector: "lightning-progress-step.slds-path__item.slds-is-current", prop: "border-top-left-radius", base: "15px" });
 });

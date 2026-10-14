@@ -21,8 +21,15 @@ export type Probe = {
   comp: string;
   /** 요소를 나타내는 선택자: 태그, 클래스, input의 type, readonly, part, 상태(:focus), 가상 요소(::before) */
   selector: string;
-  /** 가까운 조상 몇 개의 선택자(먼 것부터, 공백으로 잇는다). 고정 목록의 후손 선택자(.slds-theme_x a)를 맞출 때만 쓴다 */
-  context?: string;
+  /**
+   * 가까운 조상 몇 개의 선택자(먼 것부터). 고정 목록 중 후손 선택자로 합의한 항목(COMPUTED_FIXED)만 쓴다.
+   * 일반 매처에는 쓰지 않는다. 조상에만 그 클래스가 있는 요소(꼬리 팝오버 본문 안 버튼)까지 고정으로 숨기 때문이다
+   */
+  context?: string[];
+  /** 이 요소를 shadow 안에 둔 컴포넌트 태그(lightning-base-combobox). 고정 매처의 컴포넌트 폴더 이름(baseCombobox)에 맞춘다 */
+  host?: string;
+  /** 요소가 첫째·마지막 자식이면 ":first-child"·":last-child". 고정 매처의 :first-child 꼴에 맞춘다 */
+  nth?: string[];
   prop: string;
   base: string;
   sentinel: string;
@@ -241,28 +248,32 @@ function followsFont(p: Probe): boolean {
   return Math.abs(b / fb - s / fs) <= 0.005 * Math.abs(b / fb);
 }
 
-// 고정 목록의 매처는 정적 검사의 원본 선언(선택자 목록 전체, 컴포넌트 폴더 이름, rem·rgb() 값)에 맞춘 것이라 계산값과 맞지 않는 항목이 있다.
-// 그 항목의 계산값 매처다. 매처가 빈 항목(form-letter-spacing, object-icon-background)은 정적 검사에 들어오는 선언이 없지만 계산값으로는 드러난다
+// 고정 매처는 정적 검사의 원본 선언에 맞춘 것이다. 계산값에 맞출 때 지키는 것:
+// - 일반 매처는 요소 자신의 선택자로만 맞춘다(조상을 붙이지 않는다). 조상에만 그 클래스가 있는 요소까지 고정으로 숨기면
+//   9.4에서 합의한 범위보다 넓어진다(설계 9.6의 4: 범위를 넓히려면 합의가 필요하다)
+// - 원본 매처가 컴포넌트 폴더 이름(baseCombobox, toast)으로 시작하면, 요소를 shadow에 둔 컴포넌트 태그를 폴더 이름으로 바꿔 맞춘다
+// - 원본 값 문법(rem, rgb(…, 0.x))이나 후손 선택자로 합의한 항목만 아래 계산값 매처를 둔다
 const CONTROL = /\.slds-(button|input|input_faux|select|radio_button|checkbox_button)(?![\w-])/;
-const LBC_INTERNAL_PROPS = ["margin", "padding", "cursor", "line-height", "height", "border-radius", "font-size"];
-const COMPUTED_FIXED: Record<string, (p: Probe, names: string[]) => boolean> = {
-  // 텍스트 컨트롤의 line-height 1.875rem(30px). 원본 매처는 선택자 목록 전체(^\S+ .slds-button$)에 맞춘다
+const COMPUTED_FIXED: Record<string, (p: Probe, names: string[], f: FixedItem) => boolean> = {
+  // 텍스트 컨트롤의 line-height 1.875rem(30px). 원본 값이 rem이다
   "lex-control-height": (p) => p.prop === "line-height" && p.base === "30px" && CONTROL.test(p.selector),
-  // 브라우저 기본 스타일이 폼 요소의 letter-spacing을 normal로 다시 정한다
+  // 브라우저 기본 스타일이 폼 요소의 letter-spacing을 normal로 다시 정한다(원본 매처가 비어 있다)
   "form-letter-spacing": (p) => p.prop === "letter-spacing" && /^(button|input|select|textarea)(?![\w-])/.test(p.selector),
-  // SLDS 2가 개체 아이콘 클래스마다 c hook으로 정한 배경색
+  // SLDS 2가 개체 아이콘 클래스마다 c hook으로 정한 배경색(원본 매처가 비어 있다)
   "object-icon-background": (p) => p.prop === "background-color" && /\.slds-icon-(standard|custom|action|doctype)-/.test(p.selector),
-  // 원본 매처는 컴포넌트 폴더 이름(toast, baseCombobox …)으로 시작한다. 기본 컴포넌트 자체 CSS의 클래스는 fix-로 시작한다
-  "toast-duration": (p) => p.prop === "animation-duration" && /^0?\.4s$/.test(p.base) && /fix-notify_toast_animation/.test(`${p.context} ${p.selector}`),
-  "lbc-internal": (p, names) => /\.fix-/.test(p.selector) && names.some((n) => LBC_INTERNAL_PROPS.includes(n)),
+  // 애니메이션 아이콘 안의 클래스 없는 svg(`.slds-icon-ellie svg` 꼴). 바로 위 부모까지만 본다
+  "motion-out-of-band": (p, names, f) => {
+    const parent = p.context?.at(-1);
+    return parent !== undefined && matchesItem(f, selectorVariants(parent).map((v) => `${p.comp} ${v} ${p.selector}`), names, p.base);
+  },
   // 원본은 `.slds-theme_x a:not(.slds-button_neutral)`와 rgb(255, 255, 255, 0.x)다. 계산값은 rgba(…)로 나온다
   "theme-translucent-text": (p) =>
-    p.prop === "color" && /^a(?![\w-])/.test(p.selector) && /^rgba\(255, 255, 255, 0?\.\d+\)$/.test(p.base) && /\.slds-theme_/.test(p.context ?? ""),
-  // 원본은 :first-child·:last-child다. Path 가운데 항목은 반경이 0이라 반경이 있는 항목은 양 끝이다
-  "path-end-radius": (p) => /radius$/.test(p.prop) && /\.slds-path__item(?![\w-])/.test(p.selector),
-  // 원본은 `^\S+ .slds-radio .slds-form-element__label$` 꼴 선택자 목록이다
+    p.prop === "color" && /^a(?![\w-])/.test(p.selector) && /^rgba\(255, 255, 255, 0?\.\d+\)$/.test(p.base) && (p.context ?? []).some((s) => /\.slds-theme_/.test(s)),
+  // 원본은 `^\S+ .slds-radio .slds-form-element__label$` 꼴의 후손 선택자다
   "choice-label-weight": (p) =>
-    p.prop === "font-weight" && /\.slds-form-element__label(?![\w-])/.test(p.selector) && /\.slds-(radio|checkbox|checkbox_toggle)(?![\w-])/.test(p.context ?? ""),
+    p.prop === "font-weight" &&
+    /\.slds-form-element__label(?![\w-])/.test(p.selector) &&
+    (p.context ?? []).some((s) => /\.slds-(radio|checkbox|checkbox_toggle)(?![\w-])/.test(s)),
 };
 
 /**
@@ -300,35 +311,45 @@ export function family(prop: string): string[] {
 }
 
 /**
- * 고정 매처에 맞출 선택자들. 전체 선택자와, 클래스 하나마다 상태·가상 요소를 바로 붙인 꼴이다.
- * 원본 매처는 `.slds-file:focus`, `.slds-truncate::after`처럼 클래스 바로 뒤에 상태가 오는데, 계산값 선택자는 클래스를 모두 적은 뒤에 붙이기 때문이다
+ * 고정 매처에 맞출 선택자들. 전체 선택자와, 클래스 하나마다 상태·가상 요소를 바로 붙인 꼴(태그 있는 것과 없는 것)이다.
+ * 원본 매처는 `.slds-file:focus`, `.slds-truncate::after`, `.slds-path__item:first-child`처럼 클래스 바로 뒤에 상태가 오는데,
+ * 계산값 선택자는 클래스를 모두 적은 뒤에 붙이기 때문이다. nth는 요소가 첫째·마지막 자식일 때의 구조 상태다
  */
-function selectorVariants(selector: string): string[] {
+function selectorVariants(selector: string, nth: string[] = []): string[] {
   const pseudo = /::[\w-]+$/.exec(selector)?.[0] ?? "";
   const rest = selector.slice(0, selector.length - pseudo.length);
   const state = /(:[\w-]+)+$/.exec(rest)?.[0] ?? "";
   const head = rest.slice(0, rest.length - state.length);
   const tag = /^[\w-]+/.exec(head)?.[0] ?? "";
   const classes = head.replace(/\[[^\]]*\]/g, "").match(/\.[\w-]+/g) ?? [];
-  return [selector, ...classes.map((c) => `${tag}${c}${state}${pseudo}`)];
+  const out = new Set([selector]);
+  for (const c of classes) {
+    for (const n of ["", ...nth]) out.add(`${tag}${c}${n}${state}${pseudo}`).add(`${c}${n}${state}${pseudo}`);
+  }
+  return [...out];
+}
+
+/** 컴포넌트 태그 → 기본 컴포넌트 폴더 이름: lightning-base-combobox → baseCombobox (정적 검사의 lbc 컴포넌트 이름) */
+const folderOf = (tag: string) => tag.replace(/^(lightning|c)-/, "").replace(/-(\w)/g, (_, c: string) => c.toUpperCase());
+
+// lib/fixed-list.ts의 match 계약: 주어진 조건을 모두 만족하면 맞는다. 매처가 여러 개면 하나라도 맞으면 된다. js 출처는 CSS 값과 맞추지 않는다
+function matchesItem(f: FixedItem, targets: string[], names: string[], value: string): boolean {
+  return [f.match].flat().some(
+    (m) =>
+      m.source !== "js" &&
+      (!m.selector || targets.some((t) => m.selector!.test(t))) &&
+      (!m.property || [m.property].flat().some((q) => names.some((n) => n === q || n.startsWith(`${q}-`)))) &&
+      (!m.value || m.value.test(value)),
+  );
 }
 
 /** 9.4 고정 목록 중 이 값에 맞는 항목. 동적 검사는 지금(synthetic)만 재므로 두 모드 모두 고정인 항목만 본다 */
 export function fixedOf(p: Probe, fixed: FixedItem[]): FixedItem | undefined {
   const names = family(p.prop);
-  const targets = selectorVariants(p.selector).map((s) => `${p.comp} ${p.context ? `${p.context} ` : ""}${s}`);
-  return fixed.find(
-    (f) =>
-      f.mode === "both" &&
-      (COMPUTED_FIXED[f.id]?.(p, names) ||
-        [f.match].flat().some(
-          (m) =>
-            m.source !== "js" &&
-            (!m.selector || targets.some((t) => m.selector!.test(t))) &&
-            (!m.property || [m.property].flat().some((q) => names.some((n) => n === q || n.startsWith(`${q}-`)))) &&
-            (!m.value || m.value.test(p.base)),
-        )),
-  );
+  const prefixes = [p.comp, ...(p.host ? [folderOf(p.host)] : [])];
+  const variants = selectorVariants(p.selector, p.nth);
+  const targets = prefixes.flatMap((pre) => variants.map((v) => `${pre} ${v}`));
+  return fixed.find((f) => f.mode === "both" && (COMPUTED_FIXED[f.id]?.(p, names, f) || matchesItem(f, targets, names, p.base)));
 }
 
 /** 계산값 한 쌍 → 명세 항목별 판정. 판정할 것이 없으면 빈 배열 */
@@ -369,8 +390,8 @@ export type Cell = { reached: number; gap: number; fixed: number };
 export type CellStatus = "반영" | "일부" | "빈틈" | "고정" | "";
 
 /**
- * 컴포넌트 × 항목 칸의 상태. 정적 검사(scripts/audit/report.ts)처럼 가장 나쁜 상태를 따른다: 빈틈 > 고정 > 반영.
- * 일부는 빈틈 중에서 바뀐 값도 함께 있는 칸이다
+ * 정적 검사(scripts/audit/report.ts)와 같은 칸 상태: 가장 나쁜 상태를 따른다(빈틈 > 고정 > 반영).
+ * 일부는 빈틈 중에서 바뀐 값도 함께 있는 칸이다. itemScore의 strict가 이 상태로 센다
  */
 export function cellStatus(c: Cell | undefined): CellStatus {
   if (!c) return "";
@@ -379,8 +400,27 @@ export function cellStatus(c: Cell | undefined): CellStatus {
   return c.reached ? "반영" : "";
 }
 
-/** 설계 9.6의 4: 항목마다 반영된 컴포넌트 수 / 해당 컴포넌트 수. 정적 검사의 byItem처럼 고정이 섞인 칸은 반영으로 세지 않는다 */
-export function itemScore(table: Map<string, Map<string, Cell>>, item: string): { reached: number; total: number } {
-  const statuses = [...table.values()].map((row) => cellStatus(row.get(item))).filter((s) => s !== "");
-  return { reached: statuses.filter((s) => s === "반영").length, total: statuses.length };
+/**
+ * 칸에 보일 글자. "원본과 hook" 보기(stories/salesforce-source.js)와 같은 꼴이다: 상태 (hook n · 고정 m · 빈틈 k).
+ * hook이 닿고 고정도 섞인 칸은 "일부 (hook·고정)"로 보인다. 고정만 있는 칸과 구별해 브랜드가 닿는 컴포넌트를 닿지 않는 것처럼 보이지 않게 한다
+ */
+export function cellLabel(c: Cell | undefined): string {
+  if (!c || !(c.reached + c.gap + c.fixed)) return "";
+  const label = !(c.fixed + c.gap) ? "반영" : !c.reached ? (c.gap ? "빈틈" : "고정") : "일부";
+  const parts = [c.reached && `hook ${c.reached}`, c.fixed && `고정 ${c.fixed}`, c.gap && `빈틈 ${c.gap}`].filter(Boolean);
+  return `${label} (${parts.join(" · ")})`;
+}
+
+/**
+ * 설계 9.6의 4: 항목마다 반영된 컴포넌트 수 / 해당 컴포넌트 수
+ * - reached: hook이 닿고 빈틈이 없는 컴포넌트. 9.4 고정은 "모든 컴포넌트" 요구의 합의된 예외라 섞여 있어도 반영으로 센다
+ * - strict: 정적 검사의 byItem과 같은 셈(고정이 섞인 칸은 반영이 아니다). 두 검사를 나란히 견줄 때 쓴다
+ */
+export function itemScore(table: Map<string, Map<string, Cell>>, item: string): { reached: number; strict: number; total: number } {
+  const cells = [...table.values()].map((row) => row.get(item)).filter((c): c is Cell => !!c && c.reached + c.gap + c.fixed > 0);
+  return {
+    reached: cells.filter((c) => c.reached && !c.gap).length,
+    strict: cells.filter((c) => cellStatus(c) === "반영").length,
+    total: cells.length,
+  };
 }

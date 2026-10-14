@@ -3,7 +3,7 @@
 // - 센티널은 스토리 URL의 globals=brand:milvus-sentinel로 연다(.storybook/brand.ts SENTINEL). 처음부터 센티널로 그린다
 // - 재기 전에 두 문서의 움직임을 멈춘다(transition은 끝 값, animation은 처음 값). 센티널 시간(0.777s)이 길어 중간값을 읽지 않게 한다
 // - disabled는 스토리 변형(disabled 스토리)에서 :disabled·aria-disabled 요소로 잰다. focus는 focus()를 부르고 transition을 끝낸 뒤 잰다
-// - 판정은 컴포넌트 호스트(lightning-*, c-*) 안의 요소만 한다. 상속 속성은 컴포넌트 경계에서 한 번 센다
+// - 판정은 컴포넌트 호스트(lightning-*, c-*)와 그 shadow 안의 요소만 한다(슬롯에 넣은 예제 내용은 뺀다). 상속 속성은 컴포넌트 경계에서 한 번 센다
 // - 두 그림의 요소 수가 다르면(가상 스크롤, 넘침 메뉴처럼 크기에 따라 그리는 것) 그 스토리는 비교하지 않고 "재지 못한 스토리"에 적는다
 // - 처음에는 사람이 버튼으로 돌린다(CI는 헤드리스 브라우저라는 새 의존성이 필요하다)
 // 스토리 이름·값은 textContent로만 넣는다(innerHTML을 쓰지 않는다)
@@ -11,7 +11,7 @@ import { brandColorHooks, missing, sentinelCss, sentinelHooks } from "virtual:mi
 import { brands, SENTINEL } from "../../.storybook/brand.ts";
 import { FIXED_ITEMS } from "../../lib/fixed-list.ts";
 import {
-  cellStatus,
+  cellLabel,
   FOCUS_PROPS,
   fingerprintKey,
   hookItems,
@@ -47,7 +47,8 @@ const isHelper = (e: Element) => [...e.classList].some((k) => k.startsWith("sb-"
 const COMPONENT_HOST = /^(lightning|c)-/;
 
 type Entry = { id: string; title: string; name: string; type: string; exportName?: string };
-type Box = { el: Element; parent: number; disabled: boolean; judged: boolean };
+/** owner: 이 요소의 스타일을 정하는 컴포넌트 태그(고정 매처의 컴포넌트 폴더 이름에 쓴다). 호스트는 자기 태그, 그 shadow 안은 그 호스트다 */
+type Box = { el: Element; parent: number; disabled: boolean; judged: boolean; owner: string; host: boolean };
 type Row = { comp: string; item: string; selector: string; prop: string; value: string; story: string; fixed?: string; count: number };
 type Tally = {
   table: Map<string, Map<string, Cell>>;
@@ -102,15 +103,17 @@ async function ready(frame: HTMLIFrameElement): Promise<void> {
 // shadowRoot까지 내려가며 요소를 앞순서로 모은다. synthetic shadow에서 호스트의 children은 light DOM(슬롯에 넣은 요소)이다
 function collect(doc: Document): Box[] {
   const out: Box[] = [];
-  // 컴포넌트의 shadow 안만 판정한다. 컴포넌트에 슬롯으로 넣은 light DOM(예제의 본문 p, custom-box div)은 예제 것이다
-  const visit = (e: Element, parent: number, disabled: boolean, inside: boolean) => {
+  // 컴포넌트 호스트와 그 shadow 안만 판정한다. 호스트의 클래스(lightning-badge.slds-badge, lightning-progress-step.slds-path__item)는
+  // 컴포넌트가 붙인다. 컴포넌트에 슬롯으로 넣은 light DOM(예제의 본문 p, custom-box div)은 예제 것이라 판정하지 않는다
+  const visit = (e: Element, parent: number, disabled: boolean, inside: boolean, owner: string) => {
     const d = disabled || e.matches(":disabled, [aria-disabled='true']");
-    const i = out.push({ el: e, parent, disabled: d, judged: inside && !isHelper(e) }) - 1;
-    for (const c of e.shadowRoot?.children ?? []) visit(c, i, d, inside || COMPONENT_HOST.test(e.localName));
-    for (const c of e.children) visit(c, i, d, inside);
+    const host = COMPONENT_HOST.test(e.localName);
+    const i = out.push({ el: e, parent, disabled: d, judged: (inside || host) && !isHelper(e), owner: host ? e.localName : owner, host }) - 1;
+    for (const c of e.shadowRoot?.children ?? []) visit(c, i, d, inside || host, e.localName);
+    for (const c of e.children) visit(c, i, d, inside, owner);
   };
   for (const c of doc.body.children) {
-    if (!SKIP_TAGS.has(c.localName) && !SKIP_IDS.test(c.id) && !isHelper(c)) visit(c, -1, false, false);
+    if (!SKIP_TAGS.has(c.localName) && !SKIP_IDS.test(c.id) && !isHelper(c)) visit(c, -1, false, false, "");
   }
   return out;
 }
@@ -131,11 +134,18 @@ const selectorOf = (e: Element, pseudo: string, state: State) =>
   pseudo;
 
 // 가까운 조상 셋의 선택자(먼 것부터). 고정 목록의 후손 선택자(.slds-theme_x a, 애니메이션 아이콘 안의 svg)를 맞출 때만 쓴다
-function contextOf(nodes: Box[], i: number): string {
+function contextOf(nodes: Box[], i: number): string[] {
   const out: string[] = [];
   for (let p = nodes[i].parent; p >= 0 && out.length < 3; p = nodes[p].parent) out.unshift(selectorOf(nodes[p].el, "", "static"));
-  return out.join(" ");
+  return out;
 }
+
+// 고정 매처에 넘길 요소 정보: 조상(합의한 후손 선택자 항목만 쓴다), 호스트 태그, 첫째·마지막 자식
+const whereOf = (nodes: Box[], i: number): Pick<Probe, "context" | "host" | "nth"> => ({
+  context: contextOf(nodes, i),
+  host: nodes[i].owner,
+  nth: [":first-child", ":last-child"].filter((n) => nodes[i].el.matches(n)),
+});
 
 // 움직임을 멈춘다. transition은 끝 값으로 보내고, animation(무한 반복은 끝낼 수 없다)은 멈추고 처음 값으로 맞춘다.
 // 센티널 시간(0.777s)이 기본보다 길어 렌더 뒤에 움직이는 요소(팝오버, carousel, 점 애니메이션)의 중간값을 읽지 않게 한다
@@ -236,6 +246,9 @@ async function measure(entry: Entry, area: HTMLElement, t: Tally, getCtx: (b: Do
     let [base, sent] = [collect(baseDoc), collect(sentDoc)];
     if (base.length !== sent.length) {
       await sleep(800);
+      // 기다리는 사이에 시작한 움직임도 멈춘다
+      settle(baseDoc);
+      settle(sentDoc);
       [base, sent] = [collect(baseDoc), collect(sentDoc)];
     }
     if (base.length !== sent.length || base.some((n, i) => n.el.localName !== sent[i].el.localName)) {
@@ -257,9 +270,11 @@ async function measure(entry: Entry, area: HTMLElement, t: Tally, getCtx: (b: Do
         // 컴포넌트 경계(부모가 판정 밖)에서는 상속으로 바뀐 값(:root 자간, body 글자색 등)도 그 컴포넌트에 닿은 것으로 센다
         const boundary = !pseudo && !base[base[i].parent]?.judged;
         const selector = selectorOf(base[i].el, pseudo, state);
-        const context = contextOf(base, i);
+        const where = whereOf(base, i);
         for (const prop of STATIC_PROPS) {
-          const p: Probe = { comp, selector, context, prop, base: b[prop], sentinel: s[prop], state, fontSize: [b["font-size"], s["font-size"]], el: b };
+          // 호스트의 바깥 여백은 놓인 자리(예제 배치의 slds-m-* 클래스)가 정한다
+          if (base[i].host && prop.startsWith("margin-")) continue;
+          const p: Probe = { comp, selector, ...where, prop, base: b[prop], sentinel: s[prop], state, fontSize: [b["font-size"], s["font-size"]], el: b };
           if (parent && INHERITED.has(prop) && !(boundary && b[prop] !== s[prop])) p.parent = [parent[0][prop], parent[1][prop]];
           record(t, story, p, ctx);
         }
@@ -287,7 +302,7 @@ async function measure(entry: Entry, area: HTMLElement, t: Tally, getCtx: (b: Do
             const [pre, b, s] = [before[k][m][prop], fb[k][m][prop], fs[k][m][prop]];
             if (!base[j].judged || b === undefined || s === undefined || pre === b) continue;
             const selector = selectorOf(base[j].el, pseudo, "focus");
-            const p: Probe = { comp, selector, context: contextOf(base, j), prop, base: b, sentinel: s, state: "focus", fontSize: ["", ""], el: fb[k][m] };
+            const p: Probe = { comp, selector, ...whereOf(base, j), prop, base: b, sentinel: s, state: "focus", fontSize: ["", ""], el: fb[k][m] };
             record(t, story, p, ctx);
           }
         }),
@@ -340,8 +355,8 @@ function renderResult(t: Tally, out: HTMLElement) {
   const items = SPEC_ITEMS.map((i) => i.id).filter((id) => itemScore(t.table, id).total > 0);
   const comps = [...t.table.keys()].sort();
   const status = (c: string, i: string) => {
-    const s = cellStatus(t.table.get(c)?.get(i));
-    return el("span", { className: STATUS_CLASS[s] ?? "" }, s);
+    const s = cellLabel(t.table.get(c)?.get(i));
+    return el("span", { className: STATUS_CLASS[s.split(" ")[0]] ?? "" }, s);
   };
   const unmeasured = SPEC_ITEMS.filter((i) => !items.includes(i.id)).map((i) => i.label);
   out.replaceChildren(
@@ -352,13 +367,13 @@ function renderResult(t: Tally, out: HTMLElement) {
       el(
         "p",
         {},
-        "칸 상태는 정적 검사처럼 가장 나쁜 것을 따른다(빈틈 > 고정 > 반영). 일부는 빈틈 중에서 센티널로 바뀐 값도 있는 칸이다. 반영은 반영 칸만 세고, 일부·빈틈·고정은 해당 컴포넌트에만 센다. native는 Storybook이 synthetic shadow로만 빌드해 잴 수 없다(설계 9.2: native 빌드는 발표 뒤).",
+        "지금: hook이 닿고 빈틈이 없는 컴포넌트 수 / 해당 컴포넌트 수. 9.4 고정은 합의한 예외라 섞여 있어도 반영으로 센다. 정적 검사 방식: 정적 검사(pnpm audit:brand)처럼 가장 나쁜 상태를 따라, 고정이 섞인 칸은 반영으로 세지 않는다. 칸 글자는 \"원본과 hook\" 보기처럼 개수를 함께 보인다: hook이 닿고 고정이나 빈틈이 섞이면 일부다. native는 Storybook이 synthetic shadow로만 빌드해 잴 수 없다(설계 9.2: native 빌드는 발표 뒤).",
       ),
       table(
-        ["항목", "지금", "native"],
+        ["항목", "지금", "정적 검사 방식", "native"],
         items.map((id) => {
           const s = itemScore(t.table, id);
-          return [label(id), `${s.reached} / ${s.total}`, "잴 수 없음"];
+          return [label(id), `${s.reached} / ${s.total}`, `${s.strict} / ${s.total}`, "잴 수 없음"];
         }),
       ),
       el("p", {}, `이 검사로 재지 않은 항목: ${unmeasured.join(", ")}. hover·눌림은 재지 않는다(마우스를 올린 상태를 만들지 않는다).`),
