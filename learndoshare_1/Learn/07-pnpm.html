@@ -285,11 +285,11 @@ pnpm milvus deploy          <span class="c"># org 반영. 계획을 보고 승�
   <h3>Salesforce와의 관계</h3>
   <ul>
     <li><code>update</code>는 프로젝트 파일만 바꾸고 org는 바꾸지 않는다. 바꾼 파일이 있으면 "<code>pnpm milvus deploy</code>로 계획을 확인하라"고 안내한다. 배포는 계획 확인과 승인을 거친다(<a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html#deploy">05 테마 동기화</a>)</li>
-    <li>사라진 관리 파일을 지우지 않는 이유: 프로젝트에서 파일을 지워도 org에 이미 배포된 컴포넌트는 남는다. Metadata API에서 org의 컴포넌트를 지우는 일은 destructive changes 매니페스트로 하는 별도 배포다. 그 컴포넌트를 쓰는 화면이 있을 수 있어 지울지는 사람이 정한다</li>
-    <li>[관리] 파일을 고치지 말라는 규칙은 고객 프로젝트의 <code>permissions.deny</code>(<code>Edit(...)</code>)가 Claude에게 강제하고, 다른 경로로 바뀐 것은 <code>check</code>의 sha256 비교가 잡는다(<a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html#runbook">08 Claude Code</a>). <code>update</code>의 충돌 판단도 같은 기록을 쓴다</li>
+    <li>사라진 관리 파일을 지우지 않는 이유: 프로젝트에서 파일을 지워도 org에 이미 배포된 컴포넌트는 남는다. Metadata API에서 org의 컴포넌트를 지우려면 지울 컴포넌트를 적은 <code>destructiveChanges.xml</code>을 넣어 따로 배포해야 한다. 활성 Lightning 페이지에 올라간 컴포넌트는 이 방법으로도 지울 수 없고, 먼저 Lightning App Builder에서 그 페이지를 비활성화해야 한다. 그 컴포넌트를 쓰는 화면이 있을 수 있어 지울지는 사람이 정한다</li>
+    <li>[관리] 파일을 고치지 말라는 규칙은 고객 프로젝트의 <code>permissions.deny</code>(<code>Edit(...)</code>)로 Claude에게 강제하도록 설정했다. 실제 Claude Code에서 막히는지는 재지 않았다 <span class="tag warn">미확인</span>(설계 14장). 다른 경로로 바뀐 것은 <code>check</code>의 sha256 비교가 잡는다(<a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html#runbook">08 Claude Code</a>). <code>update</code>의 충돌 판단도 같은 기록을 쓴다</li>
   </ul>
   <p><code>tests/update.test.ts</code>가 로컬 수정 감지(아무것도 바꾸지 않음), <code>--force</code>, 사라진 관리 파일, settings 병합, <code>milvusVf.css</code> 보존, [소유] 파일 보존을 확인한다. 설치본의 버전을 올려 실제로 갱신해 본 기록은 없다 <span class="tag warn">미확인</span>. 0.1.0을 발행하기 전이라 레지스트리에서 받은 두 버전 사이의 <code>update</code>는 시험하지 못했다.</p>
-  <p class="sources">출처: <a href="https://pnpm.io/10.x/cli/add">pnpm 10.x — pnpm add (sax@3.0.0: 버전 지정)</a> (확인 2026-10-14) · <a href="https://developer.salesforce.com/docs/atlas.en-us.api_meta.meta/api_meta/file_based_zip_file.htm">Metadata API — Deploying and Retrieving Metadata with the Zip File (컴포넌트 삭제는 destructive changes 매니페스트로 하는 배포)</a> (확인 2026-10-14) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (3장 [관리]·[소유]·[생성], 4.3 check, 4.5 update와 구현 판단, 7.2 permissions)</a> (확인 2026-10-14)</p>
+  <p class="sources">출처: <a href="https://pnpm.io/10.x/cli/add">pnpm 10.x — pnpm add (sax@3.0.0: 버전 지정)</a> (확인 2026-10-14) · <a href="https://developer.salesforce.com/docs/atlas.en-us.264.0.api_meta.meta/api_meta/meta_deploy_deleting_files.htm">Metadata API — Deleting Components from an Organization (destructiveChanges.xml로 하는 배포, 활성 Lightning 페이지의 컴포넌트는 먼저 페이지를 비활성화)</a> (확인 2026-10-14) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (3장 [관리]·[소유]·[생성], 4.3 check, 4.5 update와 구현 판단, 7.2 permissions)</a> (확인 2026-10-14)</p>
 </section>
 
 <section id="quiz" class="quiz">

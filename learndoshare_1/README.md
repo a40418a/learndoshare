@@ -5,7 +5,7 @@
 
 > 표기 규칙: **확정**은 결정되었거나 실제로 확인한 것, **미확인**은 확인이 필요한 것, **미정**은 결정이 필요한 것이다.
 
-> **2026-10-08부터 원본은 [패키지·CLI 설계](docs/specs/2026-10-08-milvus-package-design.md)와 [구현 계획](docs/plans/2026-10-08-milvus-package-plan.md)이다.** 밀버스는 패키지 `@a40418a/milvus-design-system` 하나(버전 0.1.0, 10/16 발행 예정)로 배포하고, 고객 프로젝트에서는 `pnpm milvus` CLI로 세팅한다. 이 README의 1·2·4·7·11장은 설계 첫머리 "이 문서가 대체하는 것" 표대로 고쳤다(2026-10-14).
+> **2026-10-08부터 원본은 [패키지·CLI 설계](docs/specs/2026-10-08-milvus-package-design.md)와 [구현 계획](docs/plans/2026-10-08-milvus-package-plan.md)이다.** 밀버스는 패키지 `@a40418a/milvus-design-system` 하나(버전 0.1.0, 10/16 발행 예정)로 배포하고, 고객 프로젝트에서는 `pnpm milvus` CLI로 세팅한다. 이 README의 1·2·4·7·11장은 설계 첫머리 "이 문서가 대체하는 것" 표대로 고쳤다(2026-10-14). 5장은 발표에 쓰는 5.3·5.4·5.5와 6장 결정 목록만 지금 흐름으로 고쳤고, 5.1·5.2와 8·9장은 패키지 설계 이전 기록이다. 일정과 빼는 순서는 설계 12장, 남은 미정 항목은 설계 15장을 본다.
 >
 > | 이전 계획 | 지금 |
 > | --- | --- |
@@ -188,7 +188,7 @@ Storybook에서는 브랜드 root style을 래퍼 요소에 주입하면 된다.
 
 ## 4. 진행 계획
 
-> **2026-10-08부터 실행은 [구현 계획](docs/plans/2026-10-08-milvus-package-plan.md)의 마일스톤 M0~M7을 따른다.** 아래 Phase 0~9는 9/26 계획이며 기록으로 남긴다. Phase 1~5의 기반(Storybook, `lightning-*` 렌더, SLDS 카탈로그, util.css, `milvusButton`, `pnpm sync:theme`)은 M0 이전 PR(#3, #4, #9, #11, #14, #16, #19)에서 만들었다. Phase 6(프로젝트 시작 워크플로)은 패키지와 `pnpm milvus` CLI로 대체했다. 대체한 항목은 각 Phase에 "(대체)"로 적었다.
+> **2026-10-08부터 실행은 [구현 계획](docs/plans/2026-10-08-milvus-package-plan.md)의 마일스톤 M0~M7을 따른다.** 아래 Phase 0~9는 9/26 계획이며 기록으로 남긴다. Phase 1~5의 기반(Storybook, `lightning-*` 렌더, SLDS 카탈로그, util.css, `milvusButton`, `pnpm sync:theme`)은 M0 이전 PR #7, #8, #10, #13, #15, #17, #19(이슈 #3, #4, #9, #11, #14, #16, #18)에서 만들었다. Phase 6(프로젝트 시작 워크플로)은 패키지와 `pnpm milvus` CLI로 대체했다. 대체한 항목은 각 Phase에 "(대체)"로 적었다.
 >
 > | 마일스톤 | 내용 | PR |
 > | --- | --- | --- |
@@ -332,7 +332,7 @@ pnpm sync:theme
 9/26 계획(런북 skill `milvus-init`, `root.css`, `create-project.mjs`로 컴포넌트 선택)은 아래로 바뀌었다.
 
 - [x] **런북:** 고객 프로젝트 루트에 `milvus-design.md`([관리], 세팅 안내서이자 Claude 규칙)를 두고, 프로젝트 `CLAUDE.md`에 `@milvus-design.md` 한 줄을 더한다(설계 7.1). skill은 `milvus-brand` 하나다(11.2)
-- [x] **브랜드 요청 반영:** 브랜드 명세 페이지나 채팅 → `milvus-brand` skill → `BrandingSet`과 `milvusBrand.css`. 규칙 밖 값은 hook의 `check --style`이 막는다(설계 6장, 7.2)
+- [x] **브랜드 요청 반영:** 브랜드 명세 페이지나 채팅 → `milvus-brand` skill → `BrandingSet`과 `milvusBrand.css`. 규칙 밖 값은 hook의 `check --style`이 잡아 고칠 값을 Claude에게 돌려준다(설계 6장, 7.2)
 - [x] **세팅:** `pnpm milvus init --target-org <별칭> (--brand <이름> | --from-org) [--no-vf]`. 컴포넌트를 고르지 않고 밀버스 LWC를 모두 복사한다. Storybook 설정은 복사하지 않고 패키지 안의 것으로 띄운다(`pnpm milvus storybook`, 설계 3장, 4.2)
 - [x] **`milvus.config.json`:** `init`이 패키지 버전, 대상 org 별칭, 브랜드, VF 사용 여부, 밀버스 관리 파일 목록과 sha256을 기록한다. `check`가 sha256으로 직접 수정을 잡고, `update`가 새 버전의 관리 파일을 반영한다([11.3](#113-패키지로-프로젝트-세팅-체계화))
 - [x] **배포:** `pnpm milvus deploy`가 계획을 보여 주고, `--yes`일 때 밀버스 메타데이터를 배포한 뒤 활성 테마를 바꾼다(설계 4.4)
@@ -376,8 +376,10 @@ pnpm sync:theme
 
 > 관련 이슈: [a40418a/learndoshare#1](https://github.com/a40418a/learndoshare/issues/1) (계획, 완료) · 구현: [#3](https://github.com/a40418a/learndoshare/issues/3) Storybook 기반·배포 → [#4](https://github.com/a40418a/learndoshare/issues/4) `milvusButton`·root style → [#5](https://github.com/a40418a/learndoshare/issues/5) 브랜드 입력 skill → [#6](https://github.com/a40418a/learndoshare/issues/6) 컴포넌트 활성화 선택
 > 남은 기간: 9/28(월)부터 약 4주, 실제 작업일 18일 (10/9 한글날 제외)
+>
+> **2026-10-14 갱신:** 5.1·5.2는 9/26 계획 기록이다. 실제 진행은 4장 마일스톤 표, 일정과 빼는 순서는 [설계](docs/specs/2026-10-08-milvus-package-design.md) 12장을 따른다. #6(컴포넌트 활성화 선택)은 하지 않았다(`init`이 밀버스 LWC를 모두 복사한다). 5.3~5.5는 지금 패키지 흐름으로 고쳤다.
 
-### 5.1 주차별 일정
+### 5.1 주차별 일정 (기록, 9/26 계획)
 
 | 주차 | 날짜 | 작업 | 학습 자료 | 완료 기준 |
 | --- | --- | --- | --- | --- |
@@ -400,7 +402,7 @@ pnpm sync:theme
 | | 10/22(목) | 리허설 2, 장비와 데모 환경 점검, 버퍼 | — | 녹화 재생 확인 |
 | | **10/23(금)** | **발표** | | |
 
-### 5.2 판단 시점과 컷 라인
+### 5.2 판단 시점과 컷 라인 (기록. 지금 빼는 순서는 설계 12장)
 
 **10/2 go/no-go에서 실패해도 발표는 성립한다.** "업계 PoC도 못 푼 부분을 검증했더니 이렇게 안 됐다. 그래서 대안으로 간다"는 그 자체로 제안의 근거다. 이 경우 W2 초반을 LWC Garden 검증으로 대체하고, 실습 A의 ④는 Garden 기반으로 바꾼다.
 
@@ -425,10 +427,10 @@ pnpm sync:theme
 | 1 | 실제로 있었던 일 | 3분 | 같은 SLDS인데 페이지마다 다르다 | 사례 화면 캡처 2장 | 10/8 |
 | 2 | 왜 생기는가 | 2분 | 코드 속에만 있는 컴포넌트는 아무도 못 본다 | 발굴 수치 | 10/8 |
 | 3 | React는 풀린 문제인데 왜 어려운가 | 3분 | LWC(Rollup) vs Storybook(Vite), Apex. Storybook 설명은 여기서 끝낸다 | 구조도, 공개 PoC도 `lightning-*`과 LDS 목킹을 못 풀었다는 사실. "Salesforce가 공식 문서를 Storybook으로 만든다"는 **사실이 아니므로 쓰지 않는다** (SLDS 2 공식 문서는 lightningdesignsystem.com) | 10/2 |
-| 4 | 밀버스 방향 | 4분 | SLDS를 최대한 쓰되 브랜드 차이는 root에서. 스타일 계층 L1~L4. SLDS 2의 제약(`--slds-c-*` 미지원, global hook 읽기 전용)과 그래서 택한 방식 | 원칙 1장, 계층도 1장 | 10/16 |
-| 5 | **실습 A: 새 프로젝트 시작** | 7분 | org 테마 → 색·로고 → Claude로 root style → 컴포넌트 선택 → 전용 Storybook | 녹화 (라이브는 여유 있을 때) | 10/19 |
+| 4 | 밀버스 방향 | 4분 | SLDS를 최대한 쓰고 브랜드는 공식 기능부터. 기본은 Salesforce 기본 모양 + 브랜드 색·로고(`BrandingSet`)이고, 모양은 요청이 있을 때만 util.css(`milvusBrand.css`)의 hook → 브리지 변수 → opt-in `milvusOverride.css` 순으로 바꾼다(설계 5.1). SLDS 2의 제약(`--slds-c-*`는 Developer Preview·운영 금지, global hook 재정의는 공식 권고 밖)과 그래서 택한 방식. 어떤 방법으로도 바꿀 수 없는 "Salesforce 고정" 목록(설계 9.4) | 원칙 1장, 계층도 1장(2장 표), 고정 목록 1장 | 10/16 |
+| 5 | **실습 A: 새 프로젝트 시작** | 7분 | `pnpm add` → `pnpm milvus init` → `pnpm milvus storybook`의 브랜드 명세 페이지에 요청 입력 → Claude Code "브랜드 요청 반영해줘" → 브랜드 명세 표 승인 → `check` → Storybook 갱신 → `pnpm milvus deploy` 계획 확인·승인 → LEX 화면 (1.2) | 녹화 (라이브는 여유 있을 때) | 10/19 |
 | 6 | 실습 B: 도구 역할 분담 | 2분 | `sf lightning dev`와 Storybook은 경쟁이 아니라 역할이 다르다 | 비교표, 녹화 | 10/19 |
-| 7 | 필요한 결정 | 3분 | 네임스페이스, 오너와 시간, 브랜드 단위, 배포 형태 | 결정 요청 목록 | 10/16 |
+| 7 | 필요한 결정 | 3분 | 네임스페이스, 오너와 시간, 앱마다 다른 브랜드가 필요한가, 두 번째 프로젝트의 컴포넌트 배포 방식 (6장, 설계 15장) | 결정 요청 목록 | 10/16 |
 | — | Q&A | 5분 | | 예상 질문 답변 | 10/21 |
 
 "디자인 시스템의 중요성"으로 시작하지 않는다. 개발팀은 첫 3분에 흥미를 잃는다.
@@ -437,31 +439,35 @@ pnpm sync:theme
 
 | 질문 | 답변 방향 |
 | --- | --- |
-| 토큰(테마)만 하면 되는 거 아닌가? | 브랜드 전환은 토큰과 root style로 풀린다. 컴포넌트를 만드는 이유는 중복 구현과 일관성이다 |
+| 토큰(테마)만 하면 되는 거 아닌가? | 브랜드 전환은 org 테마(`BrandingSet`)와, 요청이 있을 때만 쓰는 util.css로 풀린다(기본 우선). 컴포넌트를 만드는 이유는 브랜드가 아니라 중복 구현과 일관성이다 |
 | 브랜드마다 버튼 디자인이 다르면? | 색은 org 테마로 `lightning-button`까지 바뀐다. 모양은 SLDS 2에 운영에서 쓸 공식 경로가 없다. 컴포넌트 hook(`--slds-c-*`)은 SLDS 2에서 Developer Preview(Winter '27, 운영 금지)이고 global hook은 읽기 전용이다. 그래서 요청이 있을 때만 util.css의 hook → 브리지 변수 → opt-in `milvusOverride.css`(마지막 수단, 공식 권고 밖) 순으로 바꾸고, 릴리스마다 재확인한다. 모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다(기능이 없을 때만 만든다). `milvusButton`은 "새로 만드는 방식"의 비교 예시로 보여 준다(2026-10-09 갱신, [Learn 09](<Learn/09-override와 공식 권고.html>)) |
-| Claude가 만든 스타일을 믿을 수 있나? | 수정 파일은 `root.css` 하나, 허용 목록 밖은 거부, 린트, Storybook 시각 확인, PR 리뷰를 거친다 |
-| Storybook에서 브랜드를 바꾸면 org도 바뀌나? | 아니다. 시뮬레이션이다. 색은 관리자가 Setup에서, root style은 배포로 반영한다 |
+| Claude가 만든 스타일을 믿을 수 있나? | Claude가 고치는 것은 프로젝트 소유 파일(`milvusBrand.css`, `BrandingSet`)이다. 고칠 때마다 hook이 `check --style`로 util.css 규칙(설계 5.2)과 대비 4.5:1을 검사한다. 어기면 hook이 2로 끝나 고칠 값을 Claude에게 돌려주고, Claude가 그 값으로 다시 고친다(편집 자체를 되돌리지는 않는다). 밀버스 관리 파일은 `permissions.deny`로 막도록 설정했다(실제 동작 **미확인**, 설계 14장). 그 앞뒤로 브랜드 명세 표 승인, Storybook 확인, `deploy` 계획 승인을 거친다 |
+| Storybook에서 브랜드를 바꾸면 org도 바뀌나? | 아니다. Storybook은 프로젝트의 `BrandingSet`과 `milvusBrand.css`로 그린 미리보기다(팔레트는 실측으로 역산한 규칙, 3장). org에는 `pnpm milvus deploy`가 색·로고(`BrandingSet`)와 util.css를 함께 배포하고 활성 테마를 바꾼다. 활성 테마는 org 전체 사용자에게 적용되고, LEX 색은 새로고침 뒤 반영된다(설계 4.4) |
 | 공식 도구가 있는데 왜 Storybook까지? | 실습 B 결과. 개발 중 확인은 공식 도구, 카탈로그·브랜드·공유·프로젝트 시작은 Storybook |
-| 폰트도 org에서 바꿀 수 있나? | 없다. Themes and Branding은 색·로고·이미지만 다룬다. 그래서 L3 root style이 있다 |
-| SLDS 2로 가면 깨지지 않나? | global hook만 쓰고 `--slds-c-*`는 쓰지 않으므로 막히지 않는다 |
+| 폰트도 org에서 바꿀 수 있나? | 없다. Themes and Branding은 색·로고·이미지만 다룬다. 밀버스도 글꼴은 바꾸지 않는다. 브랜드 글꼴은 범위 밖이고(설계 0장), util.css에서 `--slds-g-font-family*`와 `@font-face`는 금지다(설계 5.2). 발표 뒤 검토 항목이다(설계 15장) |
+| Salesforce 업데이트나 native shadow 전환 때 깨지지 않나? | 깨질 수 있는 부분이 있다. 공식 경로는 `BrandingSet`(색·로고)이다. util.css의 hook 재정의, 브리지(클래스 규칙), `milvusOverride.css`는 공식 권고 밖이다. 기본 컴포넌트가 native shadow로 바뀌면 그 안에는 클래스 규칙이 닿지 않고, hook은 native CSS가 읽는 이름에만 효과가 있다(2장, 설계 5.6). 그래서 정적 반영 검사(`pnpm audit:brand`)가 SLDS·기본 컴포넌트 CSS의 hook·native 지원 목록·브리지 선택자 변화를 기준 파일과 비교하고, 브리지 항목은 명세 페이지에 "native 전환 시 잃음"으로 표시한다 |
+| 정말 모든 컴포넌트에 반영되나? | 정적 반영 검사가 SLDS 2·기본 컴포넌트 CSS 선언을 명세 항목별로 반영 / 브리지 / 고정 / 빈틈으로 판정하고, 빈틈 0을 `pnpm test`에서 지킨다. 어떤 방법으로도 바꿀 수 없는 것은 "Salesforce 고정"으로 합의해 그대로 밝힌다. 예: 토스트 표시 시간, 아이콘 모양, LEX 전역 헤더, LEX 컨트롤 높이 1.875rem(설계 9.4) |
 | 유지보수는 누가 하나? | 결정 요청 항목이다. 오너 1명, 주 4시간 이상을 제안한다 |
 
 ### 5.5 발표 당일 체크리스트
 
 - [ ] 녹화 파일 2개를 발표 PC 로컬에 저장 (네트워크에 의존하지 않는다)
-- [ ] 라이브 데모를 한다면 `pnpm storybook`을 미리 띄워 두고 org에 로그인해 둔다
+- [ ] 라이브 데모를 한다면 고객 프로젝트에서 `pnpm milvus storybook`(`init`이 더한 `pnpm storybook`도 된다)을 미리 띄워 두고 org에 로그인해 둔다
 - [ ] 결정 요청 슬라이드를 띄워 둔 채로 Q&A를 진행한다
 
 ---
 
 ## 6. 결정이 필요한 것 (미정)
 
+2026-10-14 갱신. 정해진 항목은 체크하고 결론을 적었다. 설계 15장의 미정 항목(회사 GitHub 조직으로 옮기기, `BrandingSet`의 SLDS 2 전용 색 속성, `--slds-s-*` 허용 유지, 브랜드 글꼴, c hook)도 함께 본다.
+
 - [ ] **네임스페이스 사용 여부.** 없으면 `c-milvus-badge`, 있으면 `milvus-badge`다. Dev Hub에 등록하면 변경·삭제가 불가능하다. 조직 차원에서 결정한다
-- [ ] **배포 형태.** 최종 목표는 밀버스 플러그인([11.3](#113-패키지로-프로젝트-세팅-체계화))이다. 컴포넌트는 복사 + checksum 관리로 시작할지, 처음부터 패키지로 설치할지 정한다
-- [ ] **root style의 org 반영 방식.** 정적 리소스 `loadStyle` / 컨테이너 상속
-- [ ] **브랜드 단위.** org 단위인가, Lightning 앱 단위인가
+- [x] **배포 형태 (확정, 2026-10-08).** GitHub Packages 패키지 하나로 배포하고 `pnpm milvus` CLI로 세팅한다(1.2, 설계 1·2장). Claude Code 플러그인 마켓플레이스는 범위 밖이다(설계 0장)
+- [ ] **두 번째 프로젝트의 컴포넌트 배포 방식.** 패키지 + sha256 관리(`milvus.config.json`)를 유지할지, unlocked package로 갈지 두 번째 프로젝트가 합류할 때 정한다([11.3](#113-패키지로-프로젝트-세팅-체계화) 로드맵)
+- [x] **util.css의 org 반영 방식 (확정).** 정적 리소스 + `loadStyle`. 밀버스 컴포넌트와 앱 유틸리티 바의 `milvusBrandLoader`가 넣고, VF는 `milvusHead`가 넣는다(2.4, 설계 5.5)
+- [ ] **앱마다 다른 브랜드가 필요한가.** 활성 테마(브랜드 색·로고)는 org에 하나이고 `deploy`가 바꾸면 org 전체에 적용된다(설계 4.4). 밀버스는 이 org 단위를 기준으로 한다. 앱별 브랜드가 필요한지는 미정이다(App Manager의 앱 브랜딩은 3장)
 - [ ] **pnpm 버전.** 10(로컬 설치) / 12(최신)
-- [ ] **테마 메타데이터 커밋 여부.** `force-app/main/default/lightningExperienceThemes/`
+- [x] **테마 메타데이터 (사실상 정해짐).** 고객 프로젝트에서는 `init`이 `brandingSets/`·`lightningExperienceThemes/`를 프로젝트 소유 파일로 만들고, `deploy`가 그 파일로 배포한다. 색의 원본이 이 파일이다(설계 3장, 4.4). 커밋한다고 문서에 명시한 곳은 없다 **(미확인)**
 - [ ] **디자인 시스템 오너와 주당 확보 시간.** 최소 주 4시간 제안
 
 ---
@@ -489,6 +495,8 @@ pnpm sync:theme
 
 ## 8. 리스크와 대응
 
+> 패키지 설계(2026-10-08) 이전 기록이다(`override.css`, root style 반영 방식 등). 지금 흐름과 위험은 [패키지·CLI 설계](docs/specs/2026-10-08-milvus-package-design.md)를 따른다(5.6 브리지 위험, 10장 오류 처리, 14장 미확인).
+
 | 리스크 | 영향 | 대응 |
 | --- | --- | --- |
 | `lightning-*`이 Storybook에서 렌더되지 않는다 | Storybook 방식 전체 무산 | Phase 2를 먼저 하고, 실패하면 LWC Garden → org 내 문서 앱 |
@@ -505,6 +513,8 @@ pnpm sync:theme
 ---
 
 ## 9. 목표 디렉터리 구조
+
+> 패키지 설계(2026-10-08) 이전 기록이다(`root.css`, `create-project.mjs`, 저장소 `.claude/`는 없다). 지금 구조는 [패키지·CLI 설계](docs/specs/2026-10-08-milvus-package-design.md) 2장(패키지에 넣는 것)·3장(고객 프로젝트 파일)과 [구현 계획](docs/plans/2026-10-08-milvus-package-plan.md)의 "파일 지도"를 따른다.
 
 ```
 learndoshare_1/                     # 밀버스 디자인 시스템 (공용)
@@ -562,7 +572,7 @@ learndoshare_1/                     # 밀버스 디자인 시스템 (공용)
 
 | 종류 | 규칙 | 하는 일 | 대체한 계획 |
 | --- | --- | --- | --- |
-| `permissions.deny` | `Bash(sf org display)`, `Bash(sf org display *)`, `Bash(sf org open --url-only *)`, `sf org list --json` 계열(`--json`이 어디에 와도 걸리게 규칙을 여러 개 둔다. 정확한 목록은 템플릿 파일) | 액세스 토큰을 출력하는 명령을 막는다 | H2 3층 |
+| `permissions.deny` | `Bash(sf org display)`, `Bash(sf org display *)`, `Bash(sf org open --url-only *)`, `sf org list --json`·`sf auth list --json` 계열(`--json`이 어디에 와도 걸리게 규칙을 여러 개 둔다. 정확한 목록은 템플릿 파일) | 액세스 토큰을 출력하는 명령을 막는다 | H2 3층 |
 | `permissions.deny` | `Edit(...)`: `lwc/milvus*/**`, `classes/utils/design/**`, `milvusHead.component*`, `staticresources/milvusVf.*`·`milvusBridge.*`, `milvus-design.md`, `milvus.config.json`, `.claude/skills/milvus-brand/**`, `.claude/hooks/milvus-check.mjs` | 밀버스 [관리]·[생성] 파일을 Claude의 파일 도구로 고치지 못하게 한다. 다른 경로로 바뀐 것은 `check`의 sha256 비교가 잡는다 | H7 |
 | `permissions.ask` | `pnpm milvus deploy`(`pnpm exec milvus`, `milvus`, `./node_modules/.bin/milvus`를 포함한 네 형태), `sf project deploy`, `sf data create/delete/update/upsert`, `sf apex run` | 실행 전에 묻는다. auto 모드에서도 묻는다 | H2 1층 |
 | hook `PostToolUse` · `Edit\|Write` | `node "$CLAUDE_PROJECT_DIR"/.claude/hooks/milvus-check.mjs` | `milvusBrand.css`·`milvusOverride.css`·`brandingSets/`를 고쳤을 때만 패키지 CLI의 `check --style`을 node로 직접 실행한다(pnpm을 거치지 않음). 위반이면 2로 끝나 Claude가 stderr의 고칠 값을 본다. override 경고는 stdout JSON의 `additionalContext`로 넘긴다 | H4 |
@@ -585,9 +595,9 @@ learndoshare_1/                     # 밀버스 디자인 시스템 (공용)
 | H8 | 세션 시작 안내(`/milvus-init`, `/milvus-update`) | 두지 않았다. `milvus-design.md`가 같은 안내를 한다 |
 
 **운영 원칙 (발표에서 배운 점, 설계 7.2에 반영):**
-- 편집마다 도는 PostToolUse에는 **0.2초 안에 끝나는 검사**만 건다. `check --style`은 정규식 수준이고, hook은 pnpm 기동(약 0.3초)을 피하려고 node로 직접 실행한다
+- 편집마다 도는 PostToolUse에는 **0.2초 안에 끝나는 검사**만 건다. `check --style`은 postcss로 파싱하고 패키지에 미리 넣은 hook 색인(`dist/hooks-index.json`)을 읽어 원본 CSS를 다시 읽지 않는다(`lib/rules.ts`, `lib/hooks-index.ts`). 검사 자체는 0.2초 안이고(설계 첫머리 표), hook은 pnpm 기동(약 0.3초)을 피하려고 node로 직접 실행한다
 - stderr는 사람이 아니라 Claude가 읽는다. 위반마다 **고칠 값**을 함께 적는다. PostToolUse가 0으로 끝나면 stderr가 Claude에게 가지 않으므로 경고는 stdout JSON으로 넘긴다
-- 인자를 제한하는 Bash 규칙은 깨지기 쉽다(공식 문서 경고). `sf org:list --json`, `sfdx force:org:list --json`, `sh -c` 안의 명령은 deny에 걸리지 않는다
+- 인자를 제한하는 Bash 규칙은 깨지기 쉽다(공식 문서 경고). `SF_CONTENT_TYPE=JSON sf org list`(환경 변수로 JSON 출력), `sf org:list --json`, `sfdx force:org:list --json`, `sh -c` 안의 명령은 deny에 걸리지 않는다(설계 7.2)
 - 실제 프로젝트는 운영 org에 붙는다. 그래서 고객 프로젝트에서는 배포·데이터 변경을 `ask`로, 토큰 출력을 `deny`로 둔다
 - husky: `pre-commit`(`pnpm precommit` → lint-staged)만 있고 `commit-msg`는 없다. git 루트가 상위 폴더라 husky가 설치되지 않는 문제는 남아 있다(**미정**, [07 pnpm](<Learn/07-pnpm.html>) husky 절)
 
@@ -643,7 +653,7 @@ learndoshare_1/                     # 밀버스 디자인 시스템 (공용)
 | 시점 | 형태 | 범위 |
 | --- | --- | --- |
 | **10/16 동결** | 패키지 0.1.0 (GitHub Packages, 발행 예정) | `init`·`check`·`storybook`·`deploy`·`update`, `milvus-brand` skill, permissions와 hook 하나 |
-| **10/23 발표** | 같은 패키지 | 1.2의 흐름을 시연한다(5장) |
+| **10/23 발표** | 같은 패키지 | 1.2의 흐름을 시연한다(5.3 실습 A) |
 | 발표 뒤 | 검토 항목 | SLDS 1 테마 org 지원(#22), Storybook native 빌드(설계 9.2), 브랜드 글꼴, 회사 GitHub 조직으로 옮기기(설계 15장) |
 | 두 번째 프로젝트 합류 시 | 컴포넌트 배포 방식 재결정 | 패키지 + sha256 관리를 유지할지, unlocked package로 갈지 |
 
