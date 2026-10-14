@@ -281,7 +281,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 모달 너비 (원할 때만) | `.slds-modal__container`와 크기 클래스(`_small`·`_medium`·`_large`·`_full`) | 크기마다 너비·최대 너비, 최소 너비 20·40rem 고정. 변수는 `--milvus-modal-width-base`(크기 클래스 없음)·`-small`·`-medium`·`-large`·`-full`, `--milvus-modal-min-width`. 작은 화면의 full 모달은 바꾸지 않는다 |
 
 - **2026-10-14 사용자 결정으로 뺀 브리지:** 컨트롤 높이, 줄인 움직임 규칙, Path 양 끝 반경, 컨트롤 안·정렬 아이콘 크기, 폼 요소 자간, 선택지 라벨 굵기, 비활성 커서, 링크 hover 밑줄, 팝오버 꼬리 그림자, 개체 아이콘 배경색(973규칙). 리허설(에어로케이 브랜드, `learndoshare_1`)에서 컨트롤 높이 브리지가 모든 `.slds-button`에 걸려 목록·헤더 툴바의 2rem 고정 아이콘 버튼과 어긋났다(텍스트 버튼 32→40px, 아이콘 버튼은 상자 32px에 줄 높이 38px, 전역 헤더 검색창 40px). 클래스 규칙인 브리지는 범위를 가리지 않아 같은 위험이 있다고 보고 꼭 필요한 것만 남겼다. 뺀 항목은 "Salesforce 고정"(9.4)이다. 줄인 움직임은 Salesforce 기본 처리에 맡긴다(브랜드가 "모두 최소화"를 원하면 움직임 시간 변수를 `0.01ms`로 정한다)
-- **넣으면 안 되는 값:** 모달과 토스트는 움직임이 끝나는 이벤트(`transitionend`, `animationend`)를 기다려 닫힌다. transition은 시간이 `0s`면 전환이 일어나지 않아 `transitionend`가 오지 않는다(animation은 `0s`여도 `animationend`가 온다). 그래서 닫히지 않을 수 있어 최솟값은 `0.01ms`다. 단위 없는 `0`은 `max()`를 무효로 만든다. 생성기는 모달·토스트만이 아니라 묶음에 드는 모든 시간을 `max(var(…), 0.01ms)`로 감싼다(2026-10-12). 스피너는 점별 지연이 1000ms 기준이라 시간을 바꾸면 순서가 어긋나므로 줄인 움직임 켜기·끄기만 다룬다
+- **넣으면 안 되는 값:** 모달과 토스트는 움직임이 끝나는 이벤트(`transitionend`, `animationend`)를 기다려 닫힌다. transition은 시간이 `0s`면 전환이 일어나지 않아 `transitionend`가 오지 않는다(animation은 `0s`여도 `animationend`가 온다). 그래서 닫히지 않을 수 있어 최솟값은 `0.01ms`다. 단위 없는 `0`은 `max()`를 무효로 만든다. 생성기는 모달·토스트만이 아니라 묶음에 드는 모든 시간을 `max(var(…), 0.01ms)`로 감싼다(2026-10-12). 스피너는 점별 지연이 1000ms 기준이라 시간을 바꾸면 순서가 어긋나므로 움직임 브리지에서 뺀다(줄인 움직임 브리지 규칙도 2026-10-14에 뺐다)
 - **생성 방식 (2026-10-12 Task 15):** 표의 "대상"은 예시이고, 생성기는 각 항목에 해당하는 SLDS 2 리터럴 선언을 모두 잇는다. 원본 선택자 목록과 `@media`·`@supports` 맥락을 그대로 복사하고, 움직임은 shorthand를 두고 longhand(`-duration`, `-timing-function`)만 정한다. 대상 선택자·속성·바꿀 값이 원본에서 사라지면 생성이 실패한다(Salesforce 구조 변경 감지)
 - **원래 이기던 규칙 다시 넣기:** 브리지는 SLDS 2 CSS보다 뒤에 들어오므로, 같은 선택자를 복사하면 우선순위(specificity)가 같은 원본 규칙을 모두 이긴다(예: `.slds-button__icon`을 이으면 뒤에서 이기던 `.slds-button__icon_large`가 진다). 그래서 원래 이기던 같은 우선순위 규칙을 원래 값 그대로 다시 넣는다. 10/14 제거 뒤 파일은 111,364바이트(gzip 11,715)이고 다시 넣은 규칙은 812개다(제거 전 358,310바이트·gzip 33,474, 다시 넣은 규칙 1,110개). 한계: 그 선택자에 맞는 LEX 요소 전체가 npm SLDS 2(2.264.2) 값을 받는다. org가 다른 값을 내려주면 그 값이 덮인다. 문제가 보이면 다시 넣는 규칙을 `:where(대상 선택자)`로 좁히고, org가 내려주는 SLDS 버전과 비교하는 확인을 둔다(Task 25)
 - **위험:** 브리지는 지금 org(synthetic)에서 닿지만, 기본 컴포넌트가 native로 바뀌면 그 컴포넌트 안에는 닿지 않는다. 브리지 항목은 명세 페이지와 Storybook에 "native 전환 시 잃음"으로 표시하고 9.6의 검사로 감시한다
@@ -491,7 +491,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 모양 | 테두리 두께 | "전체 테두리를 2px로" | `sizing-border-1/-2`, native 버튼 `--slds-s-button-sizing-border` | 입력창은 브리지 |
 | 모양 | 아바타·개체 아이콘 모양 | "프로필 사진을 둥근 사각으로" | `--slds-s-avatar-radius-border`, `--slds-s-icon-radius-border` | |
 | 모양 | 탭·페이지 헤더 모양 | "선택된 탭 밑줄을 2px로" | `navigation-sizing-border-*`, `navigation-radius-border`, `pageheader-radius-border`, `pageheader-sizing-border` | native tabBar는 고정 |
-| 크기 | 컨트롤 높이 | "버튼과 입력창을 40px로" | 버튼 안쪽 여백 `--slds-s-button-spacing-block`, native용 `--slds-s-input-sizing-height` | LEX 텍스트 컨트롤 높이(1.875rem)는 Salesforce 고정(2026-10-14). 목록·헤더 툴바가 2rem 고정 아이콘 버튼과 섞여 있어 바꾸면 어긋난다 |
+| 크기 | 컨트롤 높이 | "버튼 안쪽 위아래 여백을 조금 넉넉하게" | 버튼 안쪽 여백 `--slds-s-button-spacing-block`, native용 `--slds-s-input-sizing-height` | LEX 텍스트 컨트롤 높이(1.875rem)는 Salesforce 고정(2026-10-14). 목록·헤더 툴바가 2rem 고정 아이콘 버튼과 섞여 있어 바꾸면 어긋난다 |
 | 크기 | 탭·헤더 높이 | "탭 바를 낮게" | `navigation-sizing-height`, `navigation-font-lineheight`, `header-sizing-height` | |
 | 크기 | 아이콘 크기 | "기본 아이콘을 36px로" | `--slds-s-icon-sizing`, `--slds-s-icon-spacing` | 컨트롤 안 아이콘·정렬 아이콘 크기와 애니메이션 아이콘 부품은 고정(2026-10-14) |
 | 글자 | 줄 간격 | "본문 줄 간격 1.6" | `font-line-height-base`, `-2`, `-1` | 컨트롤 안 줄 간격은 고정 |
@@ -504,8 +504,8 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 움직임 | 곡선 | "부드럽게 감속하며" | 브리지의 `--milvus-motion-easing` | 속도와 같다 |
 | 움직임 | 줄인 움직임 | "애니메이션을 모두 최소화" | 움직임 시간 변수 세 개를 `0.01ms`로 | "켠 사람만"은 Salesforce 기본 처리에 맡긴다(브리지 규칙 제거, 2026-10-14) |
 | 포커스 | 포커스 링 모양 | "포커스 링을 3px로 굵게" | 포커스 그림자 4종(5.2 조건), native용 s `*-shadow-focus` | 링 색은 브랜드 색을 따른다 |
-| 포커스 | 커서·링크 밑줄 | "링크에 밑줄 없이" | 없음 | Salesforce 고정(브리지 제거, 2026-10-14) |
-| 아이콘 | 개체 아이콘 색 | "Account 아이콘을 브랜드 남색으로" | 없음 | Salesforce 고정(개체 아이콘 색 브리지 973규칙 제거, 2026-10-14) |
+| 표시만 | 커서·링크 밑줄 | 없음 | 입력 없음 | Salesforce 고정(브리지 제거, 2026-10-14) |
+| 표시만 | 개체 아이콘 색 | 없음 | 입력 없음 | Salesforce 고정(개체 아이콘 색 브리지 973규칙 제거, 2026-10-14) |
 | 표시만 | Salesforce 고정 | "토스트를 10초 동안" | 입력 없음. 9.4 목록을 보여 준다 | |
 
 (hook 이름 앞의 `--slds-g-color-`, `--slds-g-` 등은 생략했다. 실제 이름은 5.2 표와 분석 원본에 있다)
