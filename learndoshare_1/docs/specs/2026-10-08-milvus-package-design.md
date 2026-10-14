@@ -669,6 +669,8 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | App Manager의 "앱이 열릴 때 백그라운드로 로드" 체크는 유틸리티 바 FlexiPage의 decorator `eager` = `true`로 저장된다(Tooling API `FlexiPage.Metadata` 조회). 체크가 꺼져 있으면 유틸리티 패널을 열기 전까지 로더가 만들어지지 않아 표준 화면에 브랜드가 들어가지 않고, 켜면 패널을 열지 않아도 리드 목록에 세 link가 들어간다(14장 항목 해소) | 10/14 리허설 |
 | 줄인 브리지(111,364바이트)에서 리드 목록 높이는 Salesforce 원래 값이다: 머리 버튼 그룹 30px, 툴바 검색 입력·아이콘 버튼 32px, 목록 선택·열 작업 24px. 컨트롤 높이 브리지가 텍스트 버튼만 높여 생기던 어긋남이 없어졌고, 브랜드 반경 2px는 모두 닿는다(5.6) | 10/14 리허설 |
 | VF: `milvusHead` 컴포넌트 안의 `<apex:slds/>`도 Visualforce Settings SLDS 2 설정의 대상이다(`slds-plus.css`). `<head>` 안 순서는 `slds-plus.css` → `milvusVf` → `milvusBridge` → `milvusBrand` → `milvusOverride`. `<body>`에 `slds-scope` 클래스가 자동으로 붙어 래퍼는 필요 없다. 브랜드 버튼 배경 `#2976ca`가 LEX와 같고, `milvusBrand`의 반경도 VF에 닿는다. 기본 아바타 이미지는 200으로 보인다(14장 VF 항목 4개 해소) | 10/14 Task 24 측정(페이지 2개, 둘 다 `<apex:page showHeader="false" sidebar="false" standardStylesheets="false">`) |
+| 설치본 `update`(0.0.1 → 0.1.0 tgz, `learndoshare_2`): 버전을 올리면 바뀐 [관리] 파일(`milvus-design.md`, skill)만 갱신하고 `settings.json`에 새 deny 14개를 병합한다. [관리] 파일 하나를 고친 상태에서는 줄 단위 차이를 보여 주고 config까지 아무것도 바꾸지 않은 채 1로 끝난다. `--force`는 그 파일만 원본으로 되돌린다. [소유] 파일(`milvusBrand.css`, `milvusOverride.css`, BrandingSet)은 그대로이고 뒤의 `check`가 통과한다 | 10/14 M7 리허설 |
+| 저장소 `pnpm build:lwc`는 `node_modules` 안의 심볼릭 링크를 따라간 경로를 별개 모듈로 본다. 작업 폴더에 자기 참조 링크 `node_modules/node_modules`가 있으면 `@lwc/engine-dom`이 경로가 다른 사본으로 여러 번 번들되고, `lightning-*`이 "does not extends LightningElement"로 그려지지 않는다. 링크를 지우면 정상이다. 같은 Mac에서 새로 설치한 main·M7 소스는 정상이고, CI 배포본(GitHub Pages)도 정상이었다. 고객 빌드(`milvus storybook`, `npmFromPackage`)는 엔진을 절대 경로로 받아 이 영향이 없다 | 10/14 조사(`lwc-render-debug`) |
 
 ## 14. 미확인 (구현 중 확인할 것)
 
