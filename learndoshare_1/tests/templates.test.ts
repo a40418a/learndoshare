@@ -47,7 +47,7 @@ test("settings.json deny는 토큰을 출력하는 sf org display·sf org list -
   const rules = deny.map(bashRule).filter((r) => r !== undefined);
   const denied = (cmd: string) => rules.some((r) => r.test(cmd));
   const tokenCommands = ["sf org display", "sf org display --json", "sf org list --json", "sf org list --json --all", "sf org list --all --json"];
-  tokenCommands.push("sf org list --all --json --skip-connection-status", "sf org list auth --json", "sf auth list --json", "sf auth list --loglevel warn --json");
+  tokenCommands.push("sf org list --all --json --skip-connection-status", "sf org list auth --json", "sf auth list --json", "sf auth list --loglevel warn --json", "sf auth list --loglevel warn --json --dev-debug");
   for (const cmd of tokenCommands) assert.ok(denied(cmd), cmd);
   // 설계 4.4: 대상 org가 없으면 sf org list로 별칭을 확인하라고 안내한다. 표 출력에는 토큰이 없다
   for (const cmd of ["sf org list", "sf org list --all", "sf auth list"]) assert.ok(!denied(cmd), cmd);
