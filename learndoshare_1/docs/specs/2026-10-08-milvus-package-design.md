@@ -393,7 +393,10 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
       "Bash(sf data create *)", "Bash(sf data delete *)", "Bash(sf data update *)", "Bash(sf data upsert *)", "Bash(sf apex run *)"
     ],
     "deny": [
-      "Bash(sf org display)", "Bash(sf org display *)", "Bash(sf org open --url-only *)",
+      "Bash(sf org display)", "Bash(sf org display *)",
+      "Bash(sf org open --url-only *)", "Bash(sf org open * --url-only)", "Bash(sf org open * --url-only *)",
+      "Bash(sf org open -r *)", "Bash(sf org open * -r)", "Bash(sf org open * -r *)",
+      "Bash(sf org open --json *)", "Bash(sf org open * --json)", "Bash(sf org open * --json *)",
       "Bash(sf org list --json *)", "Bash(sf org list * --json)", "Bash(sf org list * --json *)",
       "Bash(sf auth list --json *)", "Bash(sf auth list * --json)", "Bash(sf auth list * --json *)",
       "Edit(/force-app/main/default/lwc/milvus*/**)",
@@ -417,7 +420,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 - `ask`는 auto 모드에서도 실행 전에 묻는다. 규칙 순서는 deny → ask → allow다(공식 문서)
 - hook은 바뀐 파일이 `milvusBrand.css`, `milvusOverride.css`, `brandingSets/`일 때만 `check --style`을 실행한다. 프로젝트에서 패키지를 찾아 `dist/cli/index.js`를 node로 직접 실행한다(pnpm 기동 0.3초를 없애고 Windows의 shell 경고를 피한다, 10/9 판정)
 - 결과 전달(공식 문서 code.claude.com/docs/en/hooks, 2026-10-09 확인: PostToolUse가 0으로 끝나면 stderr는 디버그 로그로만 가고 Claude는 보지 못한다): 2로 끝나면 stderr를 그대로 넘겨 Claude가 고칠 값을 본다. 0인데 override 경고가 있으면 stdout에 `{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"…"}}`를 써서 Claude에게 알린다
-- 저장소 hook H2의 2·3층(개인정보 필드·`FIELDS(ALL)` 조회, 토큰을 출력하는 명령)도 프로젝트에 가져간다(10/9 판정). 토큰을 출력하는 `sf org display`와 `sf org open --url-only`는 `deny`로 막는다. 개인정보 필드와 `FIELDS(ALL)`는 명령 패턴으로 막을 수 없어 `milvus-design.md`의 규칙 문장으로 둔다
+- 저장소 hook H2의 2·3층(개인정보 필드·`FIELDS(ALL)` 조회, 토큰을 출력하는 명령)도 프로젝트에 가져간다(10/9 판정). 토큰을 출력하는 `sf org display`와 `sf org open --url-only`는 `deny`로 막는다. `sf org open`은 `--url-only`(짧게 `-r`)와 `--json`일 때 front door URL을 출력하므로 옵션 위치와 상관없이 막는다(공식 소스 [plugin-org `orgOpenCommandBase.ts`](https://github.com/salesforcecli/plugin-org/blob/main/src/shared/orgOpenCommandBase.ts)의 `output = { orgId, url, username }`, 2026-10-14 확인). `deploy`가 출력하는 `sf org open --target-org … --path …`는 브라우저만 열어 막지 않는다. 환경 변수 `SF_CONTAINER_MODE`에서도 URL이 출력되지만 명령 패턴으로는 막을 수 없다. 개인정보 필드와 `FIELDS(ALL)`는 명령 패턴으로 막을 수 없어 `milvus-design.md`의 규칙 문장으로 둔다
 - `sf org list --json`과 `sf auth list --json`(= `sf org list auth --json`)은 모든 org의 액세스 토큰을 출력하므로 `deny`로 막는다(#36)
   - 근거: 2026-10-13 로컬 실측(sf 2.108.6, 출력의 org마다 `accessToken`), 공식 소스 [plugin-org 5.9.30 `orgListUtil.ts`](https://github.com/salesforcecli/plugin-org/blob/5.9.30/src/shared/orgListUtil.ts)(복호화한 필드에서 `refreshToken`·`clientSecret`만 뺀다), [plugin-auth 3.9.8 `org/list/auth.ts`](https://github.com/salesforcecli/plugin-auth/blob/3.9.8/src/commands/org/list/auth.ts)(`AuthInfo.listAllAuthorizations()` 결과를 그대로 돌려준다. 별칭 `auth:list`), [sfdx-core 8.23.2 `authInfo.ts`](https://github.com/forcedotcom/sfdx-core/blob/8.23.2/src/org/authInfo.ts)(`accessToken`을 넣는다). 모두 2026-10-14 확인
   - 두 플러그인의 `main`(2026-10-14)은 `SF_TEMP_SHOW_SECRETS`가 없으면 `accessToken`을 가린다. 어느 sf 버전부터인지는 미확인이고, 고객 프로젝트의 sf 버전을 알 수 없어 규칙을 유지한다

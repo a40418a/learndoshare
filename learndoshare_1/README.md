@@ -572,7 +572,7 @@ learndoshare_1/                     # 밀버스 디자인 시스템 (공용)
 
 | 종류 | 규칙 | 하는 일 | 대체한 계획 |
 | --- | --- | --- | --- |
-| `permissions.deny` | `Bash(sf org display)`, `Bash(sf org display *)`, `Bash(sf org open --url-only *)`, `sf org list --json`·`sf auth list --json` 계열(`--json`이 어디에 와도 걸리게 규칙을 여러 개 둔다. 정확한 목록은 템플릿 파일) | 액세스 토큰을 출력하는 명령을 막는다 | H2 3층 |
+| `permissions.deny` | `Bash(sf org display)`, `Bash(sf org display *)`, `sf org open --url-only`(`-r`)·`--json`, `sf org list --json`·`sf auth list --json` 계열(옵션이 어디에 와도 걸리게 규칙을 여러 개 둔다. 정확한 목록은 템플릿 파일) | 액세스 토큰을 출력하는 명령을 막는다 | H2 3층 |
 | `permissions.deny` | `Edit(...)`: `lwc/milvus*/**`, `classes/utils/design/**`, `milvusHead.component*`, `staticresources/milvusVf.*`·`milvusBridge.*`, `milvus-design.md`, `milvus.config.json`, `.claude/skills/milvus-brand/**`, `.claude/hooks/milvus-check.mjs` | 밀버스 [관리]·[생성] 파일을 Claude의 파일 도구로 고치지 못하게 한다. 다른 경로로 바뀐 것은 `check`의 sha256 비교가 잡는다 | H7 |
 | `permissions.ask` | `pnpm milvus deploy`(`pnpm exec milvus`, `milvus`, `./node_modules/.bin/milvus`를 포함한 네 형태), `sf project deploy`, `sf data create/delete/update/upsert`, `sf apex run` | 실행 전에 묻는다. auto 모드에서도 묻는다 | H2 1층 |
 | hook `PostToolUse` · `Edit\|Write` | `node "$CLAUDE_PROJECT_DIR"/.claude/hooks/milvus-check.mjs` | `milvusBrand.css`·`milvusOverride.css`·`brandingSets/`를 고쳤을 때만 패키지 CLI의 `check --style`을 node로 직접 실행한다(pnpm을 거치지 않음). 위반이면 2로 끝나 Claude가 stderr의 고칠 값을 본다. override 경고는 stdout JSON의 `additionalContext`로 넘긴다 | H4 |
