@@ -544,7 +544,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 - util.css와 브리지는 `loadBrand`를 부른 컴포넌트가 있는 페이지에 들어간다. 그런 컴포넌트가 없는 표준 레코드 페이지에는 org 테마 색만 적용된다
 - **해결 (10/9 실측, D3):** 앱 유틸리티 바에 화면 없는 LWC를 두고 백그라운드로 로드하게 하면(FlexiPage decorator `eager` = `true`), 유틸리티 패널을 열지 않아도 그 앱의 표준 화면(리드 목록)에 브랜드 CSS가 들어갔다. 잰 화면은 이것 하나다. 유틸리티 바는 앱의 모든 페이지에 붙으므로 다른 페이지도 같다고 본다. 다른 앱(판매)을 새로 불러오면 들어가지 않았다. 공식 문서의 "백그라운드 유틸리티 항목"(`lightning:backgroundUtilityItem`)은 Aura 전용이라 쓰지 않고, 보이는 유틸리티 항목의 백그라운드 로드를 쓴다([기록](../research/2026-10-09-org-probe.md) 3.7)
 - 패키지는 이 용도의 `milvusBrandLoader`(대상 `lightning__UtilityBar`, 빈 템플릿, `connectedCallback`에서 `loadBrand(this)`만)를 [관리] 파일로 넣는다. 앱에 붙이는 것은 사용자가 App Manager에서 앱마다 한다(유틸리티 항목 추가, "앱이 열릴 때 백그라운드로 로드" 체크). `deploy`는 고객 앱 메타데이터를 바꾸지 않는다
-- 10/14 리허설에서 App Manager로 유틸리티 항목 `milvusBrandLoader`를 붙이자 그 앱의 표준 리드 목록에 세 link가 들어가고 표준 버튼 반경·회색이 바뀌었다(13장). "App Manager로 붙이면 표준 화면에 들어가는가"는 해소했다(14장에서 뺌). 그때 "앱이 열릴 때 백그라운드로 로드" 체크 상태와 유틸리티 패널을 열었는지는 기록하지 않았다
+- 10/14 리허설에서 App Manager로 유틸리티 항목 `milvusBrandLoader`를 붙이자 그 앱의 표준 리드 목록에 세 link가 들어가고 표준 버튼 반경·회색이 바뀌었다(13장). "App Manager로 붙이면 표준 화면에 들어가는가"는 해소했다(14장에서 뺌). 그때 "앱이 열릴 때 백그라운드로 로드" 체크 상태와 유틸리티 패널을 열었는지는 기록하지 않았다. 그래서 그 체크가 프로브의 decorator `eager`와 같은 설정인지는 여전히 **미확인**이다(14장)
 
 ### 9.8 분석 중 함께 발견한 것
 - `brands/Sample_Forest/util.css` 주석의 "버튼·뱃지 등 알약형"은 틀렸다. 뱃지는 `--slds-g-radius-border-1`을 읽는다
@@ -657,6 +657,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | `node_modules`의 `.storybook`으로 정적 빌드(`storybook build`, `milvus storybook build`)도 되는가. 개발 서버(`preview.ts`·`manager.ts`, `../lib/*.ts` import 포함)는 10/14 tgz 리허설에서 동작했다(13장) | 다음 tgz 리허설 |
 | pnpm 11.5.3 이후(10.x는 10.34.2 이후) 프로젝트 `.npmrc`의 `${…}` 치환을 하지 않는다는 pnpm.io 설명(Learn 07). 10.13.1에서는 치환이 동작했다(13장). 고객 프로젝트가 더 새 pnpm을 쓰면 토큰 줄은 `~/.npmrc`, 범위 레지스트리는 `pnpm-workspace.yaml`의 `registries`로 안내해야 한다 — 그 버전에서 실제 확인 | Task 20(milvus-design.md 설치 안내) 전 |
 | 고객 프로젝트에서 pnpm이 `esbuild` 빌드 스크립트를 건너뛰는 것이 Storybook 정적 빌드·Vite에 영향을 주는가. 영향이 있으면 `init`이 `pnpm.onlyBuiltDependencies`에 `esbuild`를 더한다 | Task 11·18 |
+| App Manager의 "앱이 열릴 때 백그라운드로 로드" 체크가 프로브의 decorator `eager`와 같은 설정인가. 10/14 리허설은 App Manager로 붙이면 들어간다는 것까지 확인했고, 체크 상태와 유틸리티 패널을 열었는지는 기록하지 않았다(9.7, 13장) | 다음 org 확인(읽기만) |
 | `Bash(pnpm milvus deploy *)`가 인자 없는 명령에도 걸리는가 | Task 23 리허설(10/12 판정: 고객 프로젝트에서 Claude Code를 직접 띄워야 해서 M3 마무리에서 옮김) |
 | `Edit(...)` deny 규칙이 의도대로 막는가 | Task 23 리허설(같은 이유) |
 | org `accent-2`의 다크 값(`#87aef7`)이 팔레트 70단계(`#8cb1f7`)와 다른 원인. 다크 모드가 범위 밖이라 지금 화면에는 영향이 없다(기록 3.9) | 다크 모드 검토 때 |
