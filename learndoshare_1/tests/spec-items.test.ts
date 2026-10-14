@@ -37,6 +37,14 @@ test("SPEC_ITEMS의 bridgeVars는 모두 BRIDGE_VARS의 값이다", () => {
   assert.deepEqual([...vars].filter((v) => !used.has(v)), []);
 });
 
+test("컨트롤 높이는 hook만 남고 브리지가 없어 native 전환 때 잃는 것이 없다(2026-10-14 사용자 결정)", () => {
+  const item = SPEC_ITEMS.find((i) => i.id === "control-height");
+  assert.deepEqual(item?.hooks, ["--slds-s-button-spacing-block", "--slds-s-input-sizing-height"]);
+  assert.deepEqual(item?.bridgeVars, []);
+  assert.equal(item?.nativeLoss, false);
+  assert.match(item?.limits ?? "", /Salesforce 고정/);
+});
+
 test("움직임 묶음 항목은 hooks가 비고 bridgeVars가 있으며 nativeLoss가 참이다", () => {
   const motion = SPEC_ITEMS.filter((i) => i.group === "움직임");
   assert.equal(motion.length, 3);

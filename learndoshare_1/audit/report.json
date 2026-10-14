@@ -618,7 +618,7 @@
         "native": "reached"
       },
       "control-height": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "reached"
       },
       "icon-size": {
@@ -626,7 +626,7 @@
         "native": "n/a"
       },
       "line-height": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "hover-press": {
@@ -1344,7 +1344,7 @@
         "native": "n/a"
       },
       "control-height": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "shadow": {
@@ -3602,7 +3602,7 @@
         "native": "reached"
       },
       "control-height": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "icon-size": {
@@ -6714,7 +6714,7 @@
         "native": "n/a"
       },
       "control-height": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "hover-press": {
@@ -7080,7 +7080,7 @@
         "native": "reached"
       },
       "control-height": {
-        "now": "bridge",
+        "now": "fixed",
         "native": "n/a"
       },
       "line-height": {
@@ -9218,7 +9218,7 @@
     },
     "control-height": {
       "now": {
-        "reached": 5,
+        "reached": 0,
         "total": 5
       },
       "native": {
@@ -9248,7 +9248,7 @@
     },
     "line-height": {
       "now": {
-        "reached": 28,
+        "reached": 27,
         "total": 36
       },
       "native": {

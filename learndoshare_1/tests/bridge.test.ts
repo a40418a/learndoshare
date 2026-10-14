@@ -10,6 +10,7 @@ import { generateBridge } from "../scripts/bridge/generate.ts";
 import { BRIDGE_VARS } from "../lib/bridge-vars.ts";
 import { SPEC_ITEMS } from "../lib/spec-items.ts";
 import { loadRuleContext } from "../lib/hooks-index.ts";
+import { declProblem } from "../lib/rules.ts";
 
 const pkgRoot = fileURLToPath(new URL("..", import.meta.url));
 const sldsCss = readSlds2Css();
@@ -132,7 +133,6 @@ test("SPEC_ITEMS의 모든 bridgeVars가 생성된 CSS에서 읽힌다", () => {
   const expected: [string, string, string][] = [
     // lightning-combobox는 slds-input 대신 slds-input_faux만 붙인다
     [" | .slds-input_faux, .slds-input--faux", "border", BRIDGE_VARS["input-border-width"]],
-    [" | .slds-input_height, .slds-input--height", "min-height", BRIDGE_VARS["control-height"]],
     [" | .slds-checkbox_toggle .slds-form-element__label, .slds-checkbox--toggle .slds-form-element__label", "font-weight", BRIDGE_VARS["choice-label-weight"]],
     ["@media (min-width: 48em) | .slds-modal__container", "width", BRIDGE_VARS["modal-width-base"]],
     ["@media (min-width: 48em) | .slds-modal__container", "max-width", BRIDGE_VARS["modal-width-base"]],
@@ -233,6 +233,16 @@ test("생성된 --milvus-* 이름이 loadRuleContext의 milvusVars에 잡힌다"
   assert.deepEqual([...names].filter((n) => !fromProject.has(n)), []);
 });
 
+// 2026-10-14 사용자 결정: LEX 목록·헤더 툴바는 32px 아이콘 버튼과 텍스트 버튼을 섞어 두어 브리지로 높이를 바꾸면 어긋난다
+test("컨트롤 높이는 브리지로 잇지 않는다. 브랜드가 --milvus-control-height를 쓰면 check가 '읽는 곳 없음'으로 막는다", () => {
+  assert.equal(BRIDGE_VARS["control-height"], undefined);
+  assert.deepEqual(BRIDGE_TARGETS.filter((t) => t.id === "control-height"), []);
+  assert.doesNotMatch(bridgeCss, /--milvus-control-height/);
+  const ctx = loadRuleContext({ pkgRoot });
+  assert.equal(ctx.milvusVars.has("--milvus-control-height"), false);
+  assert.equal(declProblem("--milvus-control-height", "2.375rem", ctx)?.[0], "milvus-var");
+});
+
 test("shorthand는 longhand로 잇고 묶음 밖 시간·곡선은 원래 값, 원본 맥락(@media·@supports)을 지킨다", () => {
   const css = `.slds-a { transition: opacity 0.1s linear, transform 0.2s ease-in, color 0.12s; }
     @media (min-width: 48em) { @supports (display: grid) { .slds-b { animation: spin 0.3s steps(4) 2s, pulse 0.4s ease-out; } } }`;
@@ -278,14 +288,14 @@ test("같은 우선순위로 뒤에 오는 원본 선언은 그대로 다시 넣
     .slds-badge:hover { line-height: 3; }
     .slds-badge { line-height: 3; }
     div { line-height: 4; }`;
-  const out = generateBridge(css, [{ id: "control-height", selectors: [".slds-button"], property: "line-height", varName: BRIDGE_VARS["control-height"] }]);
+  const out = generateBridge(css, [{ id: "x", selectors: [".slds-button"], property: "line-height", varName: "--milvus-x" }]);
   // 우선순위가 다른 규칙(.x .slds-button_icon, .slds-badge:hover, div)은 원래대로 이기거나 지므로 다시 넣지 않는다.
   // 같은 우선순위는 같은 요소에 맞는지 알 수 없어 모두 다시 넣는다(.slds-badge).
   // font shorthand는 line-height도 정하므로 그 값만 꺼내 넣는다(다른 글꼴 속성은 건드리지 않는다)
   assert.deepEqual(
     [...declsByRule(out)].map(([k, ds]) => `${k.slice(3)} { ${ds.map((d) => `${d.prop}: ${d.value}`).join("; ")} }`),
     [
-      ".slds-button { line-height: var(--milvus-control-height, 1.875rem) }",
+      ".slds-button { line-height: var(--milvus-x, 1.875rem) }",
       ".slds-button_icon { line-height: 1 }",
       ".slds-button_icon-more { line-height: inherit }",
       ".slds-badge { line-height: 3 }",
@@ -301,8 +311,8 @@ test("원본에서 대상 선택자나 속성을 찾지 못하면 실패한다(S
   assert.match(generateBridge("button, input { font: inherit; }", [letter]), /button, input \{\n {2}letter-spacing: var\(--milvus-letter-spacing, normal\);\n\}/);
   assert.throws(() => generateBridge("button, input { font: inherit; }", [{ ...letter, initial: undefined }]), /letter-spacing/);
   // 선언은 있어도 바꿀 값(token, 묶음 안 시간 등)이 사라졌으면 실패한다. 조용히 넘어가면 그 컨트롤에서만 브랜드 값이 빠진다
-  const height: BridgeTarget = { id: "control-height", selectors: [".slds-select"], property: "height", varName: BRIDGE_VARS["control-height"], token: "1.875rem" };
-  assert.match(generateBridge(".slds-select { height: calc(1.875rem + 2px); }", [height]), /calc\(var\(--milvus-control-height, 1\.875rem\) \+ 2px\)/);
+  const height: BridgeTarget = { id: "x", selectors: [".slds-select"], property: "height", varName: "--milvus-x", token: "1.875rem" };
+  assert.match(generateBridge(".slds-select { height: calc(1.875rem + 2px); }", [height]), /calc\(var\(--milvus-x, 1\.875rem\) \+ 2px\)/);
   assert.throws(() => generateBridge(".slds-select { height: calc(2rem + 2px); }", [height]), /1\.875rem/);
   const border: BridgeTarget = { id: "input-border-width", selectors: [".slds-input"], property: "border", varName: BRIDGE_VARS["input-border-width"], token: "1px" };
   assert.throws(() => generateBridge(".slds-input { border: var(--slds-g-sizing-border-1) solid red; }", [border]), /1px/);

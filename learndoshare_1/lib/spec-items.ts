@@ -363,11 +363,12 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     id: "control-height",
     group: "크기",
     label: "컨트롤 높이",
-    description: "버튼·입력창·선택·콤보박스의 높이",
+    description: "버튼·입력창·선택·콤보박스의 높이. LEX 텍스트 컨트롤 높이(1.875rem)는 Salesforce 고정이다",
     examples: ["버튼과 입력창을 40px로"],
     hooks: [s("button-spacing-block"), s("input-sizing-height")],
-    bridgeVars: [B["control-height"]],
-    limits: "입력·선택·콤보는 브리지로 바꾼다. --slds-s-input-sizing-height는 native용이다. 브리지 없이 버튼만 키우면 폼에서 높이가 어긋난다",
+    bridgeVars: [],
+    limits:
+      "LEX 텍스트 컨트롤 높이(1.875rem)는 Salesforce 고정이다. 목록·헤더 툴바가 32px 아이콘 버튼과 섞여 있어 브리지로 바꾸면 어긋난다(2026-10-14 리허설). --slds-s-button-spacing-block은 버튼 안쪽 여백이고, --slds-s-input-sizing-height는 native용이다",
     input: "text",
   },
   {

@@ -70,22 +70,8 @@ const modal = (size: string) => `.slds-modal_${size} .slds-modal__container, .sl
 
 // 손으로 적는 대상(설계 5.6 표의 "대상")
 const LISTED: BridgeTarget[] = [
-  // 버튼(드롭다운 아이콘 버튼 포함)·입력·선택·버튼형 라디오·체크박스의 1.875rem. 선택은 높이 calc 안의 값만 바꿔 다른 컨트롤과 같이 움직인다
-  T(
-    "control-height",
-    [
-      ".slds-button",
-      ".slds-button_icon-more, .slds-button--icon-more",
-      ".slds-button_icon-container-more, .slds-button--icon-container-more",
-      ".slds-input",
-      ".slds-input_faux, .slds-input--faux",
-      ".slds-radio_button, .slds-radio--button",
-      ".slds-checkbox_button, .slds-checkbox--button",
-    ],
-    "line-height",
-  ),
-  T("control-height", [".slds-select"], "height", { token: "1.875rem" }),
-  T("control-height", [".slds-select[size], .slds-select[multiple]", ".slds-input_height, .slds-input--height"], "min-height", { token: "1.875rem" }),
+  // 컨트롤 높이(1.875rem)는 잇지 않는다(2026-10-14 사용자 결정, 고정 목록 lex-control-height).
+  // LEX 목록·헤더 툴바가 32px 아이콘 버튼과 텍스트 버튼을 섞어 두어 높이를 바꾸면 어긋난다
   // lightning-combobox(선택형)는 slds-input 대신 slds-input_faux만 붙인다
   T("input-border-width", [".slds-input", ".slds-input_faux, .slds-input--faux", ".slds-textarea"], "border", { token: "1px" }),
   T("path-end-radius", [".slds-path__item:first-child"], "border-start-start-radius"),

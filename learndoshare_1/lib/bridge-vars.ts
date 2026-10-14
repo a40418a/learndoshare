@@ -9,7 +9,6 @@ export const BRIDGE_VARS: Record<string, string> = {
   "motion-duration-slow": "--milvus-motion-duration-slow",
   "motion-easing": "--milvus-motion-easing",
   // 크기·모양
-  "control-height": "--milvus-control-height",
   "input-border-width": "--milvus-input-border-width",
   "path-end-radius": "--milvus-path-end-radius",
   "control-icon-size": "--milvus-control-icon-size",

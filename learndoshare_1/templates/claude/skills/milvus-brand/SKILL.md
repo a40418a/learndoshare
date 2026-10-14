@@ -46,7 +46,7 @@ description: 밀버스 디자인 시스템의 브랜드 요청(milvus-brand-requ
   - `.slds-*` 클래스 선택자만 쓴다. hex 색, `!important`, 브랜드 색 hook은 check가 경고한다. `@font-face`, `@import`는 막는다
 - **모양만 바꾸려고 밀버스 컴포넌트(`lwc/milvus*`)를 새로 만들지 않는다.** 밀버스 컴포넌트는 SLDS에 기능이 없을 때만 만든다
 - 밀버스 관리 파일(`lwc/milvus*`, `milvusBridge.css`, `milvusVf.css`, `milvusHead`, `milvus-design.md`, 이 skill)은 고치지 않는다
-- **Salesforce 고정(설계 9.4)** 은 요청이 와도 바꿀 수 없다고 답하고 목록을 보여 준다. override로도 우회하지 않는다. 예: 토스트 표시 시간, z-index, 아이콘 모양, 스피너, LEX 전역 헤더(org 테마가 원본). 글꼴도 바꾸지 않는다. 목록 전체:
+- **Salesforce 고정(설계 9.4)** 은 요청이 와도 바꿀 수 없다고 답하고 목록을 보여 준다. override로도 우회하지 않는다. 예: 토스트 표시 시간, z-index, 아이콘 모양, 스피너, LEX 전역 헤더(org 테마가 원본), LEX 컨트롤 높이. 글꼴도 바꾸지 않는다. 목록 전체:
   ```bash
   node --input-type=module -e 'import { FIXED_ITEMS } from "@a40418a/milvus-design-system/dist/lib/fixed-list.js"; for (const i of FIXED_ITEMS) console.log(i.mode === "both" ? "지금도 native에서도" : "native 전환 뒤", "-", i.label)'
   ```
@@ -80,7 +80,7 @@ node --input-type=module -e 'import { SPEC_ITEMS } from "@a40418a/milvus-design-
 | --- | --- | --- |
 | 브랜드 색 (`brand-color`) | BrandingSet `BRAND_COLOR` | 5장 |
 | 로고 (`logo`) | `BRAND_IMAGE`, `FA/contentassets/` | 6장 |
-| 모서리 (`radius`) | `--slds-g-radius-border-1`~`-4`, `--slds-g-radius-border-pill`, 브리지 `--milvus-path-end-radius`(Path 양 끝) | |
+| 모서리 (`radius`) | `--slds-g-radius-border-1`~`-4`, `--slds-g-radius-border-pill`, 브리지 `--milvus-path-end-radius`(Path 양 끝) | 버튼은 `--slds-s-button-radius-border`(기본 pill)를 읽어 global 1~4만으로는 바뀌지 않는다. 7장 프리셋 |
 | 밀도 (`density`) | `--slds-g-spacing-1`~`-12`, `--slds-s-button-spacing-inline`, `--slds-s-button-spacing-block`, `--slds-s-input-spacing`, `--slds-s-label-spacing-gap` | |
 | 글자 (`typography`) | `--slds-g-font-scale-neg-2`~`--slds-g-font-scale-7`(기본 `--slds-g-font-scale-base`), `--slds-s-container-heading-font-weight`, `--slds-s-pageheader-title-font-weight`, `--slds-s-label-font-weight`, 브리지 `--milvus-choice-label-weight`(라디오·체크박스 라벨) | 글꼴은 바꾸지 않는다 |
 | 피드백 색 (`feedback`) | 4장 표 | |
@@ -101,7 +101,7 @@ node --input-type=module -e 'import { SPEC_ITEMS } from "@a40418a/milvus-design-
 | 테두리 두께 (`border-width`) | `--slds-g-sizing-border-1`(1px), `--slds-g-sizing-border-2`(2px), native 버튼 `--slds-s-button-sizing-border`, 선택 상자·라디오 `--slds-s-input-sizing-border`, 브리지 `--milvus-input-border-width`(입력창) | |
 | 아바타·개체 아이콘 모양 (`avatar-icon-shape`) | `--slds-s-avatar-radius-border`, `--slds-s-icon-radius-border` | |
 | 탭·페이지 헤더 모양 (`tab-header-shape`) | `--slds-s-navigation-sizing-border-active`, `--slds-s-navigation-sizing-border-hover`, `--slds-s-navigation-radius-border`, `--slds-s-pageheader-radius-border`, `--slds-s-pageheader-sizing-border` | native tabBar는 고정 |
-| 컨트롤 높이 (`control-height`) | 버튼 `--slds-s-button-spacing-block`, 브리지 `--milvus-control-height`(입력·선택·콤보), native용 `--slds-s-input-sizing-height` | 버튼만 키우면 폼에서 높이가 어긋난다. 셋을 함께 정한다 |
+| 컨트롤 높이 (`control-height`) | 없음. LEX 컨트롤 높이(텍스트 버튼·입력 1.875rem)는 Salesforce 고정 | 요청이 오면 바꿀 수 없다고 답한다. 목록·헤더 툴바가 32px 아이콘 버튼과 텍스트 버튼을 섞어 두어 높이를 바꾸면 어긋난다(2026-10-14 리허설). 대안: 밀버스 컴포넌트 안에서만 쓰는 높이는 이 고정과 상관없다(그 컴포넌트의 `--milvus-*`). 버튼 안쪽 여백 `--slds-s-button-spacing-block`은 텍스트 버튼만 높여 같은 줄의 아이콘 버튼·입력과 어긋날 수 있어 신중히 쓴다. `--slds-s-input-sizing-height`는 native용이다 |
 | 탭·헤더 높이 (`tab-header-height`) | `--slds-s-navigation-sizing-height`, `--slds-s-navigation-font-lineheight`, `--slds-s-header-sizing-height` | |
 | 아이콘 크기 (`icon-size`) | `--slds-s-icon-sizing`, `--slds-s-icon-spacing`, 브리지 `--milvus-control-icon-size`(버튼·입력창 안, 원래 0.875rem), `--milvus-sort-icon-size`(정렬, 원래 0.75rem) | |
 | 줄 간격 (`line-height`) | `--slds-g-font-line-height-base`(본문 1.5), `--slds-g-font-line-height-2`, `--slds-g-font-line-height-1` | 컨트롤 안 줄 간격은 고정 |
@@ -175,8 +175,8 @@ node --input-type=module -e 'import { SPEC_ITEMS } from "@a40418a/milvus-design-
 
   | 표현 | 쓰는 이름 | 제안 |
   | --- | --- | --- |
-  | 각진 / 기본 / 둥근 | `--slds-g-radius-border-1`~`-4`, `--slds-g-radius-border-pill` | 기본 0.25·0.5·0.75·1.25rem, pill 15rem. 각진은 절반 이하(0·0.125·0.25·0.5rem), 둥근은 1.5배 |
-  | 기본 / 촘촘 | `--slds-s-button-spacing-inline`(기본 1rem), `--slds-s-button-spacing-block`, `--slds-s-input-spacing`(기본 0.5rem), `--slds-s-label-spacing-gap`(기본 0.25rem) | 촘촘은 4분의 3 정도로 줄인다. 컨트롤 높이와 함께 본다 |
+  | 각진 / 기본 / 둥근 | `--slds-g-radius-border-1`~`-4`, `--slds-g-radius-border-pill`, 버튼·입력·카드 `--slds-s-button-radius-border`, `--slds-s-input-radius-border`, `--slds-s-container-radius-border` | 기본 0.25·0.5·0.75·1.25rem, pill 15rem. 각진은 절반 이하(0·0.125·0.25·0.5rem), 둥근은 1.5배. 버튼·입력·카드의 컴포넌트 hook 셋도 함께 정한다. 기본이 버튼 `var(--slds-g-radius-border-pill)`, 입력 `var(--slds-g-radius-border-2)`, 카드 `var(--slds-g-radius-border-4)`라 global 1~4만 바꾸면 버튼은 알약 그대로다(2026-10-14 리허설). 각진이면 버튼도 `var(--slds-g-radius-border-2)`처럼 global 단계를 가리키게 한다 |
+  | 기본 / 촘촘 | `--slds-s-button-spacing-inline`(기본 1rem), `--slds-s-button-spacing-block`, `--slds-s-input-spacing`(기본 0.5rem), `--slds-s-label-spacing-gap`(기본 0.25rem) | 촘촘은 4분의 3 정도로 줄인다. 컨트롤 높이는 고정이다(4장 컨트롤 높이 행) |
   | 보통 / 굵게 (제목·라벨) | `--slds-s-container-heading-font-weight`, `--slds-s-pageheader-title-font-weight`, `--slds-s-label-font-weight` | 보통 400, 굵게 700 |
   | 그림자 없이 / 기본 / 깊게 | `--slds-g-shadow-1`~`-4`와 방향형, 카드는 `--slds-s-container-shadow`(기본 none) | 없이는 `none`. 이때도 `--slds-g-shadow-5`·`-6`은 기본값을 적는다 |
   | 빠르게 / 기본 / 차분하게 (움직임) | `--milvus-motion-duration-fast`, `--milvus-motion-duration-medium`, `--milvus-motion-duration-slow`, `--milvus-motion-easing` | 빠르게 0.05s·0.1s·0.2s, 차분하게 0.15s·0.3s·0.5s, 부드러운 감속 `cubic-bezier(0, 0, 0.2, 1)` |

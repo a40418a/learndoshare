@@ -1,4 +1,4 @@
-// "Salesforce 고정" 목록 (설계 9.4, 2026-10-08 사용자 합의. 2026-10-12 남은 빈틈 묶음 ①~⑯ 사용자 합의로 더함). 모든 방법을 써도 바꿀 수 없어 명세 페이지와 발표에 "바꿀 수 없음"으로 적는다.
+// "Salesforce 고정" 목록 (설계 9.4, 2026-10-08 사용자 합의. 2026-10-12 남은 빈틈 묶음 ①~⑯, 2026-10-14 LEX 컨트롤 높이 사용자 합의로 더함). 모든 방법을 써도 바꿀 수 없어 명세 페이지와 발표에 "바꿀 수 없음"으로 적는다.
 // 새 항목을 넣으려면 사용자 합의가 필요하다(설계 9.6의 4)
 // 브라우저(Storybook 명세 페이지)에서도 import하므로 Node 모듈을 쓰지 않는다
 
@@ -147,6 +147,23 @@ export const FIXED_ITEMS: FixedItem[] = [
     match: { selector: /\.slds-theme_[\w-]+ a:not\(\.slds-button_neutral\)/, property: "color", value: /^rgb\(255, 255, 255, 0?\.\d+\)$/ },
   },
   { id: "fade-gradient", label: "글자 자름 페이드·색 선택기 그라데이션", mode: "both", match: { selector: /\.slds-truncate::after|\.slds-color-picker__custom-range::before/, property: "background", value: /linear-gradient\(/ } },
+
+  // 2026-10-14 사용자 합의: 컨트롤 높이 브리지를 뺐다. LEX 목록·헤더 툴바가 32px 아이콘 버튼과 텍스트 버튼을 섞어 두어
+  // 높이를 바꾸면 어긋난다(리허설 실측). 브리지가 잇던 SLDS 2 선택자 목록 전체와 그 값에만 맞춘다
+  {
+    id: "lex-control-height",
+    label: "LEX 컨트롤 높이(텍스트 버튼·입력 1.875rem)",
+    mode: "both",
+    match: [
+      {
+        selector:
+          /^\S+ \.slds-(button(_icon(-container)?-more,\s*\.slds-button--icon(-container)?-more)?|input(_faux,\s*\.slds-input--faux)?|radio_button,\s*\.slds-radio--button|checkbox_button,\s*\.slds-checkbox--button)$/,
+        property: "line-height",
+        value: /^1\.875rem$/,
+      },
+      { selector: /^\S+ \.slds-select(\[size\],\s*\.slds-select\[multiple\])?$/, property: ["height", "min-height"], value: /^calc\(1\.875rem \+ \(1px \* 2\)\)$/ },
+    ],
+  },
 
   // native 전환 뒤 생기는 고정 (9.2의 c hook을 열면 일부 메울 수 있음)
   // nubbin은 팝오버·드롭다운의 꼬리다
