@@ -507,10 +507,10 @@ test("override: @font-face와 @import는 오류", ...);
 **Interfaces:**
 - Produces (`lib/bridge-vars.ts`): `BRIDGE_VARS: Record<string, string>`. 키는 항목 id, 값은 변수 이름이다
   - 움직임 4개: 전역 제약의 이름
-  - 크기·모양: `--milvus-control-height`, `--milvus-input-border-width`, `--milvus-path-end-radius`, `--milvus-control-icon-size`, `--milvus-sort-icon-size`, `--milvus-modal-width-base`, `--milvus-modal-width-small`, `--milvus-modal-width-medium`, `--milvus-modal-width-large`, `--milvus-modal-width-full`, `--milvus-modal-min-width` (정렬 아이콘과 모달 너비 나머지는 2026-10-12 사용자 결정으로 Task 15에서 더함)
-  - 글자: `--milvus-letter-spacing`, `--milvus-caps-transform`, `--milvus-caps-letter-spacing`, `--milvus-choice-label-weight`
-  - 커서·밑줄·그림자·바탕: `--milvus-cursor-disabled`, `--milvus-link-decoration-hover`, `--milvus-nubbin-shadow`, `--milvus-nav-selected-background`(2026-10-12 사용자 결정으로 더함)
-  - 아이콘: `--milvus-icon-color-all`
+  - 크기·모양: `--milvus-input-border-width`, `--milvus-modal-width-base`, `--milvus-modal-width-small`, `--milvus-modal-width-medium`, `--milvus-modal-width-large`, `--milvus-modal-width-full`, `--milvus-modal-min-width` (모달 너비 나머지는 2026-10-12 사용자 결정으로 Task 15에서 더함)
+  - 글자: `--milvus-caps-transform`, `--milvus-caps-letter-spacing`
+  - 바탕: `--milvus-nav-selected-background`(2026-10-12 사용자 결정으로 더함)
+  - 2026-10-14 리허설 뒤 사용자 결정으로 뺌(설계 5.6): `--milvus-control-height`, `--milvus-path-end-radius`, `--milvus-control-icon-size`, `--milvus-sort-icon-size`, `--milvus-letter-spacing`, `--milvus-choice-label-weight`, `--milvus-cursor-disabled`, `--milvus-link-decoration-hover`, `--milvus-nubbin-shadow`, `--milvus-icon-color-all`과 개체 아이콘 973규칙(Task 16), 줄인 움직임 규칙
 - Produces (`lib/spec-items.ts`):
   - `type SpecItem`
     ```ts
