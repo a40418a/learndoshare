@@ -45,7 +45,7 @@
   <div class="eyebrow">LEARN 07 · Phase 1 준비</div>
   <h1>pnpm 핵심 정리</h1>
   <p class="lead">밀버스는 pnpm만 쓴다. npm에 익숙한 사람이 pnpm에서 걸리는 지점, 특히 Storybook을 설치할 때 문제가 되는 부분을 중심으로 정리한다.</p>
-  <div class="meta"><span>예상 1시간</span><span>2026-10-09 기준 pnpm 최신 12.10.1</span><span>로컬 설치 10.13.1 · Node 24.4.1</span></div>
+  <div class="meta"><span>예상 1시간</span><span>2026-10-09 기준 pnpm 최신 12.10.1</span><span>로컬 설치 10.13.1 · Node 24.4.1</span><span>2026-10-14 갱신 (<code>deploy</code> 구현)</span></div>
 </header>
 
 <section id="why">
@@ -246,13 +246,13 @@ pnpm milvus init --target-org &lt;별칭&gt; --brand &lt;이름&gt;</code></pre>
     <li>패키지의 <code>package.json</code>에 <code>"bin": { "milvus": "dist/cli/index.js" }</code>가 있다. pnpm은 설치할 때 프로젝트의 <code>node_modules/.bin/milvus</code>를 만든다</li>
     <li><code>milvus</code>는 pnpm 명령이 아니다. pnpm 문서는 알 수 없는 명령을 받으면 먼저 같은 이름의 스크립트를 찾고, 없으면 그 명령을 셸 명령으로 실행한다고 적는다(<code>pnpm exec</code>와 같은 방식). 그래서 <code>package.json</code>에 스크립트가 없어도 <code>pnpm milvus &lt;명령&gt;</code>이 설치된 CLI를 실행한다. <code>pnpm exec milvus &lt;명령&gt;</code>도 같다</li>
     <li>pnpm이 만든 <code>milvus</code> 실행 파일은 실제 경로의 <code>dist/cli/index.js</code>를 실행한다(설계 13장, 2026-10-09 스파이크). Node는 <code>node_modules</code> 안의 <code>.ts</code>를 실행하지 않으므로 CLI는 <code>dist/</code>에 JS로 빌드해 발행한다(설계 2장)</li>
-    <li>지금 있는 명령은 <code>--version</code>, <code>init</code>, <code>check [--style]</code>(Task 10~12)과 <code>storybook [build]</code>(Task 18)이다(2026-10-13 갱신). <code>deploy</code>, <code>update</code>는 <span class="tag info">계획</span>이다. <code>init</code>이 <code>package.json</code>에 <code>"storybook": "milvus storybook"</code>을 더하므로 <code>pnpm storybook</code>으로도 띄운다. <code>storybook</code>은 고객 프로젝트에 storybook을 따로 설치하지 않고 패키지 의존성의 실행 파일을 쓴다(<a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html#modes">03 두 모드</a>)</li>
+    <li>지금 있는 명령은 <code>--version</code>, <code>init</code>, <code>check [--style]</code>(Task 10~12), <code>storybook [build]</code>(Task 18), <code>deploy [--target-org &lt;별칭&gt;] [--yes]</code>(Task 22)이다. 2026-10-14 갱신: <code>deploy</code>는 구현했고, tgz로 설치한 프로젝트에서 메타데이터 배포와 활성 테마 변경 두 단계가 모두 성공했다(설계 13장, <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html#deploy">05 테마 동기화</a>). <code>update</code>는 <span class="tag info">계획</span>이다. <code>init</code>이 <code>package.json</code>에 <code>"storybook": "milvus storybook"</code>을 더하므로 <code>pnpm storybook</code>으로도 띄운다. <code>storybook</code>은 고객 프로젝트에 storybook을 따로 설치하지 않고 패키지 의존성의 실행 파일을 쓴다(<a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html#modes">03 두 모드</a>)</li>
     <li>예외: Claude Code hook은 pnpm을 거치지 않고 패키지의 <code>dist/cli/index.js</code>를 node로 직접 실행한다. pnpm 기동 시간을 줄이고 Windows에서 셸이 필요한 문제를 피하려는 것이다(<a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html#runbook">08 Claude Code</a>)</li>
   </ul>
   <h3><code>init</code>이 프로젝트 <code>.npmrc</code>에 더하는 두 줄</h3>
   <p><code>init</code>은 프로젝트 <code>.npmrc</code>에 위 두 줄이 없으면 더한다. 팀원도 같은 준비를 하게 하려는 것이다(설계 3장). 토큰 값이 아니라 환경 변수 이름 <code>${NODE_AUTH_TOKEN}</code>만 쓴다. 이 저장소의 pnpm 10.13.1은 프로젝트 <code>.npmrc</code>의 이 이름을 치환해 설치했다(설계 13장). 다만 <a href="#registry">위 절</a>대로 pnpm 11.5.3부터(10.x는 10.34.2부터)는 프로젝트 <code>.npmrc</code>의 인증 값에 있는 <code>${...}</code>를 풀지 않는다. 고객 프로젝트가 더 새 pnpm을 쓰면 토큰 줄을 <code>~/.npmrc</code>로 옮겨야 한다. 그 버전에서 실제로 어떻게 되는지는 <span class="tag warn">미확인</span>이다(설계 14장, <code>milvus-design.md</code> 설치 안내를 쓰기 전에 확인).</p>
   <div class="callout warn"><strong><code>esbuild</code> 빌드 스크립트 경고</strong>설치할 때 pnpm 10.13.1이 <code>esbuild</code> 빌드 스크립트를 건너뛰었다고 경고한다(<a href="#builds">빌드 스크립트 승인</a>). Storybook의 <code>.ts</code> 설정 변환은 동작했다(설계 13장). 정적 빌드에 영향이 있는지는 <span class="tag warn">미확인</span>이고(설계 14장), 영향이 있으면 <code>init</code>이 <code>pnpm.onlyBuiltDependencies</code>에 <code>esbuild</code>를 더한다.</div>
-  <p class="sources">출처: <a href="https://pnpm.io/10.x/pnpm-cli">pnpm 10.x — pnpm CLI (알 수 없는 명령: 스크립트를 찾고, 없으면 셸 명령으로 실행)</a> (확인 2026-10-12) · <a href="https://pnpm.io/cli/exec">pnpm exec</a> (확인 2026-10-09) · <a href="https://nodejs.org/api/typescript.html">Node.js — Modules: TypeScript (node_modules 아래의 TypeScript 파일은 처리하지 않음)</a> (확인 2026-10-12) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09) · <a href="https://pnpm.io/10.x/npmrc">pnpm 10.x — .npmrc (${NAME} 치환, 10.34.2 제한)</a> (확인 2026-10-09) · <a href="https://pnpm.io/npmrc">pnpm — Auth &amp; Registry Settings (11.5.3 제한)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (0장 준비, 2장 bin·engines·발행, 3장 .npmrc, 4장 명령, 4.1 사전 점검, 4.2 storybook, 13장 설치·실행 경로 확인, 14장 새 pnpm·esbuild 미확인)</a> (확인 2026-10-13)</p>
+  <p class="sources">출처: <a href="https://pnpm.io/10.x/pnpm-cli">pnpm 10.x — pnpm CLI (알 수 없는 명령: 스크립트를 찾고, 없으면 셸 명령으로 실행)</a> (확인 2026-10-12) · <a href="https://pnpm.io/cli/exec">pnpm exec</a> (확인 2026-10-09) · <a href="https://nodejs.org/api/typescript.html">Node.js — Modules: TypeScript (node_modules 아래의 TypeScript 파일은 처리하지 않음)</a> (확인 2026-10-12) · <a href="https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry">GitHub Docs — Working with the npm registry</a> (확인 2026-10-09) · <a href="https://pnpm.io/10.x/npmrc">pnpm 10.x — .npmrc (${NAME} 치환, 10.34.2 제한)</a> (확인 2026-10-09) · <a href="https://pnpm.io/npmrc">pnpm — Auth &amp; Registry Settings (11.5.3 제한)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지 설계 (0장 준비, 2장 bin·engines·발행, 3장 .npmrc, 4장 명령, 4.1 사전 점검, 4.2 storybook, 4.4 deploy, 13장 설치·실행 경로 확인과 10/14 리허설, 14장 새 pnpm·esbuild 미확인)</a> (확인 2026-10-14)</p>
 </section>
 
 <section id="quiz" class="quiz">
@@ -288,7 +288,7 @@ pnpm milvus init --target-org &lt;별칭&gt; --brand &lt;이름&gt;</code></pre>
 
 <footer class="doc-foot">
   <span>밀버스 디자인 시스템 · Learn 07</span>
-  <span>2026-10-09 갱신, 2026-10-12 갱신 (M3: 밀버스 설치 준비와 <code>pnpm milvus</code>), 2026-10-13 갱신 (M5: <code>storybook</code> 명령 구현). 버전 정보는 <code>pnpm view</code>와 공식 문서로 확인함</span>
+  <span>2026-10-09 갱신, 2026-10-12 갱신 (M3: 밀버스 설치 준비와 <code>pnpm milvus</code>), 2026-10-13 갱신 (M5: <code>storybook</code> 명령 구현), 2026-10-14 갱신 (M6: <code>deploy</code> 구현과 리허설). 버전 정보는 <code>pnpm view</code>와 공식 문서로 확인함</span>
 </footer>
 </main>
 </div>
