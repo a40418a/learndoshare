@@ -372,7 +372,7 @@ pnpm exec slds-linter report force-app   <span class="c"># SARIF 보고서</span
     <li>같은 툴바의 아이콘 버튼은 상자가 2rem(32px)으로 따로 고정돼 있어 상자는 그대로인데 줄 높이만 38px가 되었다</li>
     <li>전역 헤더 검색창도 40px가 되었다</li>
   </ul>
-  <p>LEX 표준 화면은 텍스트 버튼과 크기가 고정된 아이콘 버튼을 한 줄에 섞어 둔다. 클래스 규칙은 선택자에 맞는 모든 요소에 닿으므로 "이 화면의 이 버튼만"을 고를 수 없다. 사용자는 클래스 규칙인 다른 브리지도 같은 위험이 있다고 보고 꼭 필요한 것만 남기기로 했다. 뺀 항목은 "Salesforce 고정"(설계 9.4, <code>lib/fixed-list.ts</code>)이 되었고, 요청이 오면 바꿀 수 없다고 답한다. 브리지를 뺀 직후 정적 검사에 생긴 빈틈 73개를 새 고정 항목이 흡수해 빈틈은 다시 0이다(<a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html#audit">00 개념 7절</a>).</p>
+  <p>LEX 표준 화면은 텍스트 버튼과 크기가 고정된 아이콘 버튼을 한 줄에 섞어 둔다. 클래스 규칙은 선택자에 맞는 모든 요소에 닿으므로 "이 화면의 이 버튼만"을 고를 수 없다. 사용자는 클래스 규칙인 다른 브리지도 같은 위험이 있다고 보고 꼭 필요한 것만 남기기로 했다. 뺀 항목은 "Salesforce 고정"(설계 9.4, <code>lib/fixed-list.ts</code>)이 되었고, 요청이 오면 바꿀 수 없다고 답한다. 브리지를 뺀 직후 정적 검사에 생긴 빈틈(선언 73개)을 새 고정 항목이 흡수해 빈틈은 다시 0이다(설계 9.4 끝 문단). 이미 <code>milvusBrand.css</code>에 뺀 변수(예: 리허설의 <code>--milvus-control-height</code>)를 쓴 브랜드는 <code>check --style</code>이 <code>milvus-var</code> 규칙으로 막고 "2026-10-14 브리지에서 뺐다"고 알려 준다(<code>lib/rules.ts</code>의 <code>REMOVED_BRIDGE_VARS</code>). 그 줄을 지우면 된다.</p>
   <div class="table-wrap"><table>
     <tr><th>뺀 브리지 (옛 변수)</th><th>지금</th><th>메모</th></tr>
     <tr><td>컨트롤 높이 (<code>control-height</code>)</td><td>고정: LEX 컨트롤 높이(텍스트 버튼·입력 1.875rem)</td><td>위 리허설. 버튼 안쪽 여백 hook <code>--slds-s-button-spacing-block</code>은 남지만 텍스트 버튼만 높여 같은 어긋남이 생길 수 있어 skill이 신중히 쓰라고 안내한다. 밀버스 컴포넌트 안의 높이는 이 고정과 상관없다</td></tr>
@@ -404,7 +404,7 @@ pnpm exec slds-linter report force-app   <span class="c"># SARIF 보고서</span
     <li><b>공식 권고 밖이다:</b> 위 Anti-Patterns가 말한 위험을 그대로 갖는다. SLDS 선택자나 값이 바뀌면 브리지가 효과를 잃거나 어긋날 수 있다. 위의 구조 변경 감지가 이것을 먼저 알리려는 장치다. 2026-10-14 리허설의 컨트롤 높이 사례처럼, Salesforce가 아무것도 바꾸지 않아도 같은 선택자를 쓰는 다른 표준 화면이 함께 바뀌어 어긋날 수 있다(<a href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html#choice">09 밀버스의 선택</a>)</li>
     <li><b>npm 값으로 고정된다:</b> 기본값과 다시 넣은 규칙은 npm SLDS 2(2.264.2) 값이다. 그 선택자에 맞는 LEX 요소 전체가 이 값을 받는다. org가 클래스 규칙에 다른 값을 내려주면 그 값이 덮인다. 브랜드 계열을 뺀 잰 표본(중립·피드백·모양·간격)에서 hook 기본값은 org와 npm이 같았지만(10/9 프로브 3.9), 클래스 규칙의 리터럴 값까지 같은지는 재지 않았다 <span class="tag warn">미확인</span>. 문제가 보이면 다시 넣는 규칙을 <code>:where(대상 선택자)</code>로 좁힌다(설계 5.6)</li>
     <li><b>파일 크기 (2026-10-14 갱신):</b> 111,364바이트, gzip 11,715바이트(Node <code>zlib</code> 기본값)다. 브리지 규칙 97개, 다시 넣은 원본 규칙 812개이고 개체 아이콘·줄인 움직임 규칙은 없다. 줄이기 전에는 358,310바이트(gzip 33,474)에 브리지 175개, 개체 아이콘 973규칙, 다시 넣은 1,110개, 줄인 움직임 141규칙이었다. SLDS 2 CSS(996,682바이트)의 약 9분의 1이다. 정적 리소스는 Cache Control 설정에 따라 Salesforce 서버 캐시에 저장된다(private는 세션 동안 사용자별 캐시, public은 공유 캐시. Help "Define Static Resources"). 브라우저가 페이지를 옮길 때 다시 받지 않는지는 재지 않았다 <span class="tag warn">미확인</span>. <code>loadBrand</code>가 있는 모든 페이지에 들어간다</li>
-    <li><b>org에서 잰 것:</b> 클래스 규칙이 닿는 것은 10/9 프로브에서 <code>.slds-button</code> 한 줄로 확인했다(<code>lightning-button</code> 안과 표준 헤더 버튼 대부분, 더 구체적인 선택자가 이기는 버튼은 예외). 2026-10-14 리허설에서 줄이기 전 브리지 파일을 org에 올려 리드 목록에서 쟀고, 위 어긋남이 그 결과다. 줄인 뒤의 파일(111,364바이트)을 org에 올려 다시 재지는 않았다 <span class="tag warn">미확인</span></li>
+    <li><b>org에서 잰 것:</b> 클래스 규칙이 닿는 것은 10/9 프로브에서 <code>.slds-button</code> 한 줄로 확인했다(<code>lightning-button</code> 안과 표준 헤더 버튼 대부분, 더 구체적인 선택자가 이기는 버튼은 예외). 2026-10-14 리허설에서 줄이기 전 브리지 파일을 org에 올려 리드 목록에서 쟀고, 위 어긋남이 그 결과다. 줄인 뒤의 파일(111,364바이트)도 같은 날 다시 배포했지만(설계 13장), 그 파일로 목록 화면을 다시 잰 결과는 기록이 없다 <span class="tag warn">미확인</span></li>
   </ul>
   <h3>직접 확인하기</h3>
 <pre><code><span class="c"># learndoshare_1에서. 생성 결과가 저장소 파일과 같으면 git diff가 비어 있다</span>

@@ -108,7 +108,7 @@
 - **`check`가 sha256 차이를 말함:** 밀버스 관리 파일이 바뀌었다. `pnpm milvus update --force`로 되돌린다
 - **설치가 인증 오류(401·403)로 실패:** `NODE_AUTH_TOKEN`이 비었거나 만료되었거나 `read:packages` 권한이 없다. `.npmrc` 두 줄과 pnpm 버전(2절)을 확인한다
 - **`init`·`deploy`가 org에서 멈춤:** `sf`가 없거나 로그인이 만료되었다. `sf org login web --alias <별칭>`
-- **VF:** 페이지에 `<c:milvusHead/>`를 넣는다(`slds-scope` 래퍼가 필요한지는 아직 재지 않았다). 프로젝트 전체 배포로 `milvusHead`를 올릴 때는 `milvusVf.css`가 커밋되어 있어야 한다
+- **VF:** 페이지에 `<c:milvusHead/>`를 넣는다. `showHeader="false"` 페이지는 `<body>`에 `slds-scope`가 자동으로 붙어 래퍼가 필요 없었다(2026-10-14 측정). `applyBodyTag`·`applyHtmlTag`를 `false`로 두면 `slds-scope`를 직접 넣는다. 프로젝트 전체 배포로 `milvusHead`를 올릴 때는 `milvusVf.css`가 커밋되어 있어야 한다
 - **VF가 SLDS 1처럼 보임(버튼 반경 4px):** 3절의 Visualforce Settings 설정을 확인한다
 - **표준 화면에 브랜드가 안 보임:** 그 앱 유틸리티 바의 `milvusBrandLoader`와 "앱이 열릴 때 백그라운드로 로드" 체크를 확인한다. 테마 색은 새로고침 뒤에 보인다
 - **Storybook 위에 오류 배너:** BrandingSet이 없거나 `milvusBrand.css`가 규칙을 어겼다. `pnpm milvus check`의 안내대로 고친다
