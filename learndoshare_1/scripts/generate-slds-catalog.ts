@@ -10,6 +10,7 @@
  *                      Salesforce 원본 파일. 그리는 코드는 stories/salesforce-source.js다
  *   shared-info.js     여러 페이지가 함께 보는 절(SLDS 블루프린트, 여러 폴더에 복사된 공용 파일)의 명세 항목별 개수·hook 행·빈틈 행. 한 번만 쓴다
  *   hook-info.js       hook마다 페이지와 상관없는 정보(종류, 이어지는 hook, 기본값, util.css 허용, 명세 항목). 모든 스토리가 함께 읽는다
+ *   fixed-rules.js     정적 검사가 두 모드 고정으로 판정한 선언(선택자·속성·고정 항목). 반영 검사 페이지가 고정 범위로 쓴다
  *
  * 결과에는 개발자 PC의 절대 경로와 node_modules/ 경로를 넣지 않는다. 패키지에 넣어 다른 프로젝트에서도 쓴다
  *   rel                lightning-base-components/src/lightning 기준 상대 경로. 빌드할 때 절대 경로로 바꾼다
@@ -25,9 +26,10 @@ import { createRequire } from "node:module";
 import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { list as cssList, parse, type AtRule, type Rule } from "postcss";
-import { FIXED_ITEMS } from "../lib/fixed-list.ts";
+import { FIXED_ITEMS, type FixedItem } from "../lib/fixed-list.ts";
 import { buildHooksIndex } from "../lib/hooks-index.ts";
 import { lightningBaseComponentsDir } from "../lib/lwc-build.ts";
+import type { FixedRule } from "../lib/reflect.ts";
 import { declProblem, LBC_ONLY_G } from "../lib/rules.ts";
 import { SPEC_ITEMS } from "../lib/spec-items.ts";
 import { blueprintOf, classify } from "./audit/classify.ts";
@@ -326,6 +328,26 @@ const sourcesOf = (lbcDir: string, comp: string, blueprints: { name: string }[],
   ...[...new Set(blueprints.flatMap((b) => [...(a.sldsFiles.get(b.name) ?? [])]))].sort().map((f) => `@salesforce-ux/design-system-2/dist/components/${f}`),
 ];
 
+/**
+ * 반영 검사(stories/start/reflect-check-page.ts)의 9.4 고정 선언 목록. 정적 검사가 지금 모드에서 두 모드 고정으로 판정한 선언마다
+ * 선택자 목록을 하나씩 나누고 가상 요소(::before·::after)를 뗀다. 페이지는 el.matches(선택자)로 맞춰 정적 검사와 같은 범위에서만 고정으로 본다
+ */
+export function fixedRulesOf(judged: Judged[], fixed: FixedItem[]): FixedRule[] {
+  const out = new Map<string, FixedRule>();
+  for (const j of judged) {
+    if (j.status !== "fixed" || j.mode !== "now" || j.d.selector.startsWith("@")) continue;
+    const id = fixedItemsOf(j.d, fixed).find((f) => f.mode === "both")?.id;
+    if (!id) continue;
+    for (const part of cssList.comma(j.d.selector)) {
+      const pseudo = /::?(before|after)$/.exec(part)?.[1];
+      const selector = pseudo ? part.replace(/::?(before|after)$/, "") || "*" : part;
+      const rule: FixedRule = { selector, pseudo: pseudo ? `::${pseudo}` : "", prop: j.d.prop, id, ...(j.d.src === "lbc" && { comp: j.d.comp }) };
+      out.set(JSON.stringify(rule), rule);
+    }
+  }
+  return [...out.values()];
+}
+
 export function generateCatalog(o: { lbcDir: string; outStories: string }): { components: number; examples: number } {
   const { lbcDir, outStories: out } = o;
   const examples: Example[] = [];
@@ -378,6 +400,8 @@ export function generateCatalog(o: { lbcDir: string; outStories: string }): { co
   const hookNames = new Set([...pages.map((p) => p.view.own), ...Object.values(shared.blueprints), ...Object.values(shared.files)].flatMap((s) => s.hooks.map((h) => h[0])));
   const info = Object.fromEntries([...hookNames].sort().map((n) => [n, hookInfo(n, audit)]));
   writeFileSync(join(out, "hook-info.js"), `// 자동 생성 파일: scripts/generate-slds-catalog.ts. hook마다 종류·이어지는 hook·기본값·util.css 허용·명세 항목\nexport default ${JSON.stringify(info)};\n`);
+  const rules = fixedRulesOf([...audit.judged.values()].flat(), FIXED_ITEMS);
+  writeFileSync(join(out, "fixed-rules.js"), `// 자동 생성 파일: scripts/generate-slds-catalog.ts. 반영 검사가 쓰는 9.4 고정 선언(정적 검사 판정)\nexport default ${JSON.stringify(rules)};\n`);
 
   for (const { comp, list, view } of pages) {
     const tagName = view.tag;

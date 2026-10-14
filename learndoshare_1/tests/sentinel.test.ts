@@ -6,11 +6,30 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { FIXED_ITEMS } from "../lib/fixed-list.ts";
 import { loadRuleContext } from "../lib/hooks-index.ts";
-import { cellLabel, cellStatus, fixedOf, hookItems, itemScore, judgeProbe, UNMATCHED_FIXED, type JudgeContext, type Probe } from "../lib/reflect.ts";
+import {
+  cellLabel,
+  cellStatus,
+  COMPUTED_FIXED_IDS,
+  coversProp,
+  exampleStyledHost,
+  fixedOf,
+  FOCUS_PROPS,
+  hookItems,
+  itemScore,
+  judgeProbe,
+  STATIC_PROPS,
+  UNMATCHED_FIXED,
+  type JudgeContext,
+  type Probe,
+} from "../lib/reflect.ts";
 import { checkUtilCss, COLOR_S_WHITELIST } from "../lib/rules.ts";
 import { buildSentinelUtilCss, sentinelPlan } from "../lib/sentinel.ts";
 import { SPEC_ITEMS } from "../lib/spec-items.ts";
 import { sentinelModule } from "../lib/storybook-plugin.ts";
+import { classify } from "../scripts/audit/classify.ts";
+import { judge as judgeStatic } from "../scripts/audit/report.ts";
+import { readSources } from "../scripts/audit/run.ts";
+import { fixedRulesOf } from "../scripts/generate-slds-catalog.ts";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const ctx = loadRuleContext({ pkgRoot: root });
@@ -88,6 +107,12 @@ test("sentinelModule은 모드의 규칙 문맥으로 센티널과 브랜드 색
   assert.ok(project.missing.some((m: { name: string }) => m.name === "--milvus-motion-easing"));
 });
 
+// 정적 검사가 두 모드 고정으로 판정한 선언(페이지가 쓰는 stories/slds-catalog/fixed-rules.js와 같은 함수로 만든다)
+const src = readSources();
+const rules = fixedRulesOf(judgeStatic(classify(src), SPEC_ITEMS, src.bridgeCss, FIXED_ITEMS), FIXED_ITEMS);
+/** 브라우저의 el.matches 대신 쓴다: 주어진 선택자 문자열과 똑같을 때만 맞는다 */
+const only = (...selectors: string[]) => (sel: string) => selectors.includes(sel);
+
 // 반영 검사 페이지가 브라우저에서 잰 계산값 한 쌍을 명세 항목으로 나누는 순수 함수(lib/reflect.ts)
 const j: JudgeContext = {
   fingerprints: new Map([
@@ -101,6 +126,7 @@ const j: JudgeContext = {
   hookItems: hookItems(SPEC_ITEMS),
   brandColors: new Set(["rgb(41, 118, 202)", "rgb(255, 255, 255)"]),
   fixed: FIXED_ITEMS,
+  rules,
 };
 const probe = (o: Partial<Probe>): Probe => ({ comp: "기본/Button", selector: "button.slds-button", prop: "color", base: "", sentinel: "", state: "static", fontSize: ["13px", "17.5px"], el: {}, ...o });
 const judge = (o: Partial<Probe>) => judgeProbe(probe(o), j).map((v) => `${v.item}:${v.status}`).sort();
@@ -142,9 +168,19 @@ test("계산값 변화를 명세 항목에 대응시킨다: 지문, 속성 묶�
   // 브랜드 색과 같은 값은 판정하지 않고 따로 센다(흰색도 on-accent와 같아 여기 온다)
   assert.deepEqual(judge({ prop: "color", base: "rgb(41, 118, 202)", sentinel: "rgb(41, 118, 202)" }), ["text-color:brand"]);
   assert.deepEqual(judge({ prop: "background-color", base: "rgb(255, 255, 255)", sentinel: "rgb(255, 255, 255)" }), ["surface:brand"]);
-  // 고정(설계 9.4)은 브랜드 색보다 먼저 본다: 파괴 버튼의 흰 글자는 고정이다
-  assert.deepEqual(judge({ selector: "button.slds-button.slds-button_destructive", base: "rgb(255, 255, 255)", sentinel: "rgb(255, 255, 255)" }), ["text-color:fixed"]);
-  assert.deepEqual(judge({ selector: "button.slds-button.slds-button_neutral[part='button']", prop: "line-height", base: "30px", sentinel: "30px", fontSize: ["13px", "13px"] }), ["line-height:fixed"]);
+  // 고정(설계 9.4)은 브랜드 색보다 먼저 본다(흰 글자 고정 선언이 맞으면 고정이다)
+  const whiteRule = { selector: ".x", pseudo: "", prop: "color", id: "destructive-success-text" };
+  assert.equal(judgeProbe(probe({ base: "rgb(255, 255, 255)", sentinel: "rgb(255, 255, 255)", matches: only(".x") }), { ...j, rules: [whiteRule] })[0].status, "fixed");
+  // LEX 컨트롤 높이: 정적 검사의 고정 선언 .slds-button { line-height: 1.875rem }
+  const lex: Partial<Probe> = { selector: "button.slds-button.slds-button_neutral[part='button']", prop: "line-height", base: "30px", sentinel: "30px", fontSize: ["13px", "13px"] };
+  assert.deepEqual(judge({ ...lex, matches: only(".slds-button") }), ["line-height:fixed"]);
+  // 고정 선언의 선택자가 요소에 맞지 않으면 고정이 아니다
+  assert.deepEqual(judge({ ...lex, matches: only() }), ["line-height:gap"]);
+  // 선택자 없는 고정 매처(미세 간격 0.125rem 이하는 어디서나)는 계산값에 그대로 맞춘다. 브라우저 기본 스타일의 option padding 2px
+  assert.deepEqual(judge({ selector: "option", prop: "padding-left", base: "2px", sentinel: "2px", fontSize: ["13px", "13px"] }), ["density:fixed"]);
+  // 곡선 ease는 CSS 초기값(곡선을 적지 않은 shorthand)이라 빈틈이 아니다
+  assert.deepEqual(judge({ prop: "animation-timing-function", base: "ease", sentinel: "ease", el: { "animation-duration": "1s" } }), []);
+  assert.deepEqual(judge({ prop: "animation-timing-function", base: "linear", sentinel: "linear", el: { "animation-duration": "1s" } }), ["motion-easing:gap"]);
   assert.deepEqual(judge({ prop: "letter-spacing", base: "normal", sentinel: "normal", parent: ["normal", "1.375px"] }), ["letter-spacing:fixed"]);
   // focus 뒤에 바뀐 그림자는 포커스 링이다
   assert.deepEqual(judge({ prop: "box-shadow", state: "focus", base: "rgb(1, 2, 3) 0px 0px 0px 2px", sentinel: "rgb(1, 2, 3) 0px 0px 0px 5.5px" }), ["focus-ring:reached"]);
@@ -178,62 +214,73 @@ test("센티널과 관계없는 변화는 반영으로 세지 않는다: 다른 
   assert.deepEqual(judge({ prop: "width", base: "31.4219px", sentinel: "22.75px" }), []);
 });
 
-// 설계 9.4 고정 목록의 두 모드 항목마다 대표 계산값이 그 항목으로 맞는지, 아니면 동적 검사로 맞출 수 없다고 적었는지 확인한다
-const FIXED_PROBES: Record<string, Partial<Probe>> = {
-  // 원본 매처는 컴포넌트 폴더 이름으로 시작한다(^toast …). 요소를 shadow에 둔 컴포넌트 태그로 맞춘다
-  "toast-duration": { comp: "기본/Toast", host: "lightning-toast", selector: "div.slds-notify.slds-notify_toast.fix-notify_toast_animation", prop: "animation-duration", base: "0.4s" },
-  spinner: { comp: "기본/Spinner", selector: "div.slds-spinner__dot-a::before", prop: "animation-duration", base: "1s" },
-  "color-picker-hue": { comp: "기본/Input", selector: "div.slds-color-picker__hue-slider", prop: "background-color", base: "rgb(1, 2, 3)" },
-  agentforce: { comp: "기본/Card", selector: "div.slds-card.slds-subtheme-agentic", prop: "padding-top", base: "12px" },
-  "image-scrim": { comp: "기본/File", selector: "div.slds-file__title.slds-file__title_scrim", prop: "background-color", base: "rgba(0, 0, 0, 0.5)" },
-  "destructive-success-text": { selector: "button.slds-button.slds-button_success", prop: "color", base: "rgb(255, 255, 255)" },
-  "global-header": { comp: "기본/Header", selector: "div.slds-global-header", prop: "background-color", base: "rgb(1, 2, 3)" },
-  // 애니메이션 아이콘의 svg는 클래스가 없다. 바로 위 부모의 .slds-icon-ellie로 맞춘다
-  "motion-out-of-band": { comp: "기본/Dynamic Icon", context: ["lightning-dynamic-icon", "span.slds-icon-ellie"], selector: "svg", prop: "animation-duration", base: "1.2s" },
-  // 원본은 padding-block(논리 속성). 계산값은 padding-top 4.8px로 나온다
-  "spacing-fine": { comp: "기본/Input", selector: "button.slds-button.slds-color-picker__summary-button.slds-button_icon[part='color-picker-button']", prop: "padding-top", base: "4.8px" },
-  "line-height-special": { comp: "기본/Datepicker", selector: "table.slds-datepicker__month", prop: "line-height", base: "20px" },
-  "lbc-internal": { comp: "기본/Combobox", host: "lightning-base-combobox", selector: "div.fix-slds-dropdown_lightning", prop: "margin-top", base: "4px" },
-  "focus-readonly-radius": { comp: "기본/Textarea", selector: "textarea.slds-textarea[readonly]", prop: "border-top-left-radius", base: "4px" },
-  "misc-shadow": { comp: "기본/Avatar", selector: "abbr.slds-avatar__initials", prop: "box-shadow", base: "rgb(1, 2, 3) 0px 1px 2px 0px" },
-  "image-focus-shadow": { comp: "기본/File", selector: "a.slds-file.slds-file_card:focus", state: "focus", prop: "box-shadow", base: "rgb(1, 2, 3) 0px 0px 3px 0px" },
-  "weight-special": { comp: "기본/Datatable", selector: "td.slds-cell-edit.slds-is-edited", prop: "font-weight", base: "700" },
-  // 원본은 border-block-start-width(논리 속성). 계산값은 border-top-width 4px로 나온다
-  "popover-accent-width": { comp: "기본/Popup", selector: "section.slds-popover.slds-popover_brand-top", prop: "border-top-width", base: "4px" },
-  "timeline-color": { comp: "기본/Timeline", selector: "div.slds-timeline__item_expandable.slds-timeline__item_call::before", prop: "background-color", base: "rgb(1, 2, 3)" },
-  "theme-translucent-text": { comp: "기본/Card", context: ["div.slds-theme_shade"], selector: "a", prop: "color", base: "rgba(255, 255, 255, 0.75)" },
-  "lex-control-height": { selector: "button.slds-button.slds-button_neutral[part='button']", prop: "line-height", base: "30px" },
-  // 원본은 `^\S+ .slds-path__item:first-child$`다. 컴포넌트 폴더 이름과 구조 상태(nth)로 맞춘다
-  "path-end-radius": { comp: "기본/Progress Indicator", host: "lightning-progress-indicator", nth: [":first-child"], selector: "lightning-progress-step.slds-path__item.slds-is-complete", prop: "border-top-left-radius", base: "15px" },
-  "form-letter-spacing": { selector: "button.slds-button", prop: "letter-spacing", base: "normal" },
-  "choice-label-weight": { comp: "기본/Radio Group", context: ["span.slds-radio", "label.slds-radio__label"], selector: "span.slds-form-element__label", prop: "font-weight", base: "400" },
-  "nubbin-shadow": { comp: "기본/Popup", selector: "section.slds-popover.slds-nubbin_left::before", prop: "box-shadow", base: "rgb(1, 2, 3) 1px 1px 2px 0px" },
-  "object-icon-background": { comp: "기본/Icon", selector: "span.slds-icon_container.slds-icon-standard-account", prop: "background-color", base: "rgb(1, 2, 3)" },
-};
+// 설계 9.4 고정은 정적 검사(scripts/audit)와 같은 결론이어야 한다(설계 9.6의 4)
+const kebab = (camel: string) => camel.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+const MEASURED = [...STATIC_PROPS, ...FOCUS_PROPS];
 
-test("설계 9.4 두 모드 고정 항목은 계산값으로 맞거나, 맞출 수 없는 이유가 있다(논리 속성·조상·클래스 뒤 상태 포함)", () => {
-  for (const f of FIXED_ITEMS.filter((x) => x.mode === "both")) {
-    const p = FIXED_PROBES[f.id];
-    assert.ok(Boolean(p) !== Boolean(UNMATCHED_FIXED[f.id]), `${f.id}: 대표 계산값과 맞출 수 없는 이유 중 하나만 있어야 한다`);
-    if (p) assert.equal(fixedOf(probe(p), FIXED_ITEMS)?.id, f.id, f.id);
+test("정적 검사가 두 모드 고정으로 판정한 선언은 그 선택자가 맞는 요소에서 고정이다(모든 선언)", () => {
+  let checked = 0;
+  for (const r of rules) {
+    const prop = MEASURED.find((m) => coversProp(r.prop, m));
+    if (!prop) continue; // z-index·투명도·커서처럼 재지 않는 속성
+    const p = probe({ host: r.comp && `lightning-${kebab(r.comp)}`, selector: `x${r.pseudo}`, prop, base: "1px", matches: only(r.selector) });
+    const ids = rules.filter((x) => x.selector === r.selector && x.pseudo === r.pseudo).map((x) => x.id);
+    assert.ok(ids.includes(fixedOf(p, FIXED_ITEMS, rules)?.id ?? ""), `${r.selector}${r.pseudo} ${r.prop}`);
+    checked++;
   }
-  // 목록에 없는 이름이 남지 않았다
-  const ids = new Set(FIXED_ITEMS.map((f) => f.id));
-  assert.deepEqual([...Object.keys(FIXED_PROBES), ...Object.keys(UNMATCHED_FIXED)].filter((id) => !ids.has(id)), []);
+  assert.ok(checked > 300, String(checked));
 });
 
-test("고정은 합의한 범위에서만 맞는다: 조상에만 그 클래스가 있거나 다른 컴포넌트면 고정이 아니다", () => {
-  const no = (o: Partial<Probe>) => assert.equal(fixedOf(probe(o), FIXED_ITEMS)?.id, undefined, JSON.stringify(o));
-  // 꼬리 팝오버 본문 안 버튼의 하드코딩 그림자: nubbin-shadow가 아니다(빈틈으로 남는다)
-  const inPopover = { comp: "기본/Popup", context: ["section.slds-popover.slds-nubbin_left", "div.slds-popover__body"], selector: "button.slds-button.slds-button_neutral" };
-  no({ ...inPopover, prop: "box-shadow", base: "rgb(1, 2, 3) 0px 2px 2px 0px" });
-  assert.deepEqual(judge({ ...inPopover, prop: "box-shadow", base: "rgb(1, 2, 3) 0px 2px 2px 0px", sentinel: "rgb(1, 2, 3) 0px 2px 2px 0px" }), ["shadow:gap"]);
-  // 강조 팝오버 본문 안 입력창의 두께, Agentforce 카드 안 버튼의 padding, datepicker 안 요소의 줄 간격
-  no({ context: ["section.slds-popover.slds-popover_brand-top"], selector: "input.slds-input[type='text']", prop: "border-top-width", base: "2px" });
-  no({ context: ["div.slds-card.slds-subtheme-agentic"], selector: "button.slds-button", prop: "padding-left", base: "12px" });
-  no({ context: ["div.slds-datepicker"], selector: "span.slds-day", prop: "line-height", base: "32px" });
-  // lbc-internal은 합의한 8개 컴포넌트(baseCombobox 등)만이다. textarea의 fix- 클래스는 아니다
-  no({ host: "lightning-textarea", selector: "div.fix-slds-form-element", prop: "margin-top", base: "4px" });
-  // Path 가운데 항목(첫째·마지막 자식이 아님)의 반경은 path-end-radius가 아니다
-  no({ host: "lightning-progress-indicator", selector: "lightning-progress-step.slds-path__item.slds-is-current", prop: "border-top-left-radius", base: "15px" });
+test("두 모드 고정 항목마다 고정 선언, 계산값 매처, 맞출 수 없는 이유 중 하나가 있다", () => {
+  for (const f of FIXED_ITEMS.filter((x) => x.mode === "both")) {
+    assert.ok(rules.some((r) => r.id === f.id) || COMPUTED_FIXED_IDS.includes(f.id) || UNMATCHED_FIXED[f.id], f.id);
+  }
+  // 계산값 매처: 정적 검사에 선언이 들어오지 않는 항목(매처가 비었거나 SLDS 2 값이 키워드)
+  const computed: Record<string, Partial<Probe>> = {
+    "form-letter-spacing": { selector: "button.slds-button", prop: "letter-spacing", base: "normal" },
+    "object-icon-background": { selector: "span.slds-icon_container.slds-icon-standard-account", prop: "background-color", base: "rgb(1, 2, 3)" },
+    "choice-label-weight": { context: ["span.slds-radio", "label.slds-radio__label"], selector: "span.slds-form-element__label", prop: "font-weight", base: "400" },
+  };
+  assert.deepEqual(Object.keys(computed).sort(), [...COMPUTED_FIXED_IDS].sort());
+  for (const [id, o] of Object.entries(computed)) assert.equal(fixedOf(probe(o), FIXED_ITEMS, rules)?.id, id, id);
+});
+
+test("고정은 정적 검사와 같은 범위다: 목록·후손 선언은 고정으로 잡고, 조상에만 클래스가 있거나 다른 컴포넌트면 빈틈이다", () => {
+  const rule = (pred: (r: (typeof rules)[number]) => boolean) => {
+    const r = rules.find(pred);
+    assert.ok(r, "정적 검사가 이 선언을 고정으로 판정한다");
+    return r!;
+  };
+  // 새던 것 1: Datatable 고정 머리글 padding 32px(spacing-fine, 원본 매처는 선택자 목록의 쉼표에 맞춘다)
+  const header = rule((r) => r.selector === ".slds-table_header-fixed_container" && r.prop === "padding-block-start");
+  const headerProbe = { comp: "기본/Datatable", selector: "div.slds-table_header-fixed_container.slds-scrollable_x", prop: "padding-top", base: "32px", sentinel: "32px", fontSize: ["13px", "13px"] as [string, string] };
+  assert.deepEqual(judge({ ...headerProbe, matches: only(header.selector) }), ["density:fixed"]);
+  // 새던 것 2: datepicker 안 .slds-day 줄 간격 2rem(line-height-special, 후손 선택자 선언)
+  const day = rule((r) => /\.slds-datepicker .*\.slds-day$/.test(r.selector) && r.prop === "line-height");
+  assert.deepEqual(judge({ comp: "기본/Calendar", selector: "span.slds-day", prop: "line-height", base: "32px", sentinel: "32px", fontSize: ["13px", "13px"], matches: only(day.selector) }), ["line-height:fixed"]);
+  // 숨던 것 1: 꼬리 팝오버 본문 안 버튼 그림자. nubbin 고정 선언은 모두 꼬리 요소 자신(마지막 compound)에 걸려 조상만으로는 맞지 않는다
+  const nubbins = rules.filter((r) => r.id === "nubbin-shadow");
+  assert.deepEqual(nubbins.filter((r) => !/nubbin[^ >+~]*$/.test(r.selector)), []);
+  const popoverButton = { comp: "기본/Popup", selector: "button.slds-button.slds-button_neutral", prop: "box-shadow", base: "rgb(1, 2, 3) 0px 2px 2px 0px", sentinel: "rgb(1, 2, 3) 0px 2px 2px 0px" };
+  assert.deepEqual(judge({ ...popoverButton, matches: only(".slds-button", ".slds-button_neutral", ".slds-popover__body .slds-button") }), ["shadow:gap"]);
+  // 숨던 것 2: 기본 컴포넌트 CSS의 고정 선언은 그 컴포넌트 안에서만 맞는다(lbc-internal은 합의한 8개 컴포넌트)
+  const logo = rule((r) => r.id === "lbc-internal" && r.comp === "baseCombobox" && r.prop === "margin-top");
+  const lbc = { selector: "div.x", prop: "margin-top", base: "4px", matches: only(logo.selector) };
+  assert.equal(fixedOf(probe({ ...lbc, host: "lightning-base-combobox" }), FIXED_ITEMS, rules)?.id, "lbc-internal");
+  assert.equal(fixedOf(probe({ ...lbc, host: "lightning-textarea" }), FIXED_ITEMS, rules), undefined);
+  // Path 양 끝 반경은 :first-child·:last-child 선언이다. 가운데 항목(그 선택자에 맞지 않음)은 고정이 아니다
+  const end = rule((r) => r.id === "path-end-radius");
+  const path = { host: "lightning-progress-step", selector: "lightning-progress-step.slds-path__item", prop: "border-top-left-radius", base: "15px" };
+  assert.equal(fixedOf(probe({ ...path, matches: only(end.selector) }), FIXED_ITEMS, rules)?.id, "path-end-radius");
+  assert.equal(fixedOf(probe({ ...path, matches: only(".slds-path__item") }), FIXED_ITEMS, rules), undefined);
+});
+
+test("예제가 자기 클래스로 꾸민 호스트는 그 호스트 자신을 판정하지 않는다", () => {
+  // Layout 예제: <lightning-layout-item padding="around-small" class="custom-box">, 예제 CSS .custom-box { padding: 1rem; … }
+  assert.equal(exampleStyledHost(["custom-box", "slds-p-around_small", "slds-col"]), true);
+  // 컴포넌트가 붙인 클래스(slds-·fix-)만 있으면 판정한다
+  assert.equal(exampleStyledHost(["slds-badge"]), false);
+  assert.equal(exampleStyledHost(["slds-path__item", "slds-is-complete"]), false);
+  assert.equal(exampleStyledHost(["fix-slds-x", "slds-y"]), false);
+  assert.equal(exampleStyledHost([]), false);
 });

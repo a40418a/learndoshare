@@ -8,6 +8,8 @@
 // - 처음에는 사람이 버튼으로 돌린다(CI는 헤드리스 브라우저라는 새 의존성이 필요하다)
 // 스토리 이름·값은 textContent로만 넣는다(innerHTML을 쓰지 않는다)
 import { brandColorHooks, missing, sentinelCss, sentinelHooks } from "virtual:milvus-sentinel";
+// 정적 검사가 두 모드 고정으로 판정한 선언(scripts/generate-slds-catalog.ts가 pnpm build:lwc·prepack 때 만든다)
+import fixedRules from "../slds-catalog/fixed-rules.js";
 import { brands, SENTINEL } from "../../.storybook/brand.ts";
 import { FIXED_ITEMS } from "../../lib/fixed-list.ts";
 import {
@@ -20,8 +22,10 @@ import {
   judgeProbe,
   PROBE_PROP,
   STATIC_PROPS,
+  exampleStyledHost,
   UNMATCHED_FIXED,
   type Cell,
+  type FixedRule,
   type JudgeContext,
   type Probe,
   type State,
@@ -108,7 +112,9 @@ function collect(doc: Document): Box[] {
   const visit = (e: Element, parent: number, disabled: boolean, inside: boolean, owner: string) => {
     const d = disabled || e.matches(":disabled, [aria-disabled='true']");
     const host = COMPONENT_HOST.test(e.localName);
-    const i = out.push({ el: e, parent, disabled: d, judged: (inside || host) && !isHelper(e), owner: host ? e.localName : owner, host }) - 1;
+    // 예제가 자기 클래스(custom-box 등)와 예제 CSS로 꾸민 호스트는 그 호스트 자신만 판정하지 않는다. 컴포넌트 안(inside)에서는 클래스를 컴포넌트가 붙인다
+    const judged = !isHelper(e) && (inside || (host && !exampleStyledHost([...e.classList])));
+    const i = out.push({ el: e, parent, disabled: d, judged, owner: host ? e.localName : owner, host }) - 1;
     for (const c of e.shadowRoot?.children ?? []) visit(c, i, d, inside || host, e.localName);
     for (const c of e.children) visit(c, i, d, inside, owner);
   };
@@ -141,10 +147,18 @@ function contextOf(nodes: Box[], i: number): string[] {
 }
 
 // 고정 매처에 넘길 요소 정보: 조상(합의한 후손 선택자 항목만 쓴다), 호스트 태그, 첫째·마지막 자식
-const whereOf = (nodes: Box[], i: number): Pick<Probe, "context" | "host" | "nth"> => ({
+// 고정 선언의 선택자가 요소에 맞는가. focus 상태에서 읽은 값은 이미 포커스를 뗀 뒤에 판정하므로 :focus 계열 조건은 맞은 것으로 본다
+const matcher = (e: Element, state: State) => (selector: string) => {
+  try {
+    return e.matches(state === "focus" ? selector.replace(/:focus(-visible|-within)?/g, "") || "*" : selector);
+  } catch {
+    return false; // 문서에서 쓸 수 없는 선택자(:host, ::part 등)
+  }
+};
+const whereOf = (nodes: Box[], i: number, state: State): Pick<Probe, "context" | "host" | "matches"> => ({
   context: contextOf(nodes, i),
   host: nodes[i].owner,
-  nth: [":first-child", ":last-child"].filter((n) => nodes[i].el.matches(n)),
+  matches: matcher(nodes[i].el, state),
 });
 
 // 움직임을 멈춘다. transition은 끝 값으로 보내고, animation(무한 반복은 끝낼 수 없다)은 멈추고 처음 값으로 맞춘다.
@@ -181,7 +195,7 @@ function buildContext(baseDoc: Document, sentDoc: Document): JudgeContext {
   }
   const palette = Object.keys(brands[0].palette).map((s) => `--slds-r-color-brand-${s}`);
   const brandColors = new Set([...brandColorHooks, ...palette].map((n) => measure(baseDoc, n, "color")).filter((v): v is string => !!v));
-  return { fingerprints, hookItems: hookItems(SPEC_ITEMS), brandColors, fixed: FIXED_ITEMS };
+  return { fingerprints, hookItems: hookItems(SPEC_ITEMS), brandColors, fixed: FIXED_ITEMS, rules: fixedRules as FixedRule[] };
 }
 
 function record(t: Tally, story: string, p: Probe, ctx: JudgeContext) {
@@ -270,7 +284,7 @@ async function measure(entry: Entry, area: HTMLElement, t: Tally, getCtx: (b: Do
         // 컴포넌트 경계(부모가 판정 밖)에서는 상속으로 바뀐 값(:root 자간, body 글자색 등)도 그 컴포넌트에 닿은 것으로 센다
         const boundary = !pseudo && !base[base[i].parent]?.judged;
         const selector = selectorOf(base[i].el, pseudo, state);
-        const where = whereOf(base, i);
+        const where = whereOf(base, i, state);
         for (const prop of STATIC_PROPS) {
           // 호스트의 바깥 여백은 놓인 자리(예제 배치의 slds-m-* 클래스)가 정한다
           if (base[i].host && prop.startsWith("margin-")) continue;
@@ -302,7 +316,7 @@ async function measure(entry: Entry, area: HTMLElement, t: Tally, getCtx: (b: Do
             const [pre, b, s] = [before[k][m][prop], fb[k][m][prop], fs[k][m][prop]];
             if (!base[j].judged || b === undefined || s === undefined || pre === b) continue;
             const selector = selectorOf(base[j].el, pseudo, "focus");
-            const p: Probe = { comp, selector, ...whereOf(base, j), prop, base: b, sentinel: s, state: "focus", fontSize: ["", ""], el: fb[k][m] };
+            const p: Probe = { comp, selector, ...whereOf(base, j, "focus"), prop, base: b, sentinel: s, state: "focus", fontSize: ["", ""], el: fb[k][m] };
             record(t, story, p, ctx);
           }
         }),
@@ -315,7 +329,8 @@ async function measure(entry: Entry, area: HTMLElement, t: Tally, getCtx: (b: Do
 
 // 결과 그리기 ----------------------------------------------------------------
 
-const STATUS_CLASS: Record<string, string> = { 반영: "", 일부: "slds-text-color_weak", 빈틈: "slds-text-color_error", 고정: "slds-text-color_weak" };
+// 빈틈이 있는 칸(빈틈, 일부 (hook · 빈틈))은 빈틈 색, 고정이 섞인 칸은 흐린 색이다. 같은 "일부"라도 빈틈이 있는지 색으로 가린다
+const statusClass = (label: string) => (label.includes("빈틈") ? "slds-text-color_error" : label.includes("고정") ? "slds-text-color_weak" : "");
 
 function table(head: string[], rows: (string | Node)[][]): HTMLElement {
   const th = (c: string) => el("th", { scope: "col" }, el("div", { className: "slds-truncate", title: c }, c));
@@ -356,7 +371,7 @@ function renderResult(t: Tally, out: HTMLElement) {
   const comps = [...t.table.keys()].sort();
   const status = (c: string, i: string) => {
     const s = cellLabel(t.table.get(c)?.get(i));
-    return el("span", { className: STATUS_CLASS[s.split(" ")[0]] ?? "" }, s);
+    return el("span", { className: statusClass(s) }, s);
   };
   const unmeasured = SPEC_ITEMS.filter((i) => !items.includes(i.id)).map((i) => i.label);
   out.replaceChildren(
@@ -367,10 +382,10 @@ function renderResult(t: Tally, out: HTMLElement) {
       el(
         "p",
         {},
-        "지금: hook이 닿고 빈틈이 없는 컴포넌트 수 / 해당 컴포넌트 수. 9.4 고정은 합의한 예외라 섞여 있어도 반영으로 센다. 정적 검사 방식: 정적 검사(pnpm audit:brand)처럼 가장 나쁜 상태를 따라, 고정이 섞인 칸은 반영으로 세지 않는다. 칸 글자는 \"원본과 hook\" 보기처럼 개수를 함께 보인다: hook이 닿고 고정이나 빈틈이 섞이면 일부다. native는 Storybook이 synthetic shadow로만 빌드해 잴 수 없다(설계 9.2: native 빌드는 발표 뒤).",
+        "두 열 모두 이 동적 검사의 결과다(pnpm audit:brand의 결과가 아니다). '지금(고정은 예외)'은 hook이 닿고 빈틈이 없는 컴포넌트를 센다. 9.4 고정은 합의한 예외라 섞여 있어도 센다. '지금(정적 검사 셈법)'은 정적 검사처럼 가장 나쁜 상태를 따라 고정이 섞인 칸을 세지 않는다. 칸 글자는 '원본과 hook' 보기처럼 개수를 함께 보인다. 빈틈이 있는 칸은 빨간 글자다. native는 Storybook이 synthetic shadow로만 빌드해 잴 수 없다(설계 9.2: native 빌드는 발표 뒤).",
       ),
       table(
-        ["항목", "지금", "정적 검사 방식", "native"],
+        ["항목", "지금(고정은 예외)", "지금(정적 검사 셈법)", "native"],
         items.map((id) => {
           const s = itemScore(t.table, id);
           return [label(id), `${s.reached} / ${s.total}`, `${s.strict} / ${s.total}`, "잴 수 없음"];
@@ -461,6 +476,25 @@ export function renderReflectCheck(): HTMLElement {
       "p",
       {},
       "모든 컴포넌트 스토리를 기본 브랜드와 센티널 브랜드로 그려 요소마다 계산된 스타일을 비교한다. 센티널은 util.css에서 쓸 수 있는 모든 hook과 브리지 변수에 서로 다른 값을 넣은 브랜드다(설계 9.6의 2). 값이 바뀌면 반영, 그대로면 빈틈 후보다. 바뀐 값이 어느 hook의 센티널 값과 같은지로 명세 항목을 고른다. 컴포넌트(lightning-*, c-*) 안의 요소만 판정하고, 공식 예제의 틀(예제 배경, kbd 등)은 세지 않는다. 스토리마다 iframe 두 개를 열어 몇 분 걸린다.",
+    ),
+    el(
+      "details",
+      {},
+      el("summary", {}, "이 검사의 한계"),
+      el(
+        "ul",
+        { className: "slds-list_dotted" },
+        ...[
+          "고정(설계 9.4)은 정적 검사(pnpm audit:brand)가 두 모드 고정으로 판정한 선언의 선택자가 요소에 맞고 속성이 같으면 고정으로 본다. 그 선언이 실제로 이겼는지(우선순위, @media)는 보지 않는다",
+          "정적 검사에 선언이 들어오지 않는 고정(폼 요소 자간, 개체 아이콘 바탕, 선택지 라벨 굵기)은 계산값으로 맞춘다. 맞출 수 없는 고정은 아래 '동적 검사로 맞출 수 없는 9.4 고정 항목'에 있다",
+          "hover·눌림(:active)은 재지 않는다. focus는 이 화면이 앞에 있어야 잰다",
+          "간격·너비·높이는 레이아웃으로도 바뀌어, hook 지문이 맞을 때만 반영으로 센다. calc로 곱한 간격은 반영으로도 빈틈으로도 세지 않는다",
+          "크기에 따라 그리는 요소 수가 달라지는 스토리(가상 스크롤, 넘침 탭)는 비교하지 않는다",
+          "브랜드 색과 같은 값(흰색 포함)은 판정하지 않는다. 하드코딩된 흰색 빈틈은 나오지 않는다",
+          "컴포넌트에 슬롯으로 넣은 예제 내용과, 예제가 자기 클래스(custom-box 등)로 꾸민 호스트 자신은 판정하지 않는다",
+          "native shadow는 잴 수 없다(Storybook은 synthetic으로만 빌드한다)",
+        ].map((t) => el("li", {}, t)),
+      ),
     ),
     el(
       "details",

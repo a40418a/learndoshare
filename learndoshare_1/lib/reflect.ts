@@ -21,15 +21,12 @@ export type Probe = {
   comp: string;
   /** 요소를 나타내는 선택자: 태그, 클래스, input의 type, readonly, part, 상태(:focus), 가상 요소(::before) */
   selector: string;
-  /**
-   * 가까운 조상 몇 개의 선택자(먼 것부터). 고정 목록 중 후손 선택자로 합의한 항목(COMPUTED_FIXED)만 쓴다.
-   * 일반 매처에는 쓰지 않는다. 조상에만 그 클래스가 있는 요소(꼬리 팝오버 본문 안 버튼)까지 고정으로 숨기 때문이다
-   */
+  /** 가까운 조상 몇 개의 선택자(먼 것부터). 정적 검사에 선언이 들어오지 않는 후손 선택자 고정(choice-label-weight)만 쓴다 */
   context?: string[];
-  /** 이 요소를 shadow 안에 둔 컴포넌트 태그(lightning-base-combobox). 고정 매처의 컴포넌트 폴더 이름(baseCombobox)에 맞춘다 */
+  /** 이 요소의 스타일을 정하는 컴포넌트 태그(lightning-base-combobox). 기본 컴포넌트 CSS의 고정 선언은 그 폴더(baseCombobox) 안에서만 맞는다 */
   host?: string;
-  /** 요소가 첫째·마지막 자식이면 ":first-child"·":last-child". 고정 매처의 :first-child 꼴에 맞춘다 */
-  nth?: string[];
+  /** 고정 선언의 선택자가 이 요소에 맞는가(페이지가 el.matches로 만든다). 없으면 고정 선언은 보지 않는다 */
+  matches?: (selector: string) => boolean;
   prop: string;
   base: string;
   sentinel: string;
@@ -50,6 +47,8 @@ export type JudgeContext = {
   /** 기본 브랜드에서 잰 브랜드 색 계열 hook의 계산값(rgb(…)) */
   brandColors: Set<string>;
   fixed: FixedItem[];
+  /** 정적 검사가 고정으로 판정한 선언(FixedRule). 없으면 계산값 매처만 본다 */
+  rules?: FixedRule[];
 };
 
 const SIDES = ["top", "right", "bottom", "left"];
@@ -233,7 +232,8 @@ function trivial(prop: string, value: string, el: Record<string, string>, select
   const side = /^border-(\w+)-color$/.exec(prop)?.[1];
   if (side) return el[`border-${side}-width`] === "0px";
   if (prop === "outline-color") return el["outline-width"] === "0px";
-  if (/-timing-function$/.test(prop)) return keyword(el[prop.replace("timing-function", "duration")] ?? "0s");
+  // 곡선: 시간이 0이면 곡선이 없다. ease는 CSS 초기값이다(animation: x 1s처럼 곡선을 적지 않은 shorthand). 정적 검사도 적은 곡선만 센다
+  if (/-timing-function$/.test(prop)) return keyword(el[prop.replace("timing-function", "duration")] ?? "0s") || splitTop(value).every((v) => v === "ease");
   return false;
 }
 
@@ -248,37 +248,34 @@ function followsFont(p: Probe): boolean {
   return Math.abs(b / fb - s / fs) <= 0.005 * Math.abs(b / fb);
 }
 
-// 고정 매처는 정적 검사의 원본 선언에 맞춘 것이다. 계산값에 맞출 때 지키는 것:
-// - 일반 매처는 요소 자신의 선택자로만 맞춘다(조상을 붙이지 않는다). 조상에만 그 클래스가 있는 요소까지 고정으로 숨기면
-//   9.4에서 합의한 범위보다 넓어진다(설계 9.6의 4: 범위를 넓히려면 합의가 필요하다)
-// - 원본 매처가 컴포넌트 폴더 이름(baseCombobox, toast)으로 시작하면, 요소를 shadow에 둔 컴포넌트 태그를 폴더 이름으로 바꿔 맞춘다
-// - 원본 값 문법(rem, rgb(…, 0.x))이나 후손 선택자로 합의한 항목만 아래 계산값 매처를 둔다
-const CONTROL = /\.slds-(button|input|input_faux|select|radio_button|checkbox_button)(?![\w-])/;
-const COMPUTED_FIXED: Record<string, (p: Probe, names: string[], f: FixedItem) => boolean> = {
-  // 텍스트 컨트롤의 line-height 1.875rem(30px). 원본 값이 rem이다
-  "lex-control-height": (p) => p.prop === "line-height" && p.base === "30px" && CONTROL.test(p.selector),
-  // 브라우저 기본 스타일이 폼 요소의 letter-spacing을 normal로 다시 정한다(원본 매처가 비어 있다)
+/**
+ * 9.4 고정 선언 하나. scripts/generate-slds-catalog.ts의 fixedRulesOf가 정적 검사 판정에서 만든다(stories/slds-catalog/fixed-rules.js).
+ * 정적 검사가 지금 모드에서 두 모드 고정으로 판정한 선언의 선택자(목록을 하나씩 나눈 것, 가상 요소는 pseudo로 뗀다)와 속성이다.
+ * comp는 기본 컴포넌트 CSS 선언의 폴더 이름이다(그 컴포넌트 안에서만 맞는다)
+ */
+export type FixedRule = { selector: string; pseudo: string; prop: string; id: string; comp?: string };
+
+// 고정은 정적 검사와 같은 범위에서만 맞춘다(설계 9.6의 4: 범위를 넓히려면 합의가 필요하다).
+// 정적 검사는 매처를 선언의 선택자에 맞추므로(쉼표 목록, 후손 선택자, :first-child 포함), 동적 검사는 그 선언의 선택자가 요소에 맞는지
+// (브라우저 el.matches)와 속성으로 본다. 정규식을 계산값 선택자에 다시 맞추면 조상만 맞아도 고정이 되거나(넓음) 목록·후손 선언이 새어(좁음) 어긋난다.
+// 아래는 정적 검사에 선언이 들어오지 않는 고정 항목만 계산값으로 맞춘다
+const COMPUTED_FIXED: Record<string, (p: Probe) => boolean> = {
+  // 브라우저 기본 스타일이 폼 요소의 letter-spacing을 normal로 다시 정한다(매처가 비어 있다)
   "form-letter-spacing": (p) => p.prop === "letter-spacing" && /^(button|input|select|textarea)(?![\w-])/.test(p.selector),
-  // SLDS 2가 개체 아이콘 클래스마다 c hook으로 정한 배경색(원본 매처가 비어 있다)
+  // SLDS 2가 개체 아이콘 클래스마다 c hook으로 정한 배경색(매처가 비어 있다)
   "object-icon-background": (p) => p.prop === "background-color" && /\.slds-icon-(standard|custom|action|doctype)-/.test(p.selector),
-  // 애니메이션 아이콘 안의 클래스 없는 svg(`.slds-icon-ellie svg` 꼴). 바로 위 부모까지만 본다
-  "motion-out-of-band": (p, names, f) => {
-    const parent = p.context?.at(-1);
-    return parent !== undefined && matchesItem(f, selectorVariants(parent).map((v) => `${p.comp} ${v} ${p.selector}`), names, p.base);
-  },
-  // 원본은 `.slds-theme_x a:not(.slds-button_neutral)`와 rgb(255, 255, 255, 0.x)다. 계산값은 rgba(…)로 나온다
-  "theme-translucent-text": (p) =>
-    p.prop === "color" && /^a(?![\w-])/.test(p.selector) && /^rgba\(255, 255, 255, 0?\.\d+\)$/.test(p.base) && (p.context ?? []).some((s) => /\.slds-theme_/.test(s)),
-  // 원본은 `^\S+ .slds-radio .slds-form-element__label$` 꼴의 후손 선택자다
+  // SLDS 2 값이 키워드(normal)라 정적 검사에 들어오지 않는다(lib/fixed-list.ts). 원본은 `.slds-radio .slds-form-element__label` 꼴의 후손 선택자다
   "choice-label-weight": (p) =>
     p.prop === "font-weight" &&
     /\.slds-form-element__label(?![\w-])/.test(p.selector) &&
     (p.context ?? []).some((s) => /\.slds-(radio|checkbox|checkbox_toggle)(?![\w-])/.test(s)),
 };
+/** 정적 검사에 선언이 들어오지 않아 계산값으로 맞추는 고정 항목 id */
+export const COMPUTED_FIXED_IDS = Object.keys(COMPUTED_FIXED);
 
 /**
  * 동적 검사로 맞출 수 없는 두 모드 고정 항목과 이유. 페이지가 고정 목록 옆에 보여 준다.
- * tests/sentinel.test.ts가 두 모드 고정 항목마다 대표 계산값이 fixedOf로 맞거나 여기 있는지 확인한다
+ * tests/sentinel.test.ts가 두 모드 고정 항목마다 고정 선언·계산값 매처·여기 중 하나에 있는지 확인한다
  */
 export const UNMATCHED_FIXED: Record<string, string> = {
   "icon-glyph": "채움색(fill)과 아이콘 너비·높이는 빈틈으로 세지 않는다",
@@ -289,9 +286,11 @@ export const UNMATCHED_FIXED: Record<string, string> = {
   "fade-gradient": "그라데이션(background-image)은 재지 않는다",
   "control-sort-icon-size": "아이콘 너비·높이는 빈틈으로 세지 않는다",
   "disabled-cursor-link-underline": "커서와 밑줄(text-decoration)은 재지 않는다",
+  "destructive-success-text":
+    "정적 검사에 이 항목으로 고정된 선언이 없다(SLDS 2 선택자에 글자색 선언이 없고 c hook으로 정해진다). 흰 글자는 브랜드 흰색(on-accent)과 같아 판정하지 않고 따로 센다",
 };
 
-// 계산값은 물리 longhand다(border-top-width). 고정 목록은 shorthand와 논리 속성(padding-block, border-block-start-width)을 쓴다.
+// 계산값은 물리 longhand다(border-top-width). 고정 선언은 shorthand와 논리 속성(padding-block, border-block-start-width)을 쓴다.
 // Storybook은 가로쓰기 왼쪽→오른쪽이라 물리 방향과 논리 방향이 하나로 대응한다
 const LOGICAL: Record<string, [string, string]> = { top: ["block", "start"], bottom: ["block", "end"], left: ["inline", "start"], right: ["inline", "end"] };
 const CORNER: Record<string, string> = { "top-left": "start-start", "top-right": "start-end", "bottom-right": "end-end", "bottom-left": "end-start" };
@@ -310,47 +309,33 @@ export function family(prop: string): string[] {
   return [...out];
 }
 
-/**
- * 고정 매처에 맞출 선택자들. 전체 선택자와, 클래스 하나마다 상태·가상 요소를 바로 붙인 꼴(태그 있는 것과 없는 것)이다.
- * 원본 매처는 `.slds-file:focus`, `.slds-truncate::after`, `.slds-path__item:first-child`처럼 클래스 바로 뒤에 상태가 오는데,
- * 계산값 선택자는 클래스를 모두 적은 뒤에 붙이기 때문이다. nth는 요소가 첫째·마지막 자식일 때의 구조 상태다
- */
-function selectorVariants(selector: string, nth: string[] = []): string[] {
-  const pseudo = /::[\w-]+$/.exec(selector)?.[0] ?? "";
-  const rest = selector.slice(0, selector.length - pseudo.length);
-  const state = /(:[\w-]+)+$/.exec(rest)?.[0] ?? "";
-  const head = rest.slice(0, rest.length - state.length);
-  const tag = /^[\w-]+/.exec(head)?.[0] ?? "";
-  const classes = head.replace(/\[[^\]]*\]/g, "").match(/\.[\w-]+/g) ?? [];
-  const out = new Set([selector]);
-  for (const c of classes) {
-    for (const n of ["", ...nth]) out.add(`${tag}${c}${n}${state}${pseudo}`).add(`${c}${n}${state}${pseudo}`);
-  }
-  return [...out];
-}
-
 /** 컴포넌트 태그 → 기본 컴포넌트 폴더 이름: lightning-base-combobox → baseCombobox (정적 검사의 lbc 컴포넌트 이름) */
-const folderOf = (tag: string) => tag.replace(/^(lightning|c)-/, "").replace(/-(\w)/g, (_, c: string) => c.toUpperCase());
+export const folderOf = (tag: string) => tag.replace(/^(lightning|c)-/, "").replace(/-(\w)/g, (_, c: string) => c.toUpperCase());
 
-// lib/fixed-list.ts의 match 계약: 주어진 조건을 모두 만족하면 맞는다. 매처가 여러 개면 하나라도 맞으면 된다. js 출처는 CSS 값과 맞추지 않는다
-function matchesItem(f: FixedItem, targets: string[], names: string[], value: string): boolean {
-  return [f.match].flat().some(
-    (m) =>
-      m.source !== "js" &&
-      (!m.selector || targets.some((t) => m.selector!.test(t))) &&
-      (!m.property || [m.property].flat().some((q) => names.some((n) => n === q || n.startsWith(`${q}-`)))) &&
-      (!m.value || m.value.test(value)),
-  );
+/** 고정 선언의 속성(shorthand·논리 속성)이 이 계산값 속성을 정하는가 */
+export const coversProp = (ruleProp: string, prop: string) => family(prop).some((n) => n === ruleProp || n.startsWith(`${ruleProp}-`));
+
+/**
+ * 9.4 고정 목록 중 이 값에 맞는 항목. 동적 검사는 지금(synthetic)만 재므로 두 모드 고정만 본다.
+ * 고정 선언(rules)은 선택자가 요소에 맞고(p.matches), 가상 요소와 속성이 같고, 기본 컴포넌트 선언이면 그 컴포넌트 안일 때 맞는다
+ * ponytail: 같은 요소·속성에 맞는 선언 중 어느 것이 이겼는지(우선순위, @media)는 보지 않는다. 고정 선언이 하나라도 맞으면 고정이다
+ */
+export function fixedOf(p: Probe, fixed: FixedItem[], rules: FixedRule[] = []): FixedItem | undefined {
+  const pseudo = /::(before|after)$/.exec(p.selector)?.[0] ?? "";
+  const folder = p.host ? folderOf(p.host) : undefined;
+  const rule = rules.find((r) => r.pseudo === pseudo && (!r.comp || r.comp === folder) && coversProp(r.prop, p.prop) && p.matches?.(r.selector));
+  if (rule) return fixed.find((f) => f.id === rule.id);
+  // 선택자 없는 매처(미세 간격 0.125rem 이하 "어디서나" 등)는 선택자에 묶이지 않으므로 계산값에 그대로 맞춘다(브라우저 기본 스타일의 2px 포함)
+  const anywhere = (f: FixedItem) =>
+    [f.match].flat().some((m) => !m.selector && m.source !== "js" && !!m.property && [m.property].flat().some((q) => coversProp(q, p.prop)) && (!m.value || m.value.test(p.base)));
+  return fixed.find((f) => f.mode === "both" && (COMPUTED_FIXED[f.id]?.(p) || anywhere(f)));
 }
 
-/** 9.4 고정 목록 중 이 값에 맞는 항목. 동적 검사는 지금(synthetic)만 재므로 두 모드 모두 고정인 항목만 본다 */
-export function fixedOf(p: Probe, fixed: FixedItem[]): FixedItem | undefined {
-  const names = family(p.prop);
-  const prefixes = [p.comp, ...(p.host ? [folderOf(p.host)] : [])];
-  const variants = selectorVariants(p.selector, p.nth);
-  const targets = prefixes.flatMap((pre) => variants.map((v) => `${pre} ${v}`));
-  return fixed.find((f) => f.mode === "both" && (COMPUTED_FIXED[f.id]?.(p, names, f) || matchesItem(f, targets, names, p.base)));
-}
+/**
+ * 예제가 꾸민 호스트인가. 공식 예제는 호스트에 자기 클래스(custom-box 등)를 붙이고 예제 CSS로 padding·테두리·바탕을 정한다.
+ * 컴포넌트가 호스트에 붙이는 클래스는 slds-·fix-로 시작하므로, 그 밖의 클래스가 있으면 호스트 자신은 판정하지 않는다(그 shadow 안은 판정한다)
+ */
+export const exampleStyledHost = (classes: string[]) => classes.some((c) => !/^(slds-|fix-)/.test(c));
 
 /** 계산값 한 쌍 → 명세 항목별 판정. 판정할 것이 없으면 빈 배열 */
 export function judgeProbe(p: Probe, ctx: JudgeContext): Verdict[] {
@@ -380,7 +365,7 @@ export function judgeProbe(p: Probe, ctx: JudgeContext): Verdict[] {
   if (!item || (keyword(p.base) ? !parentChanged : trivial(p.prop, p.base, p.el, p.selector))) return [];
   // 체크박스·라디오·range·파일 input은 숨기거나 브라우저가 그린다. 글자색과 포커스 윤곽은 보이는 faux 요소가 맡는다
   if (UA_INPUT.test(p.selector) && (color || p.prop.startsWith("outline"))) return [];
-  const f = fixedOf(p, ctx.fixed);
+  const f = fixedOf(p, ctx.fixed, ctx.rules);
   if (f) return [{ item, status: "fixed", fixed: f.label }];
   // 브랜드 색과 같은 값은 org 테마가 원본이라 util.css 항목의 빈틈이 아니다. 하드코딩된 흰색도 on-accent(흰색)와 같아 여기로 온다
   return [{ item, status: color && ctx.brandColors.has(p.base) ? "brand" : "gap" }];
