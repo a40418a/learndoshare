@@ -1,6 +1,7 @@
 // 반영 검사 페이지(설계 9.6의 2). 스토리마다 기본 브랜드와 센티널 브랜드(lib/sentinel.ts)로 iframe을 하나씩 열어
 // shadowRoot까지 내려가며 요소마다 getComputedStyle(::before·::after 포함)을 비교하고, lib/reflect.ts로 명세 항목의 반영·빈틈·고정을 낸다.
-// - 센티널은 스토리 URL의 globals=brand:milvus-sentinel로 연다(.storybook/brand.ts SENTINEL). 처음부터 센티널로 그려 transition이 끼지 않는다
+// - 센티널은 스토리 URL의 globals=brand:milvus-sentinel로 연다(.storybook/brand.ts SENTINEL). 처음부터 센티널로 그린다
+// - 재기 전에 두 문서의 움직임을 멈춘다(transition은 끝 값, animation은 처음 값). 센티널 시간(0.777s)이 길어 중간값을 읽지 않게 한다
 // - disabled는 스토리 변형(disabled 스토리)에서 :disabled·aria-disabled 요소로 잰다. focus는 focus()를 부르고 transition을 끝낸 뒤 잰다
 // - 판정은 컴포넌트 호스트(lightning-*, c-*) 안의 요소만 한다. 상속 속성은 컴포넌트 경계에서 한 번 센다
 // - 두 그림의 요소 수가 다르면(가상 스크롤, 넘침 메뉴처럼 크기에 따라 그리는 것) 그 스토리는 비교하지 않고 "재지 못한 스토리"에 적는다
@@ -19,6 +20,7 @@ import {
   judgeProbe,
   PROBE_PROP,
   STATIC_PROPS,
+  UNMATCHED_FIXED,
   type Cell,
   type JudgeContext,
   type Probe,
@@ -47,7 +49,15 @@ const COMPONENT_HOST = /^(lightning|c)-/;
 type Entry = { id: string; title: string; name: string; type: string; exportName?: string };
 type Box = { el: Element; parent: number; disabled: boolean; judged: boolean };
 type Row = { comp: string; item: string; selector: string; prop: string; value: string; story: string; fixed?: string; count: number };
-type Tally = { table: Map<string, Map<string, Cell>>; gaps: Map<string, Row>; fixed: Map<string, Row>; errors: [story: string, message: string][]; done: number };
+type Tally = {
+  table: Map<string, Map<string, Cell>>;
+  gaps: Map<string, Row>;
+  fixed: Map<string, Row>;
+  errors: [story: string, message: string][];
+  done: number;
+  /** 브랜드 색과 같아 판정하지 않은 값의 수 */
+  brand: number;
+};
 
 type Props<K extends keyof HTMLElementTagNameMap> = Partial<Omit<HTMLElementTagNameMap[K], "style">>;
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, props: Props<K> = {}, ...children: (Node | string)[]): HTMLElementTagNameMap[K] {
@@ -92,11 +102,12 @@ async function ready(frame: HTMLIFrameElement): Promise<void> {
 // shadowRoot까지 내려가며 요소를 앞순서로 모은다. synthetic shadow에서 호스트의 children은 light DOM(슬롯에 넣은 요소)이다
 function collect(doc: Document): Box[] {
   const out: Box[] = [];
+  // 컴포넌트의 shadow 안만 판정한다. 컴포넌트에 슬롯으로 넣은 light DOM(예제의 본문 p, custom-box div)은 예제 것이다
   const visit = (e: Element, parent: number, disabled: boolean, inside: boolean) => {
     const d = disabled || e.matches(":disabled, [aria-disabled='true']");
     const i = out.push({ el: e, parent, disabled: d, judged: inside && !isHelper(e) }) - 1;
-    const childInside = inside || COMPONENT_HOST.test(e.localName);
-    for (const c of [...(e.shadowRoot?.children ?? []), ...e.children]) visit(c, i, d, childInside);
+    for (const c of e.shadowRoot?.children ?? []) visit(c, i, d, inside || COMPONENT_HOST.test(e.localName));
+    for (const c of e.children) visit(c, i, d, inside);
   };
   for (const c of doc.body.children) {
     if (!SKIP_TAGS.has(c.localName) && !SKIP_IDS.test(c.id) && !isHelper(c)) visit(c, -1, false, false);
@@ -114,9 +125,29 @@ const selectorOf = (e: Element, pseudo: string, state: State) =>
   e.localName +
   [...e.classList].map((c) => `.${c}`).join("") +
   (e.localName === "input" ? `[type='${(e as HTMLInputElement).type}']` : "") +
+  (e.hasAttribute("readonly") ? "[readonly]" : "") +
   (e.getAttribute("part") ? `[part='${e.getAttribute("part")}']` : "") +
   (state === "focus" ? ":focus" : "") +
   pseudo;
+
+// 가까운 조상 셋의 선택자(먼 것부터). 고정 목록의 후손 선택자(.slds-theme_x a, 애니메이션 아이콘 안의 svg)를 맞출 때만 쓴다
+function contextOf(nodes: Box[], i: number): string {
+  const out: string[] = [];
+  for (let p = nodes[i].parent; p >= 0 && out.length < 3; p = nodes[p].parent) out.unshift(selectorOf(nodes[p].el, "", "static"));
+  return out.join(" ");
+}
+
+// 움직임을 멈춘다. transition은 끝 값으로 보내고, animation(무한 반복은 끝낼 수 없다)은 멈추고 처음 값으로 맞춘다.
+// 센티널 시간(0.777s)이 기본보다 길어 렌더 뒤에 움직이는 요소(팝오버, carousel, 점 애니메이션)의 중간값을 읽지 않게 한다
+function settle(doc: Document) {
+  for (const a of doc.getAnimations()) {
+    if ("transitionProperty" in a) a.finish();
+    else {
+      a.pause();
+      a.currentTime = 0;
+    }
+  }
+}
 
 // 센티널 hook마다 계산값을 재어 지문을 만들고, 기본 브랜드에서 브랜드 색 계열을 잰다(lib/reflect.ts JudgeContext)
 function buildContext(baseDoc: Document, sentDoc: Document): JudgeContext {
@@ -131,6 +162,8 @@ function buildContext(baseDoc: Document, sentDoc: Document): JudgeContext {
   };
   const fingerprints = new Map<string, string[]>();
   for (const [name, kind] of sentinelHooks as [string, Kind][]) {
+    // :root의 일반 속성(letter-spacing)은 var()로 읽을 수 없다. 자간은 속성 묶음으로 센다
+    if (!name.startsWith("--")) continue;
     const prop = PROBE_PROP[kind];
     const value = prop && measure(sentDoc, name, prop);
     const key = value && fingerprintKey(kind, value);
@@ -143,6 +176,10 @@ function buildContext(baseDoc: Document, sentDoc: Document): JudgeContext {
 
 function record(t: Tally, story: string, p: Probe, ctx: JudgeContext) {
   for (const v of judgeProbe(p, ctx)) {
+    if (v.status === "brand") {
+      t.brand++;
+      continue;
+    }
     const row = t.table.get(p.comp) ?? new Map<string, Cell>();
     t.table.set(p.comp, row);
     const cell = row.get(v.item) ?? { reached: 0, gap: 0, fixed: 0 };
@@ -168,11 +205,19 @@ function focusTargets(nodes: Box[], i: number): number[] {
   return out;
 }
 
-// 브라우저 창에 포커스가 없으면 :focus가 맞지 않는다. 그때는 undefined(재지 못함)
-function focusAndRead(nodes: Box[], i: number, targets: number[]): Record<string, string>[][] | undefined {
+/**
+ * 포커스하고 읽는다. :focus가 맞지 않으면 까닭을 가른다
+ * - "element": 요소가 포커스를 받지 못한다(href 없는 a, 숨긴 패널 안의 버튼). 그 요소만 건너뛴다
+ * - "window": 브라우저 창에 포커스가 없다. iframe 창을 포커스해 봐도 문서에 포커스가 없으면 이 경우다
+ * 바깥 문서의 hasFocus()로는 가르지 못한다. 포커스를 가진 iframe을 지우면 창이 앞에 있어도 거짓이 된다(실측)
+ */
+function focusAndRead(nodes: Box[], i: number, targets: number[]): Record<string, string>[][] | "element" | "window" {
   const doc = nodes[i].el.ownerDocument;
   (nodes[i].el as HTMLElement).focus({ preventScroll: true, focusVisible: true } as FocusOptions);
-  if (!doc.hasFocus()) return undefined;
+  if (!nodes[i].el.matches(":focus")) {
+    doc.defaultView!.focus();
+    return doc.hasFocus() ? "element" : "window";
+  }
   // 포커스 링의 transition을 끝까지 돌려 끝 값을 읽는다
   for (const a of doc.getAnimations()) if ("transitionProperty" in a) a.finish();
   const read = targets.map((j) => PSEUDOS.map((ps) => snap(nodes[j].el, ps, FOCUS_PROPS) ?? {}));
@@ -186,6 +231,8 @@ async function measure(entry: Entry, area: HTMLElement, t: Tally, getCtx: (b: Do
     await Promise.all(frames.map(ready));
     const [baseDoc, sentDoc] = frames.map((f) => f.contentDocument!);
     const ctx = getCtx(baseDoc, sentDoc);
+    settle(baseDoc);
+    settle(sentDoc);
     let [base, sent] = [collect(baseDoc), collect(sentDoc)];
     if (base.length !== sent.length) {
       await sleep(800);
@@ -210,8 +257,9 @@ async function measure(entry: Entry, area: HTMLElement, t: Tally, getCtx: (b: Do
         // 컴포넌트 경계(부모가 판정 밖)에서는 상속으로 바뀐 값(:root 자간, body 글자색 등)도 그 컴포넌트에 닿은 것으로 센다
         const boundary = !pseudo && !base[base[i].parent]?.judged;
         const selector = selectorOf(base[i].el, pseudo, state);
+        const context = contextOf(base, i);
         for (const prop of STATIC_PROPS) {
-          const p: Probe = { comp, selector, prop, base: b[prop], sentinel: s[prop], state, fontSize: [b["font-size"], s["font-size"]], el: b };
+          const p: Probe = { comp, selector, context, prop, base: b[prop], sentinel: s[prop], state, fontSize: [b["font-size"], s["font-size"]], el: b };
           if (parent && INHERITED.has(prop) && !(boundary && b[prop] !== s[prop])) p.parent = [parent[0][prop], parent[1][prop]];
           record(t, story, p, ctx);
         }
@@ -227,16 +275,19 @@ async function measure(entry: Entry, area: HTMLElement, t: Tally, getCtx: (b: Do
       const targets = focusTargets(base, i);
       const before = targets.map((j) => PSEUDOS.map((ps) => snap(base[j].el, ps, FOCUS_PROPS) ?? {}));
       const [fb, fs] = [focusAndRead(base, i, targets), focusAndRead(sent, i, targets)];
-      if (!fb || !fs) {
+      // 브라우저 창에 포커스가 없으면 이 스토리의 나머지 요소도 재지 못한다
+      if (fb === "window" || fs === "window") {
         t.errors.push([`${entry.title} / ${entry.name}`, "브라우저 창에 포커스가 없어 focus 상태를 재지 못했다. 이 화면을 앞에 두고 다시 돌린다"]);
         break;
       }
+      if (fb === "element" || fs === "element") continue;
       targets.forEach((j, k) =>
         PSEUDOS.forEach((pseudo, m) => {
           for (const prop of FOCUS_PROPS) {
             const [pre, b, s] = [before[k][m][prop], fb[k][m][prop], fs[k][m][prop]];
             if (!base[j].judged || b === undefined || s === undefined || pre === b) continue;
-            const p: Probe = { comp, selector: selectorOf(base[j].el, pseudo, "focus"), prop, base: b, sentinel: s, state: "focus", fontSize: ["", ""], el: fb[k][m] };
+            const selector = selectorOf(base[j].el, pseudo, "focus");
+            const p: Probe = { comp, selector, context: contextOf(base, j), prop, base: b, sentinel: s, state: "focus", fontSize: ["", ""], el: fb[k][m] };
             record(t, story, p, ctx);
           }
         }),
@@ -298,7 +349,11 @@ function renderResult(t: Tally, out: HTMLElement) {
       "section",
       { className: "sb-stack" },
       el("h2", { className: "slds-text-heading_medium" }, "판정 (설계 9.6의 4: 반영된 컴포넌트 수 / 해당 컴포넌트 수)"),
-      el("p", {}, "반영은 그 항목에서 센티널로 바뀐 값만 있는 컴포넌트다. 일부·빈틈·고정은 해당 컴포넌트에만 센다. native는 Storybook이 synthetic shadow로만 빌드해 잴 수 없다(설계 9.2: native 빌드는 발표 뒤)."),
+      el(
+        "p",
+        {},
+        "칸 상태는 정적 검사처럼 가장 나쁜 것을 따른다(빈틈 > 고정 > 반영). 일부는 빈틈 중에서 센티널로 바뀐 값도 있는 칸이다. 반영은 반영 칸만 세고, 일부·빈틈·고정은 해당 컴포넌트에만 센다. native는 Storybook이 synthetic shadow로만 빌드해 잴 수 없다(설계 9.2: native 빌드는 발표 뒤).",
+      ),
       table(
         ["항목", "지금", "native"],
         items.map((id) => {
@@ -307,6 +362,11 @@ function renderResult(t: Tally, out: HTMLElement) {
         }),
       ),
       el("p", {}, `이 검사로 재지 않은 항목: ${unmeasured.join(", ")}. hover·눌림은 재지 않는다(마우스를 올린 상태를 만들지 않는다).`),
+      el(
+        "p",
+        {},
+        `브랜드 색과 같아 판정하지 않은 값 ${t.brand}곳: 브랜드 색은 org 테마가 원본이라 util.css의 빈틈으로 세지 않는다. 흰색도 브랜드 흰 글자(on-accent)와 같아 함께 빠지므로, 하드코딩된 흰색은 이 검사의 빈틈에 나오지 않는다.`,
+      ),
     ),
     el(
       "section",
@@ -316,6 +376,15 @@ function renderResult(t: Tally, out: HTMLElement) {
     ),
     rowsBlock("빈틈", [...t.gaps.values()], false),
     rowsBlock("고정 (설계 9.4 목록에 있는 빈틈)", [...t.fixed.values()], true),
+    el(
+      "details",
+      {},
+      el("summary", {}, `동적 검사로 맞출 수 없는 9.4 고정 항목 ${Object.keys(UNMATCHED_FIXED).length}개`),
+      table(
+        ["고정 항목", "이유"],
+        Object.entries(UNMATCHED_FIXED).map(([id, why]) => [FIXED_ITEMS.find((f) => f.id === id)?.label ?? id, why]),
+      ),
+    ),
     el(
       "section",
       { className: "sb-stack" },
@@ -342,7 +411,7 @@ export function renderReflectCheck(): HTMLElement {
     try {
       const index = (await (await fetch("index.json")).json()) as { entries: Record<string, Entry> };
       const entries = Object.values(index.entries).filter((e) => e.type === "story" && !DOC_TITLE.test(e.title) && e.exportName !== SOURCE_STORY);
-      const t: Tally = { table: new Map(), gaps: new Map(), fixed: new Map(), errors: [], done: 0 };
+      const t: Tally = { table: new Map(), gaps: new Map(), fixed: new Map(), errors: [], done: 0, brand: 0 };
       let ctx: JudgeContext | undefined;
       const getCtx = (b: Document, s: Document) => (ctx ??= buildContext(b, s));
       progress.max = entries.length;

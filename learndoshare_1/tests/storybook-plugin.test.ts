@@ -170,6 +170,24 @@ test("프로젝트 모드 가상 모듈은 원본 파일이 바뀌면 다시 읽
   }
 });
 
+// 반영 검사(Task 26)의 센티널 브랜드. 프로젝트 모드는 프로젝트 milvusBridge.css가 읽는 --milvus-* 변수만 넣는다
+test("virtual:milvus-sentinel을 Vite가 해석하고, 프로젝트 milvusBridge.css가 바뀌면 다시 만든다", async () => {
+  const dir = project();
+  const { vite, close } = await serve({ mode: "project", repoDir: repo, projectDir: dir });
+  try {
+    const first = await vite.ssrLoadModule("virtual:milvus-sentinel");
+    assert.match(first.sentinelCss, /--slds-g-radius-border-1: \d+px;/);
+    assert.doesNotMatch(first.sentinelCss, /--milvus-motion-duration-fast/);
+    const bridge = join(dir, RES, "milvusBridge.css");
+    writeFileSync(bridge, ".slds-button { transition-duration: max(var(--milvus-motion-duration-fast, 0.1s), 0.01ms); }\n");
+    vite.watcher.emit("change", bridge);
+    const second = await vite.ssrLoadModule("virtual:milvus-sentinel");
+    assert.match(second.sentinelCss, /--milvus-motion-duration-fast: 0\.777s;/);
+  } finally {
+    await close();
+  }
+});
+
 test("POST는 milvus-brand-request.md 하나에만 쓰고, 저장소 모드는 403, GET의 writable은 거짓", async () => {
   const dir = project();
   const before = readdirSync(dir).sort();
