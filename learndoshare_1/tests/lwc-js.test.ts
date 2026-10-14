@@ -30,6 +30,17 @@ test("milvusBrandLoader: targets는 lightning__UtilityBar 하나, isExposed true
   assert.equal(loader("milvusBrandLoader.html").trim(), "<template></template>");
 });
 
+// 밀버스 컴포넌트는 다른 LWC 안에서 쓰는 부품이라 앱 빌더 목록에 나오지 않는다(2026-10-14 리허설에서 사용자 지적)
+test("milvusBrandLoader 밖의 밀버스 번들은 isExposed false이고 targets가 없다", () => {
+  const exposed = bundles
+    .filter((b) => b !== "milvusBrandLoader")
+    .filter((b) => {
+      const meta = readFileSync(join(lwc, b, `${b}.js-meta.xml`), "utf8");
+      return !/<isExposed>\s*false\s*<\/isExposed>/.test(meta) || /<targets>/.test(meta);
+    });
+  assert.deepEqual(exposed, []);
+});
+
 test("milvusBrandLoader.js는 c/milvusScript의 loadBrand를 import해 connectedCallback에서 loadBrand(this)를 부른다", () => {
   const js = loader("milvusBrandLoader.js");
   assert.match(js, /import\s*\{\s*loadBrand\s*\}\s*from\s*["']c\/milvusScript["']/);
