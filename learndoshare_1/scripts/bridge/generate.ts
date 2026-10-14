@@ -4,7 +4,7 @@
 // - 브리지는 SLDS 2 CSS보다 뒤에 들어와 같은 우선순위(specificity)의 원본 규칙을 모두 이긴다. 그래서 원래 대상보다 뒤에서
 //   이기던 같은 우선순위 규칙(예: .slds-button 뒤의 .slds-button_icon)의 같은 속성 선언을 원래 순서대로 그대로 다시 넣는다.
 //   이 규칙이 다시 이기던 규칙도 같은 방식으로 넣는다. 우선순위가 다른 규칙은 원래대로 이기거나 진다
-// - 줄인 움직임 규칙은 브랜드 선택과 상관없이 항상 넣는다(접근성). 스피너도 여기서만 다룬다
+// - 줄인 움직임(prefers-reduced-motion) 규칙은 넣지 않는다(2026-10-14 사용자 결정, Salesforce 기본에 맡긴다)
 import { writeFileSync } from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { list, parse, type AtRule, type Declaration, type Rule } from "postcss";
@@ -14,7 +14,6 @@ const HEADER = `/* hook이 없는 항목을 --milvus-* 변수로 잇는 클래�
    scripts/bridge/generate.ts가 SLDS 2 CSS에서 만든다(pnpm bridge:generate). 변수를 정하지 않으면 모든 값이 Salesforce 원래 값이다.
    var()가 없는 선언은 원래 이기던 규칙이 계속 이기도록 원본을 그대로 다시 넣은 것이다 */
 `;
-const REDUCED_MOTION = ["transition-duration: 0.01ms", "animation-duration: 0.01ms", "animation-iteration-count: 1"];
 
 // 속성 묶음: 브리지 속성과 같은 값을 정하는 원본 속성. same은 그대로 다시 넣고, shorthand는 브리지 속성 값만 꺼내 넣는다
 type Family = { same: RegExp; shorthand?: string; property: string };
@@ -187,11 +186,6 @@ export function generateBridge(sldsCss: string, targets: BridgeTarget[]): string
     if (!row) continue;
     enter(contextOf(r));
     rule(r.selectors.join(", "), [...row].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)).map(([, { prop, value }]) => `${prop}: ${value}`));
-  }
-  const motion = [...new Set(rules.filter((r) => r.some((d) => d.type === "decl" && /^(transition|animation)/.test(d.prop))).map((r) => r.selectors.join(", ")))];
-  if (motion.length) {
-    enter(["@media (prefers-reduced-motion: reduce)"]);
-    for (const selector of motion) rule(selector, REDUCED_MOTION);
   }
   enter([]);
   return `${HEADER}${lines.join("\n")}\n`;

@@ -349,6 +349,46 @@ test("LEX 컨트롤 높이 고정은 브리지가 잇던 1.875rem 선언만 흡�
   assert.deepEqual(fixedItemsOf(native, FIXED_ITEMS).map((f) => f.id), ["combobox-height"]);
 });
 
+// 2026-10-14 사용자 합의: 브리지 10종을 빼면서 다시 빈틈이 된 선언(아래 위쪽)만 고정이다. 아래쪽은 비슷하지만 남아야 하는 선언이다
+test("브리지를 뺀 고정 항목은 그 선언만 흡수하고 비슷한 다른 선언은 빈틈으로 남긴다", () => {
+  const sldsCss = `
+    .slds-path__item:first-child { border-start-start-radius: 2rem; border-end-start-radius: 2rem; }
+    .slds-path__item:last-child { border-start-end-radius: 2rem; border-end-end-radius: 2rem; }
+    .slds-button__icon, .slds-button__icon_stateful, .slds-button__icon--stateful { width: 0.875rem; height: 0.875rem; }
+    .slds-input-has-icon .slds-input__icon { width: 0.875rem; }
+    .slds-is-sortable__icon { width: 0.75rem; height: 0.75rem; }
+    .slds-radio .slds-form-element__label { font-weight: 700; }
+    .slds-button[disabled], .slds-button:disabled { cursor: default; }
+    .slds-select[disabled], .slds-select.slds-is-disabled { cursor: not-allowed; }
+    a:hover, a:focus-visible { text-decoration: underline; }
+    .slds-context-bar__label-action:focus-visible, .slds-context-bar__label-action:focus-visible:hover { text-decoration: var(--_slds-c-globalnavigation-font-decoration-focus, underline); }
+    .slds-nubbin_top::after,.slds-nubbin--top::after { box-shadow: var(--_slds-c-popover-top-nubbin-shadow); }
+
+    .slds-path__item { border-radius: 2rem; }
+    .slds-button__icon_large { width: 1.5rem; }
+    .slds-input-has-icon .slds-input__icon { height: 0.75rem; }
+    .slds-form-element__label { font-weight: 700; }
+    .slds-b:disabled { cursor: pointer; }
+    .slds-c:hover { text-decoration: line-through; }
+    .slds-popover { box-shadow: 0 2px 3px red; }`;
+  const { gaps } = buildReport(classify({ sldsCss, lbcFiles: [] }), SPEC_ITEMS, "", FIXED_ITEMS);
+  assert.deepEqual(gaps.map((g) => `${g.selector} { ${g.prop}: ${g.value} } ${g.item}`), [
+    ".slds-path__item { border-radius: 2rem } radius",
+    ".slds-button__icon_large { width: 1.5rem } icon-size",
+    ".slds-input-has-icon .slds-input__icon { height: 0.75rem } icon-size",
+    ".slds-form-element__label { font-weight: 700 } typography",
+    ".slds-b:disabled { cursor: pointer } cursor-underline",
+    ".slds-c:hover { text-decoration: line-through } cursor-underline",
+    ".slds-popover { box-shadow: 0 2px 3px red } shadow",
+  ]);
+  // native 꼬리 그림자는 새 항목이 맡고 드롭다운·팝오버·툴팁 그림자(popup-shadow)에서는 뺐다
+  const [nubbin] = classify({
+    sldsCss: "",
+    lbcFiles: [{ comp: "helptext", file: "lightning-base-components/src/lightning/helptext/helptext.slds.css", css: `:host([data-render-mode="shadow"]) .slds-nubbin_top::after { box-shadow: 0 0 1px red; }` }],
+  });
+  assert.deepEqual(fixedItemsOf(nubbin, FIXED_ITEMS).map((f) => f.id), ["nubbin-shadow", "native-shadow"]);
+});
+
 test("--check는 기준 대비 새 하드코딩, hook 변화, native 목록 변화, 브리지 선택자 소실에서 1", () => {
   const dir = join(tmp, "기준");
   // custom property만 정의하는 원본 규칙(개체 아이콘 색)을 덮는 브리지는 소실이 아니다

@@ -37,12 +37,20 @@ test("SPEC_ITEMS의 bridgeVars는 모두 BRIDGE_VARS의 값이다", () => {
   assert.deepEqual([...vars].filter((v) => !used.has(v)), []);
 });
 
-test("컨트롤 높이는 hook만 남고 브리지가 없어 native 전환 때 잃는 것이 없다(2026-10-14 사용자 결정)", () => {
-  const item = SPEC_ITEMS.find((i) => i.id === "control-height");
-  assert.deepEqual(item?.hooks, ["--slds-s-button-spacing-block", "--slds-s-input-sizing-height"]);
-  assert.deepEqual(item?.bridgeVars, []);
-  assert.equal(item?.nativeLoss, false);
-  assert.match(item?.limits ?? "", /Salesforce 고정/);
+test("브리지를 뺀 항목은 bridgeVars가 비고 한계에 'Salesforce 고정'을 적는다(2026-10-14 사용자 결정)", () => {
+  const ids = ["control-height", "radius", "typography", "icon-size", "letter-spacing", "shadow", "cursor-underline", "object-icon-color"];
+  for (const id of ids) {
+    const item = SPEC_ITEMS.find((i) => i.id === id);
+    assert.deepEqual(item?.bridgeVars, [], id);
+    assert.equal(item?.nativeLoss, false, id);
+    assert.match(item?.limits ?? "", /Salesforce 고정/, id);
+  }
+  assert.deepEqual(SPEC_ITEMS.find((i) => i.id === "control-height")?.hooks, ["--slds-s-button-spacing-block", "--slds-s-input-sizing-height"]);
+  // 항목 전체가 고정인 것은 입력 없이 표시만 한다
+  for (const id of ["cursor-underline", "object-icon-color"]) {
+    const item = SPEC_ITEMS.find((i) => i.id === id);
+    assert.deepEqual([item?.group, item?.input, item?.hooks], ["표시만", "none", []], id);
+  }
 });
 
 test("움직임 묶음 항목은 hooks가 비고 bridgeVars가 있으며 nativeLoss가 참이다", () => {

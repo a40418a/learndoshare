@@ -6,7 +6,7 @@ import { BRIDGE_VARS as B } from "./bridge-vars.ts";
 
 export type SpecItem = {
   id: string;
-  group: "기본" | "색" | "모양" | "크기" | "글자" | "깊이" | "움직임" | "포커스" | "아이콘" | "표시만";
+  group: "기본" | "색" | "모양" | "크기" | "글자" | "깊이" | "움직임" | "포커스" | "표시만";
   label: string;
   description: string;
   examples: string[];
@@ -56,8 +56,8 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     description: "버튼, 입력창, 카드의 반경. 각진 / 기본 / 둥근 3단계",
     examples: ["각지게", "둥글게"],
     hooks: steps(g("radius-border-"), [1, 2, 3, 4, "pill"]),
-    bridgeVars: [B["path-end-radius"]],
-    limits: "Path 양 끝 반경은 hook이 없어 브리지로 바꾼다",
+    bridgeVars: [],
+    limits: "Path 양 끝 반경은 hook이 없어 Salesforce 고정이다",
     input: "text",
   },
   {
@@ -89,8 +89,8 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
       s("pageheader-title-font-weight"),
       s("label-font-weight"),
     ],
-    bridgeVars: [B["choice-label-weight"]],
-    limits: "라디오·체크박스 라벨 굵기는 hook이 없어 브리지로 바꾼다. 글꼴은 바꾸지 않는다",
+    bridgeVars: [],
+    limits: "라디오·체크박스·토글 라벨 굵기는 hook이 없어 Salesforce 고정이다. 글꼴은 바꾸지 않는다",
     input: "text",
   },
   {
@@ -386,11 +386,11 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     id: "icon-size",
     group: "크기",
     label: "아이콘 크기",
-    description: "기본 아이콘 크기와 배경 여백, 버튼·입력창 안 아이콘 크기, 표 정렬 아이콘 크기",
+    description: "기본 아이콘 크기와 배경 여백",
     examples: ["기본 아이콘을 36px로"],
     hooks: [s("icon-sizing"), s("icon-spacing")],
-    bridgeVars: [B["control-icon-size"], B["sort-icon-size"]],
-    limits: "버튼·입력창 안 아이콘(0.875rem)과 표 정렬 아이콘(0.75rem) 크기는 hook이 없어 브리지로 바꾼다",
+    bridgeVars: [],
+    limits: "버튼·입력창 안 아이콘(0.875rem)과 표 정렬 아이콘(0.75rem) 크기는 hook이 없어 Salesforce 고정이다",
     input: "text",
   },
 
@@ -410,11 +410,11 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     id: "letter-spacing",
     group: "글자",
     label: "자간",
-    description: ":root의 letter-spacing과 브리지(button, input, select, textarea)",
+    description: ":root의 letter-spacing",
     examples: ["한글 자간 -0.02em"],
     hooks: [],
-    bridgeVars: [B["letter-spacing"]],
-    limits: "",
+    bridgeVars: [],
+    limits: "폼 요소(button, input, select, textarea)는 브라우저 기본 스타일이 letter-spacing을 normal로 다시 정해 :root 자간이 상속되지 않는다. 폼 요소 자간은 Salesforce 고정이다",
     input: "text",
   },
   {
@@ -434,14 +434,14 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     id: "shadow",
     group: "깊이",
     label: "그림자 깊이",
-    description: "그림자 단계(shadow-1~4)와 방향형 그림자, 팝오버 꼬리 그림자",
+    description: "그림자 단계(shadow-1~4)와 방향형 그림자",
     examples: ["그림자 없이 평평하게"],
     hooks: [
       ...steps(g("shadow-"), [1, 2, 3, 4]),
       ...["block-start", "block-end", "inline-start", "inline-end"].flatMap((d) => steps(g(`shadow-${d}-`), [1, 2, 3, 4])),
     ],
-    bridgeVars: [B["nubbin-shadow"]],
-    limits: "shadow-5/-6은 포커스 표시에 쓰여 기본값을 유지한다. 팝오버 꼬리는 브리지로 바꾼다. native 드롭다운·팝오버·툴팁은 고정이다",
+    bridgeVars: [],
+    limits: "shadow-5/-6은 포커스 표시에 쓰여 기본값을 유지한다. 팝오버 꼬리 그림자는 Salesforce 고정이다. native 드롭다운·팝오버·툴팁은 고정이다",
     input: "text",
   },
   {
@@ -491,11 +491,11 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     id: "reduced-motion",
     group: "움직임",
     label: "줄인 움직임",
-    description: "브리지의 prefers-reduced-motion 규칙은 항상 켜 있다. 선택하면 항상 최소화한다(시간 변수를 0.01ms로)",
+    description: "동작 줄이기를 켠 사람만 줄이는 것은 Salesforce 기본에 맡긴다(밀버스는 따로 줄이지 않는다). 모두 최소화하려면 시간 변수를 0.01ms로 정한다",
     examples: ["동작 줄이기를 켠 사람에게는 애니메이션 없이"],
     hooks: [],
     bridgeVars: MOTION_DURATIONS,
-    limits: "0이 아니라 0.01ms를 쓴다. 0이면 모달·토스트가 닫히지 않을 수 있다",
+    limits: "SLDS 2 CSS의 prefers-reduced-motion 규칙은 브레드크럼 눌림 하나뿐이다. 0이 아니라 0.01ms를 쓴다. 0이면 모달·토스트가 닫히지 않을 수 있다",
     input: "text",
   },
 
@@ -519,33 +519,30 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     limits: "링 색은 브랜드 색을 따른다. 값 안의 색은 var(--slds-g-color-brand-base-15)와 var(--slds-g-color-neutral-base-100)만 쓴다",
     input: "text",
   },
+
+  // 설계 9.3 — 표시만. 커서·링크 밑줄과 개체 아이콘 색은 2026-10-14 사용자 결정으로 브리지를 빼서 바꿀 수 없다
   {
     id: "cursor-underline",
-    group: "포커스",
+    group: "표시만",
     label: "커서·링크 밑줄",
-    description: "비활성 요소의 커서와 링크 hover 밑줄",
-    examples: ["링크에 밑줄 없이"],
+    description: "비활성 요소의 커서와 링크 hover 밑줄. 바꿀 수 없다",
+    examples: [],
     hooks: [],
-    bridgeVars: [B["cursor-disabled"], B["link-decoration-hover"]],
-    limits: "",
-    input: "text",
+    bridgeVars: [],
+    limits: "hook이 없어 Salesforce 고정이다",
+    input: "none",
   },
-
-  // 설계 9.3 — 아이콘
   {
     id: "object-icon-color",
-    group: "아이콘",
+    group: "표시만",
     label: "개체 아이콘 색",
-    description:
-      "브리지가 클래스마다 아이콘 배경 hook을 다시 정의한다(원래 색이 기본값). 전체는 --milvus-icon-color-all, 개체 하나는 --milvus-icon-<종류>-<이름>(예: --milvus-icon-standard-account). icon-name `종류:이름`에서 `:`와 `_`를 `-`로 바꾼다(예: `standard:user_role` → `--milvus-icon-standard-user-role`)",
-    examples: ["Account 아이콘을 브랜드 남색으로"],
+    description: "개체마다 정해진 아이콘 배경색. 바꿀 수 없다",
+    examples: [],
     hooks: [],
-    bridgeVars: [B["icon-color-all"]],
-    limits: "개체를 색으로 구분하던 단서가 사라질 수 있다",
-    input: "text",
+    bridgeVars: [],
+    limits: "SLDS 2가 클래스마다 컴포넌트 hook(c)으로 정하고 lightning-icon은 JS 색 표를 쓴다. util.css는 c hook을 쓰지 않아 Salesforce 고정이다",
+    input: "none",
   },
-
-  // 설계 9.3 — 표시만
   {
     id: "fixed",
     group: "표시만",
