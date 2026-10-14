@@ -364,7 +364,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     group: "크기",
     label: "컨트롤 높이",
     description: "버튼·입력창·선택·콤보박스의 높이. LEX 텍스트 컨트롤 높이(1.875rem)는 Salesforce 고정이다",
-    examples: ["버튼과 입력창을 40px로"],
+    examples: ["버튼 안쪽 위아래 여백을 조금 넉넉하게"],
     hooks: [s("button-spacing-block"), s("input-sizing-height")],
     bridgeVars: [],
     limits:
@@ -492,7 +492,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     group: "움직임",
     label: "줄인 움직임",
     description: "동작 줄이기를 켠 사람만 줄이는 것은 Salesforce 기본에 맡긴다(밀버스는 따로 줄이지 않는다). 모두 최소화하려면 시간 변수를 0.01ms로 정한다",
-    examples: ["동작 줄이기를 켠 사람에게는 애니메이션 없이"],
+    examples: ["애니메이션을 모두 최소화"],
     hooks: [],
     bridgeVars: MOTION_DURATIONS,
     limits: "SLDS 2 CSS의 prefers-reduced-motion 규칙은 브레드크럼 눌림 하나뿐이다. 0이 아니라 0.01ms를 쓴다. 0이면 모달·토스트가 닫히지 않을 수 있다",

@@ -200,8 +200,8 @@ export const FIXED_ITEMS: FixedItem[] = [
   },
   // nubbin은 팝오버·드롭다운의 꼬리다
   { id: "nubbin-shadow", label: "팝오버 꼬리 그림자", mode: "both", match: { selector: /nubbin/i, property: "box-shadow" } },
-  // SLDS 2가 클래스마다 정한 --slds-c-icon-color-background(사용자 정의 속성이라 검사에 들어오지 않는다)와 lightning/iconUtils의 JS 색 표
-  { id: "object-icon-background", label: "개체 아이콘 배경색", mode: "both", match: { source: "js" } },
+  // SLDS 2가 클래스마다 정한 --slds-c-icon-color-background(사용자 정의 속성)와 lightning/iconUtils의 JS 색 표. 둘 다 검사에 들어오지 않는다
+  { id: "object-icon-background", label: "개체 아이콘 배경색", mode: "both", match: [] },
 
   // native 전환 뒤 생기는 고정 (9.2의 c hook을 열면 일부 메울 수 있음)
   // 꼬리(nubbin) 그림자는 위 nubbin-shadow가 두 모드 모두 맡는다(2026-10-14)

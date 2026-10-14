@@ -2,7 +2,7 @@
 // 선택자는 SLDS 2 CSS 규칙의 선택자 목록을 그대로 쓴다(부분마다 공백을 하나로 줄여 ", "로 잇는다).
 // 선언이 많은 움직임(217선언)은 설치된 SLDS 2 CSS에서 모으고, 나머지는 손으로 적는다.
 // 2026-10-14 사용자 결정으로 컨트롤 높이, Path 양 끝 반경, 컨트롤·정렬 아이콘 크기, 폼 요소 자간, 선택지 라벨 굵기, 비활성 커서, 링크 hover 밑줄,
-// 팝오버 꼬리 그림자, 개체 아이콘 색, 줄인 움직임 규칙은 잇지 않는다(lib/fixed-list.ts의 고정 항목)
+// 팝오버 꼬리 그림자, 개체 아이콘 색은 잇지 않는다(lib/fixed-list.ts의 고정 항목). 줄인 움직임 규칙도 넣지 않는다(Salesforce 기본에 맡긴다)
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
@@ -16,9 +16,8 @@ import { classify } from "../audit/classify.ts";
  * - property: 브리지가 정하는 속성. 움직임 longhand는 원본 shorthand에서 값을 꺼낸다
  * - min: 값을 max(var(…), min)으로 감싼다
  * - token: 값 전체가 아니라 이 값만 변수로 바꾼다(calc 안, border shorthand 안)
- * - initial: 원본에 선언이 없을 때 쓰는 브라우저 기본값. 이것이 있을 때만 새 선언을 넣는다
  */
-export type BridgeTarget = { id: string; selectors: string[]; property: string; varName: string; min?: string; token?: string; initial?: string };
+export type BridgeTarget = { id: string; selectors: string[]; property: string; varName: string; min?: string; token?: string };
 
 /** 선택자 목록을 비교용 문자열로 바꾼다 */
 export const selectorKey = (selector: string) => list.comma(selector).map((s) => s.replace(/\s+/g, " ").trim()).join(", ");

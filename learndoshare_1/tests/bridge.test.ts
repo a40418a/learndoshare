@@ -52,17 +52,11 @@ const longhandOf = (shorthand: string, part: "duration" | "timing-function") =>
     .split(/,(?![^(]*\))/)
     .map((item) => item.trim().split(/\s+(?![^(]*\))/).find((t) => (part === "duration" ? TIME : EASING).test(t)) ?? (part === "duration" ? "0s" : "ease"))
     .join(", ");
-// 원본 규칙에서 이 속성이 가질 수 있는 값: 같은 속성, shorthand에서 꺼낸 값, font: inherit
+// 원본 규칙에서 이 속성이 가질 수 있는 값: 같은 속성, 움직임 shorthand에서 꺼낸 값
 function originalValues(original: Declaration[], prop: string): string[] {
   const base = prop.replace(/-(duration|timing-function)$/, "");
   return original.flatMap((o) =>
-    o.prop === prop
-      ? [o.value]
-      : o.prop === base && base !== prop
-        ? [longhandOf(o.value, prop.endsWith("duration") ? "duration" : "timing-function")]
-        : o.prop === "font" && /^(line-height|font-weight)$/.test(prop)
-          ? [o.value]
-          : [],
+    o.prop === prop ? [o.value] : o.prop === base && base !== prop ? [longhandOf(o.value, prop.endsWith("duration") ? "duration" : "timing-function")] : [],
   );
 }
 
@@ -76,9 +70,7 @@ test("모든 규칙의 var() 기본값은 SLDS 2 원래 값과 같고, 함께 �
     const values = originalValues(original, d.prop);
     if (/var\(--milvus-/.test(d.value)) {
       bridged++;
-      // 원본에 선언이 없으면 브라우저 기본값(initial)이다
-      const initial = BRIDGE_TARGETS.find((t) => t.property === d.prop && t.initial !== undefined)?.initial;
-      assert.ok((values.length ? values : [initial]).includes(unbridged(d.value)), `${keyOf(rule)} { ${d.prop}: ${d.value} }`);
+      assert.ok(values.includes(unbridged(d.value)), `${keyOf(rule)} { ${d.prop}: ${d.value} }`);
     } else {
       assert.ok(values.includes(d.value), `원본과 다른 선언: ${keyOf(rule)} { ${d.prop}: ${d.value} }`);
     }
@@ -245,24 +237,24 @@ test("shorthand는 longhand로 잇고 묶음 밖 시간·곡선은 원래 값, �
 });
 
 test("같은 우선순위로 뒤에 오는 원본 선언은 그대로 다시 넣어 원래 이기던 규칙이 계속 이긴다", () => {
-  const css = `.slds-button { line-height: 1.875rem; color: red; }
-    .x .slds-button_icon { line-height: 2; }
-    .slds-button_icon { line-height: 1; }
-    .slds-button_icon-more { font: inherit; }
-    .slds-badge:hover { line-height: 3; }
-    .slds-badge { line-height: 3; }
-    div { line-height: 4; }`;
-  const out = generateBridge(css, [{ id: "x", selectors: [".slds-button"], property: "line-height", varName: "--milvus-x" }]);
+  const css = `.slds-button { width: 2rem; color: red; }
+    .x .slds-button_icon { width: 3rem; }
+    .slds-button_icon { width: 1rem; }
+    .slds-button_icon-more { inline-size: auto; }
+    .slds-badge:hover { width: 4rem; }
+    .slds-badge { width: 4rem; }
+    div { width: 5rem; }`;
+  const out = generateBridge(css, [{ id: "x", selectors: [".slds-button"], property: "width", varName: "--milvus-x" }]);
   // 우선순위가 다른 규칙(.x .slds-button_icon, .slds-badge:hover, div)은 원래대로 이기거나 지므로 다시 넣지 않는다.
   // 같은 우선순위는 같은 요소에 맞는지 알 수 없어 모두 다시 넣는다(.slds-badge).
-  // font shorthand는 line-height도 정하므로 그 값만 꺼내 넣는다(다른 글꼴 속성은 건드리지 않는다)
+  // 논리 속성 inline-size도 같은 너비라 그대로 다시 넣는다
   assert.deepEqual(
     [...declsByRule(out)].map(([k, ds]) => `${k.slice(3)} { ${ds.map((d) => `${d.prop}: ${d.value}`).join("; ")} }`),
     [
-      ".slds-button { line-height: var(--milvus-x, 1.875rem) }",
-      ".slds-button_icon { line-height: 1 }",
-      ".slds-button_icon-more { line-height: inherit }",
-      ".slds-badge { line-height: 3 }",
+      ".slds-button { width: var(--milvus-x, 2rem) }",
+      ".slds-button_icon { width: 1rem }",
+      ".slds-button_icon-more { inline-size: auto }",
+      ".slds-badge { width: 4rem }",
     ],
   );
 });
@@ -270,10 +262,9 @@ test("같은 우선순위로 뒤에 오는 원본 선언은 그대로 다시 넣
 test("원본에서 대상 선택자나 속성을 찾지 못하면 실패한다(Salesforce 구조 변경)", () => {
   const target: BridgeTarget = { id: "caps-transform", selectors: [".slds-gone"], property: "text-transform", varName: BRIDGE_VARS["caps-transform"] };
   assert.throws(() => generateBridge(".slds-text-title_caps { text-transform: uppercase; }", [target]), /\.slds-gone/);
-  // 원본에 선언이 없는 속성은 initial(브라우저 기본값)이 있을 때만 새로 넣는다
-  const letter: BridgeTarget = { id: "x", selectors: ["button, input"], property: "letter-spacing", varName: "--milvus-x", initial: "normal" };
-  assert.match(generateBridge("button, input { font: inherit; }", [letter]), /button, input \{\n {2}letter-spacing: var\(--milvus-x, normal\);\n\}/);
-  assert.throws(() => generateBridge("button, input { font: inherit; }", [{ ...letter, initial: undefined }]), /letter-spacing/);
+  // 규칙은 있어도 그 속성 선언이 없으면 실패한다
+  const letter: BridgeTarget = { id: "x", selectors: ["button, input"], property: "letter-spacing", varName: "--milvus-x" };
+  assert.throws(() => generateBridge("button, input { font: inherit; }", [letter]), /letter-spacing/);
   // 선언은 있어도 바꿀 값(token, 묶음 안 시간 등)이 사라졌으면 실패한다. 조용히 넘어가면 그 컨트롤에서만 브랜드 값이 빠진다
   const height: BridgeTarget = { id: "x", selectors: [".slds-select"], property: "height", varName: "--milvus-x", token: "1.875rem" };
   assert.match(generateBridge(".slds-select { height: calc(1.875rem + 2px); }", [height]), /calc\(var\(--milvus-x, 1\.875rem\) \+ 2px\)/);

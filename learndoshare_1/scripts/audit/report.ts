@@ -19,7 +19,7 @@ export type Report = {
 };
 
 export const RANK: Status[] = ["n/a", "reached", "bridge", "fixed", "gap"];
-// 컨트롤 높이 대상(설계 5.6): 버튼, 입력, 선택, 버튼형 라디오·체크박스. 기본 컴포넌트 native CSS는 part 속성으로 고른다
+// control-height 항목에 넣는 컨트롤(명세 9.3): 버튼, 입력, 선택, 버튼형 라디오·체크박스. 기본 컴포넌트 native CSS는 part 속성으로 고른다
 const CONTROLS = /\.slds-(button|input|input_faux|select|radio_button|checkbox_button)(?![\w-])|\[part~?=['"]?(button|input)['"]?\]/;
 // 음수·0·퍼센트·1px·env()는 배치용 값이라 밀도에서 뺀다 (연구 cov2.cjs의 relevant와 같은 취지)
 const GEOMETRY = /^(-|0(px|rem|em)?$)|\*\s*-1|%|^1px$|env\(/;
@@ -130,7 +130,7 @@ export const modesOf = (d: Pick<Decl, "src" | "file" | "selector">): Mode[] =>
       : ["now", "native"];
 
 type BridgeRule = { parts: Set<string>; prop: string };
-/** 브리지 CSS에서 --milvus-* 변수를 읽는 규칙. 줄인 움직임 규칙처럼 값을 직접 쓰는 규칙은 브랜드가 바꿀 수 없어 뺀다 */
+/** 브리지 CSS에서 --milvus-* 변수를 읽는 규칙. 원본 값을 그대로 다시 넣은 선언(var 없음)은 브랜드가 바꿀 수 없어 뺀다 */
 function bridgeRules(css: string): BridgeRule[] {
   const rules: BridgeRule[] = [];
   parse(css).walkDecls((d) => {

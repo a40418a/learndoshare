@@ -391,15 +391,13 @@ test("브리지를 뺀 고정 항목은 그 선언만 흡수하고 비슷한 다
 
 test("--check는 기준 대비 새 하드코딩, hook 변화, native 목록 변화, 브리지 선택자 소실에서 1", () => {
   const dir = join(tmp, "기준");
-  // custom property만 정의하는 원본 규칙(개체 아이콘 색)을 덮는 브리지는 소실이 아니다
+  // custom property만 정의하는 원본 규칙을 덮는 브리지는 소실이 아니다(합성 예)
   const base: Sources = {
     sldsCss: `.slds-badge { z-index: 100; border-radius: var(--slds-g-radius-border-1); }
-      .slds-icon-standard-account { --slds-c-icon-color-background: rgb(88, 103, 232); }`,
+      .slds-a { --slds-c-a-color-background: rgb(88, 103, 232); }`,
     lbcFiles: [],
     bridgeCss: `.slds-badge { transition-duration: var(--milvus-motion-duration-fast, 0s); }
-      .slds-icon-standard-account {
-        --slds-c-icon-color-background: var(--milvus-icon-standard-account, var(--milvus-icon-color-all, rgb(88, 103, 232)));
-      }`,
+      .slds-a { --slds-c-a-color-background: var(--milvus-x, rgb(88, 103, 232)); }`,
     nativeList: ["lightning-badge"],
   };
   assert.equal(runAudit(["--write"], base, dir).code, 0);
