@@ -1,8 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { appendFileSync, cpSync, existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { appendFileSync, chmodSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, relative, sep } from "node:path";
+import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { readConfig } from "../cli/context.ts";
 import { runInit } from "../cli/init.ts";
@@ -41,10 +41,10 @@ function snapshot(root: string): Record<string, string> {
 }
 
 /**
- * init(--brand Acme)으로 만든 프로젝트와 "새 버전" 패키지(이 저장소의 templates·LWC 사본)를 만들어 fn에 넘긴다.
+ * init(--brand Acme, vf가 false면 --no-vf)으로 만든 프로젝트와 "새 버전" 패키지(이 저장소의 templates·LWC 사본)를 만들어 fn에 넘긴다.
  * 폴더 이름에 공백과 한글을 넣는다(리뷰 중점 5)
  */
-async function withProject(fn: (root: string, pkg: string) => Promise<void>) {
+async function withProject(fn: (root: string, pkg: string) => Promise<void>, o: { vf?: boolean } = {}) {
   const root = mkdtempSync(join(tmpdir(), "밀버스 update 테스트-"));
   const pkg = mkdtempSync(join(tmpdir(), "밀버스 새 패키지-"));
   const before = process.cwd();
@@ -52,7 +52,8 @@ async function withProject(fn: (root: string, pkg: string) => Promise<void>) {
     writeFileSync(join(root, "sfdx-project.json"), JSON.stringify({ packageDirectories: [{ path: "force-app", default: true }] }));
     process.chdir(root);
     const sf = async () => ({ code: 0, stdout: "{}", stderr: "" }); // 로그인 확인만 부른다
-    const init = await capture(() => runInit(["--target-org", "dev", "--brand", "Acme"], { sf, nodeVersion: "22.18.0" }));
+    const argv = ["--target-org", "dev", "--brand", "Acme", ...(o.vf === false ? ["--no-vf"] : [])];
+    const init = await capture(() => runInit(argv, { sf, nodeVersion: "22.18.0" }));
     process.chdir(before);
     assert.equal(init.result, 0, init.stderr);
     for (const dir of ["templates", `${FA}/lwc`]) cpSync(join(pkgRoot, dir), join(pkg, dir), { recursive: true });
@@ -65,7 +66,10 @@ async function withProject(fn: (root: string, pkg: string) => Promise<void>) {
 }
 
 const read = (root: string, rel: string) => readFileSync(join(root, rel), "utf8");
-const write = (root: string, rel: string, text: string) => writeFileSync(join(root, rel), text);
+const write = (root: string, rel: string, text: string) => {
+  mkdirSync(dirname(join(root, rel)), { recursive: true });
+  writeFileSync(join(root, rel), text);
+};
 const tpl = (rel: string) => `templates/${rel}`;
 async function update(root: string, pkg: string, argv: string[] = []) {
   const before = process.cwd();
@@ -109,6 +113,45 @@ test("로컬 수정이 있으면 어떤 파일도 바뀌지 않고 1", async () 
     assert.equal(b.result, 1, b.stdout);
     assert.match(b.stderr, /settings\.json이 올바른 JSON이 아닙니다/);
     assert.deepEqual(snapshot(root), broken);
+  });
+});
+
+test("새 버전이 더한 관리 파일 경로에 사용자 파일이 있으면 충돌이다(기록이 없어도 덮어쓰지 않는다)", async () => {
+  await withProject(async (root, pkg) => {
+    const added = `${FA}/lwc/milvusNew/milvusNew.js`;
+    write(pkg, added, "// 패키지 원본\n");
+    write(root, added, "// 사용자 파일\n");
+    const before = snapshot(root);
+    const r = await update(root, pkg);
+    assert.equal(r.result, 1, r.stdout);
+    assert.ok(r.stderr.includes(added), r.stderr);
+    assert.deepEqual(snapshot(root), before);
+  });
+});
+
+test("쓰는 도중 실패하면 1과 다시 실행 안내, config는 그대로이고 다시 실행하면 마친다", { skip: process.getuid?.() === 0 && "root는 파일 쓰기 권한을 무시한다" }, async () => {
+  await withProject(async (root, pkg) => {
+    appendFileSync(join(pkg, BADGE), "// 새 버전\n");
+    appendFileSync(join(pkg, BUTTON), "// 새 버전\n");
+    const config = read(root, "milvus.config.json");
+    // 관리 파일은 milvusBadge → milvusButton 순서로 쓴다. 뒤의 것을 읽기 전용으로 두어 앞의 것만 바뀐 상태를 만든다
+    chmodSync(join(root, BUTTON), 0o444);
+    let r;
+    try {
+      r = await update(root, pkg);
+    } finally {
+      chmodSync(join(root, BUTTON), 0o644);
+    }
+    assert.equal(r.result, 1, r.stdout);
+    assert.match(r.stderr, /일부 파일이 이미 바뀌었습니다.*pnpm milvus update를 다시 실행하면/);
+    assert.equal(read(root, BADGE), read(pkg, BADGE));
+    // config는 마지막에 쓴다. 앞에 쓰면 다시 실행할 때 못 쓴 파일이 "직접 고친 파일"로 거짓 충돌한다
+    assert.equal(read(root, "milvus.config.json"), config);
+
+    const again = await update(root, pkg);
+    assert.equal(again.result, 0, again.stderr);
+    assert.equal(read(root, BUTTON), read(pkg, BUTTON));
+    assert.equal(readConfig(root)!.version, NEW);
   });
 });
 
@@ -172,6 +215,18 @@ test("milvusVf.css(생성 파일)는 템플릿으로 덮어쓰지 않는다", as
     assert.equal(read(root, `${RES}/milvusVf.css`), palette);
     assert.ok(!(`${RES}/milvusVf.css` in readConfig(root)!.managed));
   });
+});
+
+test("VF 없이 init한 프로젝트에는 update가 milvusHead·milvusVf를 만들지 않는다", async () => {
+  await withProject(
+    async (root, pkg) => {
+      const r = await update(root, pkg, ["--force"]);
+      assert.equal(r.result, 0, r.stderr);
+      for (const f of [`${FA}/components/milvusHead.component`, `${RES}/milvusVf.css`]) assert.ok(!existsSync(join(root, f)), f);
+      assert.deepEqual(Object.keys(readConfig(root)!.managed).filter((f) => /milvusHead|milvusVf/.test(f)), []);
+    },
+    { vf: false },
+  );
 });
 
 test("소유 파일은 바뀌지 않는다", async () => {

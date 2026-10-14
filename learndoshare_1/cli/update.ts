@@ -51,8 +51,9 @@ export function planUpdate(o: { root: string; pkgRoot: string; config: MilvusCon
 }
 
 export async function runUpdate(argv: string[], deps: { pkg?: { root: string; version: string } } = {}): Promise<number> {
+  let force = false;
+  let writing = false;
   try {
-    let force: boolean;
     try {
       force = parseArgs({ args: argv, options: { force: { type: "boolean" } } }).values.force === true;
     } catch {
@@ -80,9 +81,10 @@ export async function runUpdate(argv: string[], deps: { pkg?: { root: string; ve
     const dropped = Object.keys(config.managed).filter((dest) => !Object.hasOwn(managed, dest));
 
     // settings 병합이 먼저다. 기존 settings.json이 깨졌으면 applyOps가 쓰기 전에 던져 아무것도 바뀌지 않는다.
-    // ponytail: 그 뒤의 파일 쓰기는 트랜잭션이 아니다. 도중에 디스크 오류가 나면 일부만 바뀌지만, config를 마지막에 쓰므로
-    // 다시 update하면 이미 쓴 파일은 새 원본과 같아 건너뛰고 나머지를 마친다
+    // ponytail: 그 뒤의 파일 쓰기는 트랜잭션이 아니다. 도중에 권한·디스크 오류가 나면 일부만 바뀌므로 그렇게 알린다.
+    // config를 마지막에 쓰므로 같은 명령을 다시 실행하면 이미 쓴 파일은 새 원본과 같아 건너뛰고 나머지를 마친다
     const settings = applyOps(root, [settingsOp(pkg.root)]).written;
+    writing = true;
     for (const w of writes) {
       mkdirSync(dirname(join(root, w.dest)), { recursive: true });
       writeFileSync(join(root, w.dest), w.data);
@@ -101,7 +103,10 @@ export async function runUpdate(argv: string[], deps: { pkg?: { root: string; ve
     );
     return 0;
   } catch (e) {
-    process.stderr.write(`milvus update 실패: ${(e as Error).message}\n${USAGE}\n`);
+    const next = writing
+      ? `일부 파일이 이미 바뀌었습니다. 원인(권한·디스크)을 고친 뒤 pnpm milvus update${force ? " --force" : ""}를 다시 실행하면 나머지를 마칩니다`
+      : USAGE;
+    process.stderr.write(`milvus update 실패: ${(e as Error).message}\n${next}\n`);
     return 1;
   }
 }
