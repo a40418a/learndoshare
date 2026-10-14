@@ -26,6 +26,8 @@
     "lib/spec-items.ts",
     "lib/fixed-list.ts",
     "lib/bridge-vars.ts",
+    "lib/sentinel.ts",
+    "lib/reflect.ts",
     "cli/context.ts",
     "brands/Milvus_DesignSystem/logo.jpg"
   ],
