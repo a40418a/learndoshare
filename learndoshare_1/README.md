@@ -578,7 +578,7 @@ learndoshare_1/                     # 밀버스 디자인 시스템 (공용)
 | hook `PostToolUse` · `Edit\|Write` | `node "$CLAUDE_PROJECT_DIR"/.claude/hooks/milvus-check.mjs` | `milvusBrand.css`·`milvusOverride.css`·`brandingSets/`를 고쳤을 때만 패키지 CLI의 `check --style`을 node로 직접 실행한다(pnpm을 거치지 않음). 위반이면 2로 끝나 Claude가 stderr의 고칠 값을 본다. override 경고는 stdout JSON의 `additionalContext`로 넘긴다 | H4 |
 | 안내 문서 | `milvus-design.md`([관리]. 프로젝트 `CLAUDE.md`의 `@milvus-design.md` 한 줄이 불러온다) | 세팅 순서, 디자인 규칙, pnpm만 쓰기, 개인정보 필드·`FIELDS(ALL)` 조회 금지, 배포 안전장치 | H8. H1과 H2 2층은 명령 패턴으로 막지 않고 이 문서의 문장으로 둔다 |
 
-- 실제 Claude Code에서 아직 재지 않은 것: `Edit(...)` deny, 인자 없는 `pnpm milvus deploy`의 ask, `sf org list --json` deny 규칙 **(미확인, 설계 14장)**
+- 실제 Claude Code에서 잰 것(2026-10-17, `learndoshare_2` 세션): 토큰 출력 sf 명령 6개 deny, 인자 없는 `pnpm milvus deploy`의 ask, `milvusBridge.css` Edit deny가 모두 의도대로 걸린다(설계 13장). `--json` 없는 `sf org list`는 막지 않는다
 - 커밋된 설정의 hook은 팀원에게 따로 동의를 받지 않고 실행된다. 그래서 hook은 하나만 두고 `milvus-design.md`에 적는다(설계 7.2)
 
 **처음 계획한 hook (2026-09-26, 커밋하지 않음)**
