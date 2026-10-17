@@ -385,7 +385,7 @@ exit 0</code></pre>
   <aside class="legacy"><strong>이전 설계 (2026-10-09 갱신)</strong>README 11장은 위 항목을 모두 hook으로 막을 계획이었다. H2(<code>guard-sf.mjs</code>, PreToolUse, Bash와 sf MCP 도구)는 세 층으로 막는다. 1층은 <code>sf project deploy</code>, <code>sf data create/update/delete</code>, <code>sf apex run</code> 같은 되돌릴 수 없는 명령, 2층은 조회 안의 개인정보 필드와 <code>FIELDS(ALL)</code>, 3층은 <code>sf org display</code>·<code>sf org auth</code> 계열의 직접 실행이다. H7(PreToolUse)은 밀버스 관리 파일 수정 차단, H8(SessionStart)은 세션 시작 안내, H4(PostToolUse <code>lint-style.mjs</code>)는 편집마다 스타일 린트였다.</aside>
   <ul>
     <li><span class="tag warn">미확인</span> <code>Edit(...)</code> deny 규칙이 밀버스 관리 파일을 의도대로 막는지는 아직 재지 않았다. 2026-10-14 리허설은 고객 프로젝트에서 Claude Code 세션을 따로 띄우지 않아 이 항목을 확인하지 못했다(설계 14장)</li>
-    <li>설계 14장의 "<code>Bash(pnpm milvus deploy *)</code>가 인자 없는 명령에도 걸리는가"는 공식 문서상 걸린다(위 permissions 절). 실제 동작은 위와 같은 이유로 <span class="tag warn">미확인</span>이다</li>
+    <li>"<code>Bash(pnpm milvus deploy *)</code>가 인자 없는 명령에도 걸리는가"는 공식 문서상 걸리고(위 permissions 절), 2026-10-17 고객 프로젝트의 Code 세션에서 인자 없는 <code>pnpm milvus deploy</code>가 실제로 승인을 물었다 <span class="tag ok">됨</span>(설계 13장)</li>
   </ul>
 
   <h3>배포 뒤 사람이 org에서 할 일</h3>
@@ -478,7 +478,7 @@ exit 0</code></pre>
     <li>끝나면 확인용 <code>sf org open</code> 명령을 출력만 하고, 사람이 org에서 할 일 두 가지(<a href="#runbook">위</a>: VF 설정, <code>milvusBrandLoader</code>)를 알린다. 테마 색은 새로고침한 뒤에 보인다</li>
     <li>명령이 하는 일과 리허설 결과는 <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html#deploy">05 메타데이터 배포로 테마 적용</a>에 자세히 적었다(2026-10-14 갱신)</li>
   </ul>
-  <div class="callout warn"><strong>지금 상태 (2026-10-14 갱신)</strong>①~⑥의 파일과 코드는 구현됐다. 2026-10-14 설치본 리허설에서 에어로케이(aerok.com) 사이트의 CSS 변수에서 뽑은 색으로 요청을 명세 페이지에 저장하고, skill 절차대로 <code>BrandingSet</code>과 <code>milvusBrand.css</code>에 반영했다. hook이 실행하는 <code>check --style</code>은 정상 값에 0, 금지 값 두 개에 2로 끝났고, Storybook은 바로 다시 그렸다. <code>deploy --yes</code>는 1단계 13개 배포와 2단계 활성 테마 변경이 모두 성공했다(설계 13장). 이 리허설에서 skill 7장의 "각진" 프리셋이 버튼 반경 <code>--slds-s-button-radius-border</code>(SLDS 2 기본은 알약 모양)를 빠뜨린 것을 찾아 더했고, 목록 화면에서 컨트롤 높이 브리지 문제가 드러나 브리지를 줄였다(<a href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html#choice">09</a>). 남은 것: 고객 프로젝트에서 Claude Code 세션을 따로 띄우지 않아 "브랜드 요청 반영해줘"로 skill이 저절로 불리는지, <code>Edit</code> deny와 인자 없는 <code>pnpm milvus deploy</code>의 ask가 의도대로 걸리는지는 아직 <span class="tag warn">미확인</span>이다(설계 14장).</div>
+  <div class="callout warn"><strong>지금 상태 (2026-10-17 갱신)</strong>①~⑥의 파일과 코드는 구현됐다. 2026-10-14 설치본 리허설에서 에어로케이(aerok.com) 사이트의 CSS 변수에서 뽑은 색으로 요청을 명세 페이지에 저장하고, skill 절차대로 <code>BrandingSet</code>과 <code>milvusBrand.css</code>에 반영했다. hook이 실행하는 <code>check --style</code>은 정상 값에 0, 금지 값 두 개에 2로 끝났고, Storybook은 바로 다시 그렸다. <code>deploy --yes</code>는 1단계 13개 배포와 2단계 활성 테마 변경이 모두 성공했다(설계 13장). 이 리허설에서 skill 7장의 "각진" 프리셋이 버튼 반경 <code>--slds-s-button-radius-border</code>(SLDS 2 기본은 알약 모양)를 빠뜨린 것을 찾아 더했고, 목록 화면에서 컨트롤 높이 브리지 문제가 드러나 브리지를 줄였다(<a href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html#choice">09</a>). 2026-10-17에는 고객 프로젝트를 폴더로 연 Code 세션에서 권한 규칙을 쟀다. 토큰을 출력하는 sf 명령 6개는 deny로 막혔고, <code>--json</code> 없는 <code>sf org list</code>는 실행됐고, 인자 없는 <code>pnpm milvus deploy</code>는 ask로 승인을 물었고, <code>milvusBridge.css</code> Edit는 승인 없이 막혔다(설계 13장). 남은 것: "브랜드 요청 반영해줘"로 skill이 저절로 불리는지는 아직 <span class="tag warn">미확인</span>이다.</div>
   <h3>직접 확인하기</h3>
 <pre><code><span class="c"># 고객 프로젝트 루트에서. skill과 hook이 놓였는지, hook이 settings.json에 병합됐는지</span>
 head -5 .claude/skills/milvus-brand/SKILL.md
@@ -580,7 +580,7 @@ pnpm milvus check</code></pre>
       <li><span class="tag ok">완료</span> <code>deploy</code>(Task 22)와 VF <code>milvusHead</code>(Task 24), 설치본 리허설(Task 23). 2026-10-14, <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html#deploy">05 테마 동기화</a></li>
     </ul>
     <ol>
-      <li>permissions 규칙(<code>Edit</code> deny, 인자 없는 <code>pnpm milvus deploy</code>의 ask)과 skill 호출을 고객 프로젝트의 실제 Claude Code 세션에서 확인한다 <span class="tag warn">미확인</span>(2026-10-14 리허설에서 하지 못함)</li>
+      <li>permissions 규칙(<code>Edit</code> deny, 인자 없는 <code>pnpm milvus deploy</code>의 ask, 토큰 출력 명령 deny)은 2026-10-17 고객 프로젝트의 Code 세션에서 의도대로 걸렸다 <span class="tag ok">됨</span>(설계 13장). skill이 저절로 불리는지는 아직 <span class="tag warn">미확인</span>이다</li>
       <li>10/16: <code>update</code>, 최종 발행, CLAUDE.md·README 정리 후 동결 <span class="tag info">계획</span></li>
       <li>Claude Code는 프로젝트 루트(이 저장소는 <code>learndoshare_1/</code>)에서 실행해 CLAUDE.md와 skill이 로드되는지 <code>/context</code>로 확인한다</li>
       <li>Ponytail은 개인 user 범위로 먼저 써 보고, 팀 적용(project 범위)은 발표 후 결정한다</li>
