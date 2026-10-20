@@ -1,5 +1,6 @@
 // milvus update [--force] (설계 4.5, 10장). 설치된 패키지의 [관리] 파일을 프로젝트에 반영한다. 전부 반영하거나 아무것도 바꾸지 않는다.
-// - [소유](milvusBrand.css, milvusOverride.css, BrandingSet 등)는 건드리지 않는다. 사람과 skill이 고치는 파일이다
+// - [소유](milvusBrand.css, milvusOverride.css, BrandingSet 등)는 건드리지 않는다. 사람과 skill이 고치는 파일이다.
+//   다만 없는 소유 파일은 init처럼 새로 놓는다. 새 버전이 더한 소유 파일(0.2.4의 milvus-patterns.md)을 관리 파일이 가리키기 때문이다
 // - [생성](milvusVf.css 등)도 건드리지 않는다. 패키지에 있는 것은 틀이고, 실제 내용은 check·deploy가 지금 BRAND_COLOR로 다시 만든다.
 //   틀로 덮어쓰면 브랜드 팔레트가 사라진다
 // - 새 패키지에 없는 관리 파일은 milvus.config.json의 managed에서만 빼고 파일은 지우지 않는다. 설계에 삭제 규칙이 없고,
@@ -77,6 +78,9 @@ export async function runUpdate(argv: string[], deps: { pkg?: { root: string; ve
     const files = managedFiles(pkg.root, { vf: config.vf }).filter((f) => f.kind === "managed" && f.src);
     const src = new Map(files.map((f) => [f.dest, f.src!]));
     const writes = [...replace, ...conflicts.map((c) => c.path)].map((dest) => ({ dest, data: readFileSync(src.get(dest)!) }));
+    const created = managedFiles(pkg.root, { vf: config.vf })
+      .filter((f) => f.kind === "owned" && f.src && !existsSync(join(root, f.dest)))
+      .map((f) => ({ dest: f.dest, data: readFileSync(f.src!) }));
     const managed = Object.fromEntries(files.map((f) => [f.dest, sha256(readFileSync(f.src!))]));
     const dropped = Object.keys(config.managed).filter((dest) => !Object.hasOwn(managed, dest));
 
@@ -85,7 +89,7 @@ export async function runUpdate(argv: string[], deps: { pkg?: { root: string; ve
     // config를 마지막에 쓰므로 같은 명령을 다시 실행하면 이미 쓴 파일은 새 원본과 같아 건너뛰고 나머지를 마친다
     const settings = applyOps(root, [settingsOp(pkg.root)]).written;
     writing = true;
-    for (const w of writes) {
+    for (const w of [...writes, ...created]) {
       mkdirSync(dirname(join(root, w.dest)), { recursive: true });
       writeFileSync(join(root, w.dest), w.data);
     }
@@ -95,6 +99,7 @@ export async function runUpdate(argv: string[], deps: { pkg?: { root: string; ve
     process.stdout.write(
       `밀버스 update를 마쳤습니다. 버전 ${config.version} → ${pkg.version}\n` +
         (writes.length ? `바꾼 밀버스 관리 파일 ${writes.length}개${conflicts.length ? `(로컬 수정을 덮어쓴 ${conflicts.length}개 포함)` : ""}:\n${list(writes.map((w) => w.dest))}` : "바꾼 밀버스 관리 파일이 없습니다\n") +
+        (created.length ? `없던 프로젝트 소유 파일 ${created.length}개를 새로 놓았습니다. 이제 팀이 고치는 파일입니다:\n${list(created.map((w) => w.dest))}` : "") +
         (settings.length ? ".claude/settings.json에 새 permissions·hook을 병합했습니다\n" : "") +
         (dropped.length
           ? `새 패키지에 없는 관리 파일 ${dropped.length}개를 milvus.config.json에서 뺐습니다. 파일은 지우지 않았습니다. 쓰지 않으면 직접 지우세요(org에 배포한 것은 따로 지워야 합니다):\n${list(dropped)}`

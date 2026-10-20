@@ -59,6 +59,7 @@
 | `CLAUDE.md` | 소유 | `@milvus-design.md` 한 줄 |
 | `milvus.config.json` | 생성 | 패키지 버전, 브랜드, 대상 org, 관리 파일 목록과 sha256 |
 | `milvus-brand-request.md` | 소유 | 브랜드 명세 페이지가 저장한 요청 |
+| `milvus-patterns.md` | 소유 | UI 패턴 명세(모달 등). 팀이 규칙을 고치고 더한다 |
 | `.claude/settings.json` | 소유 | 밀버스 permissions·hook 병합 |
 | `.claude/skills/milvus-brand/SKILL.md` | 관리 | 브랜드 요청 반영 skill |
 | `.claude/hooks/milvus-check.mjs` | 관리 | `milvusBrand.css`·`milvusOverride.css`·`brandingSets/`를 고치면 `check --style` |
@@ -86,6 +87,7 @@
 - **util.css(`milvusBrand.css`):** `:root` 블록 하나. 이름에 color가 없는 g·s hook(읽는 곳이 있는 이름), 중립 색(`light-dark()`, 글자·면 4.5:1 이상), 피드백 색, 색 s hook 6개, 읽는 곳이 있는 `--milvus-*`, `letter-spacing`만 쓴다. 클래스 규칙, `@font-face`, 글꼴 hook, 브랜드 색 계열 hook, `--slds-c-*`는 쓰지 않는다. 고치면 hook이 `check --style`로 검사한다. 자세한 표는 `milvus-brand` skill에 있다
 - **색은 `BrandingSet`에서만.** 브랜드 색을 CSS에 적지 않는다. Salesforce는 입력한 색 대신 접근성 색(50단계)을 버튼에 쓴다
 - **Salesforce 고정 항목**(토스트 표시 시간, z-index, 아이콘 모양 등)은 바꿀 수 없다고 답하고 목록을 보여 준다. 글꼴은 바꾸지 않는다
+- **화면 패턴.** LWC 화면(모달 등)을 만들거나 고치기 전에 `milvus-patterns.md`를 읽고 따른다. 명세와 다르게 해야 하면 이유를 말하고 확인받는다. 패턴은 브랜드가 아니라 화면 구성이라 `milvus-brand` skill 범위 밖이다
 - **LWC는 JavaScript(`.js`)로 쓴다.** `.ts` LWC를 그대로 배포하면 org가 타입 검사로 거부한다
 - **`milvus` 접두사는 밀버스 전용이다.** 프로젝트 컴포넌트·변수에 `milvus`, `--milvus-`를 쓰지 않는다
 - 프로젝트 컴포넌트에서 브랜드 스타일이 필요하면 `c/milvusScript`의 `loadBrand(this)`를 부른다

@@ -231,13 +231,28 @@ test("VF 없이 init한 프로젝트에는 update가 milvusHead·milvusVf를 만
 
 test("소유 파일은 바뀌지 않는다", async () => {
   await withProject(async (root, pkg) => {
-    const owned = [`${RES}/milvusBrand.css`, `${RES}/milvusOverride.css`, `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`];
+    const owned = [`${RES}/milvusBrand.css`, `${RES}/milvusOverride.css`, "milvus-patterns.md", `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`];
     for (const f of owned) appendFileSync(join(root, f), "<!-- 로컬 -->\n");
-    for (const f of owned.slice(0, 2)) appendFileSync(join(pkg, tpl(f)), "/* 새 틀 */\n");
+    for (const f of owned.slice(0, 3)) appendFileSync(join(pkg, tpl(f)), "/* 새 틀 */\n");
     const before = Object.fromEntries(owned.map((f) => [f, read(root, f)]));
 
     const r = await update(root, pkg, ["--force"]);
     assert.equal(r.result, 0, r.stderr);
     assert.deepEqual(Object.fromEntries(owned.map((f) => [f, read(root, f)])), before);
+  });
+});
+
+test("없는 소유 파일만 새로 놓는다(새 버전이 더한 milvus-patterns.md). 있는 소유 파일과 managed 기록은 그대로다", async () => {
+  await withProject(async (root, pkg) => {
+    rmSync(join(root, "milvus-patterns.md"));
+    appendFileSync(join(root, `${RES}/milvusBrand.css`), "/* 로컬 */\n");
+    const brand = read(root, `${RES}/milvusBrand.css`);
+
+    const r = await update(root, pkg);
+    assert.equal(r.result, 0, r.stderr);
+    assert.equal(read(root, "milvus-patterns.md"), read(pkg, tpl("milvus-patterns.md")));
+    assert.equal(read(root, `${RES}/milvusBrand.css`), brand);
+    assert.ok(!("milvus-patterns.md" in readConfig(root)!.managed));
+    assert.ok(r.stdout.includes("milvus-patterns.md"), r.stdout);
   });
 });

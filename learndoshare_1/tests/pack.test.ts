@@ -41,6 +41,7 @@ test("pack 결과에 tsconfig.lwc.base.json·lwc-platform.d.ts와 force-app 아�
   assert.ok(!entries.includes("package/lwc-platform.d.ts"));
   assert.deepEqual(entries.filter((e) => e.startsWith("package/force-app/") && e.endsWith(".ts")), []);
   assert.ok(entries.includes("package/force-app/main/default/lwc/milvusBrandLoader/milvusBrandLoader.js"), entries.join("\n"));
+  assert.ok(entries.includes("package/templates/milvus-patterns.md"), entries.join("\n"));
 });
 
 // .storybook은 원본 .ts로 발행한다(Task 3). files에 고른 lib·cli 원본이 빠지면 프로젝트 모드 Storybook이 import에서 멈춘다.

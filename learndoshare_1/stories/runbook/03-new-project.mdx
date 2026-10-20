@@ -18,7 +18,7 @@ pnpm add -D @a40418a/milvus-design-system
 pnpm milvus --version
 ```
 
-`--version`이 `0.2.3`(또는 그 뒤 버전)을 출력하면 된다. `sfdx-project.json`의 기본 패키지 폴더는 `force-app`이어야 한다(`init`이 확인한다).
+`--version`이 `0.2.4`(또는 그 뒤 버전)을 출력하면 된다. `sfdx-project.json`의 기본 패키지 폴더는 `force-app`이어야 한다(`init`이 확인한다).
 
 ## 2. `init`
 
@@ -120,6 +120,7 @@ pnpm milvus deploy --yes
     <tr><td>`milvus-design.md`</td><td>관리</td><td>안내서이자 Claude Code 규칙. `CLAUDE.md`의 `@milvus-design.md` 한 줄이 불러온다</td></tr>
     <tr><td>`milvus.config.json`</td><td>생성</td><td>패키지 버전, 브랜드, 대상 org, VF 여부, 관리 파일 sha256</td></tr>
     <tr><td>`milvus-brand-request.md`</td><td>소유</td><td>명세 페이지가 저장한 요청</td></tr>
+    <tr><td>`milvus-patterns.md`</td><td>소유</td><td>UI 패턴 명세(모달 등). 팀이 고치고, Claude가 LWC를 쓰기 전에 읽는다</td></tr>
     <tr><td>`.claude/settings.json`</td><td>소유</td><td>밀버스 permissions·hook 병합</td></tr>
     <tr><td>`.claude/skills/milvus-brand/SKILL.md`</td><td>관리</td><td>"브랜드 요청 반영해줘" skill</td></tr>
     <tr><td>`.claude/hooks/milvus-check.mjs`</td><td>관리</td><td>스타일 파일을 고치면 `check --style`</td></tr>

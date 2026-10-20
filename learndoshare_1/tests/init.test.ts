@@ -213,6 +213,19 @@ test("이미 있는 milvusBrand.css는 건너뛰고 skipped에 넣는다", async
   });
 });
 
+test("milvus-patterns.md(소유)를 없을 때만 놓고 managed sha256에 넣지 않는다", async () => {
+  await withProject({}, async (root) => {
+    assert.equal((await init(root, BRAND)).code, 0);
+    assert.equal(read(root, "milvus-patterns.md"), readFileSync(join(pkgRoot, "templates/milvus-patterns.md"), "utf8"));
+    assert.ok(!("milvus-patterns.md" in readConfig(root)!.managed));
+  });
+  const mine = "# 우리 패턴\n";
+  await withProject({ "milvus-patterns.md": mine }, (root) => {
+    assert.ok(applyOps(root, plan(root)).skipped.includes("milvus-patterns.md"));
+    assert.equal(read(root, "milvus-patterns.md"), mine);
+  });
+});
+
 test("LightningExperience.settings는 만들지 않는다", async () => {
   await withProject({}, async (root) => {
     const r = await init(root, FROM, { sf: fakeSf(ORG) });

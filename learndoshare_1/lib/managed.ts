@@ -37,6 +37,7 @@ export function managedFiles(pkgRoot: string, o: { vf: boolean }): ManagedFile[]
 
   const files: ManagedFile[] = [
     copy("milvus-design.md", "managed"),
+    copy("milvus-patterns.md", "owned"),
     copy(".claude/skills/milvus-brand/SKILL.md", "managed", tpl("claude/skills/milvus-brand/SKILL.md")),
     copy(".claude/hooks/milvus-check.mjs", "managed", tpl("claude/hooks/milvus-check.mjs")),
     { dest: "milvus.config.json", kind: "generated" },
