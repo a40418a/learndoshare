@@ -37,7 +37,7 @@
 
 - [ ] `pnpm add -D @a40418a/milvus-design-system`
 - [ ] `pnpm milvus init --target-org <별칭> --brand <이름>` (org의 지금 테마를 가져오려면 `--brand` 대신 `--from-org`, VF를 안 쓰면 `--no-vf`)
-- [ ] `pnpm milvus storybook` → "시작하기 / 브랜드 명세" 페이지에 요청을 입력하고 저장한다(`milvus-brand-request.md`). 저장이 안 되면 채팅에 직접 쓴다
+- [ ] `pnpm milvus storybook` → "시작하기 / 브랜드 명세" 페이지에 요청을 입력하고 저장한다(`milvus-brand-request.md`). 입력은 브랜드 색, 로고, 피드백 색, 디자인 명세 네 가지이고 모두 선택이다. 디자인 명세에는 다른 디자인 시스템 문서의 표, 피그마 토큰 JSON, 사이트 주소, 자연어를 그대로 붙여 넣는다. 저장이 안 되면 채팅에 직접 쓴다
 - [ ] Claude Code에 "브랜드 요청 반영해줘" → 브랜드 명세 표 확인 → 승인 → 반영 → `pnpm milvus check`
 - [ ] Storybook에서 화면을 확인한다(파일이 바뀌면 저절로 갱신된다)
 - [ ] `pnpm milvus deploy`로 배포 계획 확인 → 채팅에서 승인 → `pnpm milvus deploy --yes`
@@ -95,7 +95,7 @@
 
 브랜드 작업은 `milvus-brand` skill이 맡는다. Claude는 브랜드 명세 표를 먼저 제안하고, 승인을 받은 뒤에 파일을 쓴다.
 
-- "브랜드 요청 반영해줘" (명세 페이지에 저장한 `milvus-brand-request.md`)
+- "브랜드 요청 반영해줘" (명세 페이지에 저장한 `milvus-brand-request.md`. 디자인 명세에 붙여 넣은 내용은 명세 페이지 "바꿀 수 있는 것"의 항목으로 나눠 반영한다)
 - "브랜드 색을 신뢰감 있는 딥그린으로, 각지고 촘촘하게 해줘"
 - "회색을 쿨그레이로 바꾸고 카드 그림자는 없애줘"
 - "성공 색은 글자 #1B5E20, 배경 #E8F5E9로"

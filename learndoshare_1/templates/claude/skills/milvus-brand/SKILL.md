@@ -13,7 +13,9 @@ description: 밀버스 디자인 시스템의 브랜드 요청(milvus-brand-requ
 
 1. **입력.** 프로젝트 루트의 `milvus-brand-request.md`를 읽는다. 없으면 채팅의 브랜드 설명을 쓴다. 자연어가 아니면 7장대로 값을 뽑는다
    - 파일 형식: `# 브랜드 요청`, `저장: …`, 항목마다 `## <항목>` 아래 `지금: …`(명세 페이지가 적은 당시 값)과 `요청: …`
-   - 절 제목 `<항목>`은 4장 표의 항목 이름(`SPEC_ITEMS`의 label)이다. 피드백 색만 종류마다 `## 피드백 색 / 성공`(경고·오류·정보)이다. `지금:` 줄은 없을 수 있고(로고, 전체 스타일 등), `요청:`은 여러 줄일 수 있다(다음 `## ` 줄 앞까지). 4장에 없는 제목의 절은 사용자 메모로 보고 그대로 둔다
+   - 명세 페이지의 입력은 `## 브랜드 색`, `## 로고`, `## 피드백 색 / 성공`(경고·오류·정보), `## 디자인 명세` 네 가지다. `지금:` 줄은 없을 수 있고(로고, 디자인 명세 등), `요청:`은 여러 줄일 수 있다(다음 `## ` 줄 앞까지)
+   - **디자인 명세**(옛 제목 `## 전체 스타일`도 같다)에는 다른 디자인 시스템 문서의 표, 토큰 JSON, Figma, URL, 자연어가 섞여 붙여 넣어져 있다. 붙여 넣은 글의 `## ` 줄은 `\## `로 적혀 있다(앞의 `\` 하나를 떼고 읽는다). 내용을 형식별로 7장대로 읽어 4장 표의 항목(모서리, 밀도, 회색 온도, 그림자 깊이 …)으로 나누고, 2단계 표에는 나눈 결과를 항목별 행으로 적는다. 어느 항목에도 맞지 않거나 Salesforce 고정인 요구는 "반영하지 못하는 요구와 대안" 칸에 적는다
+   - 4장 표의 다른 항목 이름으로 된 절(`## 모서리` 등, 2026-10-20 전에 항목별 입력으로 저장한 세부 요청)도 그 항목에 그대로 반영한다. 디자인 명세와 겹치면 세부 절을 우선하고 표에 겹친다고 적는다. 4장에 없는 제목의 절은 사용자 메모로 보고 그대로 둔다
 2. **브랜드 명세 표를 채팅으로 제안한다.** 파일은 아직 고치지 않는다. 칸: 항목 | 적용 값 | 쓰는 곳(hook·브리지 변수·파일) | 출처(요청 문장, 토큰 이름) | 확정/추정 | 반영하지 못하는 요구와 대안
    - 추정(이미지에서 읽은 색, 프리셋에서 고른 값)은 추정이라고 적는다
    - 2장 순서의 뒤 단계(브리지 변수, override)를 쓰는 행에는 그 한계를 함께 적는다
@@ -87,7 +89,7 @@ node --input-type=module -e 'import { SPEC_ITEMS } from "@a40418a/milvus-design-
 | 컴포넌트별 조정 (`component`) | `--slds-s-button-radius-border`, `--slds-s-input-radius-border`, `--slds-s-container-radius-border`, `--slds-s-button-shadow`, `--slds-s-input-shadow`, `--slds-s-container-shadow`, 모달 너비 브리지 `--milvus-modal-width-base`·`--milvus-modal-width-small`·`--milvus-modal-width-medium`·`--milvus-modal-width-large`·`--milvus-modal-width-full`, `--milvus-modal-min-width` | 카드 그림자는 native `lightning-card`에 닿지 않는다. 모달 너비는 아래 |
 | 밀버스 컴포넌트 (`milvus-component`) | 그 컴포넌트가 읽는 `--milvus-*` | 새로 만들지 않는다 |
 | 글꼴 (`font`) | 없음 | 바꾸지 않는다. 요청이 오면 시스템 글꼴 고정이라고 답한다 |
-| 전체 스타일 (`overall`) | 7장 프리셋으로 나눠 각 항목 행에 반영한다 | 표에는 나눈 결과를 항목별로 적는다 |
+| 디자인 명세 (`overall`) | 붙여 넣은 표·토큰 JSON·URL·자연어를 7장대로 읽어 이 표의 항목들로 나눠 각 항목 행에 반영한다 | 표에는 나눈 결과를 항목별로 적는다. 옛 절 제목 `전체 스타일`도 이 항목이다 |
 | 바탕·면 색 (`surface`) | `--slds-g-color-surface-1`~`-3`(`--slds-g-color-surface-2`가 앱 바탕), `--slds-g-color-surface-container-1`~`-3`, native용 `--slds-g-color-neutral-base-100`·`-95`·`-90` | `--slds-g-color-neutral-base-100`은 색 위 흰 글자로도 쓰여 흰색 가까이에서만 바꾼다 |
 | 글자색 단계 (`text-color`) | `--slds-g-color-on-surface-3`(제목·본문), `--slds-g-color-on-surface-2`(입력값·라벨), `--slds-g-color-on-surface-1`(보조·placeholder) | 보조 아이콘도 `--slds-g-color-on-surface-1`을 쓴다 |
 | 테두리·구분선 (`border-color`) | `--slds-g-color-border-1`(구분선·카드), `--slds-g-color-border-2`(입력·버튼), native용 `--slds-g-color-border-base-1`·`--slds-g-color-border-base-4` | |

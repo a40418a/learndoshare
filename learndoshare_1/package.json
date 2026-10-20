@@ -1,6 +1,6 @@
 {
   "name": "@a40418a/milvus-design-system",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "밀버스 디자인 시스템 (SFDX + LWC + Storybook)",
   "type": "module",
   "bin": {
