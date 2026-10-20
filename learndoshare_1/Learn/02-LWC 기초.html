@@ -397,7 +397,7 @@ export default class MilvusBrandLoader extends LightningElement {
   <p><code>.js-meta.xml</code>의 <code>isExposed</code>가 <code>false</code>면 그 컴포넌트는 Lightning App Builder 같은 빌더에 보이지 않는다. 빌더에서 쓰게 하려면 <code>true</code>로 두고 대상(<code>&lt;target&gt;</code>)을 하나 이상 정한다(LWC 개발자 가이드). 빌더 노출과 코드에서 쓰는 것은 별개다. <code>isExposed</code>가 <code>false</code>인 <code>milvusScript</code>를 프로브 컴포넌트가 <code>c/milvusScript</code>로 import해 org에서 동작했다(2026-10-09 프로브, 위 "org에서 확인한 것").</p>
   <div class="table-wrap"><table>
     <tr><th>밀버스 LWC</th><th><code>isExposed</code></th><th>대상</th><th>이유</th></tr>
-    <tr><td><code>milvusBadge</code>, <code>milvusButton</code>, <code>milvusMultiSelect</code>, <code>milvusNotification</code></td><td><code>false</code></td><td>없음</td><td>다른 LWC 안에서 쓰는 부품이다. 리허설에서 앱 빌더 목록에 나와 사용자가 지적했고, 노출을 껐다(설계 1장 10/14 결정)</td></tr>
+    <tr><td><code>milvusBadge</code>, <code>milvusButton</code>, <code>milvusMultiSelect</code>, <code>milvusNotification</code>, <code>milvusCalendar</code></td><td><code>false</code></td><td>없음</td><td>다른 LWC 안에서 쓰는 부품이다. 리허설에서 앱 빌더 목록에 나와 사용자가 지적했고, 노출을 껐다(설계 1장 10/14 결정)</td></tr>
     <tr><td><code>milvusScript</code></td><td><code>false</code></td><td>없음</td><td>화면 없는 공용 모듈(import 전용)</td></tr>
     <tr><td><code>milvusBrandLoader</code></td><td><code>true</code></td><td><code>lightning__UtilityBar</code> 하나</td><td>사람이 App Manager에서 앱의 유틸리티 바에 붙여야 하므로 노출한다</td></tr>
   </table></div>

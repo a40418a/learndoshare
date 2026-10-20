@@ -1,0 +1,81 @@
+<template>
+  <div class="slds-grid slds-grid_vertical-align-center slds-wrap header">
+    <lightning-button-icon
+      icon-name="utility:chevronleft"
+      alternative-text={prevLabel}
+      title={prevLabel}
+      onclick={handlePrev}
+    ></lightning-button-icon>
+    <lightning-button-icon
+      icon-name="utility:chevronright"
+      alternative-text={nextLabel}
+      title={nextLabel}
+      onclick={handleNext}
+    ></lightning-button-icon>
+    <lightning-button label="오늘" onclick={handleToday}></lightning-button>
+    <h2 id="title" class="slds-text-heading_small" aria-live="polite">
+      {title}
+    </h2>
+  </div>
+  <div
+    class={gridClass}
+    role="grid"
+    aria-labelledby="title"
+    onkeydown={handleKeyDown}
+  >
+    <div class="row" role="row">
+      <template for:each={weekdays} for:item="weekday">
+        <div
+          key={weekday.key}
+          class="columnheader"
+          role="columnheader"
+          aria-label={weekday.long}
+        >
+          <abbr title={weekday.long}>{weekday.short}</abbr>
+        </div>
+      </template>
+    </div>
+    <template for:each={rows} for:item="row">
+      <div key={row.key} class="row" role="row">
+        <template for:each={row.cells} for:item="cell">
+          <div
+            key={cell.key}
+            class={cell.className}
+            role="gridcell"
+            tabindex={cell.tabindex}
+            data-date={cell.key}
+            aria-label={cell.label}
+            aria-current={cell.ariaCurrent}
+            aria-selected={cell.ariaSelected}
+            onclick={handleCellClick}
+          >
+            <span class="day" aria-hidden="true">{cell.day}</span>
+            <template for:each={cell.events} for:item="item">
+              <button
+                key={item.key}
+                type="button"
+                class={item.className}
+                title={item.label}
+                tabindex={item.tabindex}
+                data-id={item.id}
+                onclick={handleEventClick}
+              >
+                {item.label}
+              </button>
+            </template>
+            <button
+              lwc:if={cell.more}
+              type="button"
+              class="more"
+              tabindex={cell.tabindex}
+              data-date={cell.key}
+              onclick={handleMoreClick}
+            >
+              {cell.more}
+            </button>
+          </div>
+        </template>
+      </div>
+    </template>
+  </div>
+</template>

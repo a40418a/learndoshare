@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <isExposed>false</isExposed>
+    <masterLabel>Milvus Calendar</masterLabel>
+    <description>날짜 칸에 일정을 보여 주는 월·주 일정표. 다른 LWC 안에서 쓰는 부품이라 앱 빌더에 노출하지 않는다</description>
+</LightningComponentBundle>
