@@ -15,7 +15,8 @@ const version = JSON.parse(readFileSync(join(pkgRoot, "package.json"), "utf8")).
 const FA = "force-app/main/default";
 const BRAND = ["--target-org", "dev", "--brand", "Acme"];
 const FROM = ["--target-org", "dev", "--from-org"];
-const NPMRC = ["@a40418a:registry=https://npm.pkg.github.com", "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}"];
+// 토큰 줄은 넣지 않는다(pnpm 11은 프로젝트 .npmrc의 ${…} 토큰을 무시, #46). 사용자 ~/.npmrc에 둔다
+const NPMRC = ["@a40418a:registry=https://npm.pkg.github.com"];
 
 // 임시 SFDX 프로젝트. 폴더 이름에 공백과 한글을 넣는다(리뷰 중점 5)
 function makeProject(files: Record<string, string> = {}): string {
@@ -183,11 +184,12 @@ test("CLAUDE.md에 정확히 '@milvus-design.md' 한 줄을 추가하고 기존 
   });
 });
 
-test(".npmrc 범위 두 줄이 없을 때만 추가한다", async () => {
+test(".npmrc 레지스트리 줄이 없을 때만 추가하고 토큰 줄은 넣지 않는다", async () => {
   await withProject({ ".npmrc": `auto-install-peers=true\n${NPMRC[0]}\n` }, (root) => {
     applyOps(root, plan(root));
     applyOps(root, plan(root));
-    assert.equal(read(root, ".npmrc"), `auto-install-peers=true\n${NPMRC[0]}\n${NPMRC[1]}\n`);
+    assert.equal(read(root, ".npmrc"), `auto-install-peers=true\n${NPMRC[0]}\n`);
+    assert.ok(!read(root, ".npmrc").includes("_authToken"));
     assert.equal(read(root, ".forceignore"), "**/jsconfig.json\n**/__tests__/**\n");
   });
   // .forceignore에 줄이 없으면 끝에 붙인다

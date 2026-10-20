@@ -12,15 +12,16 @@
 - pnpm. `npm`, `npx`, `yarn`은 쓰지 않는다
 - Salesforce CLI `sf`와 대상 org 로그인(`sf org login web --alias <별칭>`)
 - GitHub classic 토큰(`read:packages`)을 셸 환경변수 `NODE_AUTH_TOKEN`에 넣는다. 토큰 값은 파일에 쓰지 않는다
-- `.npmrc` 두 줄. `init`이 프로젝트 `.npmrc`에 없으면 더한다
+- 레지스트리 줄은 프로젝트 `.npmrc`에 둔다. `init`이 없으면 더한다
   ```
   @a40418a:registry=https://npm.pkg.github.com
+  ```
+- 토큰 줄은 pnpm 버전과 상관없이 사용자 파일 `~/.npmrc`에 둔다. `init`은 이 줄을 넣지 않는다
+  ```
   //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
   ```
-- pnpm 버전에 따라 토큰 줄을 두는 곳이 다르다(`pnpm --version`)
-  - 10.34.2 미만(10.x), 11.5.3 미만(11.x): 프로젝트 `.npmrc`의 `${NODE_AUTH_TOKEN}`을 치환한다. 10.13.1에서 설치를 확인했다
-  - 10.34.2 이상, 11.5.3 이상: 프로젝트 `.npmrc`의 인증 줄에 있는 `${…}`를 풀지 않고 그 설정을 무시한다(경고가 뜬다). 토큰 줄을 사용자 파일 `~/.npmrc`로 옮긴다. 레지스트리 줄은 프로젝트 `.npmrc`에 남긴다. pnpm 11.11.0(Windows)에서 이렇게 설치를 확인했다(2026-10-20)
-  - pnpm 11은 범위 레지스트리를 `pnpm-workspace.yaml`의 `registries`로도 정한다. 토큰은 계속 `.npmrc`에 둔다
+  - pnpm 10.34.2·11.5.3부터는 프로젝트 `.npmrc`의 인증 줄에 있는 `${…}`를 풀지 않고 경고와 함께 무시한다. 그보다 낮은 버전은 프로젝트 `.npmrc`에서도 치환했다(10.13.1 확인). 사용자 파일은 두 경우 모두 읽는다. pnpm 11.11.0(Windows)에서 이렇게 설치를 확인했다(2026-10-20)
+  - pnpm 11은 범위 레지스트리를 `pnpm-workspace.yaml`의 `registries`로도 정한다. 토큰은 계속 `~/.npmrc`에 둔다
 - **pnpm 11은 설치 전에 `pnpm-workspace.yaml`을 만든다.** 기본값 두 가지 때문이다
   - `minimumReleaseAge` 기본 1440분(하루): 발행한 지 하루가 안 된 밀버스 버전 대신 이전 버전을 설치한다
   - `strictDepBuilds` 기본 true: Storybook이 쓰는 esbuild의 설치 스크립트를 승인하지 않으면 `ERR_PNPM_IGNORED_BUILDS`로 끝난다
@@ -61,7 +62,7 @@
 | `.claude/settings.json` | 소유 | 밀버스 permissions·hook 병합 |
 | `.claude/skills/milvus-brand/SKILL.md` | 관리 | 브랜드 요청 반영 skill |
 | `.claude/hooks/milvus-check.mjs` | 관리 | `milvusBrand.css`·`milvusOverride.css`·`brandingSets/`를 고치면 `check --style` |
-| `.gitignore`, `.forceignore`, `.npmrc`, `package.json` | 소유 | `.milvus/`, `**/__tests__/**`, 레지스트리 두 줄, `storybook` 스크립트 |
+| `.gitignore`, `.forceignore`, `.npmrc`, `package.json` | 소유 | `.milvus/`, `**/__tests__/**`, 레지스트리 줄, `storybook` 스크립트 |
 | `lwc/milvus*/` (밀버스 컴포넌트, `milvusScript`, `milvusBrandLoader`) | 관리 | `.js` |
 | `classes/utils/design/` | 관리 | 밀버스 Apex(생기면) |
 | `components/milvusHead.component` | 관리, VF | VF 페이지 head |
@@ -117,7 +118,8 @@
 - **패키지 업데이트:** `pnpm add -D @a40418a/milvus-design-system@<버전>` 뒤 `pnpm milvus update`. 고친 밀버스 관리 파일이 있으면 아무것도 바꾸지 않고 차이를 보여 준다. 패키지 원본으로 되돌리려면 `pnpm milvus update --force`
 - **`storybook`이 버전이 다르다고 멈춤:** 패키지만 올리고 `update`를 하지 않아 새 밀버스 컴포넌트(`c/milvus…`)가 프로젝트에 없다. `pnpm milvus update`를 먼저 실행한다
 - **`check`가 sha256 차이를 말함:** 밀버스 관리 파일이 바뀌었다. `pnpm milvus update --force`로 되돌린다
-- **설치가 인증 오류(401·403)로 실패:** `NODE_AUTH_TOKEN`이 비었거나 만료되었거나 `read:packages` 권한이 없다. `.npmrc` 두 줄과 pnpm 버전(2절)을 확인한다
+- **설치가 인증 오류(401·403)로 실패:** `NODE_AUTH_TOKEN`이 비었거나 만료되었거나 `read:packages` 권한이 없다. 프로젝트 `.npmrc`의 레지스트리 줄과 `~/.npmrc`의 토큰 줄(2절)을 확인한다
+- **Windows에서 `storybook`이 `EISDIR lstat 'C:'`로 실패:** 0.2.2에서 고쳤다. `pnpm add -D @a40418a/milvus-design-system@0.2.2`
 - **`init`·`deploy`가 org에서 멈춤:** `sf`가 없거나 로그인이 만료되었다. `sf org login web --alias <별칭>`
 - **VF:** 페이지에 `<c:milvusHead/>`를 넣는다. `showHeader="false"` 페이지는 `<body>`에 `slds-scope`가 자동으로 붙어 래퍼가 필요 없었다(2026-10-14 측정). `applyBodyTag`·`applyHtmlTag`를 `false`로 두면 `slds-scope`를 직접 넣는다. 프로젝트 전체 배포로 `milvusHead`를 올릴 때는 `milvusVf.css`가 커밋되어 있어야 한다
 - **VF가 SLDS 1처럼 보임(버튼 반경 4px):** 3절의 Visualforce Settings 설정을 확인한다

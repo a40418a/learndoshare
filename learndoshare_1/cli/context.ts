@@ -1,19 +1,25 @@
 // 명령들이 함께 쓰는 것: 패키지 위치, SFDX 프로젝트 찾기, milvus.config.json, sf 실행
 import { spawn } from "node:child_process";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { findPackageJSON } from "node:module";
 import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 export type MilvusConfig = { version: string; targetOrg: string; brand: string; vf: boolean; managed: Record<string, string> };
 export type SfRunner = (args: string[], cwd: string) => Promise<{ code: number; stdout: string; stderr: string }>;
 
 const CONFIG = "milvus.config.json";
 
-/** 이 패키지의 루트와 버전. 저장소(cli/*.ts)와 패키지(dist/cli/*.js) 모두 가장 가까운 package.json이 이 패키지의 것이다 */
+/**
+ * 이 패키지의 루트와 버전. 저장소(cli/*.ts)와 패키지(dist/cli/*.js) 모두 가장 가까운 package.json이 이 패키지의 것이다.
+ * node:module의 findPackageJSON은 Windows에서 `\\?\C:\…` 접두사가 붙은 경로를 돌려주고, realpathSync가 이를 처리하지 못해
+ * (EISDIR lstat 'C:', 2026-10-20 Windows·Node 24.21 실측, #46) 이 파일 위치에서 위로 올라가며 직접 찾는다
+ */
 export function packageInfo(): { root: string; version: string } {
-  const path = findPackageJSON(import.meta.url);
-  if (!path) throw new Error("package.json을 찾지 못했습니다");
-  return { root: dirname(path), version: JSON.parse(readFileSync(path, "utf8")).version };
+  for (let dir = dirname(fileURLToPath(import.meta.url)); ; dir = dirname(dir)) {
+    const path = join(dir, "package.json");
+    if (existsSync(path)) return { root: dir, version: JSON.parse(readFileSync(path, "utf8")).version };
+    if (dirname(dir) === dir) throw new Error("package.json을 찾지 못했습니다");
+  }
 }
 
 /** cwd에서 위로 올라가며 sfdx-project.json을 찾는다. defaultPackageDir는 앞의 ./와 끝의 /를 뺀 기본 패키지 폴더다 */

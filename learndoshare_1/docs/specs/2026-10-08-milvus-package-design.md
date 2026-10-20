@@ -30,9 +30,9 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 ```
 0. 설치 전 준비 (개발자마다 한 번)
    - GitHub에서 read:packages 권한의 classic 토큰을 만들어 셸 환경변수 NODE_AUTH_TOKEN에 넣는다
-   - ~/.npmrc(또는 프로젝트 .npmrc)에 두 줄을 넣는다
-       @a40418a:registry=https://npm.pkg.github.com
-       //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+   - 프로젝트 .npmrc에 레지스트리 줄, ~/.npmrc에 토큰 줄을 넣는다(토큰 줄은 pnpm 버전과 상관없이 ~/.npmrc)
+       @a40418a:registry=https://npm.pkg.github.com              (프로젝트 .npmrc)
+       //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}       (~/.npmrc)
 1. pnpm add -D @a40418a/milvus-design-system
 2. pnpm milvus init --target-org <별칭> --brand <이름>     (또는 --from-org)
 3. pnpm milvus storybook        → 브랜드 명세 페이지에 항목별·전체 요청 입력 → 저장
@@ -115,7 +115,7 @@ package.json                                       [소유] "storybook": "milvus
 .claude/hooks/milvus-check.mjs                     [관리] util.css·브랜드 메타데이터 수정 후 check --style
 .gitignore                                         [소유] .milvus/ 줄 추가
 .forceignore                                       [소유] **/__tests__/** 줄 추가 (없을 때만. 밀버스 LWC가 JS라 tsconfig 줄은 넣지 않는다, 10/9 D1)
-.npmrc                                             [소유] 범위 두 줄이 없으면 추가 (0장 준비를 팀원과 공유)
+.npmrc                                             [소유] 레지스트리 줄이 없으면 추가 (0장 준비를 팀원과 공유. 토큰 줄은 넣지 않는다, #46)
 force-app/main/default/
   lwc/milvusBadge/, milvusButton/, milvusMultiSelect/ …   [관리] 밀버스 컴포넌트 (.js)
   lwc/milvusScript/                                [관리] 공용 함수 (loadBrand 등)
@@ -372,7 +372,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 
 ### 7.1 `milvus-design.md` (프로젝트 루트, 200줄 이하, [관리])
 1. 이 프로젝트의 밀버스 설정: 값은 쓰지 않고 "`milvus.config.json`을 본다"고만 적는다(원본을 하나로)
-2. 준비물: Node 22.18 이상(23.x는 23.6 이상), pnpm, sf CLI, GitHub 토큰 `NODE_AUTH_TOKEN`, `.npmrc` 두 줄, org 로그인
+2. 준비물: Node 22.18 이상(23.x는 23.6 이상), pnpm, sf CLI, GitHub 토큰 `NODE_AUTH_TOKEN`, 프로젝트 `.npmrc`의 레지스트리 줄과 `~/.npmrc`의 토큰 줄, org 로그인
 3. 세팅 순서 체크리스트: `init` → 브랜드 요청 입력 → 반영 → `storybook` 확인 → `deploy`. 배포 뒤 사람이 org에서 하는 일 두 가지(10/9 D2·D3)
    - VF를 쓰면 Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켠다. 메타데이터로 켤 수 없다
    - 앱 전체에 브랜드를 걸려면 App Manager에서 그 앱의 유틸리티 바에 `milvusBrandLoader`를 추가하고 "앱이 열릴 때 백그라운드로 로드"를 체크한다. 앱마다 한다. 안 하면 밀버스 컴포넌트가 있는 페이지에만 걸린다. 로더는 보이는 유틸리티 항목이라 유틸리티 바에 버튼으로 나온다(라벨·아이콘은 App Manager에서 정한다). 템플릿이 비어 있어 패널을 열어도 아무것도 그리지 않는다
@@ -651,7 +651,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | Storybook 개발 서버는 기본으로 모든 네트워크 주소(`*:6007`)에서 듣는다. `--host localhost`를 주면 `[::1]`에서만 듣고, 이때 `127.0.0.1`로는 연결되지 않는다 | 같은 스파이크, `lsof` |
 | 설치할 때 pnpm 10.13.1이 `esbuild` 빌드 스크립트를 건너뛰었다고 경고한다. 그래도 Storybook의 `.ts` 설정 변환(esbuild)은 동작한다 | 같은 스파이크 |
 | 태그 `v0.0.1` push로 Actions가 GitHub Packages에 발행했다(`GITHUB_TOKEN`, 32초). 패키지는 **공개**로 생겼다(로그인 없이 패키지 페이지와 설치 명령이 보임). GitHub 문서는 새 패키지의 기본을 비공개로 적는다 — 이 경우 공개가 된 이유는 미확인 | Publish run(2026-10-09), 패키지 페이지 익명 접근 |
-| 프로젝트 `.npmrc` 두 줄(0장)과 셸 환경변수 `NODE_AUTH_TOKEN`(`read:packages` classic 토큰)으로 pnpm 10.13.1이 `${NODE_AUTH_TOKEN}`을 치환해 설치한다. `pnpm add -D @a40418a/milvus-design-system@0.0.1` → `pnpm milvus --version`이 `0.0.1` | `learndoshare_2`(2026-10-09) |
+| 프로젝트 `.npmrc` 두 줄(0장)과 셸 환경변수 `NODE_AUTH_TOKEN`(`read:packages` classic 토큰)으로 pnpm 10.13.1이 `${NODE_AUTH_TOKEN}`을 치환해 설치한다. `pnpm add -D @a40418a/milvus-design-system@0.0.1` → `pnpm milvus --version`이 `0.0.1`. 지금은 토큰 줄을 `~/.npmrc`에 두고 `init`은 레지스트리 줄만 넣는다(아래 2026-10-20 행, #46) | `learndoshare_2`(2026-10-09) |
 | `.ts` LWC를 그대로 배포하면 실패한다. org가 `.ts`를 타입 검사하며 `this.template`·`this.dispatchEvent`를 "type에 없음"(LWC1539)으로 거부한다. `transpileModule`로 만든 JS를 배포하면 성공하고, `c/milvusScript` import와 `loadBrand`(세 link)가 동작한다. 공식 문서: LWC 컴파일러는 TS를 컴파일하지 않으므로 배포 전에 JS로 변환해야 하고, 플랫폼은 TS를 저장하지 않는다 | 10/9 프로브 ([기록](../research/2026-10-09-org-probe.md) 3.1), LWC 개발자 가이드 "TypeScript (Developer Preview)" (확인 2026-10-09) |
 | 프로브 화면의 기본 컴포넌트는 전부 synthetic이다(`lightning-*` 호스트 90개 중 `data-render-mode` 0개) | 10/9 프로브 (기록 3.2) |
 | `loadStyle`로 넣은 클래스 규칙 `.slds-button { border-radius: 0 }`이 `lightning-button` 안 버튼과 같은 화면의 표준 헤더 버튼 대부분에 닿는다. 더 구체적인 선택자가 있는 버튼(`appdev-panel-button` 4px, `search-button` 8px, 즐겨찾기 별 240px)은 예외다 | 10/9 프로브 (기록 3.3) |
@@ -674,6 +674,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | v0.1.0 발행: main `182f75e`에 태그 `v0.1.0`을 push하자 Publish 워크플로(`pnpm install --frozen-lockfile` → `pnpm test` → `pnpm publish`)가 성공했다. `learndoshare_2`에서 `pnpm add -D @a40418a/milvus-design-system@0.1.0`이 `npm.pkg.github.com`의 tarball로 설치되고 `milvus --version`이 `0.1.0`, `milvus check`가 통과한다. 토큰(`NODE_AUTH_TOKEN`)이 없는 셸에서는 레지스트리 설치가 404로 실패한다 | 2026-10-17 Task 28 |
 | 고객 프로젝트의 권한 규칙(템플릿 `settings.json`)이 실제 Claude Code에서 동작한다. `learndoshare_2`를 폴더로 연 데스크톱 앱 Code 세션(auto 모드)에서 쟀다: `sf org display --help`, `sf org list --json --help`, `sf org list --all --json --help`, `sf org open -o … -r --help`, `sf org open -o … --url-only --help`, `sf auth list --json --help`는 deny로 막히고, `sf org list --help`는 실행된다. 인자 없는 `pnpm milvus deploy`는 `ask`로 승인을 묻는다(`Bash(pnpm milvus deploy *)`가 인자 없는 명령에도 걸림). Edit 도구로 `milvusBridge.css`를 고치려 하면 승인 없이 "denied by your permission settings"로 막힌다. 다른 폴더(`learndoshare_1`)로 연 세션에는 이 규칙이 적용되지 않는다 | 2026-10-17 실측(14장 항목 3개 해소) |
 | pnpm 11.11.0(Windows, Git Bash)으로 설치하면 기본값 세 가지가 pnpm 10과 다르다: 프로젝트 `.npmrc`의 `${NODE_AUTH_TOKEN}` 토큰 줄은 경고와 함께 무시되고(토큰 줄은 `~/.npmrc`로 옮김), `minimumReleaseAge` 기본 1440분 때문에 방금 발행한 0.2.0 대신 0.1.0을 설치하고, `strictDepBuilds` 기본 true라 esbuild 설치 스크립트로 `ERR_PNPM_IGNORED_BUILDS`가 난다. `pnpm-workspace.yaml`에 `minimumReleaseAgeExclude: ['@a40418a/*']`, `allowBuilds: { esbuild: true }`를 두면 0.2.0이 설치되고 `milvus --version`이 동작한다(`milvus-design.md` 2절). 같은 PC에서 `init`은 sf를 찾지 못했다(Windows의 sf는 `sf.cmd`, #42에서 `cmd.exe` 경유로 고침) | 2026-10-20 다른 노트북 설치 |
+| Windows(Node 24.21)에서 `node:module`의 `findPackageJSON`이 `\\?\C:\…` 접두사가 붙은 경로를 돌려주고, 그 경로를 다루는 `realpathSync`가 `EISDIR lstat 'C:'`로 실패해 `milvus storybook`이 멈췄다. `packageInfo()`가 파일 위치에서 위로 올라가며 `package.json`을 직접 찾도록 고쳤다(0.2.2, #46) | 2026-10-20 다른 노트북 실행 |
 
 ## 14. 미확인 (구현 중 확인할 것)
 
