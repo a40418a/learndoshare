@@ -27,6 +27,7 @@
   <ol>
     <li><a href="#why">왜 알아야 하나</a></li>
     <li><a href="#parts">SLDS의 구성</a></li>
+    <li><a href="#walk">버튼 하나로 따라가 보기</a></li>
     <li><a href="#slds2">SLDS 1과 SLDS 2</a></li>
     <li><a href="#hooks">styling hook</a></li>
     <li><a href="#colors">색 hook 계열</a></li>
@@ -83,6 +84,43 @@
   <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC 개발자 가이드: Compare SLDS Versions</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-custom-properties.html">LWC 개발자 가이드: SLDS Styling Hooks</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-badge.html">Lightning Component Reference: lightning-badge (Design)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/5826e4-color-modes">SLDS 2: Color Modes (Accessibility Standards)</a> (확인 2026-10-09)</p>
 </section>
 
+<section id="walk">
+  <h2>버튼 하나로 따라가 보기 (2026-10-20 추가)</h2>
+  <p>HTML/CSS는 익숙해도 "블루프린트", "기본 컴포넌트", "hook"은 낯설 수 있다. 셋은 따로 있는 기술이 아니라 <b>같은 버튼을 세 겹으로 본 것</b>이다. 브랜드 버튼 하나를 설치된 패키지 원본에서 따라간다.</p>
+  <h3>① 블루프린트: SLDS가 정한 HTML과 클래스</h3>
+  <p>블루프린트는 "이 버튼은 이런 마크업에 이런 클래스를 붙인다"는 약속이다. 그냥 HTML이다. SLDS CSS만 실으면 어디서든 같은 모양이 된다(Visualforce에서 <code>&lt;apex:slds/&gt;</code>로 쓰는 것이 이것이다).</p>
+<pre data-file="SLDS 블루프린트 Buttons (Brand)"><code>&lt;button class="slds-button slds-button_brand"&gt;저장&lt;/button&gt;</code></pre>
+  <h3>② 기본 컴포넌트: 블루프린트를 LWC로 감싼 것</h3>
+  <p><code>lightning-button</code>은 속을 열어 보면 ①과 같은 <code>&lt;button&gt;</code>을 그린다. <code>variant="brand"</code>가 <code>slds-button_brand</code> 클래스로 바뀌고, 비활성·접근성 속성(<code>aria-*</code>)과 아이콘 배치를 컴포넌트가 대신 맞춘다. 그래서 Salesforce는 기본 컴포넌트가 있으면 이것부터 쓰라고 한다.</p>
+<pre data-file="사용하는 쪽"><code>&lt;lightning-button variant="brand" label="저장"&gt;&lt;/lightning-button&gt;</code></pre>
+<pre data-file="lightning-base-components 1.28.19-alpha · src/lightning/button/button.js (발췌)"><code>'slds-button_brand': this._normalizedVariant === 'brand',</code></pre>
+<pre data-file="lightning-base-components 1.28.19-alpha · src/lightning/button/button.html (발췌)"><code>&lt;button class={computedButtonClass}
+        disabled={disabled}
+        aria-disabled={disabled}
+        aria-label={ariaLabel}
+        part="button" …&gt;</code></pre>
+  <h3>③ styling hook: CSS가 값 대신 읽는 변수</h3>
+  <p>그럼 버튼 색은 어디에 있나. SLDS 2 CSS를 열면 색이 없다. 값 대신 CSS 변수(<code>var(--이름)</code>)를 읽는다. 이 변수가 styling hook이다. <code>var(a, var(b, c))</code>는 "a가 없으면 b, b도 없으면 c"라서 오른쪽 끝이 기본값이다. 브랜드 버튼의 바탕은 결국 global hook <code>--slds-g-color-accent-container-1</code>이다.</p>
+<pre data-file="@salesforce-ux/design-system-2 2.264.2 · dist/components/button/button.css (발췌)"><code>.slds-button {
+  background-color: var(--slds-c-button-color-background);
+  border-radius: var(--slds-c-button-radius-border,
+    var(--slds-s-button-radius-border, var(--slds-g-radius-border-2)));
+}
+.slds-button_brand {
+  --slds-c-button-color-background: var(
+    --slds-c-button-color-background-hover,
+    var(--slds-c-button-brand-color-background,
+      var(--slds-g-color-accent-container-1)));
+}</code></pre>
+  <div class="table-wrap"><table>
+    <tr><th>활성 테마</th><th><code>--slds-g-color-accent-container-1</code></th><th>버튼</th></tr>
+    <tr><td>Salesforce Cosmos(기본)</td><td><code>#066AFE</code></td><td>파랑</td></tr>
+    <tr><td>브랜드 색 <code>#4A154B</code>로 만든 테마(Slack 예시)</td><td><code>#A557A5</code>(접근성 색, <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05</a>)</td><td>보라</td></tr>
+  </table></div>
+  <div class="callout key"><strong>정리: CSS는 그대로, 값만 바뀐다</strong>①과 ②는 같은 클래스를 쓰고, 그 클래스의 CSS는 ③의 hook을 읽는다. 테마가 hook 값을 바꾸면 블루프린트로 만든 버튼, <code>lightning-button</code>, 그 클래스를 쓰는 표준 화면의 버튼이 <b>한꺼번에</b> 바뀐다. 컴포넌트 하나의 CSS를 고치면 그 컴포넌트만 바뀌는 것과 반대다. 밀버스가 고객 디자인을 전역으로 적용하려고 hook을 고른 이유가 이것이다(<a href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html#choice">09 7절</a>). 반경도 같다: <code>--slds-g-radius-border-2</code> 하나가 이 hook을 읽는 모든 컴포넌트의 모서리를 정한다.</div>
+  <p class="sources">출처: <a href="https://v1.lightningdesignsystem.com/components/buttons/">SLDS 1 — Buttons 블루프린트 (<code>.slds-button</code>, <code>.slds-button_brand</code> 클래스)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-button.html">Lightning Component Reference — lightning-button</a> (확인 2026-10-20) · <a href="https://www.npmjs.com/package/lightning-base-components">npm: lightning-base-components</a> (설치본 1.28.19-alpha <code>src/lightning/button/button.js</code>·<code>button.html</code> 확인 2026-10-20) · <a href="https://www.npmjs.com/package/@salesforce-ux/design-system-2">npm: @salesforce-ux/design-system-2</a> (설치본 2.264.2 <code>dist/components/button/button.css</code> 확인 2026-10-20) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/777f5a-global-styling-hooks">SLDS 2 — Global Styling Hooks</a> (확인 2026-10-09). <code>#066AFE</code>는 SLDS 2 Global Styling Hooks 페이지의 예(00 3절), <code>#A557A5</code>는 2026-10-20 Storybook 캡처 <code>05-after.png</code>의 값이다</p>
+</section>
+
 <section id="slds2">
   <h2>SLDS 1과 SLDS 2</h2>
   <p>SLDS 2는 Spring '25에 소개됐다. <b>구조와 시각 디자인을 분리</b>하는 새 CSS 프레임워크 위에 만들어졌고, 시각 디자인은 styling hook으로 바뀐다.</p>
@@ -96,6 +134,7 @@
     <tr><td>Visualforce</td><td><code>&lt;apex:slds/&gt;</code></td><td>Help는 "Winter '26부터 VF 페이지에서 SLDS 2를 쓸 수 있다"고 적는다. 조건은 둘이다. Setup → User Interface의 Visualforce 설정 "Use SLDS 2 for pages that include &lt;apex:slds&gt; when an SLDS 2 theme is active"를 켜고, SLDS 2 테마를 활성화한다. <code>&lt;apex:slds&gt;</code>의 <code>lightningStyleMode</code>(API 65.0 이상) 기본값 <code>Auto</code>는 이 org 설정을 따른다. <code>SLDS1</code>로 두면 SLDS 1로 고정한다 (2026-10-09 갱신)</td></tr>
   </table></div>
   <div class="callout warn"><strong>SLDS 2가 적용되지 않는 곳</strong>Salesforce 모바일 앱, 빌더(Flow Builder, Lightning App Builder), Lightning Out, Experience Cloud는 SLDS 2를 지원할 계획이 없다고 공식 문서에 적혀 있다. SLDS 2를 지원하지 않는 앱이나 영역은 SLDS 2를 켜도 SLDS 1 모양으로 보인다.</div>
+  <div class="callout key"><strong>이 차이가 보여 주는 방향 (2026-10-20 갱신)</strong>위 표의 변화를 한 줄씩 모으면 Salesforce가 어디로 가는지가 보인다. ① 블루프린트는 그대로 두고 모양만 styling hook으로 뺐다(구조와 시각 디자인 분리). ② 고객이 직접 값을 바꾸던 수단은 줄었다: <code>--lwc-*</code> 토큰은 지원하지 않고, 컴포넌트 hook은 GA에서 Developer Preview가 됐다. ③ 관리자 테마 옵션 가운데 배경색·배경 이미지·글로벌 헤더 색을 SLDS 2 테마에서 뺐고, 이유로 접근성을 든다(<a href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html#why">09 3절</a>). ④ 대신 브랜드 색 하나로 대비를 지키는 팔레트를 자동으로 만들고(<a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 접근성 색</a>), 다크 모드를 켤 수 있게 했다. ⑤ 기본 컴포넌트는 native shadow로 옮겨 가는 중이다(<a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html#shadow">00 5절</a>). <span class="tag warn">해석</span> 공식 문서가 이 다섯을 한 문장으로 묶어 말하지는 않는다. 묶어 읽으면 "값은 Salesforce가 정하고 계속 갱신한다. 고객은 테마로 고르고 hook을 읽는다"이고, Visualforce 개발자 가이드가 SLDS의 장점으로 든 "최신 SLDS를 쓰는 한 Lightning Experience와 일관된다"와 같은 방향이다(<a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html#concept">00 1절 원칙</a>). 밀버스가 이 방향에서 벗어난 곳과 이유는 <a href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html#choice">09 7절</a>에 모았다.</div>
   <div class="callout project"><strong>현재 상태</strong>org <code>learndoshare_1</code>은 SLDS 2 테마 <code>Milvus_DesignSystem</code>을 쓴다 (<a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>에서 조회). 그래서 밀버스 컴포넌트 CSS는 <code>--lwc-*</code> token과 <code>--slds-c-*</code> hook에 기대면 안 된다.</div>
   <div class="callout warn"><strong>VF가 SLDS 2를 쓰는 조건 (2026-10-09 갱신)</strong>Help에 따르면 <code>&lt;apex:slds&gt;</code>를 포함한 VF 페이지가 SLDS 2를 쓰려면 User Interface 설정 "Use SLDS 2 for pages that include &lt;apex:slds&gt; when an SLDS 2 theme is active"를 켜고 SLDS 2 테마를 써야 한다. <code>lightningStyleMode</code> 기본값 <code>Auto</code>는 이 org 설정을 따른다. 테마가 SLDS 2라는 것만으로 VF가 SLDS 2가 되지는 않는다. 2026-10-08 org 프로브에서는 VF 페이지의 <code>&lt;apex:slds/&gt;</code>가 SLDS 1로 그려졌고, 그래서 util.css가 효과가 없었다. 2026-10-09 프로브에서 이 설정을 끈 채로 같은 결과(SLDS 1)를, 켠 뒤에는 SLDS 2를 확인했다. 다만 설정을 켜도 org 테마의 브랜드 팔레트는 들어오지 않아 브랜드 버튼이 Salesforce 기본색(<code>#066afe</code>)이었고, 팔레트 CSS(약 620바이트)를 더하자 LEX와 같았다(<a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html#vf">00 문서 6절</a>). 그래서 결정 D2로 <code>milvusVf</code>는 SLDS 2 CSS 사본이 아니라 팔레트만 담는다. 이 설정은 Metadata API로 켤 수 없어 고객 org에서 Setup으로 직접 켠다 (2026-10-12 갱신).</div>
   <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-slds1-slds2.html">LWC 개발자 가이드: Compare SLDS Versions</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_enhancedlex.htm&amp;type=5">Salesforce Help: Salesforce Cosmos Theme and SLDS 2 Availability (에디션별 기본값, Essentials 예외, VF)</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.lex_themes_and_branding_considerations.htm&amp;type=5">Salesforce Help: Considerations for Themes and Branding</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html">SLDS Linter: Rules (lwc-token-to-slds-hook)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-slds.html">Visualforce 개발자 가이드: apex:slds</a> (확인 2026-10-09) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_settings.htm&amp;type=5">Salesforce Help: User Interface Settings (Visualforce Settings)</a> (확인 2026-10-09) · <a href="https://www.lightningdesignsystem.com/2e1ef8501/p/7708aa-styling-api">SLDS 2: Styling API (Component-level Styling Hooks, Developer Preview)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (VF 결과)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-09-org-probe.md">org 프로브 2차 기록 3.8 (VF 설정 꺼짐·켬, 팔레트, Metadata API에 없음)</a> (확인 2026-10-12) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (10/9 D2 VF는 공식 설정 + 팔레트), 13장 (VF 실측)</a> (확인 2026-10-12)</p>
