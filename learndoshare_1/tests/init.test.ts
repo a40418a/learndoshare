@@ -286,11 +286,14 @@ test("--from-org는 활성 테마 이름을 브랜드로 쓰고, org 파일을 �
       sf.calls.map((c) => (c.args[0] === "org" ? c.args.slice(0, 3) : metadataOf(c.args))),
       [["org", "list", "limits"], ["Settings:LightningExperience"], ["LightningExperienceTheme:Acme_Org", "BrandingSet:LEXTHEMINGAcme_Org"], ["ContentAsset:acme_logo_1"]],
     );
-    // sf는 인자 배열로, 프로젝트 밖 임시 폴더에서 실행하고, 끝나면 임시 폴더를 지운다
+    // sf는 인자 배열로 프로젝트 밖에서 실행한다. 작업 폴더는 받은 파일을 담는 임시 폴더가 아니다(Windows는 작업 폴더로 잡힌 폴더를 못 지운다, #49).
+    // 조회 결과를 받은 임시 폴더는 끝나면 지운다
     for (const c of sf.calls) {
       assert.ok(relative(root, c.cwd).startsWith(".."), c.cwd);
-      assert.ok(!existsSync(c.cwd), c.cwd);
+      assert.ok(!c.cwd.includes("milvus-init-"), c.cwd);
       assert.equal(c.args[c.args.indexOf("--target-org") + 1], "dev");
+      const dir = c.args.indexOf("--target-metadata-dir");
+      if (dir >= 0) assert.ok(!existsSync(c.args[dir + 1]), c.args[dir + 1]);
     }
   });
 });

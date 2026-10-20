@@ -62,3 +62,9 @@ test("움직임 묶음 항목은 hooks가 비고 bridgeVars가 있으며 nativeL
     assert.equal(i.nativeLoss, true, i.id);
   }
 });
+
+test("바꿀 수 없는 항목(group 표시만, 명세 페이지의 '바꿀 수 없는 것')은 글꼴·커서·링크 밑줄·개체 아이콘 색·Salesforce 고정이고 hook·브리지가 없다", () => {
+  const fixed = SPEC_ITEMS.filter((i) => i.group === "표시만");
+  assert.deepEqual(fixed.map((i) => i.id), ["font", "cursor-underline", "object-icon-color", "fixed"]);
+  for (const i of fixed) assert.deepEqual([i.input, i.hooks, i.bridgeVars], ["none", [], []], i.id);
+});

@@ -13,6 +13,11 @@ export type SpecItem = {
   hooks: string[];
   bridgeVars: string[];
   limits: string;
+  /**
+   * 명세 페이지의 입력 칸. 입력은 브랜드 색·로고·피드백 색·디자인 명세 네 가지뿐이고 나머지는 "none"(참고 목록에 표시만)이다.
+   * 처음 보는 사람이 입력이 있는 항목 34개를 다 채워야 한다고 받아들여 줄였다(2026-10-20 사용자 피드백). 나머지 항목은 디자인 명세를 Claude가 나눠 반영한다.
+   * group "표시만"은 바꿀 수 없는 항목이라 명세 페이지가 "바꿀 수 없는 것"으로 따로 보인다
+   */
   input: "text" | "color" | "path" | "none";
   /** 브리지에 기대는 부분이 있어 native 전환 때 그 부분을 잃는다(설계 5.6). bridgeVars가 있으면 참이다 */
   nativeLoss: boolean;
@@ -58,7 +63,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: steps(g("radius-border-"), [1, 2, 3, 4, "pill"]),
     bridgeVars: [],
     limits: "Path 양 끝 반경은 hook이 없어 Salesforce 고정이다",
-    input: "text",
+    input: "none",
   },
   {
     id: "density",
@@ -75,7 +80,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     ],
     bridgeVars: [],
     limits: "",
-    input: "text",
+    input: "none",
   },
   {
     id: "typography",
@@ -91,7 +96,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     ],
     bridgeVars: [],
     limits: "라디오·체크박스·토글 라벨 굵기는 hook이 없어 Salesforce 고정이다. 글꼴은 바꾸지 않는다",
-    input: "text",
+    input: "none",
   },
   {
     id: "feedback",
@@ -145,7 +150,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
       B["modal-min-width"],
     ],
     limits: "카드 그림자(--slds-s-container-shadow)는 native lightning-card에 닿지 않는다. 모달 너비는 hook이 없어 브리지로 바꾼다",
-    input: "text",
+    input: "none",
   },
   {
     id: "milvus-component",
@@ -156,11 +161,12 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: [],
     bridgeVars: [],
     limits: "모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다(설계 5.1)",
-    input: "text",
+    input: "none",
   },
   {
     id: "font",
-    group: "기본",
+    // 바꿀 수 없어 "표시만"이다(명세 페이지의 "바꿀 수 없는 것")
+    group: "표시만",
     label: "글꼴",
     description: "시스템 글꼴 고정",
     examples: [],
@@ -172,8 +178,8 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
   {
     id: "overall",
     group: "기본",
-    label: "전체 스타일",
-    description: "원하는 전체 느낌",
+    label: "디자인 명세",
+    description: "디자인 시스템 문서의 표, 피그마 토큰 JSON, 사이트 주소, 자연어 등 무엇이든 붙여 넣는다. Claude가 \"바꿀 수 있는 것\"의 항목으로 나눠 반영한다",
     examples: ["각지고 단단한 업무용 느낌, 촘촘하게"],
     hooks: [],
     bridgeVars: [],
@@ -195,7 +201,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     ],
     bridgeVars: [],
     limits: "neutral-base-100/-95/-90은 native용이다. neutral-base-100은 색 위의 흰 글자로도 쓰여 흰색에 가까운 범위에서만 바꾼다",
-    input: "text",
+    input: "none",
   },
   {
     id: "text-color",
@@ -206,7 +212,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: steps(c("on-surface-"), [3, 2, 1]),
     bridgeVars: [],
     limits: "보조 아이콘 색이 on-surface-1을 같이 쓴다. 대비 4.5:1을 검사한다",
-    input: "text",
+    input: "none",
   },
   {
     id: "border-color",
@@ -217,7 +223,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: [c("border-1"), c("border-2"), c("border-base-1"), c("border-base-4")],
     bridgeVars: [],
     limits: "border-base-1/-4는 native용이다. native 일부는 하드코딩이다",
-    input: "text",
+    input: "none",
   },
   {
     id: "neutral-tone",
@@ -229,7 +235,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: steps(c("neutral-base-"), [0, 10, 20, 30, 40, 50, 60, 65, 70, 80, 90, 95, 100]),
     bridgeVars: [],
     limits: "",
-    input: "text",
+    input: "none",
   },
   {
     id: "disabled",
@@ -245,7 +251,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     ],
     bridgeVars: [],
     limits: "",
-    input: "text",
+    input: "none",
   },
   {
     id: "inverse",
@@ -261,7 +267,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     ],
     bridgeVars: [],
     limits: "native 툴팁은 고정이다",
-    input: "text",
+    input: "none",
   },
   {
     id: "backdrop",
@@ -272,7 +278,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: [s("backdrop-color-background"), c("neutral-10-opacity-50")],
     bridgeVars: [],
     limits: "",
-    input: "text",
+    input: "none",
   },
   {
     id: "highlight",
@@ -283,7 +289,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: [c("palette-yellow-90"), c("palette-yellow-80")],
     bridgeVars: [],
     limits: "native 일부는 고정이다",
-    input: "text",
+    input: "none",
   },
   {
     id: "hover-selected",
@@ -302,7 +308,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     ],
     bridgeVars: [B["nav-selected-background"]],
     limits: "native에서는 2개만 닿는다",
-    input: "text",
+    input: "none",
   },
   {
     id: "dark-mode",
@@ -313,7 +319,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: [],
     bridgeVars: [],
     limits: "",
-    input: "text",
+    input: "none",
   },
 
   // 설계 9.3 — 모양
@@ -327,7 +333,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     bridgeVars: [B["input-border-width"]],
     limits:
       "--slds-s-button-sizing-border는 native 버튼용이다. --slds-s-input-sizing-border는 선택 상자와 라디오만 읽는다. 입력창 두께는 hook이 없어 브리지로 바꾼다",
-    input: "text",
+    input: "none",
   },
   {
     id: "avatar-icon-shape",
@@ -338,7 +344,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: [s("avatar-radius-border"), s("icon-radius-border")],
     bridgeVars: [],
     limits: "",
-    input: "text",
+    input: "none",
   },
   {
     id: "tab-header-shape",
@@ -355,7 +361,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     ],
     bridgeVars: [],
     limits: "native tabBar는 고정이다",
-    input: "text",
+    input: "none",
   },
 
   // 설계 9.3 — 크기
@@ -369,7 +375,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     bridgeVars: [],
     limits:
       "LEX 텍스트 컨트롤 높이(1.875rem)는 Salesforce 고정이다. 목록·헤더 툴바가 32px 아이콘 버튼과 섞여 있어 브리지로 바꾸면 어긋난다(2026-10-14 리허설). --slds-s-button-spacing-block은 버튼 안쪽 여백이고, --slds-s-input-sizing-height는 native용이다",
-    input: "text",
+    input: "none",
   },
   {
     id: "tab-header-height",
@@ -380,7 +386,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: [s("navigation-sizing-height"), s("navigation-font-lineheight"), s("header-sizing-height")],
     bridgeVars: [],
     limits: "",
-    input: "text",
+    input: "none",
   },
   {
     id: "icon-size",
@@ -391,7 +397,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: [s("icon-sizing"), s("icon-spacing")],
     bridgeVars: [],
     limits: "버튼·입력창 안 아이콘(0.875rem)과 표 정렬 아이콘(0.75rem) 크기는 hook이 없어 Salesforce 고정이다",
-    input: "text",
+    input: "none",
   },
 
   // 설계 9.3 — 글자
@@ -404,7 +410,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: [g("font-line-height-base"), g("font-line-height-2"), g("font-line-height-1")],
     bridgeVars: [],
     limits: "컨트롤 안 줄 간격은 고정이다",
-    input: "text",
+    input: "none",
   },
   {
     id: "letter-spacing",
@@ -415,7 +421,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: [],
     bridgeVars: [],
     limits: "폼 요소(button, input, select, textarea)는 브라우저 기본 스타일이 letter-spacing을 normal로 다시 정해 :root 자간이 상속되지 않는다. 폼 요소 자간은 Salesforce 고정이다",
-    input: "text",
+    input: "none",
   },
   {
     id: "text-case",
@@ -426,7 +432,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: [],
     bridgeVars: [B["caps-transform"], B["caps-letter-spacing"]],
     limits: "",
-    input: "text",
+    input: "none",
   },
 
   // 설계 9.3 — 깊이
@@ -442,7 +448,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     ],
     bridgeVars: [],
     limits: "shadow-5/-6은 포커스 표시에 쓰여 기본값을 유지한다. 팝오버 꼬리 그림자는 Salesforce 고정이다. native 드롭다운·팝오버·툴팁은 고정이다",
-    input: "text",
+    input: "none",
   },
   {
     id: "hover-press",
@@ -461,7 +467,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     ],
     bridgeVars: [],
     limits: "native에는 떠오름이 없다",
-    input: "text",
+    input: "none",
   },
 
   // 설계 9.3 — 움직임 (hook이 없어 브리지로만 된다)
@@ -474,7 +480,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: [],
     bridgeVars: MOTION_DURATIONS,
     limits: "지금 org에서만 된다. 모달·토스트는 최소 0.01ms, 스피너는 제외",
-    input: "text",
+    input: "none",
   },
   {
     id: "motion-easing",
@@ -485,7 +491,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: [],
     bridgeVars: [B["motion-easing"]],
     limits: "지금 org에서만 된다. 스피너는 제외",
-    input: "text",
+    input: "none",
   },
   {
     id: "reduced-motion",
@@ -496,7 +502,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     hooks: [],
     bridgeVars: MOTION_DURATIONS,
     limits: "SLDS 2 CSS의 prefers-reduced-motion 규칙은 브레드크럼 눌림 하나뿐이다. 0이 아니라 0.01ms를 쓴다. 0이면 모달·토스트가 닫히지 않을 수 있다",
-    input: "text",
+    input: "none",
   },
 
   // 설계 9.3 — 포커스
@@ -517,7 +523,7 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     ],
     bridgeVars: [],
     limits: "링 색은 브랜드 색을 따른다. 값 안의 색은 var(--slds-g-color-brand-base-15)와 var(--slds-g-color-neutral-base-100)만 쓴다",
-    input: "text",
+    input: "none",
   },
 
   // 설계 9.3 — 표시만. 커서·링크 밑줄과 개체 아이콘 색은 2026-10-14 사용자 결정으로 브리지를 빼서 바꿀 수 없다
