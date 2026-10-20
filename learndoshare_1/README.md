@@ -455,6 +455,7 @@ pnpm sync:theme
 
 ### 5.5 발표 당일 체크리스트
 
+- [ ] Do 시연 녹화·캡처: [테스트·캡처 가이드](docs/presentation/do-test-capture-guide.md) 순서대로 (다른 노트북, 패키지 0.2.1)
 - [ ] 녹화 파일 2개를 발표 PC 로컬에 저장 (네트워크에 의존하지 않는다)
 - [ ] 라이브 데모를 한다면 고객 프로젝트에서 `pnpm milvus storybook`(`init`이 더한 `pnpm storybook`도 된다)을 미리 띄워 두고 org에 로그인해 둔다
 - [ ] 결정 요청 슬라이드를 띄워 둔 채로 Q&A를 진행한다
