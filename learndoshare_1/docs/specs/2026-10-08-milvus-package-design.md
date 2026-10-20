@@ -673,6 +673,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | 저장소 `pnpm build:lwc`는 `node_modules` 안의 심볼릭 링크를 따라간 경로를 별개 모듈로 본다. 작업 폴더에 자기 참조 링크 `node_modules/node_modules`가 있으면 `@lwc/engine-dom`이 경로가 다른 사본으로 여러 번 번들되고, `lightning-*`이 "does not extends LightningElement"로 그려지지 않는다. 링크를 지우면 정상이다. 같은 Mac에서 새로 설치한 main·M7 소스는 정상이고, CI 배포본(GitHub Pages)도 정상이었다. 고객 빌드(`milvus storybook`, `npmFromPackage`)는 엔진을 절대 경로로 받아 이 영향이 없다 | 10/14 조사(`lwc-render-debug`) |
 | v0.1.0 발행: main `182f75e`에 태그 `v0.1.0`을 push하자 Publish 워크플로(`pnpm install --frozen-lockfile` → `pnpm test` → `pnpm publish`)가 성공했다. `learndoshare_2`에서 `pnpm add -D @a40418a/milvus-design-system@0.1.0`이 `npm.pkg.github.com`의 tarball로 설치되고 `milvus --version`이 `0.1.0`, `milvus check`가 통과한다. 토큰(`NODE_AUTH_TOKEN`)이 없는 셸에서는 레지스트리 설치가 404로 실패한다 | 2026-10-17 Task 28 |
 | 고객 프로젝트의 권한 규칙(템플릿 `settings.json`)이 실제 Claude Code에서 동작한다. `learndoshare_2`를 폴더로 연 데스크톱 앱 Code 세션(auto 모드)에서 쟀다: `sf org display --help`, `sf org list --json --help`, `sf org list --all --json --help`, `sf org open -o … -r --help`, `sf org open -o … --url-only --help`, `sf auth list --json --help`는 deny로 막히고, `sf org list --help`는 실행된다. 인자 없는 `pnpm milvus deploy`는 `ask`로 승인을 묻는다(`Bash(pnpm milvus deploy *)`가 인자 없는 명령에도 걸림). Edit 도구로 `milvusBridge.css`를 고치려 하면 승인 없이 "denied by your permission settings"로 막힌다. 다른 폴더(`learndoshare_1`)로 연 세션에는 이 규칙이 적용되지 않는다 | 2026-10-17 실측(14장 항목 3개 해소) |
+| pnpm 11.11.0(Windows, Git Bash)으로 설치하면 기본값 세 가지가 pnpm 10과 다르다: 프로젝트 `.npmrc`의 `${NODE_AUTH_TOKEN}` 토큰 줄은 경고와 함께 무시되고(토큰 줄은 `~/.npmrc`로 옮김), `minimumReleaseAge` 기본 1440분 때문에 방금 발행한 0.2.0 대신 0.1.0을 설치하고, `strictDepBuilds` 기본 true라 esbuild 설치 스크립트로 `ERR_PNPM_IGNORED_BUILDS`가 난다. `pnpm-workspace.yaml`에 `minimumReleaseAgeExclude: ['@a40418a/*']`, `allowBuilds: { esbuild: true }`를 두면 0.2.0이 설치되고 `milvus --version`이 동작한다(`milvus-design.md` 2절). 같은 PC에서 `init`은 sf를 찾지 못했다(Windows의 sf는 `sf.cmd`, #42에서 `cmd.exe` 경유로 고침) | 2026-10-20 다른 노트북 설치 |
 
 ## 14. 미확인 (구현 중 확인할 것)
 
@@ -680,7 +681,6 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | --- | --- |
 | Vite 개발 서버 미들웨어로 요청 파일을 저장할 수 있는가. POST 미들웨어 응답까지는 확인했다(13장) | Task 17 테스트 |
 | `node_modules`의 `.storybook`으로 정적 빌드(`storybook build`, `milvus storybook build`)도 되는가. 개발 서버(`preview.ts`·`manager.ts`, `../lib/*.ts` import 포함)는 10/14 tgz 리허설에서 동작했다(13장) | 다음 tgz 리허설 |
-| pnpm 11.5.3 이후(10.x는 10.34.2 이후) 프로젝트 `.npmrc`의 `${…}` 치환을 하지 않는다는 pnpm.io 설명(Learn 07). 10.13.1에서는 치환이 동작했다(13장). 고객 프로젝트가 더 새 pnpm을 쓰면 토큰 줄은 `~/.npmrc`, 범위 레지스트리는 `pnpm-workspace.yaml`의 `registries`로 안내해야 한다 — 그 버전에서 실제 확인 | Task 20(milvus-design.md 설치 안내) 전 |
 | 고객 프로젝트에서 pnpm이 `esbuild` 빌드 스크립트를 건너뛰는 것이 Storybook 정적 빌드·Vite에 영향을 주는가. 영향이 있으면 `init`이 `pnpm.onlyBuiltDependencies`에 `esbuild`를 더한다 | Task 11·18 |
 | `sf org list --json`·`sf auth list --json`이 `accessToken`을 가리기 시작한 sf 버전. deny 규칙 자체는 2026-10-17 실측으로 확인했다(13장) | 필요할 때 |
 | org `accent-2`의 다크 값(`#87aef7`)이 팔레트 70단계(`#8cb1f7`)와 다른 원인. 다크 모드가 범위 밖이라 지금 화면에는 영향이 없다(기록 3.9) | 다크 모드 검토 때 |

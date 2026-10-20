@@ -19,8 +19,18 @@
   ```
 - pnpm 버전에 따라 토큰 줄을 두는 곳이 다르다(`pnpm --version`)
   - 10.34.2 미만(10.x), 11.5.3 미만(11.x): 프로젝트 `.npmrc`의 `${NODE_AUTH_TOKEN}`을 치환한다. 10.13.1에서 설치를 확인했다
-  - 10.34.2 이상, 11.5.3 이상: pnpm 문서에 따르면 프로젝트 `.npmrc`의 인증 줄에 있는 `${…}`를 풀지 않고 그 설정을 무시한다. 토큰 줄을 사용자 파일 `~/.npmrc`로 옮긴다. 레지스트리 줄은 프로젝트 `.npmrc`에 남겨도 된다. 이 버전에서 직접 설치해 보지는 않았다(미확인)
+  - 10.34.2 이상, 11.5.3 이상: 프로젝트 `.npmrc`의 인증 줄에 있는 `${…}`를 풀지 않고 그 설정을 무시한다(경고가 뜬다). 토큰 줄을 사용자 파일 `~/.npmrc`로 옮긴다. 레지스트리 줄은 프로젝트 `.npmrc`에 남긴다. pnpm 11.11.0(Windows)에서 이렇게 설치를 확인했다(2026-10-20)
   - pnpm 11은 범위 레지스트리를 `pnpm-workspace.yaml`의 `registries`로도 정한다. 토큰은 계속 `.npmrc`에 둔다
+- **pnpm 11은 설치 전에 `pnpm-workspace.yaml`을 만든다.** 기본값 두 가지 때문이다
+  - `minimumReleaseAge` 기본 1440분(하루): 발행한 지 하루가 안 된 밀버스 버전 대신 이전 버전을 설치한다
+  - `strictDepBuilds` 기본 true: Storybook이 쓰는 esbuild의 설치 스크립트를 승인하지 않으면 `ERR_PNPM_IGNORED_BUILDS`로 끝난다
+  ```yaml
+  minimumReleaseAgeExclude:
+    - '@a40418a/*'
+  allowBuilds:
+    esbuild: true
+  ```
+  pnpm이 이미 `allowBuilds` 자리를 만들어 두었으면 덧붙이지 말고 위 내용으로 파일을 바꾼다(같은 키가 두 번 있으면 YAML 오류)
 
 ## 3. 세팅 순서
 

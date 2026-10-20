@@ -68,11 +68,29 @@ export function writeConfig(root: string, c: MilvusConfig): void {
   writeFileSync(join(root, CONFIG), `${JSON.stringify(c, null, 2)}\n`);
 }
 
-/** sf를 인자 배열로 실행한다(셸을 거치지 않아 경로의 공백·한글이 그대로 간다). sf를 찾지 못하면 code 127 */
+/**
+ * sf를 실행할 방법. macOS·Linux는 셸 없이 인자 배열을 그대로 넘긴다(경로의 공백·한글이 그대로 간다).
+ * Windows의 sf는 sf.cmd(배치 파일)라 셸 없이는 찾지 못하고, Node 18.20.2·20.12.2부터는 .cmd를 셸 없이 실행하면 EINVAL로 막는다
+ * (nodejs.org 2024-04 보안 공지 CVE-2024-27980). 그래서 cmd.exe를 거치고 인자를 큰따옴표로 감싼다.
+ * cmd.exe는 따옴표 안에서도 %를 풀고, 따옴표 자체는 이스케이프할 수 없어 둘이 든 인자는 거부한다(밀버스가 넘기는 인자는 메타데이터 이름·경로·org 별칭뿐)
+ */
+export function sfSpawn(args: string[], platform: NodeJS.Platform = process.platform): { args: string[]; shell: boolean } {
+  if (platform !== "win32") return { args, shell: false };
+  const bad = args.find((a) => /["%\r\n]/.test(a));
+  if (bad !== undefined) throw new Error(`Windows에서는 큰따옴표·%·줄바꿈이 든 값을 sf에 넘길 수 없습니다: ${bad}`);
+  return { args: args.map((a) => (/^[\w@.:/\\=-]+$/.test(a) ? a : `"${a}"`)), shell: true };
+}
+
+/** sf를 실행한다. sf를 찾지 못하면 code 127 */
 export const runSf: SfRunner = (args, cwd) =>
   new Promise((done) => {
-    // ponytail: Windows의 sf는 sf.cmd라 셸 없이 spawn하면 찾지 못한다(127). Windows 사용자가 생기면 sf.cmd와 인자 인용을 처리한다
-    const child = spawn("sf", args, { cwd, stdio: ["ignore", "pipe", "pipe"] });
+    let spec;
+    try {
+      spec = sfSpawn(args);
+    } catch (e) {
+      return done({ code: 2, stdout: "", stderr: (e as Error).message });
+    }
+    const child = spawn("sf", spec.args, { cwd, shell: spec.shell, stdio: ["ignore", "pipe", "pipe"] });
     let stdout = "";
     let stderr = "";
     child.stdout.on("data", (d) => (stdout += d));
