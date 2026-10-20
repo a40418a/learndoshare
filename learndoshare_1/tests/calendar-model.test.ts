@@ -1,4 +1,7 @@
 // milvusCalendar의 날짜 계산(lwc/milvusCalendar/calendarModel.js). LWC Jest 대신 순수 함수만 node:test로 본다
+// UTC(+0, CI)나 KST(+9, DST 없음)에서는 "YYYY-MM-DD"를 UTC로 읽는 실수와 DST 날의 24시간 덧셈 실수가 드러나지 않는다.
+// 음수 오프셋이고 DST가 있는 시간대로 고정해 두 실수를 잡는다. Date를 만들기 전에 정해야 한다
+process.env.TZ = "America/Los_Angeles";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 

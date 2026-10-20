@@ -325,6 +325,7 @@ pnpm sync:theme
 | 3 | **브랜드 버튼** (`milvusButton`) | Phase 3에서 구현. 여기서는 스토리 3종, 사용 기준 문서(언제 `lightning-button` 대신 쓰는가), Jest를 마무리한다 |
 | 4 | **multi 검색** (`milvusMultiSelect`) | `lightning-combobox`는 다중 선택을 지원하지 않는다. 다중 선택 기본 컴포넌트는 `lightning-dual-listbox`와 `lightning-select`(`multiple`, 네이티브 목록 상자)뿐이고, 검색 가능한 다중 선택 콤보박스는 없다 **(컷 1순위)** |
 | 5 | **영역 알림** (`milvusNotification`, #40, 동결 이후 추가) | 공식 LWC에 없는 SLDS Scoped Notification 블루프린트. SLDS는 닫을 수 없는 것으로 정의하지만 밀버스가 닫기 버튼(`dismissible`, 취소할 수 있는 `close` 이벤트)을 더했다 |
+| 6 | **월·주 일정표** (`milvusCalendar`, #40, 동결 이후 추가) | 공식 LWC에는 날짜 선택(`lightning-input type="date"`)만 있고 일정표는 없다. 패키지의 `lightning/calendar`는 Date Picker 내부 부품(비공개)이다. 데이터는 부모가 `events`로 넘기고 `rangechange`로 범위를 받는다 |
 
 각 컴포넌트마다 표현 컴포넌트로 작성, 스토리(기본 / 변형 / 브랜드별), 사용 기준 문서(언제 쓰는지, 언제 쓰면 안 되는지), Jest 테스트를 갖춘다. 컴포넌트마다 **메타데이터(이름, 설명, 의존 컴포넌트)**를 두어 Phase 6의 선택 목록에 쓴다. (대체) 선택 목록은 만들지 않았다. `init`은 밀버스 LWC를 모두 복사한다.
 
