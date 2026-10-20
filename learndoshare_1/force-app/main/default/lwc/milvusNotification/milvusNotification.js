@@ -35,8 +35,8 @@ export default class MilvusNotification extends LightningElement {
   }
 
   get current() {
-    // 목록에 없는 값은 info로 떨어뜨린다
-    return VARIANT[this.variant] ?? VARIANT.info;
+    // 목록에 없는 값은 info로 떨어뜨린다. hasOwn이라 "constructor" 같은 프로토타입 이름도 거른다
+    return Object.hasOwn(VARIANT, this.variant) ? VARIANT[this.variant] : VARIANT.info;
   }
 
   get containerClass() {

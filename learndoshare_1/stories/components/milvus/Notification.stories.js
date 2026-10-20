@@ -63,7 +63,8 @@ export default {
 | \`dismissible\` | 닫기 버튼. 누르면 스스로 숨고 \`close\` 이벤트를 보낸다 |
 
 - \`close\`는 취소할 수 있다. 부모가 \`event.preventDefault()\`를 부르면 숨지 않는다
-- 닫으면 버튼이 사라지므로 포커스가 문서 맨 앞으로 간다. 키보드 사용자를 위해 **부모가 \`close\` 핸들러에서 다음 작업 위치로 \`focus()\`를 옮긴다**
+- 닫으면 버튼이 사라지므로 포커스가 문서 맨 앞으로 간다. 키보드 사용자를 위해 **부모가 \`close\` 핸들러에서 다음 작업 위치로 \`focus()\`를 옮긴다** (닫기 가능 스토리의 코드 참고)
+- 한 번 닫으면 \`message\`가 바뀌어도 다시 열리지 않는다. 다시 보이려면 부모가 \`lwc:if\`로 컴포넌트를 새로 만든다
 - 컨테이너는 \`role="status"\`라 내용이 바뀌면 화면 낭독기가 읽는다
 
 맨 아래 **소스 코드**에서 실제 파일을 볼 수 있다.`
@@ -107,6 +108,26 @@ export const 닫기_가능 = {
       }
     });
     return stack(notification, log);
+  },
+  parameters: {
+    docs: {
+      source: {
+        transform: (code) => code,
+        code: `<!-- 템플릿 -->
+<c-milvus-notification
+    variant="warning"
+    message="${MESSAGES.warning}"
+    dismissible
+    onclose={handleClose}
+></c-milvus-notification>
+<lightning-input data-id="next" label="이름" required></lightning-input>
+
+// JS: 닫은 뒤 키보드 포커스를 다음 작업 위치로 옮긴다
+handleClose() {
+    this.template.querySelector('[data-id="next"]').focus();
+}`
+      }
+    }
   }
 };
 
