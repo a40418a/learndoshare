@@ -1,16 +1,15 @@
 // 브랜드 명세 페이지(설계 6.1, 9.3). 입력은 브랜드 색·로고·피드백 색·디자인 명세 네 가지이고(2026-10-20 사용자 피드백),
-// 나머지 SPEC_ITEMS는 "바꿀 수 있는 것" 참고 목록(설명·예시·한계·지금 값)으로 그린다. 저장하면 프로젝트 루트의 milvus-brand-request.md를 쓴다.
+// 나머지 SPEC_ITEMS는 "바꿀 수 있는 것" 참고 목록(설명·예시·한계·지금 값)과 "바꿀 수 없는 것"(group 표시만)으로 그린다. 저장하면 프로젝트 루트의 milvus-brand-request.md를 쓴다.
 // 요청 파일은 lib/storybook-plugin.ts의 /__milvus/brand-request(GET { text, writable }, POST { text })로 읽고 쓴다. 정적 빌드와 저장소 모드에서는 입력을 끈다
 // 사용자 입력과 파일 내용은 textContent·value로만 넣는다(innerHTML을 쓰지 않는다)
 import { brands, mode } from "../../.storybook/brand.ts";
 import { contrastRatio } from "../../lib/contrast.ts";
 import { FIXED_ITEMS } from "../../lib/fixed-list.ts";
 import { brandPalette } from "../../lib/palette.ts";
-import { FEEDBACK_KINDS, parseRequest, REQUEST_SECTIONS, saveRequest, serializeRequest, type BrandRequest } from "../../lib/request.ts";
+import { FEEDBACK_KINDS, legacySections, parseRequest, REQUEST_SECTIONS, saveRequest, serializeRequest, type BrandRequest } from "../../lib/request.ts";
 import { SPEC_ITEMS, type SpecItem } from "../../lib/spec-items.ts";
 
 const ENDPOINT = "/__milvus/brand-request";
-const SPEC_LABELS = new Set(SPEC_ITEMS.map((i) => i.label));
 const WHITE = "#ffffff";
 const HEX6 = /^#[0-9a-f]{6}$/i;
 
@@ -176,9 +175,9 @@ function fixedView(): HTMLElement {
   return el(
     "div",
     { className: "slds-m-top_x-small" },
-    el("h6", { className: "slds-text-title_bold" }, "두 모드 모두 고정 (지금과 native 전환 뒤)"),
+    el("h5", { className: "slds-text-title_bold" }, "두 모드 모두 고정 (지금과 native 전환 뒤)"),
     list("both"),
-    el("h6", { className: "slds-text-title_bold slds-m-top_small" }, "native 전환 뒤 생기는 고정"),
+    el("h5", { className: "slds-text-title_bold slds-m-top_small" }, "native 전환 뒤 생기는 고정"),
     list("native"),
   );
 }
@@ -218,10 +217,10 @@ function itemView(item: SpecItem, inputs: Fields, level: "h4" | "h5" = "h4"): HT
   } else if (item.id === "feedback") {
     for (const [kind, name] of FEEDBACK_KINDS) box.append(feedbackRow(kind, name, REQUEST_SECTIONS.find((s) => s.id === `feedback-${kind}`)!.title, inputs));
   } else if (item.id === "overall") {
-    description.id = "milvus-spec-overall-guide";
-    box.append(input(item.id, "디자인 명세 붙여 넣기", item.input, DESIGN_SPEC_PLACEHOLDER, inputs));
-    inputs.get(item.id)!.setAttribute("aria-describedby", description.id);
-    box.append(para("색·간격 표는 통째로 붙여 넣어도 된다. 줄바꿈은 그대로 저장되고, 바꿀 수 없는 것은 Claude가 대안과 함께 알려 준다", "slds-text-color_weak"));
+    const note = para("색·간격 표는 통째로 붙여 넣어도 된다. 줄바꿈은 그대로 저장되고, 바꿀 수 없는 것은 Claude가 대안과 함께 알려 준다. 이전에 저장한 세부 요청과 같은 항목을 다루면 디자인 명세가 우선한다", "slds-text-color_weak");
+    [description.id, note.id] = ["milvus-spec-overall-guide", "milvus-spec-overall-note"];
+    box.append(input(item.id, "디자인 명세 붙여 넣기", item.input, DESIGN_SPEC_PLACEHOLDER, inputs), note);
+    inputs.get(item.id)!.setAttribute("aria-describedby", `${description.id} ${note.id}`);
   } else if (item.id === "fixed") {
     box.append(fixedView());
   } else {
@@ -273,16 +272,24 @@ export function renderBrandSpec(): HTMLElement {
 
   page.append(el("h3", { className: "slds-text-heading_medium slds-m-top_large" }, "입력"));
   for (const item of SPEC_ITEMS.filter((i) => i.input !== "none")) page.append(itemView(item, inputs));
+  // 옛 세부 절(lib/request.ts legacySections). 파일을 읽은 뒤 showFile이 채운다
+  const legacyBox = el("div", { className: "slds-box slds-m-top_small slds-hide" });
+  page.append(legacyBox);
 
-  const reference = SPEC_ITEMS.filter((i) => i.input === "none");
+  const reference = SPEC_ITEMS.filter((i) => i.input === "none" && i.group !== "표시만");
   page.append(
     el("h3", { className: "slds-text-heading_medium slds-m-top_large" }, "바꿀 수 있는 것"),
-    para("입력 칸이 없는 참고 목록이다. 디자인 명세에 붙여 넣은 내용을 Claude가 이 항목들로 나눠 반영한다. 특정 항목만 바꾸고 싶으면 디자인 명세에 항목 이름과 함께 적는다", "slds-text-color_weak"),
+    para("입력 칸이 없는 참고 목록이다. 디자인 명세에 붙여 넣은 내용을 Claude가 이 항목들로 나눠 반영한다. 특정 항목만 바꾸고 싶으면 디자인 명세에 항목 이름과 함께 적는다. 디자인 명세는 이전에 저장한 세부 요청보다 우선한다", "slds-text-color_weak"),
   );
   for (const group of [...new Set(reference.map((i) => i.group))]) {
     page.append(el("h4", { className: "slds-text-title_caps slds-m-top_medium" }, group));
     for (const item of reference.filter((i) => i.group === group)) page.append(itemView(item, inputs, "h5"));
   }
+  page.append(
+    el("h3", { className: "slds-text-heading_medium slds-m-top_large" }, "바꿀 수 없는 것"),
+    para("요청해도 바꿀 수 없다. Claude는 이 항목의 요청에 바꿀 수 없다고 답하고 대안이 있으면 알려 준다(설계 9.4)", "slds-text-color_weak"),
+  );
+  for (const item of SPEC_ITEMS.filter((i) => i.group === "표시만")) page.append(itemView(item, inputs));
   for (const [id, field] of inputs) {
     field.addEventListener("input", () => (field.value === (opened.get(id) ?? "") ? drafts.delete(id) : drafts.set(id, field.value)));
   }
@@ -298,11 +305,26 @@ export function renderBrandSpec(): HTMLElement {
 
   const showFile = (r: BrandRequest) => {
     const parts = [r.savedAt ? `마지막 저장 ${r.savedAt}` : "저장 시각 없음", r.appliedAt ? `Claude 반영 ${r.appliedAt} (다시 저장하면 반영 표시를 지운다)` : "아직 반영 표시 없음"];
-    // 2026-10-20 전에 항목별 입력으로 저장한 절(## 모서리 등). 지우지 않고 skill이 그 항목에 반영한다
-    const legacy = r.unknown.filter((u) => u.startsWith("## ") && SPEC_LABELS.has(u.slice(3).split("\n")[0].trim())).length;
-    if (legacy) parts.push(`이전에 저장한 세부 요청 ${legacy}개가 있다. 저장해도 그대로 남고 Claude가 그 항목에 반영한다`);
-    if (r.unknown.length > legacy) parts.push(`명세 항목이 아닌 줄·절 ${r.unknown.length - legacy}개는 저장해도 그대로 남는다`);
+    // 2026-10-20 전에 항목별 입력으로 저장한 절(## 모서리 등). 지우지 않고 내용을 보여 준다
+    const legacy = legacySections(r);
+    if (legacy.length) parts.push(`이전에 저장한 세부 요청 ${legacy.length}개가 있다(아래 입력 다음)`);
+    if (r.unknown.length > legacy.length) parts.push(`명세 항목이 아닌 줄·절 ${r.unknown.length - legacy.length}개는 저장해도 그대로 남는다`);
     fileStatus.textContent = `milvus-brand-request.md: ${parts.join(". ")}`;
+    legacyBox.replaceChildren();
+    legacyBox.classList.toggle("slds-hide", !legacy.length);
+    if (!legacy.length) return;
+    const summary = el("summary", {}, `이전에 저장한 세부 요청 ${legacy.length}개`);
+    Object.assign(summary.style, { display: "list-item", cursor: "pointer" });
+    const blocks = legacy.map((block) => {
+      const pre = el("pre", { className: "slds-m-top_x-small" }, block);
+      Object.assign(pre.style, { whiteSpace: "pre-wrap", overflowWrap: "anywhere" });
+      return pre;
+    });
+    legacyBox.append(
+      el("h4", { className: "slds-text-heading_small" }, "이전에 저장한 세부 요청"),
+      para("2026-10-20 전에 항목별 입력으로 저장한 요청이다. 저장해도 그대로 남고 Claude가 그 항목에 반영한다. 디자인 명세와 같은 항목을 다루면 디자인 명세가 우선하고, Claude가 반영 전에 어느 쪽인지 확인을 받는다. 필요 없으면 milvus-brand-request.md에서 그 절을 지운다"),
+      el("details", { className: "slds-m-top_x-small" }, summary, ...blocks),
+    );
   };
 
   const enable = (why?: string) => {

@@ -1,5 +1,6 @@
 // 브랜드 요청 파일 milvus-brand-request.md (설계 6.1). 명세 페이지(Storybook "시작하기/브랜드 명세")가 쓰고 milvus-brand skill이 읽는다.
 // 형식: `# 브랜드 요청`, 머리 줄 `반영: <날짜>`(skill이 제목 바로 아래에 적음)·`저장: <날짜 시각>`, 항목마다 `## <제목>` 아래 `지금: …`(한 줄, 없을 수 있음)과 `요청: …`(여러 줄 가능)
+// 요청의 앞뒤 공백(첫 줄 들여쓰기 포함)은 지운다. 안쪽 줄바꿈·빈 줄·들여쓰기·탭은 그대로 둔다
 // 요청 안에서 `## `로 시작하는 줄(붙여 넣은 문서의 제목)은 `\## `로 적어 절이 깨지지 않게 한다. 이미 `\`로 시작하면 `\`를 하나 더 붙인다(읽을 때 하나 뗀다)
 // 브라우저(Storybook)에서도 import하므로 Node 모듈을 쓰지 않는다
 import { SPEC_ITEMS } from "./spec-items.ts";
@@ -30,6 +31,13 @@ const TITLE = "# 브랜드 요청";
 const OLD_TITLES = new Map([["전체 스타일", "overall"]]);
 const escapeHeadings = (text: string) => text.replace(/^(\\*## )/gm, "\\$1");
 const unescapeHeadings = (text: string) => text.replace(/^\\(\\*## )/gm, "$1");
+
+/** 옛 세부 절: 2026-10-20 전에 항목별 입력으로 저장한 절(`## 모서리` 등)과 둘째 옛 디자인 명세(`## 전체 스타일`). r.unknown 가운데 원문 그대로다.
+ *  skill이 같은 제목을 그 항목으로 읽으므로 명세 페이지가 내용을 보여 준다. 디자인 명세가 우선한다(SKILL.md 1장) */
+export function legacySections(r: BrandRequest): string[] {
+  const titles = new Set([...SPEC_ITEMS.filter((i) => i.input === "none").map((i) => i.label), ...OLD_TITLES.keys()]);
+  return r.unknown.filter((u) => u.startsWith("## ") && titles.has(u.slice(3).split("\n")[0].trim()));
+}
 
 export function parseRequest(md: string): BrandRequest {
   const r: BrandRequest = { sections: [], unknown: [] };

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { parseRequest, REQUEST_SECTIONS, saveRequest, serializeRequest, type BrandRequest } from "../lib/request.ts";
+import { legacySections, parseRequest, REQUEST_SECTIONS, saveRequest, serializeRequest, type BrandRequest } from "../lib/request.ts";
 import { SPEC_ITEMS } from "../lib/spec-items.ts";
 
 // 설계 6.1의 예시 파일에 Claude가 적은 반영 줄(SKILL.md 1장 6단계: 제목 줄 바로 아래)을 더한 것
@@ -213,4 +213,11 @@ test("디자인 명세에 붙여 넣은 표·JSON·제목 줄은 줄바꿈과 �
   // 저장 경로(saveRequest)로 써도 같다
   const saved = serializeRequest(saveRequest(back, new Map([["overall", pasted]]), "2026-10-20 10:00"));
   assert.deepEqual(parseRequest(saved).sections, [{ id: "overall", title: "디자인 명세", request: pasted }]);
+});
+
+test("legacySections: 입력이 없어진 항목의 옛 절과 둘째 옛 디자인 명세만 고르고 메모와 같은 제목 둘째 절은 고르지 않는다", () => {
+  const r = parseRequest(
+    "# 브랜드 요청\n\n## 디자인 명세\n요청: 새 명세\n\n## 전체 스타일\n요청: 옛 명세\n\n## 모서리\n요청: 각지게\n\n## 회의 메모\n메모\n\n## 브랜드 색\n요청: a\n\n## 브랜드 색\n요청: b\n",
+  );
+  assert.deepEqual(legacySections(r), ["## 전체 스타일\n요청: 옛 명세", "## 모서리\n요청: 각지게"]);
 });
