@@ -1,0 +1,163 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="런북/5. 컴포넌트 쓰기" />
+
+# 5. 컴포넌트 쓰기
+
+## 원칙: `lightning-*` 먼저
+
+1. Salesforce 기본 컴포넌트(`lightning-*`)에 있으면 그것을 쓴다. Storybook **컴포넌트 / 기본**에 73개 전부가 브랜드로 그려져 있다
+2. 없을 때만 밀버스 컴포넌트(**컴포넌트 / 밀버스 추가**)를 쓴다
+3. 둘 다 없으면 프로젝트 컴포넌트를 만든다. 이름에 `milvus`를 쓰지 않는다(밀버스 전용 접두사)
+
+<table>
+  <thead>
+    <tr><th>필요한 것</th><th>쓸 것</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>토스트</td><td>`lightning/toast` ([문서](https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-toast.html))</td></tr>
+    <tr><td>날짜 하나 고르기</td><td>`lightning-input type="date"`</td></tr>
+    <tr><td>버튼, 입력, 표, 모달</td><td>`lightning-button`, `lightning-input`, `lightning-datatable`, `LightningModal`</td></tr>
+    <tr><td>그 밖의 아래 표</td><td>밀버스 컴포넌트</td></tr>
+  </tbody>
+</table>
+
+## 밀버스 컴포넌트
+
+프로젝트 LWC의 html에서 `c-milvus-…` 태그로 쓴다. App Builder에는 나오지 않는다(`milvusBrandLoader`만 유틸리티 바에 노출). 각 컴포넌트는 브랜드 CSS를 스스로 불러온다. 모든 속성과 이벤트는 Storybook 문서 페이지의 controls와 실제 소스에 있다.
+
+<table>
+  <thead>
+    <tr><th>컴포넌트</th><th>왜 있나</th><th>주요 속성</th><th>이벤트</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>`c-milvus-badge`</td><td>`lightning-badge`에 의미색(variant)이 없다</td><td>`label`, `variant`(default·inverse·lightest·success·warning·error·info), `icon-name`, `icon-position`</td><td>없음</td></tr>
+    <tr><td>`c-milvus-button`</td><td>비교 예시. 평소엔 `lightning-button` 그대로 그린다. util.css에 `--milvus-button-custom: on`이 있을 때만 블루프린트 버튼</td><td>`label`, `variant`, `icon-name`, `icon-position`, `disabled`, `type`, `title`</td><td>`click`</td></tr>
+    <tr><td>`c-milvus-multi-select`</td><td>검색해서 여러 개 고르기</td><td>`label`, `options`(`[{ label, value }]`), `value`(value 배열), `placeholder`, `required`, `disabled`</td><td>`change` → `detail.value`</td></tr>
+    <tr><td>`c-milvus-notification`</td><td>SLDS Scoped Notification(화면 안 알림)에 공식 LWC가 없다. 닫기는 밀버스 확장</td><td>`variant`(info·success·warning·error), `message`, `dismissible`, 기본 slot</td><td>`close`(취소 가능)</td></tr>
+    <tr><td>`c-milvus-calendar`</td><td>공식 LWC는 날짜 선택만 있고 일정표가 없다</td><td>`view`(month·week), `value`(YYYY-MM-DD), `first-day-of-week`(0=일), `max-events-per-day`, `events`</td><td>`rangechange`, `eventselect`, `dayselect`</td></tr>
+  </tbody>
+</table>
+
+### 예: 알림과 일정표를 쓰는 화면
+
+```xml
+<!-- teamSchedule.html -->
+<template>
+  <c-milvus-notification
+    variant="warning"
+    message="이번 주 릴리스 마감이 있습니다."
+    dismissible
+    onclose={handleClose}
+  ></c-milvus-notification>
+
+  <c-milvus-multi-select
+    label="담당자"
+    options={owners}
+    value={selectedOwners}
+    onchange={handleOwners}
+  ></c-milvus-multi-select>
+
+  <c-milvus-calendar
+    view="month"
+    events={events}
+    onrangechange={handleRange}
+    oneventselect={handleSelect}
+  ></c-milvus-calendar>
+</template>
+```
+
+```js
+// teamSchedule.js
+import { LightningElement } from "lwc";
+
+export default class TeamSchedule extends LightningElement {
+  owners = [
+    { label: "김하나", value: "u1" },
+    { label: "이두리", value: "u2" }
+  ];
+  selectedOwners = [];
+  // id·title·start는 필수. start·end는 YYYY-MM-DD 또는 YYYY-MM-DDTHH:mm. 형식이 틀린 항목은 빠진다(console.warn)
+  events = [
+    { id: "1", title: "주간 회의", start: "2026-10-05T10:00" },
+    { id: "2", title: "릴리스 마감", start: "2026-10-16", variant: "error" },
+    { id: "3", title: "워크숍", start: "2026-10-27", end: "2026-10-29", variant: "warning" }
+  ];
+
+  handleOwners(event) {
+    this.selectedOwners = event.detail.value;
+  }
+
+  handleRange(event) {
+    // { view, start, end } — 보이는 범위가 바뀌면 이 범위의 일정을 다시 불러온다
+    const { start, end } = event.detail;
+    console.log("load", start, end);
+  }
+
+  handleSelect(event) {
+    console.log("selected", event.detail.id);
+  }
+
+  handleClose() {
+    // 닫힌 뒤 포커스는 부모가 정한다. 키보드 사용자를 위해 다음 작업 위치로 옮긴다
+  }
+}
+```
+
+- 밀버스 컴포넌트는 **표현 컴포넌트**다. `@wire`·Apex·LDS를 넣지 않는다. 데이터는 위처럼 부모(컨테이너)가 가져와 `events`·`options`로 넘긴다
+- `close` 이벤트에서 `event.preventDefault()`를 부르면 알림이 닫히지 않는다(닫기 전 확인용)
+
+### 토스트와 날짜는 기본으로
+
+```js
+import Toast from "lightning/toast";
+
+Toast.show({ label: "저장했습니다", message: "일정이 등록되었습니다.", variant: "success" }, this);
+```
+
+```xml
+<lightning-input type="date" label="시작일" name="startDate"></lightning-input>
+```
+
+## 프로젝트 컴포넌트에 브랜드 걸기
+
+프로젝트 컴포넌트가 `--milvus-*`나 util.css 값을 읽어야 하면 `c/milvusScript`의 `loadBrand(this)`를 부른다. 브랜드 CSS(브리지 → util.css → override 순)를 문서에 넣고, 실패해도 화면을 막지 않는다.
+
+```js
+import { LightningElement } from "lwc";
+import { loadBrand } from "c/milvusScript";
+
+export default class OrderSummary extends LightningElement {
+  connectedCallback() {
+    loadBrand(this);
+  }
+}
+```
+
+앱에 `milvusBrandLoader`를 걸었으면([3장 7절](?path=/docs/런북-3-새-프로젝트에-적용--docs)) 그 앱의 페이지에는 이미 들어가 있다. 다른 앱·커뮤니티에서도 쓰일 컴포넌트라면 부르는 편이 안전하다.
+
+## Visualforce
+
+<table>
+  <thead>
+    <tr><th>쓰고 싶은 것</th><th>방법</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>블루프린트 기반 UI(버튼, 배지, 알림 마크업)</td><td>SLDS 마크업을 직접 쓰고 페이지에 `<c:milvusHead/>` 한 줄. SLDS 2 → 팔레트 → 브리지 → util.css → override 순으로 들어간다</td></tr>
+    <tr><td>밀버스 LWC 자체(예: Calendar)</td><td>Lightning Out(beta)로 넣는다. 공식 절차와 한계는 [Learn 05 "Visualforce에서 밀버스 컴포넌트 쓰기"](https://github.com/a40418a/learndoshare/blob/main/learndoshare_1/Learn/05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html)</td></tr>
+  </tbody>
+</table>
+
+```xml
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false">
+  <c:milvusHead />
+  <button class="slds-button slds-button_brand">저장</button>
+  <div class="slds-scoped-notification slds-media slds-media_center slds-theme_warning" role="status">
+    <div class="slds-media__body"><p>이번 주 릴리스 마감이 있습니다.</p></div>
+  </div>
+</apex:page>
+```
+
+- 먼저 [3장 7절](?path=/docs/런북-3-새-프로젝트에-적용--docs)의 Visualforce Settings를 켠다. `init --no-vf`로 만들었으면 VF 파일이 없다
+- 위 조건(`showHeader="false"`, `applyBodyTag` 기본값)에서는 `<body>`에 `slds-scope`가 자동으로 붙는다(2026-10-14 측정). `applyBodyTag`·`applyHtmlTag`를 `false`로 두면 `slds-scope`를 직접 넣는다
+- **미확인:** `showHeader="true"` 페이지의 `slds-scope`, Lightning Out에서 `rangechange`·`eventselect` 같은 밀버스 이벤트를 VF 스크립트로 받을 수 있는지, Lightning Out 2.0을 VF에서 쓰는 방법
