@@ -9,7 +9,7 @@ import { createInterface } from "node:readline/promises";
 import { parseArgs } from "node:util";
 import { logoAsset, readBranding, writeActiveThemeSettings, writeSettingsPackageXml } from "../lib/branding.ts";
 import { runCheck } from "./check.ts";
-import { findProject, readConfig, runSf, type MilvusConfig, type SfRunner } from "./context.ts";
+import { findProject, readConfig, runSf, type MilvusConfig, type SfRunner, removeTemp } from "./context.ts";
 
 /** root는 sf를 실행할 프로젝트 폴더다. sourceDirs·settingsDir는 root 기준 상대 경로(/ 구분) */
 export type DeployPlan = { root: string; targetOrg: string; currentTheme: string; newTheme: string; sourceDirs: string[]; settingsDir: string };
@@ -70,14 +70,14 @@ async function activeTheme(sf: SfRunner, org: string): Promise<string> {
   const tmp = mkdtempSync(join(tmpdir(), "milvus-deploy-"));
   try {
     const args = ["project", "retrieve", "start", "--metadata", "Settings:LightningExperience", "--target-org", org];
-    const failures = await callSf(sf, [...args, "--target-metadata-dir", tmp, "--unzip", "--single-package", "--json"], tmp, org);
+    const failures = await callSf(sf, [...args, "--target-metadata-dir", tmp, "--unzip", "--single-package", "--json"], tmpdir(), org);
     if (failures.length) throw new Error(`org ${org}의 활성 테마를 읽지 못해 배포하지 않습니다. ${failures[0].problem}`);
     const file = join(tmp, "unpackaged/settings/LightningExperience.settings");
     if (!existsSync(file)) throw new Error(`org ${org}에서 Settings:LightningExperience를 받지 못했습니다`);
     const name = /<activeThemeName>([^<]*)<\/activeThemeName>/.exec(readFileSync(file, "utf8"))?.[1].trim();
     return name || "Salesforce 기본 테마(활성 커스텀 테마 없음)";
   } finally {
-    rmSync(tmp, { recursive: true, force: true });
+    removeTemp(tmp);
   }
 }
 

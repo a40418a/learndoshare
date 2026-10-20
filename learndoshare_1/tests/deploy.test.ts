@@ -386,3 +386,17 @@ test("알 수 없는 옵션은 사용법과 1", async () => {
     assert.deepEqual(sf.calls, []);
   });
 });
+
+test("활성 테마 조회는 sf를 받은 파일의 임시 폴더 밖에서 실행하고, 끝나면 그 임시 폴더를 지운다(#49)", async () => {
+  await withProject({}, async (root) => {
+    const sf = fakeSf({ active: "Old_Theme" });
+    const plan = await planDeploy({ root, config: config(root) }, sf);
+    assert.equal(plan.currentTheme, "Old_Theme");
+    const retrieve = sf.calls.find((c) => c.args[1] === "retrieve")!;
+    const dir = retrieve.args[retrieve.args.indexOf("--target-metadata-dir") + 1];
+    // Windows는 작업 폴더로 잡힌 폴더를 지우지 못한다(EPERM). 그래서 sf의 작업 폴더는 받은 파일의 폴더가 아니다
+    assert.notEqual(retrieve.cwd, dir);
+    assert.ok(!retrieve.cwd.includes("milvus-deploy-"), retrieve.cwd);
+    assert.equal(existsSync(dir), false);
+  });
+});

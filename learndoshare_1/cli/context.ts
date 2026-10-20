@@ -1,6 +1,6 @@
 // 명령들이 함께 쓰는 것: 패키지 위치, SFDX 프로젝트 찾기, milvus.config.json, sf 실행
 import { spawn } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -80,11 +80,24 @@ export function writeConfig(root: string, c: MilvusConfig): void {
  * (nodejs.org 2024-04 보안 공지 CVE-2024-27980). 그래서 cmd.exe를 거치고 인자를 큰따옴표로 감싼다.
  * cmd.exe는 따옴표 안에서도 %를 풀고, 따옴표 자체는 이스케이프할 수 없어 둘이 든 인자는 거부한다(밀버스가 넘기는 인자는 메타데이터 이름·경로·org 별칭뿐)
  */
-export function sfSpawn(args: string[], platform: NodeJS.Platform = process.platform): { args: string[]; shell: boolean } {
-  if (platform !== "win32") return { args, shell: false };
+export function sfSpawn(args: string[], platform: NodeJS.Platform = process.platform): { command: string; args: string[]; shell: boolean } {
+  if (platform !== "win32") return { command: "sf", args, shell: false };
   const bad = args.find((a) => /["%\r\n]/.test(a));
   if (bad !== undefined) throw new Error(`Windows에서는 큰따옴표·%·줄바꿈이 든 값을 sf에 넘길 수 없습니다: ${bad}`);
-  return { args: args.map((a) => (/^[\w@.:/\\=-]+$/.test(a) ? a : `"${a}"`)), shell: true };
+  // 셸을 쓸 때 인자 배열을 넘기면 Node 24가 DEP0190으로 경고한다(인자를 이스케이프하지 않고 이어 붙이기 때문). 인용한 명령 한 줄로 넘긴다(#49)
+  return { command: ["sf", ...args.map((a) => (/^[\w@.:/\\=-]+$/.test(a) ? a : `"${a}"`))].join(" "), args: [], shell: true };
+}
+
+/**
+ * 임시 폴더를 지운다. 실패해도 넘어간다: Windows는 다른 프로세스가 쥔 폴더를 지우지 못해 EPERM을 내고(#49),
+ * 쓰고 난 임시 폴더를 못 지운 것은 명령의 실패가 아니다(OS 임시 폴더라 나중에 정리된다)
+ */
+export function removeTemp(dir: string): void {
+  try {
+    rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
+  } catch {
+    // 남은 임시 폴더는 OS가 정리한다
+  }
 }
 
 /** sf를 실행한다. sf를 찾지 못하면 code 127 */
@@ -96,7 +109,7 @@ export const runSf: SfRunner = (args, cwd) =>
     } catch (e) {
       return done({ code: 2, stdout: "", stderr: (e as Error).message });
     }
-    const child = spawn("sf", spec.args, { cwd, shell: spec.shell, stdio: ["ignore", "pipe", "pipe"] });
+    const child = spawn(spec.command, spec.args, { cwd, shell: spec.shell, stdio: ["ignore", "pipe", "pipe"] });
     let stdout = "";
     let stderr = "";
     child.stdout.on("data", (d) => (stdout += d));

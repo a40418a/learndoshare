@@ -1,7 +1,7 @@
 // milvus init (설계 3장, 4.1). 순서: 사전 점검 → (--from-org면 org 조회·검증) → planInit → applyOps → writeConfig
 // 사전 점검, org 조회·검증, 병합 준비(기존 JSON 읽기) 중 하나라도 실패하면 프로젝트에 아무것도 쓰지 않고 1로 끝난다.
 // applyOps는 모든 결과를 먼저 만든 뒤에 쓴다
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
@@ -9,7 +9,7 @@ import { isValidBrandName, logoAsset, readBranding, writeBrandingSet, writeConte
 import { managedFiles, sha256 } from "../lib/managed.ts";
 import { addKeyIfMissing, appendLines, mergeSettings } from "../lib/merge.ts";
 import { buildMilvusVfCss } from "../lib/vf.ts";
-import { findProject, packageInfo, readConfig, runSf, writeConfig, type SfRunner } from "./context.ts";
+import { findProject, packageInfo, readConfig, runSf, writeConfig, type SfRunner, removeTemp } from "./context.ts";
 
 export type Op = {
   kind: "copy" | "create" | "merge-json" | "append-lines" | "add-key";
@@ -162,7 +162,7 @@ async function fetchOrgBrand(
   const retrieve = async (step: string, members: string[]) => {
     const out = join(tmp, step);
     const args = ["project", "retrieve", "start", ...members.flatMap((m) => ["--metadata", m]), "--target-org", org];
-    const r = await sf([...args, "--target-metadata-dir", out, "--unzip", "--single-package", "--json"], tmp);
+    const r = await sf([...args, "--target-metadata-dir", out, "--unzip", "--single-package", "--json"], tmpdir());
     if (r.code !== 0) throw new Error(`org 조회에 실패했습니다(${members.join(", ")}): ${sfMessage(r)}`);
     return (rel: string) => {
       const file = join(out, "unpackaged", rel);
@@ -248,9 +248,10 @@ export async function runInit(argv: string[], deps: { sf?: SfRunner; nodeVersion
       throw new Error(`milvus.config.json의 버전(${configVersion})이 설치된 패키지 버전(${pkg.version})과 다릅니다. init을 다시 실행하지 말고 pnpm milvus update를 쓰세요`);
     }
 
-    // sf는 프로젝트 밖 임시 폴더에서 실행한다. 조회 결과도 여기에 받아 검증 전에는 프로젝트에 쓰지 않는다
+    // 조회 결과는 프로젝트 밖 임시 폴더에 받아 검증 전에는 프로젝트에 쓰지 않는다. sf의 작업 폴더는 그 임시 폴더가 아니라 OS 임시 폴더다:
+    // Windows는 작업 폴더로 잡힌 폴더를 지우지 못한다(EPERM, #49)
     tmp = mkdtempSync(join(tmpdir(), "milvus-init-"));
-    const login = await sf(["org", "list", "limits", "--target-org", targetOrg, "--json"], tmp);
+    const login = await sf(["org", "list", "limits", "--target-org", targetOrg, "--json"], tmpdir());
     if (login.code === 127) throw new Error("sf CLI를 찾지 못했습니다. Salesforce CLI를 설치한 뒤 다시 실행하세요");
     if (login.code !== 0) {
       throw new Error(`org ${targetOrg}에 로그인되어 있지 않거나 연결하지 못했습니다. sf org login web --alias ${targetOrg}로 로그인하세요: ${sfMessage(login)}`);
@@ -287,6 +288,6 @@ export async function runInit(argv: string[], deps: { sf?: SfRunner; nodeVersion
     process.stderr.write(`milvus init 실패: ${(e as Error).message}\n${USAGE}\n`);
     return 1;
   } finally {
-    if (tmp) rmSync(tmp, { recursive: true, force: true });
+    if (tmp) removeTemp(tmp);
   }
 }
