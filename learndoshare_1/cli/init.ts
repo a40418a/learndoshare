@@ -24,8 +24,9 @@ export type Op = {
 const FA = "force-app/main/default";
 const DEFAULT_BRAND_COLOR = "#0176D3";
 const VF_CSS = `${FA}/staticresources/milvusVf.css`;
-// 설계 0장의 준비 두 줄. 토큰 값이 아니라 환경변수 이름이다
-const NPMRC = ["@a40418a:registry=https://npm.pkg.github.com", "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}"];
+// 프로젝트 .npmrc에는 레지스트리 줄만 넣는다. 토큰 줄(//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN})은 사용자 ~/.npmrc에 둔다.
+// pnpm 11.5.3·10.34.2부터 프로젝트 .npmrc의 ${…} 토큰은 경고와 함께 무시된다(#46). init은 설치 뒤에 돌므로 인증은 이미 동작한다
+const NPMRC = ["@a40418a:registry=https://npm.pkg.github.com"];
 const USAGE = "사용법: pnpm milvus init --target-org <별칭> (--brand <이름> | --from-org) [--no-vf]";
 
 /** .claude/settings.json에 패키지 틀(설계 7.2)을 병합하는 op. init과 update가 같은 병합을 한다(설계 4.5) */

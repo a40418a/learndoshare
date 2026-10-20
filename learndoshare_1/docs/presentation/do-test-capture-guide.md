@@ -3,7 +3,7 @@
 10/23 발표의 **Do**(Learn Do Share)에서 보여 줄 "밀버스 패키지로 새 Salesforce 프로젝트를 브랜드에 맞게 세팅하기"를, 다른 노트북(Windows, Git Bash, pnpm 11)에서 처음부터 실행하며 캡처하는 순서다.
 단계마다 **실행 → 캡처 → 왜**를 적었다. 발표에서는 "왜"를 한 줄씩 말하면 된다. 발표 구성 전체는 `README.md` 5.3을 따른다.
 
-기준: 패키지 `@a40418a/milvus-design-system` **0.2.1**, 대상 org 별칭 `learndoshare_1`(리허설 DE org).
+기준: 패키지 `@a40418a/milvus-design-system` **0.2.2**, 대상 org 별칭 `learndoshare_1`(리허설 DE org).
 
 ---
 
@@ -46,7 +46,7 @@ pnpm add -D @a40418a/milvus-design-system
 pnpm milvus --version
 ```
 
-**캡처:** `01-install.png` — `pnpm add` 끝부분(`+ @a40418a/milvus-design-system 0.2.1`)과 `--version`의 `0.2.1`.
+**캡처:** `01-install.png` — `pnpm add` 끝부분(`+ @a40418a/milvus-design-system 0.2.2`)과 `--version`의 `0.2.2`.
 
 **왜:**
 - 디자인 시스템을 **복사가 아니라 버전 있는 패키지로** 받는다. 모든 프로젝트가 같은 버전을 쓰고, 고친 것은 `update` 한 번으로 받는다. 복사해 쓰면 프로젝트마다 조금씩 달라진다
@@ -66,7 +66,7 @@ pnpm milvus init --target-org learndoshare_1 --brand Demo --no-vf
 - 빠뜨리기 쉬운 세팅(밀버스 LWC, 브랜드 파일, BrandingSet·테마 메타데이터, Claude Code 규칙과 skill)을 한 번에 같은 모양으로 놓는다
 - 파일마다 **누가 고치는지** 정해져 있다. 밀버스 **관리** 파일은 sha256을 기록해 두고 직접 고치지 않으며, 프로젝트 **소유** 파일(`milvusBrand.css`, BrandingSet)만 고친다. 그래서 업데이트해도 프로젝트가 고친 내용이 지워지지 않는다
 
-`init`이 프로젝트 `.npmrc`에 토큰 줄을 더해 pnpm 11이 "무시했다"는 경고를 낼 수 있다. 토큰은 `~/.npmrc`에서 읽으므로 지장이 없다.
+`init`은 프로젝트 `.npmrc`에 레지스트리 줄만 둔다(1단계에서 이미 넣었으므로 그대로다). 0.2.1까지는 토큰 줄도 더해 pnpm 11이 "무시했다"는 경고를 냈는데, 0.2.2부터는 토큰 줄을 넣지 않아 경고가 없다. 토큰은 `~/.npmrc`에서 읽는다(0단계).
 
 ### 3단계 — Storybook 브랜드 명세 페이지에 요청 쓰기
 
@@ -196,6 +196,7 @@ pnpm milvus update
 | `duplicated mapping key` | pnpm이 만든 `allowBuilds` 자리 밑에 같은 키를 덧붙임 | 파일을 1단계 내용으로 덮어쓴다(`>`) |
 | `Command "milvus" not found` | `pnpm milvus add …`처럼 설치 전에 milvus를 부름 | 설치는 `pnpm add -D …` |
 | `init`: sf CLI를 찾지 못했습니다 | Windows의 sf는 `sf.cmd` | 0.2.1에서 고침(#42). `pnpm add -D @a40418a/milvus-design-system@0.2.1` |
+| `storybook`: `EISDIR lstat 'C:'` | Windows에서 Node의 `findPackageJSON`이 `\\?\C:\…` 경로를 돌려줌 | 0.2.2에서 고침(#46). `pnpm add -D @a40418a/milvus-design-system@0.2.2` |
 | `milvus storybook`: 버전이 다릅니다 | 패키지만 올리고 `update`를 안 함 | `pnpm milvus update` |
 | 설치를 엉뚱한 폴더에서 함 | 저장소 루트·`learndoshare_1`에서 실행 | 시연 프로젝트(`milvus-demo`) 폴더에서 실행 |
 

@@ -37,7 +37,8 @@
 
 ```
 0. 설치 전 준비 (개발자마다 한 번)
-   GitHub read:packages classic 토큰 → 셸 환경 변수 NODE_AUTH_TOKEN, .npmrc 두 줄 (Learn 07)
+   GitHub read:packages classic 토큰 → 셸 환경 변수 NODE_AUTH_TOKEN, 토큰 줄은 ~/.npmrc,
+   레지스트리 줄은 프로젝트 .npmrc (init이 없으면 더함, Learn 07)
 1. pnpm add -D @a40418a/milvus-design-system
 2. pnpm milvus init --target-org <별칭> --brand <이름>     (또는 --from-org, VF를 안 쓰면 --no-vf)
 3. pnpm milvus storybook        → "시작하기 / 브랜드 명세" 페이지에 요청 입력 → 저장 (milvus-brand-request.md)
@@ -455,7 +456,7 @@ pnpm sync:theme
 
 ### 5.5 발표 당일 체크리스트
 
-- [ ] Do 시연 녹화·캡처: [테스트·캡처 가이드](docs/presentation/do-test-capture-guide.md) 순서대로 (다른 노트북, 패키지 0.2.1)
+- [ ] Do 시연 녹화·캡처: [테스트·캡처 가이드](docs/presentation/do-test-capture-guide.md) 순서대로 (다른 노트북, 패키지 0.2.2)
 - [ ] 녹화 파일 2개를 발표 PC 로컬에 저장 (네트워크에 의존하지 않는다)
 - [ ] 라이브 데모를 한다면 고객 프로젝트에서 `pnpm milvus storybook`(`init`이 더한 `pnpm storybook`도 된다)을 미리 띄워 두고 org에 로그인해 둔다
 - [ ] 결정 요청 슬라이드를 띄워 둔 채로 Q&A를 진행한다
