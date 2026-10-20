@@ -700,6 +700,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 | `sf org list --json`·`sf auth list --json`이 `accessToken`을 가리기 시작한 sf 버전. deny 규칙 자체는 2026-10-17 실측으로 확인했다(13장) | 필요할 때 |
 | org `accent-2`의 다크 값(`#87aef7`)이 팔레트 70단계(`#8cb1f7`)와 다른 원인. 다크 모드가 범위 밖이라 지금 화면에는 영향이 없다(기록 3.9) | 다크 모드 검토 때 |
 | native에서 기본 컴포넌트 CSS가 직접 읽는 `--slds-s-*`에 `:root` 값이 닿는가 (9.1 전제 수정) | 발표 뒤 native 빌드 |
+| VF에서 Lightning Out으로 밀버스 LWC 쓰기: `isExposed: false`인 부품을 `aura:dependency`로 넣을 수 있는가, Lightning Out으로 그렸을 때 `loadBrand`가 브랜드 CSS를 불러오는가, 서드파티 쿠키를 막은 브라우저에서 뜨는가(Learn 05 `vf-plan`) | 발표 뒤 백로그(org에 시험용 앱·VF 페이지 배포, 승인 후) |
 | info 토스트에 피드백 색이 반영되는가(10/9 프로브에서 동시 표시 3개 제한으로 못 잼), `shadow-1`의 org 값이 npm 값과 같은가(구조만 기록) | 필요할 때 org 프로브(읽기만) |
 
 ## 15. 미정

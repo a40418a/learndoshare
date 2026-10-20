@@ -34,6 +34,9 @@
     <li><a href="#deploy">메타데이터 배포로 테마 적용</a></li>
     <li><a href="#a11y">접근성 색 실측</a></li>
     <li><a href="#vf">Visualforce에 브랜드 걸기</a></li>
+    <li><a href="#vf-components">Visualforce에서 밀버스 컴포넌트 쓰기</a></li>
+    <li><a href="#vf-practice">실무에서 VF 구성</a></li>
+    <li><a href="#vf-plan">밀버스 VF 컴포넌트 계획</a></li>
     <li><a href="#limits">한계와 주의</a></li>
     <li><a href="#quiz">스스로 점검</a></li>
   </ol>
@@ -44,7 +47,7 @@
   <div class="eyebrow">LEARN 05 · Phase 4 준비 · M6 배포</div>
   <h1>테마와 브랜딩 동기화</h1>
   <p class="lead">org의 Themes and Branding 설정이 어디에 어떻게 저장되는지 이해하고, 그것을 Storybook 브랜드로 가져오는 방법과 메타데이터로 배포해 활성화하는 방법(<code>pnpm milvus deploy</code>), Visualforce에 같은 브랜드를 거는 방법을 정리한다.</p>
-  <div class="meta"><span>예상 1시간</span><span>선행: 00 개념, 01 SLDS</span><span>2026-09-26 org 조회 · 2026-10-08 org 프로브 · 2026-10-09 갱신 · 2026-10-14 갱신 (M6: deploy 2단계, 리허설, 접근성 색, VF)</span></div>
+  <div class="meta"><span>예상 1시간</span><span>선행: 00 개념, 01 SLDS</span><span>2026-09-26 org 조회 · 2026-10-08 org 프로브 · 2026-10-09 갱신 · 2026-10-14 갱신 (M6: deploy 2단계, 리허설, 접근성 색, VF) · 2026-10-20 갱신 (VF에서 컴포넌트 쓰기)</span></div>
 </header>
 
 <section id="why">
@@ -420,6 +423,124 @@ getComputedStyle(document.documentElement).getPropertyValue('--slds-g-color-acce
 [...document.querySelectorAll('head link[rel=stylesheet]')].map((l) =&gt; l.href.split('/').pop())
 document.body.className</code></pre>
   <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-slds.html">Visualforce Developer Guide — apex:slds (정적 리소스 대신, <code>slds-scope</code> 자동·수동, <code>lightningStyleMode</code>)</a> (확인 2026-10-14) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-stylesheet.html">Visualforce Developer Guide — apex:stylesheet (head에 link)</a> (확인 2026-10-14) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-component.html">Visualforce Developer Guide — apex:component (커스텀 컴포넌트, <code>&lt;c:이름/&gt;</code>)</a> (확인 2026-10-14) · <a href="https://help.salesforce.com/s/articleView?id=xcloud.customize_ui_settings.htm&amp;type=5">Salesforce Help — User Interface Settings (Visualforce Settings: 설정과 SLDS 2 테마 둘 다)</a> (확인 2026-10-14) · <a href="https://www.w3.org/TR/css-cascade-5/">W3C — CSS Cascading and Inheritance Level 5 (같은 조건이면 나중 선언)</a> (확인 2026-10-13) · <a href="../docs/research/2026-10-09-org-probe.md">org 프로브 2차 기록 3.8 (설정 꺼짐·켬, 팔레트, Metadata API에 없음)</a> (확인 2026-10-12) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (1장 D2, 4.1 --no-vf, 4.4 VF 안내, 5.5 VF와 2026-10-14 측정, 13장 VF)</a> (확인 2026-10-14)</p>
+</section>
+
+<section id="vf-components">
+  <h2>Visualforce에서 밀버스 컴포넌트 쓰기 <span class="tag info">공식 방법 정리</span></h2>
+  <p>2026-10-20 추가(#51). 위 절은 VF 페이지에 브랜드 <b>CSS</b>를 거는 방법이다. 여기서는 밀버스 <b>LWC</b>를 VF 페이지에 넣을 수 있는지, 공식 방법은 무엇인지 정리한다.</p>
+  <h3>개념: 왜 VF에 LWC를 바로 넣을 수 없나</h3>
+  <ul>
+    <li><b>VF는 서버가 그리는 페이지다.</b> VF 페이지는 VF 마크업과 컨트롤러(표준 컨트롤러 또는 Apex 클래스)로 이루어진다. 사용자가 페이지를 요청하면 앱 서버가 컴파일된 페이지를 꺼내 VF 렌더러가 HTML로 바꿔 보낸다(VF 개발자 가이드)</li>
+    <li><b>LWC는 브라우저가 그리는 컴포넌트다.</b> LWC 파일은 그대로 HTML이 되지 않는다. Lightning 프레임워크(런타임)가 브라우저에서 컴포넌트를 만들고 그린다. LEX 페이지에는 이 런타임이 있고, VF 페이지에는 없다. 그래서 VF 마크업에 <code>&lt;c-milvus-calendar&gt;</code>를 적어도 그려지지 않는다. 런타임을 페이지에 따로 실어 와야 한다(아래 공식 방법이 하는 일)</li>
+    <li><b>VF는 다른 도메인에서, LEX 안에서는 iframe으로 열린다.</b> LEX와 모바일 앱에서 VF 페이지는 <code>/lightning</code> 컨테이너 안의 iframe에서 돈다. iframe은 바깥 Lightning 화면과 따로 떨어진 브라우저 창처럼 동작한다. VF와 Lightning 컴포넌트는 서로 다른 도메인에서 서빙된다(VF 개발자 가이드, Aura·LWC 개발자 가이드)</li>
+  </ul>
+  <p>그래서 LEX에 이미 떠 있는 Lightning 런타임을 iframe 안의 VF 페이지가 빌려 쓸 수 없다. VF 페이지에 런타임을 새로 실어야 하고, 그 런타임은 다른 도메인에서 오므로 쿠키 같은 제약이 따른다.</p>
+
+  <h3>Salesforce에서는: Lightning Components for Visualforce</h3>
+  <p>공식 방법의 이름이다. Aura 개발자 가이드와 LWC 개발자 가이드에 같은 절차가 있다. 세 단계다.</p>
+  <ol>
+    <li><code>&lt;apex:includeLightning/&gt;</code>를 페이지 앞쪽에 둔다. 이 컴포넌트가 Lightning Components for Visualforce의 JavaScript 라이브러리를 싣는다. 라이브러리는 VF 페이지가 있는 org에서 오므로 아래 앱도 같은 org에 있어야 한다</li>
+    <li><b>Lightning Out 앱</b>을 만든다. <code>access="GLOBAL"</code>이고 <code>ltng:outApp</code>를 확장하는 특수한 Aura 앱이다. 쓸 컴포넌트를 <code>&lt;aura:dependency resource="..."/&gt;</code>로 적는다. LWC는 <code>&lt;namespace:camelCaseComponentName&gt;</code> 형식으로 적는다(예: <code>c:milvusCalendar</code>). <code>ltng:outApp</code>는 페이지에 SLDS 리소스를 더하고, 원하지 않으면 <code>ltng:outAppUnstyled</code>를 확장한다</li>
+    <li>페이지 스크립트에서 <code>$Lightning.use("c:앱이름", 콜백)</code>으로 앱을 싣고, 콜백 안에서 <code>$Lightning.createComponent(이름, 속성, DOM 위치, 콜백)</code>으로 컴포넌트를 만든다. org에 네임스페이스가 없으면 기본 <code>c</code>를 쓴다</li>
+  </ol>
+  <div class="callout warn"><strong>제약 (공식 문서)</strong>
+    <ul>
+      <li><b>베타 기반:</b> Lightning Components for Visualforce는 Lightning Out (Beta) 위에 있다. Lightning Out (beta)는 Beta Services Terms의 적용을 받는다</li>
+      <li><b>PDF 불가:</b> Aura 컴포넌트가 든 VF 페이지는 PDF로 렌더링할 수 없다(Aura 가이드). Lightning Out 앱 자체가 Aura 앱이므로 LWC만 넣어도 같다고 본다 <span class="tag warn">추정</span></li>
+      <li><b>서드파티 쿠키:</b> Lightning 컴포넌트는 브라우저에 쿠키를 둔다. VF와 Lightning 컴포넌트가 다른 도메인에서 서빙되므로 이 쿠키는 서드파티 쿠키다. LWC 가이드는 사용자가 브라우저에서 서드파티 쿠키를 허용해야 한다고 적는다</li>
+      <li><b>앱은 하나:</b> <code>$Lightning.use()</code>는 한 페이지에서 여러 번 불러도 되지만 모두 같은 Lightning Out 앱을 가리켜야 한다</li>
+      <li><b>기본 컴포넌트:</b> 많은 표준 컴포넌트가 <code>one.app</code> 컨테이너의 리소스에 기대므로 Lightning Out (beta)와 VF에서 스타일이 다 들어가지 않거나 문서대로 동작하지 않을 수 있다</li>
+      <li><b>보안·이벤트:</b> Lightning Out (beta)는 Lightning Locker가 필요하고 LWS를 지원하지 않는다. 비교표의 "Events" 항목은 Not supported다</li>
+    </ul>
+  </div>
+  <div class="callout key"><strong>Lightning Out 2.0은 VF용이 아니다</strong>Lightning Out 2.0은 LWC를 Salesforce 밖의 외부 앱에 넣는 GA 기능이다. Setup에서 만드는 앱이고, LWR 위에서 컴포넌트를 iframe과 shadow DOM으로 감싼다. Lightning Out (beta)를 확장한 것이 아니라 완전히 대체하는 새 기능이다. VF 페이지에 넣는 공식 절차(<code>apex:includeLightning</code>)는 여전히 Lightning Out (beta) 기반이다. 공식 문서는 외부 앱에는 2.0을 권하지만, VF에서 2.0을 쓰는 방법은 찾지 못했다 <span class="tag warn">미확인</span></div>
+
+  <h3>예시: VF 페이지에 <code>milvusCalendar</code> 넣기 <span class="tag info">계획</span></h3>
+  <p>공식 문서의 형식대로 쓴 예시다. org에 배포해 실행해 보지 않았다. 확인할 것은 아래 <a href="#vf-plan">밀버스 계획</a>에 있다.</p>
+<pre data-file="force-app/main/default/aura/milvusVfApp/milvusVfApp.app (예시)"><code>&lt;aura:application access="GLOBAL" extends="ltng:outApp"&gt;
+  <span class="c">&lt;!-- createComponent로 만드는 최상위 컴포넌트마다 하나씩. 그 안의 자식은 프레임워크가 해결한다 --&gt;</span>
+  &lt;aura:dependency resource="c:milvusCalendar" /&gt;
+&lt;/aura:application&gt;</code></pre>
+<pre data-file="force-app/main/default/pages/milvusCalendarVf.page (예시)"><code>&lt;apex:page showHeader="false" sidebar="false" standardStylesheets="false"&gt;
+  &lt;apex:includeLightning /&gt;
+  &lt;div id="calendar"&gt;&lt;/div&gt;
+  &lt;script&gt;
+    $Lightning.use("c:milvusVfApp", function () {
+      $Lightning.createComponent(
+        "c:milvusCalendar",
+        <span class="c">// @api 속성. events 형식은 milvusCalendar와 같다</span>
+        { view: "month", value: "2026-10-23", events: [{ id: "1", title: "발표", start: "2026-10-23" }] },
+        "calendar",
+        function (cmp) { console.log("milvusCalendar를 만들었다"); }
+      );
+    });
+  &lt;/script&gt;
+&lt;/apex:page&gt;</code></pre>
+  <p>속성 객체의 키는 JavaScript 속성 이름(<code>firstDayOfWeek</code>처럼 camelCase)이다. 공식 예시는 <code>{ name: theName, amount: theAmount }</code> 형식이다. <code>rangechange</code>·<code>eventselect</code> 같은 밀버스 이벤트를 VF 페이지 스크립트에서 받을 수 있는지는 재지 않았다 <span class="tag warn">미확인</span></p>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/aura-platform/guide/components-visualforce.html">Aura 개발자 가이드 — Use Lightning Components in Visualforce Pages (세 단계, ltng:outApp, $Lightning.use는 같은 앱, PDF 불가, 다른 도메인·서드파티 쿠키)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/use-visualforce.html">LWC 개발자 가이드 — Use Components in Visualforce Pages (LWC는 <code>namespace:camelCaseComponentName</code>, 서드파티 쿠키 허용 필요)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/lightning-out-dependencies.html">LWC 개발자 가이드 — Lightning Out (Beta) Dependencies (<code>c:myAppComponent</code>, 최상위마다 dependency, 자식은 프레임워크가 해결)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/lightning-out-markup.html">LWC 개발자 가이드 — Lightning Out (Beta) Markup (<code>$Lightning.createComponent</code> 인자, <code>c:newExpenseForm</code>)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/lightning-out-considerations.html">LWC 개발자 가이드 — Lightning Out (Beta) Considerations and Limitations (표준 컴포넌트 한계, VF 포함)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/lightning-out-compare.html">LWC 개발자 가이드 — How Lightning Out 2.0 Compares to Lightning Out (Beta) (Beta Services Terms, Locker 필요·LWS 미지원, Events 미지원)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/lightning-out-intro.html">LWC 개발자 가이드 — Use Components Outside Salesforce with Lightning Out 2.0 (외부 앱, LWR, iframe)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-intro-architecture.html">VF 개발자 가이드 — How is Visualforce Architected? (렌더러가 HTML로 바꿈)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-mobile-salesforce1-container.html">VF 개발자 가이드 — Understanding the Salesforce Mobile App Container (LEX·모바일에서 VF는 /lightning 안의 iframe, 다른 도메인)</a> (확인 2026-10-20)</p>
+</section>
+
+<section id="vf-practice">
+  <h2>실무에서 VF는 어떻게 구성하나</h2>
+  <p>밀버스가 VF에서 무엇을 지원할지 정하려면 VF가 실제로 어디에 쓰이는지부터 알아야 한다. VF의 기본 부품은 아래와 같다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>부품</th><th>하는 일 (공식 문서)</th></tr>
+    <tr><td>표준 컨트롤러 (<code>standardController="Account"</code>)</td><td>표준 Salesforce 페이지와 같은 기능과 로직. 예를 들어 Account 표준 컨트롤러의 Save는 표준 편집 페이지의 Save와 같다. user mode로 실행되어 권한·필드 수준 보안·공유 규칙을 지킨다</td></tr>
+    <tr><td>커스텀 컨트롤러 (<code>controller="MyController"</code>)</td><td>페이지 로직 전체를 구현하는 Apex 클래스. system mode로 실행되어 사용자의 개체·필드 권한을 무시한다. 공유 규칙은 <code>with sharing</code>으로 고른다</td></tr>
+    <tr><td>컨트롤러 확장 (<code>extensions="MyExt"</code>)</td><td>표준·커스텀 컨트롤러에 동작을 더하거나 바꾸는 Apex 클래스. 표준 컨트롤러를 확장하면 그 부분은 user mode로 권한을 지킨다</td></tr>
+    <tr><td><code>&lt;apex:form&gt;</code>, <code>&lt;apex:inputField&gt;</code></td><td>form은 입력을 받아 <code>&lt;apex:commandButton&gt;</code> 등으로 제출하는 영역이다. 페이지에 하나만 두는 것이 권장이다. inputField는 개체 필드의 속성(필수·고유, 날짜면 달력 입력 등)을 따라 입력 요소를 그린다</td></tr>
+    <tr><td><code>&lt;apex:slds/&gt;</code></td><td>SLDS 스타일시트를 페이지에 싣는다(<a href="#vf">위 절</a>)</td></tr>
+    <tr><td><code>&lt;apex:page renderAs="pdf"&gt;</code></td><td>PDF 렌더링 서비스로 내려받거나 인쇄할 수 있는 PDF를 만든다. Apex에서는 <code>PageReference.getContentAsPDF()</code>로 PDF 데이터를 받아 이메일 첨부 등에 쓴다. 견적서·계약서 같은 출력물이 대표적인 쓰임이다(쓰임 예는 밀버스 서술)</td></tr>
+    <tr><td>VF 이메일 템플릿</td><td>Salesforce 레코드를 반복해 그리는 VF 기능으로 재사용할 수 있는 이메일 템플릿을 만든다</td></tr>
+    <tr><td>LEX 안의 VF</td><td>LEX와 모바일 앱에서는 <code>/lightning</code> 컨테이너 안의 iframe에서 돈다(<a href="#vf-components">위 개념</a>)</td></tr>
+  </table></div>
+  <div class="callout key"><strong>새 화면은 LWC를 권한다 (공식)</strong>VF 개발자 가이드는 새 VF 컴포넌트를 만들려 한다면 대신 LWC를 만들라고 권하고, 사용자 정의 기능도 VF보다 LWC로 만들라고 권한다.</div>
+  <h3>정리: 실무에서 VF가 남는 자리 <span class="tag warn">추정</span></h3>
+  <p>위 공식 권고와 VF만의 기능(서버 PDF 렌더링, VF 이메일 템플릿)을 함께 보면, 실무의 VF는 주로 아래 셋으로 남는다고 본다. 시장 통계나 공식 분류가 아니라 공식 문서에서 끌어낸 추정이다.</p>
+  <ul>
+    <li><b>PDF 출력:</b> 견적서·계약서·청구서처럼 서버에서 PDF를 만들어야 하는 것</li>
+    <li><b>오래된 페이지 유지:</b> Classic 때 만든 VF 페이지를 LEX에서 iframe으로 계속 쓰는 것</li>
+    <li><b>특수한 서버 렌더링:</b> 이메일 템플릿처럼 서버가 레코드를 반복해 HTML을 만드는 것</li>
+  </ul>
+  <p>이 셋 가운데 PDF와 이메일은 브라우저 JavaScript가 도는 화면이 아니므로 LWC를 넣는 Lightning Out 방식이 맞지 않는다. 밀버스가 VF에서 해 줄 일은 대부분 CSS(<code>milvusHead</code>)이고, LWC는 오래된 페이지에 동작이 있는 부품을 더할 때만 필요하다고 본다 <span class="tag warn">추정</span></p>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-intro-what-is-it.html">VF 개발자 가이드 — What is Visualforce? (표준·커스텀 컨트롤러, 확장, user mode·system mode, LWC 권장)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-intro.html">VF 개발자 가이드 — Introducing Visualforce (새 VF 컴포넌트 대신 LWC 권장)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-form.html">VF 개발자 가이드 — apex:form (제출, 페이지에 하나)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-inputfield.html">VF 개발자 가이드 — apex:inputField (필드 속성을 따름)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-compref-slds.html">VF 개발자 가이드 — apex:slds</a> (확인 2026-10-14) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-output-pdf-renderas.html">VF 개발자 가이드 — Render a Visualforce Page as a PDF File (<code>renderAs="pdf"</code>, <code>getContentAsPDF()</code>)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-email-and-templates.html">VF 개발자 가이드 — Integrate Email with Visualforce (VF 이메일 템플릿)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/salesforce-pages-developers-guide/guide/pages-mobile-salesforce1-container.html">VF 개발자 가이드 — Understanding the Salesforce Mobile App Container (LEX에서 iframe)</a> (확인 2026-10-20)</p>
+</section>
+
+<section id="vf-plan">
+  <h2>밀버스가 VF에 컴포넌트를 더하는 방법 <span class="tag info">계획</span></h2>
+  <p>밀버스 부품을 동작 유무와 SLDS 블루프린트 유무로 나눈다. 블루프린트는 SLDS가 정한 HTML 구조와 클래스다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>부품</th><th>VF에서 쓰는 방법</th><th>상태</th></tr>
+    <tr><td><code>milvusNotification</code>(SLDS Scoped Notification), <code>milvusBadge</code>(SLDS Badge 클래스), <code>milvusButton</code>(SLDS Button)</td><td>LWC 없이 SLDS 마크업을 그대로 쓰고 <code>&lt;c:milvusHead/&gt;</code>로 브랜드 CSS를 건다. 닫기 같은 동작은 페이지 JavaScript로 직접 짠다</td><td><span class="tag ok">지금 지원</span> <code>milvusHead</code>는 2026-10-14 측정(<a href="#vf">위</a>)</td></tr>
+    <tr><td><code>milvusCalendar</code>(블루프린트 없음, 날짜 계산·키보드 조작이 있음)</td><td>Lightning Out 방식(<a href="#vf-components">위</a>)으로 넣는다</td><td><span class="tag info">계획</span> 발표 뒤 백로그</td></tr>
+  </table></div>
+  <h3>블루프린트로 쓰는 예</h3>
+<pre data-file="VF 페이지 (예시)"><code>&lt;apex:page showHeader="false" sidebar="false" standardStylesheets="false"&gt;
+  &lt;c:milvusHead /&gt;
+  <span class="c">&lt;!-- milvusNotification이 그리는 클래스와 같다. 아이콘은 이 예시에서 뺐다 --&gt;</span>
+  &lt;div id="notice" class="slds-scoped-notification slds-media slds-media_center slds-theme_info" role="status"&gt;
+    &lt;div class="slds-media__body"&gt;&lt;p&gt;저장했습니다.&lt;/p&gt;&lt;/div&gt;
+    &lt;div class="slds-media__figure slds-media__figure_reverse"&gt;
+      &lt;button type="button" class="slds-button" onclick="closeNotice()"&gt;닫기&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;span class="slds-badge slds-theme_success"&gt;완료&lt;/span&gt;
+  &lt;button type="button" class="slds-button slds-button_brand"&gt;저장&lt;/button&gt;
+  &lt;script&gt;
+    <span class="c">// milvusNotification의 닫기를 대신한다. 닫은 뒤 포커스를 다음 작업 위치로 옮기는 것도 페이지 몫이다</span>
+    function closeNotice() { document.getElementById("notice").hidden = true; }
+  &lt;/script&gt;
+&lt;/apex:page&gt;</code></pre>
+  <p>클래스 이름은 저장소 코드에서 옮겼다: Scoped Notification은 <code>milvusNotification.js</code>의 <code>containerClass</code>와 <code>VARIANT</code>, 배지는 <code>milvusBadge.js</code>의 <code>VARIANT_CLASS</code>(<code>slds-theme_success</code> 등)다. LWC가 해 주던 접근성(<code>role="status"</code>, 닫기 버튼의 이름, 포커스 이동)은 페이지가 직접 맞춰야 한다.</p>
+  <h3>시험할 것 <span class="tag warn">미확인</span></h3>
+  <ul>
+    <li><b><code>isExposed: false</code>인 부품을 <code>aura:dependency</code>로 넣을 수 있는가.</b> 밀버스 LWC는 로더를 빼고 모두 <code>isExposed</code>가 <code>false</code>다(저장소 <code>force-app/main/default/lwc/milvus*/*.js-meta.xml</code>, <a href="02-LWC%20%EA%B8%B0%EC%B4%88.html#shared">02 LWC</a>). 공식 문서에서 Lightning Out과 <code>isExposed</code>의 관계를 찾지 못했다. 안 되면 VF용 래퍼 LWC를 만들어 노출하는 방법을 본다</li>
+    <li><b>Lightning Out으로 그렸을 때 <code>loadBrand</code>가 브랜드 CSS를 불러오는가.</b> 밀버스 부품은 <code>connectedCallback</code>에서 <code>c/milvusScript</code>의 <code>loadBrand(this)</code>를 부르고, <code>loadBrand</code>는 <code>lightning/platformResourceLoader</code>의 <code>loadStyle</code>로 <code>milvusBridge</code> → <code>milvusBrand</code> → <code>milvusOverride</code>를 차례로 넣는다. 실패하면 던지지 않고 <code>console.error</code>만 남긴다. Lightning Out 페이지에서 <code>@salesforce/resourceUrl</code>이 VF 도메인 기준으로 풀리는지, 같은 페이지에 <code>&lt;c:milvusHead/&gt;</code>를 함께 두면 CSS가 두 번 들어가 순서가 꼬이는지, <code>ltng:outApp</code>가 넣는 SLDS와 <code>&lt;apex:slds/&gt;</code>가 어느 버전으로 겹치는지도 함께 본다</li>
+    <li><b>서드파티 쿠키.</b> 서드파티 쿠키를 막는 브라우저에서 컴포넌트가 뜨는가, 막혔을 때 어떻게 보이는가</li>
+    <li><b>기본 컴포넌트와 이벤트.</b> <code>milvusCalendar</code>가 안에서 쓰는 <code>lightning-button</code>·<code>lightning-button-icon</code>이 제대로 그려지는가(공식 문서의 표준 컴포넌트 한계), <code>rangechange</code> 등을 페이지에서 받을 수 있는가</li>
+  </ul>
+  <p>모두 org에 시험용 Lightning Out 앱과 VF 페이지를 배포해 재야 한다. 배포는 승인이 필요한 작업이고 10/16 내용 동결 뒤이므로 <b>발표(10/23) 뒤 백로그</b>로 둔다(설계 14장).</p>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/use-visualforce.html">LWC 개발자 가이드 — Use Components in Visualforce Pages</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/lightning-out-considerations.html">LWC 개발자 가이드 — Lightning Out (Beta) Considerations and Limitations (표준 컴포넌트, <code>@salesforce/resourceUrl</code>로 의존 리소스를 명시)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/lightning-out-compare.html">LWC 개발자 가이드 — How Lightning Out 2.0 Compares to Lightning Out (Beta) (Events 미지원)</a> (확인 2026-10-20) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/reference-configuration-tags.html">LWC 개발자 가이드: XML Configuration File Elements (<code>isExposed</code>)</a> (확인 2026-10-14) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-platform-resource-loader.html">Lightning Component Reference: Platform Resource Loader (loadStyle)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (5.5 VF와 2026-10-14 측정, 14장 VF에서 Lightning Out으로 밀버스 LWC 쓰기)</a> (확인 2026-10-20) · <a href="../README.md">README Phase 5 (milvusNotification은 SLDS Scoped Notification 블루프린트, milvusCalendar는 공식 LWC에 없음)</a> (확인 2026-10-20)</p>
 </section>
 
 <section id="limits">
