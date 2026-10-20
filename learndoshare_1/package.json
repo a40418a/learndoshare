@@ -15,6 +15,7 @@
     "!force-app/**/__tests__",
     "audit/report.json",
     "stories",
+    "!stories/runbook",
     ".storybook",
     "lib/storybook-plugin.ts",
     "lib/branding.ts",

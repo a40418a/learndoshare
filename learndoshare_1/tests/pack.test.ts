@@ -27,6 +27,9 @@ const read = (entry: string) => readFileSync(join(dir, entry), "utf8");
 test("pack 결과에 dist/cli/index.js가 있고 __tests__가 없으며, 텍스트 파일에 '/Users/'가 없다", () => {
   assert.ok(entries.includes("package/dist/cli/index.js"), entries.join("\n"));
   assert.deepEqual(entries.filter((e) => e.includes("__tests__")), []);
+  // 팀 런북은 저장소 GitHub Pages에만 둔다. 고객 프로젝트 Storybook에는 넣지 않는다(#55)
+  assert.deepEqual(entries.filter((e) => e.startsWith("package/stories/runbook/")), []);
+  assert.ok(entries.includes("package/stories/Welcome.mdx"), entries.join("\n"));
   // 판정 R1: 개발자 PC 경로 검사는 dist/, prepack이 만든 카탈로그, package.json만 한다
   assert.ok(entries.includes("package/stories/slds-catalog/examples.json"), entries.join("\n"));
   const checked = entries.filter((e) => e.startsWith("package/dist/") || e.startsWith("package/stories/slds-catalog/") || e === "package/package.json");
