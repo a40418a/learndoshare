@@ -35,7 +35,7 @@ export default class MilvusBadge extends LightningElement {
   }
 
   get badgeClass() {
-    // 목록에 없는 값은 기본 모양으로 떨어뜨린다
-    return VARIANT_CLASS[this.variant] ?? VARIANT_CLASS.default;
+    // 목록에 없는 값은 기본 모양으로 떨어뜨린다. hasOwn이라 "constructor" 같은 프로토타입 이름도 거른다
+    return Object.hasOwn(VARIANT_CLASS, this.variant) ? VARIANT_CLASS[this.variant] : VARIANT_CLASS.default;
   }
 }

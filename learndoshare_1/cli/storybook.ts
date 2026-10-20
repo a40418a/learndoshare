@@ -8,7 +8,7 @@ import { constants } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { buildLwc, catalogModules, lightningBaseComponentsDir, sfdxLwcModules } from "../lib/lwc-build.ts";
-import { findProject, packageInfo, readConfig } from "./context.ts";
+import { assertSameVersion, findProject, packageInfo, readConfig, type MilvusConfig } from "./context.ts";
 
 const USAGE = "사용법: pnpm milvus storybook [build]";
 // 정적 빌드 출력. init이 .gitignore에 넣는 .milvus/ 안이라 따로 무시 설정을 하지 않아도 커밋되지 않는다
@@ -75,9 +75,12 @@ export async function runStorybook(argv: string[], deps: { spawn?: typeof spawn;
   }
 
   let root: string;
+  let config: MilvusConfig;
   try {
     root = findProject(deps.cwd ?? process.cwd()).root;
-    if (!readConfig(root)) throw new Error("milvus.config.json이 없습니다");
+    const found = readConfig(root);
+    if (!found) throw new Error("milvus.config.json이 없습니다");
+    config = found;
   } catch (e) {
     // readConfig의 오류 문구에는 init 안내가 이미 있는 것이 있다
     const message = (e as Error).message;
@@ -86,7 +89,10 @@ export async function runStorybook(argv: string[], deps: { spawn?: typeof spawn;
   }
 
   try {
-    const plan = planStorybook({ root, pkgRoot: deps.pkgRoot ?? packageInfo().root, build: build ? BUILD_OUT : undefined });
+    const pkgRoot = deps.pkgRoot ?? packageInfo().root;
+    // LWC 빌드 전에 막는다. 버전이 다르면 패키지 스토리가 프로젝트에 없는 밀버스 컴포넌트를 찾지 못한다
+    assertSameVersion(config, pkgRoot);
+    const plan = planStorybook({ root, pkgRoot, build: build ? BUILD_OUT : undefined });
     process.stdout.write(`LWC 빌드 중: ${plan.lwc.out}\n`);
     await buildLwc(plan.lwc);
     return await new Promise<number>((done) => {

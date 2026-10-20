@@ -105,6 +105,7 @@
 ## 8. 업데이트와 문제 해결
 
 - **패키지 업데이트:** `pnpm add -D @a40418a/milvus-design-system@<버전>` 뒤 `pnpm milvus update`. 고친 밀버스 관리 파일이 있으면 아무것도 바꾸지 않고 차이를 보여 준다. 패키지 원본으로 되돌리려면 `pnpm milvus update --force`
+- **`storybook`이 버전이 다르다고 멈춤:** 패키지만 올리고 `update`를 하지 않아 새 밀버스 컴포넌트(`c/milvus…`)가 프로젝트에 없다. `pnpm milvus update`를 먼저 실행한다
 - **`check`가 sha256 차이를 말함:** 밀버스 관리 파일이 바뀌었다. `pnpm milvus update --force`로 되돌린다
 - **설치가 인증 오류(401·403)로 실패:** `NODE_AUTH_TOKEN`이 비었거나 만료되었거나 `read:packages` 권한이 없다. `.npmrc` 두 줄과 pnpm 버전(2절)을 확인한다
 - **`init`·`deploy`가 org에서 멈춤:** `sf`가 없거나 로그인이 만료되었다. `sf org login web --alias <별칭>`

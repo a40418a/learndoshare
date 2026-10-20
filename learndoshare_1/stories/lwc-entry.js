@@ -7,4 +7,8 @@ export { createElement } from "lwc";
 export { default as MilvusBadge } from "c/milvusBadge";
 export { default as MilvusButton } from "c/milvusButton";
 export { default as MilvusMultiSelect } from "c/milvusMultiSelect";
+export { default as MilvusNotification } from "c/milvusNotification";
+export { default as MilvusCalendar } from "c/milvusCalendar";
 export { default as MilvusBrandLoader } from "c/milvusBrandLoader";
+// 스토리 전용 예시 컴포넌트(슬롯에 내용을 넣는 쪽). 패키지 stories 폴더에 함께 들어간다
+export { default as NotificationSlotDemo } from "./lwc/notificationSlotDemo/notificationSlotDemo.js";

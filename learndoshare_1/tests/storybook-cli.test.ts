@@ -27,10 +27,12 @@ function makePkg(o: { light?: boolean; broken?: boolean } = {}): string {
   // broken: 없는 파일을 import해 LWC 빌드가 실패한다
   const entry = o.broken ? 'import "./없는 파일.js";\n' : o.light ? "export {};\n" : readFileSync(join(repo, "stories/lwc-entry.js"));
   writeFileSync(join(pkg, "stories/lwc-entry.js"), entry);
+  // 진입 파일이 상대 경로로 import하는 스토리 전용 예시 컴포넌트(패키지에는 stories 폴더째 들어간다)
+  if (!o.light && !o.broken) cpSync(join(repo, "stories/lwc"), join(pkg, "stories/lwc"), { recursive: true });
   writeFileSync(join(pkg, "stories/slds-catalog/entry.js"), o.light ? "export {};\n" : 'export { default as accordionBasic } from "accordion/basic";\n');
   writeFileSync(join(pkg, "stories/slds-catalog/examples.json"), JSON.stringify([{ name: "accordion/basic", rel: "accordion/__examples__/basic/basic.js" }]));
   // @lwc/module-resolver가 진입 파일에서 위로 package.json을 찾는다
-  writeFileSync(join(pkg, "package.json"), JSON.stringify({ name: "fake-milvus-pkg", type: "module" }));
+  writeFileSync(join(pkg, "package.json"), JSON.stringify({ name: "fake-milvus-pkg", version: "0.0.1", type: "module" }));
   symlinkSync(join(repo, "node_modules"), join(pkg, "node_modules"), "junction");
   return pkg;
 }
@@ -194,6 +196,18 @@ test("LWC 빌드가 실패하면 Storybook을 실행하지 않고 1을 돌려준
   const { result, stderr } = await capture(() => runStorybook([], { spawn: spawnFn, cwd: makeProject(), pkgRoot: makePkg({ broken: true }) }));
   assert.equal(result, 1);
   assert.match(stderr, /milvus storybook 실패.*없는 파일\.js/s);
+  assert.equal(spawnFn.calls.length, 0);
+});
+
+test("패키지와 milvus.config.json의 버전이 다르면 LWC를 빌드하지 않고 update 안내와 1", async () => {
+  const root = makeProject();
+  const configFile = join(root, "milvus.config.json");
+  writeFileSync(configFile, readFileSync(configFile, "utf8").replace('"0.0.1"', '"0.0.0"'));
+  const spawnFn = fakeSpawn();
+  const { result, stdout, stderr } = await capture(() => runStorybook([], { spawn: spawnFn, cwd: root, pkgRoot: makePkg({ light: true }) }));
+  assert.equal(result, 1);
+  assert.match(stderr, /패키지\(0\.0\.1\).*파일\(0\.0\.0\).*pnpm milvus update/);
+  assert.doesNotMatch(stdout, /LWC 빌드 중/);
   assert.equal(spawnFn.calls.length, 0);
 });
 

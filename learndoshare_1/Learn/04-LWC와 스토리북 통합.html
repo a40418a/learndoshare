@@ -380,7 +380,11 @@ export { createElement } from "lwc";
 export { default as MilvusBadge } from "c/milvusBadge";
 export { default as MilvusButton } from "c/milvusButton";
 export { default as MilvusMultiSelect } from "c/milvusMultiSelect";
-export { default as MilvusBrandLoader } from "c/milvusBrandLoader";</code></pre>
+export { default as MilvusNotification } from "c/milvusNotification";
+export { default as MilvusCalendar } from "c/milvusCalendar";
+export { default as MilvusBrandLoader } from "c/milvusBrandLoader";
+<span class="c">// 스토리 전용 예시 컴포넌트(슬롯에 내용을 넣는 쪽). 패키지 stories 폴더에 함께 들어간다</span>
+export { default as NotificationSlotDemo } from "./lwc/notificationSlotDemo/notificationSlotDemo.js";</code></pre>
 
 <pre data-file="package.json (scripts 일부)"><code>  "scripts": {
     …
@@ -498,9 +502,9 @@ export const 기본 = {};</code></pre>
 
 <section id="project">
   <h2>우리 프로젝트 적용</h2>
-  <div class="callout project"><strong>지금 상태 (2026-10-12 갱신)</strong>
+  <div class="callout project"><strong>지금 상태 (2026-10-20 갱신)</strong>
     <ul>
-      <li>표현 컴포넌트 3개(<code>milvusBadge</code>, <code>milvusButton</code>, <code>milvusMultiSelect</code>)와 화면 없는 앱 전체 브랜드 로더 <code>milvusBrandLoader</code>(Task 30)가 <code>force-app/main/default/lwc/</code>에 있고, <code>stories/lwc-entry.js</code>가 export한다</li>
+      <li>표현 컴포넌트 5개(<code>milvusBadge</code>, <code>milvusButton</code>, <code>milvusMultiSelect</code>, <code>milvusNotification</code>·<code>milvusCalendar</code>, 이슈 #40)와 화면 없는 앱 전체 브랜드 로더 <code>milvusBrandLoader</code>(Task 30)가 <code>force-app/main/default/lwc/</code>에 있고, <code>stories/lwc-entry.js</code>가 export한다</li>
       <li>Salesforce 기본 컴포넌트는 <code>lightning-base-components</code>의 공식 예제(<code>__examples__</code>)를 그대로 컴파일한 카탈로그로 보여 준다 (<code>scripts/generate-slds-catalog.ts</code>의 <code>generateCatalog</code>, <a href="#code">저장소 코드</a>)</li>
       <li>컨테이너(<code>@wire</code>, Apex, LDS를 쓰는 컴포넌트)는 빌드 입력에 넣지 않는다. <code>lightning/uiRecordApi</code>가 패키지에 없으므로 빌드되지 않는 것이 정상이다. 지금 저장소에는 컨테이너 컴포넌트가 없다</li>
       <li>밀버스 컴포넌트는 JavaScript(<code>.js</code>)다(2026-10-12 갱신: 10/9 결정 D1로 TypeScript에서 되돌렸다, <a href="02-LWC%20%EA%B8%B0%EC%B4%88.html#ts">02 LWC</a>). 빌드는 npm에 없는 플랫폼 모듈(<code>lightning/platformResourceLoader</code>, <code>@salesforce/resourceUrl/*</code>)을 대체 모듈로 바꾼다 (<a href="#plugins">플랫폼 모듈 대체</a>, 2026-10-09 구현)</li>

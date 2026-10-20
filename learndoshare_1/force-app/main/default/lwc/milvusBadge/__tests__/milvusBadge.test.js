@@ -38,8 +38,8 @@ describe("c-milvus-badge", () => {
     expect(badge.classList).toContain(className);
   });
 
-  it("알 수 없는 variant는 기본 모양으로 렌더한다", () => {
-    const badge = render({ label: "상태", variant: "purple" });
+  it.each(["purple", "constructor"])("알 수 없는 variant %s는 기본 모양으로 렌더한다", (variant) => {
+    const badge = render({ label: "상태", variant });
     expect(badge.className).toBe("");
   });
 

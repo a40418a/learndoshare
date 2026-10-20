@@ -194,8 +194,16 @@ export default class MilvusRecordBadge extends LightningElement {
 <pre><code>&lt;button onclick={handleClick}&gt;{label}&lt;/button&gt;
 &lt;c-milvus-badge onselect={handleSelect}&gt;&lt;/c-milvus-badge&gt;</code></pre>
   <p>핸들러는 <code>on</code> + 이벤트 이름으로 쓰고, 값은 클래스의 메서드를 가리킨다(<code>{handleClick}</code>). 필요한 값은 <code>data-*</code> 속성에 넣고 <code>event.currentTarget.dataset</code>으로 읽는다(<code>data-item-id</code> → <code>dataset.itemId</code>).</p>
+  <h3>슬롯</h3>
+<pre data-file="milvusNotification.html (일부) · 부모 템플릿"><code>&lt;p&gt;{message} &lt;slot&gt;&lt;/slot&gt;&lt;/p&gt;
+
+&lt;c-milvus-notification message="같은 리드가 있습니다."&gt;
+  &lt;a href="#" onclick={handleView}&gt;중복 보기&lt;/a&gt;
+&lt;/c-milvus-notification&gt;</code></pre>
+  <p><code>&lt;slot&gt;</code>은 부모가 컴포넌트 본문에 넣은 마크업이 들어갈 자리다. 이름 없는 슬롯은 <code>slot</code> 속성이 없는 마크업을 받고, <code>&lt;slot name="..."&gt;</code>은 같은 <code>slot</code> 속성을 단 요소만 받는다. 슬롯에 들어온 요소는 자식의 shadow tree에 속하지 않으므로 자식은 <code>this.template.querySelector()</code>가 아니라 <code>this.querySelector()</code>로 찾는다. Aura 컴포넌트는 슬롯에 넣을 수 없다.</p>
+  <div class="callout project"><strong>Storybook에서 슬롯 채우기 (2026-10-20 실측)</strong><code>createElement</code>로 만든 호스트에 자식을 <code>append</code>하면 synthetic shadow에서는 슬롯에 들어가지 않고 컴포넌트 밖에 그려졌다. 그래서 <code>milvusNotification</code>의 슬롯 스토리는 템플릿으로 슬롯을 채우는 스토리 전용 LWC(<code>stories/lwc/notificationSlotDemo</code>)로 그린다(#40).</div>
   <div class="callout warn"><strong>템플릿 식 (2026-10-09 갱신)</strong>기본 바인딩 <code>{ }</code> 안에는 식별자나 멤버 식만 쓸 수 있고, 계산은 getter로 한다. Spring '26부터는 컴포넌트 <code>apiVersion</code>이 66.0 이상이면 함수 호출, 화살표 함수 같은 복잡한 식을 템플릿에 쓸 수 있다. 밀버스는 단위 테스트가 쉬운 getter와 메서드 참조를 기본으로 쓴다. 로컬 도구(Storybook용 컴파일, Jest)가 이 새 문법을 지원하는지는 <span class="tag warn">미확인</span>이다.</div>
-  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-conditional.html">LWC 개발자 가이드: Render HTML Conditionally</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-lists.html">LWC 개발자 가이드: Render Lists</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/events-handling.html">LWC 개발자 가이드: Handle Events</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/js-props-getter.html">LWC 개발자 가이드: Bind Data in a Template</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-html-expressions.html">LWC 개발자 가이드: Template Expressions (Spring '26, apiVersion 66.0)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-html-expressions-types.html">LWC 개발자 가이드: Supported Expression Types (Function Calls, Arrow Functions)</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset">MDN: HTMLElement.dataset</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-conditional.html">LWC 개발자 가이드: Render HTML Conditionally</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-lists.html">LWC 개발자 가이드: Render Lists</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/events-handling.html">LWC 개발자 가이드: Handle Events</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/js-props-getter.html">LWC 개발자 가이드: Bind Data in a Template</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-html-expressions.html">LWC 개발자 가이드: Template Expressions (Spring '26, apiVersion 66.0)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-html-expressions-types.html">LWC 개발자 가이드: Supported Expression Types (Function Calls, Arrow Functions)</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/dataset">MDN: HTMLElement.dataset</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-slots.html">LWC 개발자 가이드: Pass Markup into Slots</a> (확인 2026-10-20) · <a href="../README.md">README 3장 (createElement 슬롯 실측)</a> (확인 2026-10-20)</p>
 </section>
 
 <section id="events">
@@ -211,14 +219,20 @@ export default class MilvusRecordBadge extends LightningElement {
     <tr><th>옵션</th><th>기본값</th><th>의미</th></tr>
     <tr><td><code>bubbles</code></td><td><code>false</code></td><td>DOM 위쪽으로 전파되는지</td></tr>
     <tr><td><code>composed</code></td><td><code>false</code></td><td>shadow 경계를 넘어가는지</td></tr>
+    <tr><td><code>cancelable</code></td><td><code>false</code></td><td>받는 쪽이 <code>event.preventDefault()</code>로 취소할 수 있는지</td></tr>
   </table></div>
   <ul>
     <li>이벤트 이름에는 대문자를 쓰지 않고, <code>on</code>으로 시작하지 않는다. 템플릿의 핸들러 이름이 <code>on</code>으로 시작해야 해서 <code>ononselect</code>가 되어 버린다</li>
     <li><code>detail</code>에 객체를 그대로 넣으면 받는 쪽이 원본을 바꿀 수 있다. 원시값만 넣거나 새 객체로 복사해서 넣는다</li>
     <li>버블링하는 이벤트는 경로 위의 모든 소비자에게 API가 된다. <b>가장 제한적인 설정(기본값 둘 다 false)</b>부터 시작한다</li>
     <li>LWC는 버블링 단계만 쓴다. capture 단계는 지원하지 않는다</li>
+    <li><b>취소할 수 있는 이벤트</b>: <code>cancelable: true</code>로 보내면 받는 쪽이 <code>preventDefault()</code>를 부를 수 있다. 보내는 쪽은 <code>dispatchEvent()</code>의 반환값으로 안다. 반환값은 이벤트가 취소할 수 있고 핸들러 중 하나라도 <code>preventDefault()</code>를 불렀으면 <code>false</code>, 아니면 <code>true</code>다. 이벤트를 보낸 다음 자기 동작을 할지 부모에게 묻는 방법이다</li>
   </ul>
-  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-data-flow.html">LWC 개발자 가이드: Data Flow</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/events-create-dispatch.html">LWC 개발자 가이드: Create and Dispatch Events</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/events-propagation.html">LWC 개발자 가이드: Configure Event Propagation</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/events-best-practices.html">LWC 개발자 가이드: Events Best Practices</a> (확인 2026-10-09)</p>
+<pre data-file="milvusNotification/milvusNotification.js (일부)"><code>handleClose() {
+  const proceed = this.dispatchEvent(new CustomEvent('close', { cancelable: true }));
+  if (proceed) this.isOpen = false; <span class="c">// 부모가 preventDefault()하면 숨지 않는다</span>
+}</code></pre>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-data-flow.html">LWC 개발자 가이드: Data Flow</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/events-create-dispatch.html">LWC 개발자 가이드: Create and Dispatch Events</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/events-propagation.html">LWC 개발자 가이드: Configure Event Propagation</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/events-best-practices.html">LWC 개발자 가이드: Events Best Practices</a> (확인 2026-10-09) · <a href="https://developer.mozilla.org/en-US/docs/Web/API/Event/Event">MDN: Event() constructor (bubbles·cancelable·composed 기본값 false)</a> (확인 2026-10-20) · <a href="https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent">MDN: EventTarget.dispatchEvent() (반환값)</a> (확인 2026-10-20)</p>
 </section>
 
 <section id="shadow">
@@ -383,7 +397,7 @@ export default class MilvusBrandLoader extends LightningElement {
   <p><code>.js-meta.xml</code>의 <code>isExposed</code>가 <code>false</code>면 그 컴포넌트는 Lightning App Builder 같은 빌더에 보이지 않는다. 빌더에서 쓰게 하려면 <code>true</code>로 두고 대상(<code>&lt;target&gt;</code>)을 하나 이상 정한다(LWC 개발자 가이드). 빌더 노출과 코드에서 쓰는 것은 별개다. <code>isExposed</code>가 <code>false</code>인 <code>milvusScript</code>를 프로브 컴포넌트가 <code>c/milvusScript</code>로 import해 org에서 동작했다(2026-10-09 프로브, 위 "org에서 확인한 것").</p>
   <div class="table-wrap"><table>
     <tr><th>밀버스 LWC</th><th><code>isExposed</code></th><th>대상</th><th>이유</th></tr>
-    <tr><td><code>milvusBadge</code>, <code>milvusButton</code>, <code>milvusMultiSelect</code></td><td><code>false</code></td><td>없음</td><td>다른 LWC 안에서 쓰는 부품이다. 리허설에서 앱 빌더 목록에 나와 사용자가 지적했고, 노출을 껐다(설계 1장 10/14 결정)</td></tr>
+    <tr><td><code>milvusBadge</code>, <code>milvusButton</code>, <code>milvusMultiSelect</code>, <code>milvusNotification</code>, <code>milvusCalendar</code></td><td><code>false</code></td><td>없음</td><td>다른 LWC 안에서 쓰는 부품이다. 리허설에서 앱 빌더 목록에 나와 사용자가 지적했고, 노출을 껐다(설계 1장 10/14 결정)</td></tr>
     <tr><td><code>milvusScript</code></td><td><code>false</code></td><td>없음</td><td>화면 없는 공용 모듈(import 전용)</td></tr>
     <tr><td><code>milvusBrandLoader</code></td><td><code>true</code></td><td><code>lightning__UtilityBar</code> 하나</td><td>사람이 App Manager에서 앱의 유틸리티 바에 붙여야 하므로 노출한다</td></tr>
   </table></div>

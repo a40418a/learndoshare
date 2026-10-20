@@ -1,0 +1,24 @@
+<template>
+  <div lwc:if={isOpen} class={containerClass} role="status">
+    <div class="slds-media__figure">
+      <lightning-icon
+        icon-name={current.icon}
+        alternative-text={current.label}
+        title={current.label}
+        size="small"
+      ></lightning-icon>
+    </div>
+    <div class="slds-media__body">
+      <p>{message} <slot></slot></p>
+    </div>
+    <div lwc:if={dismissible} class="slds-media__figure slds-media__figure_reverse">
+      <lightning-button-icon
+        icon-name="utility:close"
+        alternative-text="닫기"
+        title="닫기"
+        variant="bare"
+        onclick={handleClose}
+      ></lightning-button-icon>
+    </div>
+  </div>
+</template>

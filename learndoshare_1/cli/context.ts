@@ -53,6 +53,17 @@ export function readConfig(root: string): MilvusConfig | undefined {
   return c;
 }
 
+/**
+ * 프로젝트에 놓인 밀버스 파일의 버전(milvus.config.json)이 pkgRoot 패키지와 같은지 본다. 다르면 update 안내로 던진다.
+ * 패키지만 올리고 update를 안 하면 패키지 스토리가 프로젝트에 아직 없는 c/milvus*를 import해 원인이 안 보이는 빌드 오류가 난다
+ */
+export function assertSameVersion(config: MilvusConfig, pkgRoot: string): void {
+  const { version } = JSON.parse(readFileSync(join(pkgRoot, "package.json"), "utf8")) as { version?: string };
+  if (config.version !== version) {
+    throw new Error(`설치된 패키지(${version})와 프로젝트에 놓인 밀버스 파일(${config.version})의 버전이 다릅니다. pnpm milvus update를 먼저 실행하세요`);
+  }
+}
+
 export function writeConfig(root: string, c: MilvusConfig): void {
   writeFileSync(join(root, CONFIG), `${JSON.stringify(c, null, 2)}\n`);
 }

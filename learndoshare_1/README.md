@@ -182,6 +182,8 @@ Storybook에서는 브랜드 root style을 래퍼 요소에 주입하면 된다.
 | 공식 로컬 미리보기 | Spring '26에 **Live Preview**로 이름이 바뀌었다(`sf lightning dev app / site / component`). 단일 컴포넌트 미리보기에서 LDS wire adapter, `@salesforce` scoped module, Apex를 쓸 수 있다(Winter '26~). HMR 지원 | 확인 |
 | 한 org에 테마 여러 개 | 커스텀 테마는 최대 300개, 활성은 1개 (공식 문서). Storybook에 여러 브랜드를 띄우는 것은 Phase 4에서 확인 | 확인 |
 | SLDS 2 테마의 헤더 배경색 | SLDS 2 테마에서는 배경색·배경 이미지·글로벌 헤더 색을 쓸 수 없다(접근성). API의 `HEADER_BACKGROUND_COLOR`는 저장만 된 값일 수 있다 | 확인 |
+| `createElement`와 슬롯 | `createElement`로 만든 LWC 호스트에 자식을 `append`하면 synthetic shadow에서는 슬롯에 들어가지 않고 컴포넌트 밖에 그려진다. 슬롯 스토리는 템플릿으로 슬롯을 채우는 스토리 전용 LWC(`stories/lwc/`)로 그린다(#40) | 확인 (2026-10-20 Storybook 실측) |
+| 패키지만 올리고 `update` 전 | 새 밀버스 컴포넌트가 든 패키지를 설치하고 `update`를 하지 않으면 `milvus storybook`의 LWC 빌드가 `c/milvus…`를 찾지 못한다. 그래서 `storybook`은 빌드 전에 `milvus.config.json`의 `version`과 패키지 버전을 비교해 `update`를 안내한다(#40). 버전 번호를 올리지 않은 tgz는 이 비교로 잡히지 않는다 | 확인 (2026-10-20 리뷰 재현) |
 | 브랜드 단위 | org 단위인지 Lightning 앱 단위인지. 앱 브랜딩은 내장 테마는 항상 덮어쓰지만, 커스텀 테마를 덮으려면 App Manager의 override 옵션이 필요하다 | 미정 |
 
 ---
@@ -322,6 +324,8 @@ pnpm sync:theme
 | 2 | **의미색 뱃지** (`milvusBadge`) | `lightning-badge`에 없는 성공·경고·위험 변형. 의미색은 브랜드색과 별개 계층이다 |
 | 3 | **브랜드 버튼** (`milvusButton`) | Phase 3에서 구현. 여기서는 스토리 3종, 사용 기준 문서(언제 `lightning-button` 대신 쓰는가), Jest를 마무리한다 |
 | 4 | **multi 검색** (`milvusMultiSelect`) | `lightning-combobox`는 다중 선택을 지원하지 않는다. 다중 선택 기본 컴포넌트는 `lightning-dual-listbox`와 `lightning-select`(`multiple`, 네이티브 목록 상자)뿐이고, 검색 가능한 다중 선택 콤보박스는 없다 **(컷 1순위)** |
+| 5 | **영역 알림** (`milvusNotification`, #40, 동결 이후 추가) | 공식 LWC에 없는 SLDS Scoped Notification 블루프린트. SLDS는 닫을 수 없는 것으로 정의하지만 밀버스가 닫기 버튼(`dismissible`, 취소할 수 있는 `close` 이벤트)을 더했다 |
+| 6 | **월·주 일정표** (`milvusCalendar`, #40, 동결 이후 추가) | 공식 LWC에는 날짜 선택(`lightning-input type="date"`)만 있고 일정표는 없다. 패키지의 `lightning/calendar`는 Date Picker 내부 부품(비공개)이다. 데이터는 부모가 `events`로 넘기고 `rangechange`로 범위를 받는다 |
 
 각 컴포넌트마다 표현 컴포넌트로 작성, 스토리(기본 / 변형 / 브랜드별), 사용 기준 문서(언제 쓰는지, 언제 쓰면 안 되는지), Jest 테스트를 갖춘다. 컴포넌트마다 **메타데이터(이름, 설명, 의존 컴포넌트)**를 두어 Phase 6의 선택 목록에 쓴다. (대체) 선택 목록은 만들지 않았다. `init`은 밀버스 LWC를 모두 복사한다.
 
@@ -337,7 +341,7 @@ pnpm sync:theme
 - [x] **`milvus.config.json`:** `init`이 패키지 버전, 대상 org 별칭, 브랜드, VF 사용 여부, 밀버스 관리 파일 목록과 sha256을 기록한다. `check`가 sha256으로 직접 수정을 잡고, `update`가 새 버전의 관리 파일을 반영한다([11.3](#113-패키지로-프로젝트-세팅-체계화))
 - [x] **배포:** `pnpm milvus deploy`가 계획을 보여 주고, `--yes`일 때 밀버스 메타데이터를 배포한 뒤 활성 테마를 바꾼다(설계 4.4)
 - [x] **리허설:** 설치본(tgz)으로 `init` → 명세 페이지 저장 → 반영 → hook 검사 → Storybook → `deploy --yes`가 이어지는 것을 2026-10-14에 확인했다(설계 13장)
-- [ ] **`update`:** 구현과 단위 테스트(`tests/update.test.ts`)는 커밋했다(이슈 #36). 설치본의 버전을 올려 실제로 갱신해 본 기록은 없다 **(미확인)**
+- [ ] **`update`:** 구현과 단위 테스트(`tests/update.test.ts`)는 커밋했다(이슈 #36). 2026-10-20 #40 리뷰에서 같은 버전 번호의 새 tgz로 `update`를 돌려 새 관리 파일(`milvusNotification` 3개)이 추가되고 그 뒤 `storybook build`가 되는 것을 확인했다. 버전 번호를 올린 설치본으로 갱신해 본 기록은 없다 **(미확인)**
 
 **완료 기준:** 새 SFDX 프로젝트에서 1.2의 흐름이 막힘 없이 org 화면(LEX)까지 이어지고, 브랜드 값이 정적 반영 검사에서 모든 컴포넌트에 반영된다(설계 0장 성공 기준).
 
