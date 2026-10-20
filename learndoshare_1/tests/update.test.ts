@@ -231,9 +231,9 @@ test("VF 없이 init한 프로젝트에는 update가 milvusHead·milvusVf를 만
 
 test("소유 파일은 바뀌지 않는다", async () => {
   await withProject(async (root, pkg) => {
-    const owned = [`${RES}/milvusBrand.css`, `${RES}/milvusOverride.css`, `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`];
+    const owned = [`${RES}/milvusBrand.css`, `${RES}/milvusOverride.css`, "milvus-patterns.md", `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`];
     for (const f of owned) appendFileSync(join(root, f), "<!-- 로컬 -->\n");
-    for (const f of owned.slice(0, 2)) appendFileSync(join(pkg, tpl(f)), "/* 새 틀 */\n");
+    for (const f of owned.slice(0, 3)) appendFileSync(join(pkg, tpl(f)), "/* 새 틀 */\n");
     const before = Object.fromEntries(owned.map((f) => [f, read(root, f)]));
 
     const r = await update(root, pkg, ["--force"]);

@@ -51,7 +51,7 @@
 
 | 단계 | 누가 | 결과물 | 수단 |
 | --- | --- | --- | --- |
-| 2 | 개발자 | 밀버스 관리 파일(LWC, `milvusBridge.css`, `milvus-design.md`, skill, hook), 브랜드 파일(`BrandingSet`, 테마, 빈 `milvusBrand.css`, 설명 주석만 있는 `milvusOverride.css`), `milvus.config.json` | `pnpm milvus init` (설계 3장, 4.1) |
+| 2 | 개발자 | 밀버스 관리 파일(LWC, `milvusBridge.css`, `milvus-design.md`, skill, hook), 브랜드 파일(`BrandingSet`, 테마, 빈 `milvusBrand.css`, 설명 주석만 있는 `milvusOverride.css`), UI 패턴 명세 `milvus-patterns.md`(소유), `milvus.config.json` | `pnpm milvus init` (설계 3장, 4.1) |
 | 3 | 개발자 | `milvus-brand-request.md` | 브랜드 명세 페이지 (설계 6.1) |
 | 4 | Claude Code | `BrandingSet`의 색·로고, `milvusBrand.css`의 hook·브리지 변수 | `milvus-brand` skill + hook의 `check --style` (설계 6.2, 7.2) |
 | 5 | 개발자가 승인, CLI가 실행 | org의 밀버스 메타데이터와 활성 테마 | `pnpm milvus deploy` (설계 4.4) |
@@ -186,6 +186,7 @@ Storybook에서는 브랜드 root style을 래퍼 요소에 주입하면 된다.
 | SLDS 2 테마의 헤더 배경색 | SLDS 2 테마에서는 배경색·배경 이미지·글로벌 헤더 색을 쓸 수 없다(접근성). API의 `HEADER_BACKGROUND_COLOR`는 저장만 된 값일 수 있다 | 확인 |
 | `createElement`와 슬롯 | `createElement`로 만든 LWC 호스트에 자식을 `append`하면 synthetic shadow에서는 슬롯에 들어가지 않고 컴포넌트 밖에 그려진다. 슬롯 스토리는 템플릿으로 슬롯을 채우는 스토리 전용 LWC(`stories/lwc/`)로 그린다(#40) | 확인 (2026-10-20 Storybook 실측) |
 | 패키지만 올리고 `update` 전 | 새 밀버스 컴포넌트가 든 패키지를 설치하고 `update`를 하지 않으면 `milvus storybook`의 LWC 빌드가 `c/milvus…`를 찾지 못한다. 그래서 `storybook`은 빌드 전에 `milvus.config.json`의 `version`과 패키지 버전을 비교해 `update`를 안내한다(#40). 버전 번호를 올리지 않은 tgz는 이 비교로 잡히지 않는다 | 확인 (2026-10-20 리뷰 재현) |
+| 모달 규칙 (#57) | `LightningModal`은 `lightning/modal`을 상속해 만들고 `lightning-modal` 태그는 없다. `label`은 필수(헤더가 있으면 `lightning-modal-header`에), `size`는 `small`·`medium`(기본)·`large`·`full`이고 연 뒤에는 못 바꾼다. `this.close(result)`의 값이 `open()` promise 결과이고, X로 닫으면 `undefined`다. SLDS 2 `.slds-modal__footer`는 `text-align: end`, `slds-modal__footer_directional`은 여러 단계 모달용이다. footer 버튼 순서(취소 → 주 동작)를 정한 공식 규칙은 찾지 못했다(공식 예시만 그 순서) | 확인 (2026-10-20 LightningModal·Modal Footer Component Reference, SLDS 2 Modals, `modal.css` 2.264.2) |
 | 브랜드 단위 | org 단위인지 Lightning 앱 단위인지. 앱 브랜딩은 내장 테마는 항상 덮어쓰지만, 커스텀 테마를 덮으려면 App Manager의 override 옵션이 필요하다 | 미정 |
 
 ---
@@ -477,6 +478,7 @@ pnpm sync:theme
 - [x] **테마 메타데이터 (사실상 정해짐).** 고객 프로젝트에서는 `init`이 `brandingSets/`·`lightningExperienceThemes/`를 프로젝트 소유 파일로 만들고, `deploy`가 그 파일로 배포한다. 색의 원본이 이 파일이다(설계 3장, 4.4). 커밋한다고 문서에 명시한 곳은 없다 **(미확인)**
 - [ ] **디자인 시스템 오너와 주당 확보 시간.** 최소 주 4시간 제안
 - [x] **브랜드 명세 페이지 입력 (확정, 2026-10-20 사용자 피드백, #48).** 입력은 브랜드 색·로고·피드백 색·디자인 명세 네 가지다. 입력이 있는 항목 34개를 처음 보는 사람이 "다 채워야 하나"로 받아들였고, 다른 디자인 시스템 문서의 표를 통째로 붙여 넣는 쓰임새를 원했다. 나머지 항목은 "바꿀 수 있는 것"·"바꿀 수 없는 것" 참고 목록이고, 디자인 명세가 옛 세부 절보다 우선한다(설계 6.1). 10/16 내용 동결 뒤의 변경이며 사용자 요청에 따른 예외다
+- [x] **UI 패턴 명세 (확정, 2026-10-20 사용자 요청, #57).** 화면 패턴을 고객 프로젝트의 [소유] 파일 `milvus-patterns.md`에 적고, Claude가 LWC를 쓰기 전에 읽는다(`milvus-design.md` 5절). 최소 버전은 모달 패턴만 다룬다: `LightningModal` 상속, `lightning-modal-*`, footer 오른쪽 끝 정렬, 취소 → 주 동작, `size`, `close(result)`, `open()`. 씨팝코리아 프로젝트에서 모달마다 버튼 위치와 여는 방식이 달랐던 것이 계기다. 새 컴포넌트는 만들지 않는다(설계 1장 10/20). 10/16 내용 동결 뒤의 변경이며 사용자 요청에 따른 예외다
 
 ---
 

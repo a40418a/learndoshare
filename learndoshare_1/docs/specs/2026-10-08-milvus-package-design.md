@@ -76,6 +76,7 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 | 10/9 | **D3 앱 전체 브랜드.** 화면 없는 LWC `milvusBrandLoader`(대상 `lightning__UtilityBar`, `loadBrand(this)`만)를 패키지에 넣는다. 앱에 붙이는 것은 사용자가 App Manager에서 한다(유틸리티 항목 추가, "앱이 열릴 때 백그라운드로 로드" 체크). `deploy`는 고객 앱 메타데이터를 바꾸지 않는다 | 사용자 선택. 유틸리티 항목의 백그라운드 로드만으로 그 앱의 표준 화면(리드 목록)에 브랜드 CSS가 들어갔다(9.7, 13장) |
 | 10/9 | **D4 TS 배포 단계 없음.** `deploy`에 TS → JS 변환 단계를 넣지 않는다 | LWC가 JS이므로 필요 없다 |
 | 10/14 | **앱 빌더 노출은 로더 하나.** 밀버스 부품(`milvusBadge`, `milvusButton`, `milvusMultiSelect`)과 `milvusScript`는 `isExposed`를 `false`로 두어 앱 빌더에 노출하지 않는다. 노출하는 밀버스 LWC는 `milvusBrandLoader`(대상 `lightning__UtilityBar` 하나)뿐이다 | 사용자 지적. 10/14 리허설에서 부품이 앱 빌더 목록에 나왔다. 부품은 다른 LWC 안에서 쓰는 것이다 |
+| 10/20 | **UI 패턴 명세(최소: 모달, #57).** 고객 프로젝트 루트에 [소유] `milvus-patterns.md`를 놓는다. 패턴마다 규칙·이유·예시 코드·출처를 적고, 첫 패턴은 모달(`LightningModal` 상속, `lightning-modal-*`, footer 오른쪽 끝 정렬, 취소 → 주 동작, `size`, `close(result)`, `open()`)이다. `milvus-design.md` 5절이 Claude에게 LWC 화면을 만들기 전에 읽게 한다. 새 컴포넌트는 만들지 않는다 | 2026-10-20 사용자 요청. 씨팝코리아 프로젝트에서 같은 SLDS를 써도 모달마다 버튼 위치와 여는 방식이 달랐다. 근거는 LightningModal Component Reference와 SLDS 2 Modals 블루프린트(2026-10-20 확인)이고, 공식 근거가 없는 규칙(버튼 순서 등)은 "밀버스 규칙(팀 합의)"로 표시한다. 10/16 내용 동결 뒤의 변경이며 사용자 요청에 따른 예외다 |
 
 ---
 
@@ -109,6 +110,7 @@ milvus-design.md                                   [관리] 세팅 안내서이�
 CLAUDE.md                                          [소유] @milvus-design.md 한 줄 추가 (없으면 이 한 줄로 생성)
 milvus.config.json                                 [생성] 패키지 버전, 브랜드, 대상 org, 밀버스 관리 파일 목록과 sha256
 milvus-brand-request.md                            [소유] 브랜드 명세 페이지가 저장 (처음에는 없음)
+milvus-patterns.md                                 [소유] UI 패턴 명세(모달 등). 없을 때만 놓고 팀이 고친다. update는 건드리지 않는다 (1장 10/20)
 package.json                                       [소유] "storybook": "milvus storybook" 스크립트 추가 (없을 때만)
 .claude/settings.json                              [소유] permissions와 hook 병합 (7.2)
 .claude/skills/milvus-brand/SKILL.md               [관리] 브랜드 입력 skill
@@ -389,7 +391,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
    - VF를 쓰면 Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켠다. 메타데이터로 켤 수 없다
    - 앱 전체에 브랜드를 걸려면 App Manager에서 그 앱의 유틸리티 바에 `milvusBrandLoader`를 추가하고 "앱이 열릴 때 백그라운드로 로드"를 체크한다. 앱마다 한다. 안 하면 밀버스 컴포넌트가 있는 페이지에만 걸린다. 로더는 보이는 유틸리티 항목이라 유틸리티 바에 버튼으로 나온다(라벨·아이콘은 App Manager에서 정한다). 템플릿이 비어 있어 패널을 열어도 아무것도 그리지 않는다
 4. 파일 지도: [관리] / [소유] / [생성] (3장과 같음)
-5. 디자인 규칙: 판단 순서, util.css 규칙(5.2), 색은 `BrandingSet`에서만, LWC는 JavaScript(`.js`, 10/9 D1), `milvus` 접두사는 밀버스 전용
+5. 디자인 규칙: LWC 화면을 만들기 전에 `milvus-patterns.md`를 읽는다(1장 10/20), 판단 순서, util.css 규칙(5.2), 색은 `BrandingSet`에서만, LWC는 JavaScript(`.js`, 10/9 D1), `milvus` 접두사는 밀버스 전용
 6. Claude에게 시키는 법: 예시 문장, skill 이름
 7. 배포 안전장치: 배포는 `pnpm milvus deploy`로만, 계획 확인 후 `--yes`, 활성 테마는 org 전체에 적용, 테마 반영은 새로고침 후
 8. 업데이트와 문제 해결: `milvus update`(`--force`), GitHub 토큰 오류, VF는 `<c:milvusHead/>`(`showHeader="false"` 페이지에서는 `<body>`에 `slds-scope`가 자동으로 붙어 래퍼가 필요 없다, 2026-10-14 측정. `applyBodyTag`·`applyHtmlTag`를 `false`로 두면 직접 넣는다), 프로젝트 전체 배포로 `milvusHead`를 올릴 때는 `milvusVf.css`가 커밋되어 있어야 함, VF가 SLDS 1(버튼 반경 4px)로 보이면 위 VF 설정 확인, 표준 화면에 브랜드가 안 보이면 `milvusBrandLoader` 백그라운드 로드 확인
