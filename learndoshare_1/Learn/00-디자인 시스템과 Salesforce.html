@@ -287,6 +287,7 @@ node hk.cjs --slds-s-button-radius-border</code></pre>
   </ul>
   <h3>직접 확인하기</h3>
   <ul>
+    <li>VF 페이지에 CSS가 아니라 밀버스 <b>LWC</b>를 넣는 방법(공식 Lightning Components for Visualforce)과 밀버스 계획은 <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html#vf-components">05 Visualforce에서 밀버스 컴포넌트 쓰기</a>에 있다(2026-10-20 추가)</li>
     <li>Setup → User Interface → Visualforce Settings에서 위 설정의 체크 상태를 본다(읽기만. 바꾸는 것은 org 설정 변경이라 승인 후)</li>
     <li>VF 페이지에서 DevTools Network 탭으로 어떤 SLDS 스타일시트가 내려오는지 본다</li>
     <li>npm SLDS 2 CSS는 <code>:root</code>에 <code>--slds-is-v2-enabled: true</code>를 정의한다(설치본 확인). VF 콘솔에서 <code>getComputedStyle(document.documentElement).getPropertyValue('--slds-is-v2-enabled')</code>를 읽어 볼 수 있다. org가 내려주는 SLDS 2 스타일시트에도 이 값이 있는지는 <span class="tag warn">미확인</span></li>
