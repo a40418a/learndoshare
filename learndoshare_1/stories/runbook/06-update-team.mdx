@@ -17,7 +17,7 @@ pnpm milvus check
     <tr><th>`update`가 하는 일</th><th>하지 않는 일</th></tr>
   </thead>
   <tbody>
-    <tr><td>관리 파일(밀버스 LWC, `milvusBridge.css`, `milvus-design.md`, skill, hook)을 새 버전으로 바꾼다</td><td>소유 파일(`milvusBrand.css`, `milvusOverride.css`, `milvus-patterns.md`, BrandingSet 등)은 건드리지 않는다. 0.2.4 전에 만든 프로젝트에는 `milvus-patterns.md`가 생기지 않으니 `node_modules/@a40418a/milvus-design-system/templates/milvus-patterns.md`를 프로젝트 루트에 복사한다</td></tr>
+    <tr><td>관리 파일(밀버스 LWC, `milvusBridge.css`, `milvus-design.md`, skill, hook)을 새 버전으로 바꾼다</td><td>소유 파일(`milvusBrand.css`, `milvusOverride.css`, `milvus-patterns.md`, BrandingSet 등)은 건드리지 않는다. 없는 소유 파일만 새로 놓는다(0.2.4 전에 만든 프로젝트의 `milvus-patterns.md`)</td></tr>
     <tr><td>`.claude/settings.json`에 새 permissions·hook을 병합한다</td><td>생성 파일(`milvusVf.css`)은 덮지 않는다. `check`·`deploy`가 다시 만든다</td></tr>
     <tr><td>`milvus.config.json`의 버전과 sha256을 갱신한다</td><td>새 버전에 없는 관리 파일을 지우지 않는다. 목록에서만 빼고 알려 준다</td></tr>
   </tbody>

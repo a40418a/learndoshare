@@ -110,7 +110,7 @@ milvus-design.md                                   [관리] 세팅 안내서이�
 CLAUDE.md                                          [소유] @milvus-design.md 한 줄 추가 (없으면 이 한 줄로 생성)
 milvus.config.json                                 [생성] 패키지 버전, 브랜드, 대상 org, 밀버스 관리 파일 목록과 sha256
 milvus-brand-request.md                            [소유] 브랜드 명세 페이지가 저장 (처음에는 없음)
-milvus-patterns.md                                 [소유] UI 패턴 명세(모달 등). 없을 때만 놓고 팀이 고친다. update는 건드리지 않는다 (1장 10/20)
+milvus-patterns.md                                 [소유] UI 패턴 명세(모달 등). 없을 때만 놓고 팀이 고친다. update는 없을 때만 놓고 있는 파일은 건드리지 않는다 (1장 10/20)
 package.json                                       [소유] "storybook": "milvus storybook" 스크립트 추가 (없을 때만)
 .claude/settings.json                              [소유] permissions와 hook 병합 (7.2)
 .claude/skills/milvus-brand/SKILL.md               [관리] 브랜드 입력 skill
@@ -195,7 +195,7 @@ force-app/main/default/
 - 성공하면 `milvus.config.json`의 버전과 sha256을 함께 바꾼다
 - 구현 판단(2026-10-14, #36)
   - 로컬 수정 판단: 파일의 sha256이 `milvus.config.json`에 기록된 값과 다르면 충돌이다. 기록이 없는 경로(새 버전이 더한 관리 파일)에 다른 내용의 파일이 이미 있어도 사용자 파일이라 충돌이다. 파일이 없으면 잃을 수정이 없으므로 충돌이 아니라 복구한다
-  - [소유]와 [생성]은 바꾸지 않는다. `milvusVf.css`는 패키지에 틀만 있고 내용은 `check`·`deploy`가 지금 `BRAND_COLOR`로 다시 만든다. 틀로 덮어쓰면 브랜드 팔레트가 사라진다
+  - [소유]와 [생성]은 바꾸지 않는다. 없는 [소유] 파일만 init처럼 새로 놓는다(새 버전이 더한 `milvus-patterns.md`를 [관리] 파일 `milvus-design.md`가 가리키기 때문, 10/20). `milvusVf.css`는 패키지에 틀만 있고 내용은 `check`·`deploy`가 지금 `BRAND_COLOR`로 다시 만든다. 틀로 덮어쓰면 브랜드 팔레트가 사라진다
   - 새 패키지에서 사라진 관리 파일은 `managed`에서만 빼고 파일은 지우지 않는다. 지울지는 org에 배포된 것과 함께 사람이 정하도록 목록으로 안내한다
   - 차이는 처음 달라진 줄과 줄 수만 보인다. `settings.json` 병합을 파일 쓰기보다 먼저 해서, 기존 `settings.json`이 깨졌으면 아무것도 바꾸지 않는다
   - 한계: 쓰기 단계(settings 병합 뒤)에서 권한·디스크 오류가 나면 일부 파일만 바뀐다. 롤백은 하지 않는다. 먼저 바뀐 파일은 기록한 sha256과 같았거나(로컬 수정 없음) `--force`로 덮어쓰기에 동의한 것이라 잃는 수정이 없다. 이때 "일부 파일이 이미 바뀌었다, 원인을 고친 뒤 같은 명령을 다시 실행하라"고 안내하고 1로 끝난다. `milvus.config.json`을 마지막에 쓰므로 다시 실행하면 이미 쓴 파일은 새 원본과 같아 건너뛰고 나머지를 마친다(테스트로 고정)

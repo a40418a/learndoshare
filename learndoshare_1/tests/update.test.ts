@@ -241,3 +241,18 @@ test("소유 파일은 바뀌지 않는다", async () => {
     assert.deepEqual(Object.fromEntries(owned.map((f) => [f, read(root, f)])), before);
   });
 });
+
+test("없는 소유 파일만 새로 놓는다(새 버전이 더한 milvus-patterns.md). 있는 소유 파일과 managed 기록은 그대로다", async () => {
+  await withProject(async (root, pkg) => {
+    rmSync(join(root, "milvus-patterns.md"));
+    appendFileSync(join(root, `${RES}/milvusBrand.css`), "/* 로컬 */\n");
+    const brand = read(root, `${RES}/milvusBrand.css`);
+
+    const r = await update(root, pkg);
+    assert.equal(r.result, 0, r.stderr);
+    assert.equal(read(root, "milvus-patterns.md"), read(pkg, tpl("milvus-patterns.md")));
+    assert.equal(read(root, `${RES}/milvusBrand.css`), brand);
+    assert.ok(!("milvus-patterns.md" in readConfig(root)!.managed));
+    assert.ok(r.stdout.includes("milvus-patterns.md"), r.stdout);
+  });
+});
