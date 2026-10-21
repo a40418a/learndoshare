@@ -4,14 +4,14 @@ import { readFileSync } from "node:fs";
 import { SPEC_ITEMS } from "../lib/spec-items.ts";
 
 const read = (path: string) => readFileSync(new URL(`../templates/${path}`, import.meta.url), "utf8");
-const design = read("milvus-design.md");
+const design = read("claude/rules/milvus/design.md");
 const skill = read("claude/skills/milvus-brand/SKILL.md");
 
 // 설계 7.1의 8개 절
 const SECTIONS = ["이 프로젝트의 밀버스 설정", "준비물", "세팅 순서", "파일 지도", "디자인 규칙", "Claude에게 시키는 법", "배포 안전장치", "업데이트와 문제 해결"];
 const section = (md: string, n: number) => md.split(/^## /m).find((s) => s.startsWith(`${n}. `)) ?? "";
 
-test("milvus-design.md는 200줄 이하이고 8개 절 제목이 있다", () => {
+test("design.md는 200줄 이하이고 8개 절 제목이 있다", () => {
   const lines = design.trimEnd().split("\n").length;
   assert.ok(lines <= 200, `${lines}줄`);
   const titles = [...design.matchAll(/^## (\d+)\. (.+)$/gm)].map((m) => `${m[1]}. ${m[2]}`);
@@ -20,28 +20,28 @@ test("milvus-design.md는 200줄 이하이고 8개 절 제목이 있다", () => 
   assert.ok(section(design, 1).includes("milvus.config.json"));
 });
 
-test("milvus-design.md 3절에 배포 뒤 할 일 두 가지가 있다: VF 설정 이름 'Use SLDS 2 for pages that include <apex:slds>'과 App Manager의 milvusBrandLoader·'앱이 열릴 때 백그라운드로 로드'(10/9 D2·D3)", () => {
+test("design.md 3절에 배포 뒤 할 일 두 가지가 있다: VF 설정 이름 'Use SLDS 2 for pages that include <apex:slds>'과 App Manager의 milvusBrandLoader·'앱이 열릴 때 백그라운드로 로드'(10/9 D2·D3)", () => {
   const s3 = section(design, 3);
   assert.ok(s3.includes("Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"));
   for (const w of ["App Manager", "milvusBrandLoader", "앱이 열릴 때 백그라운드로 로드"]) assert.ok(s3.includes(w), w);
 });
 
-test("milvus-design.md 4절에 커밋된 hook은 팀원에게도 별도 동의 없이 실행된다는 안내가 있다(설계 7.2)", () => {
+test("design.md 4절에 커밋된 hook은 팀원에게도 별도 동의 없이 실행된다는 안내가 있다(설계 7.2)", () => {
   const s4 = section(design, 4);
   assert.match(s4, /hook은[^\n]*팀원에게도 별도 동의 없이 실행된다/);
   // 그래서 hook은 하나만 둔다
   assert.match(s4, /hook은 `milvus-check\.mjs` 하나만 둔다/);
 });
 
-test("milvus-patterns.md에 LightningModal 규칙과 출처가 있고, milvus-design.md 4·5절이 이 파일을 가리킨다", () => {
-  const patterns = read("milvus-patterns.md");
+test("docs/milvus/patterns/modal.md에 LightningModal 규칙과 출처가 있고, design.md 4·5절이 패턴 폴더를 가리킨다", () => {
+  const patterns = read("docs/milvus/patterns/modal.md");
   for (const w of ["LightningModal", "lightning-modal-header", "lightning-modal-body", "lightning-modal-footer", 'variant="destructive"', "this.close(", ".open({", "밀버스 규칙(팀 합의)", "다음 패턴 후보"]) {
     assert.ok(patterns.includes(w), w);
   }
   assert.match(patterns, /`small`·`medium`\(기본\)·`large`·`full`/);
   assert.ok(patterns.includes("developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-modal"));
-  assert.ok(section(design, 4).includes("`milvus-patterns.md` | 소유"));
-  assert.ok(section(design, 5).includes("`milvus-patterns.md`를 읽고 따른다"));
+  assert.ok(section(design, 4).includes("`docs/milvus/patterns/` | 소유"));
+  assert.ok(section(design, 5).includes("`docs/milvus/patterns/`에서 해당 패턴 파일을 읽고 따른다"));
 });
 
 // Claude Code 권한 규칙의 Bash 와일드카드를 옮긴 근사(code.claude.com/docs/en/permissions "Wildcard patterns", 확인 2026-10-14):

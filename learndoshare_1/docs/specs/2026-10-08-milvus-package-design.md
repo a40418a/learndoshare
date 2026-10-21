@@ -3,7 +3,7 @@
 - 작성: 2026-10-08 · 이슈 [#20](https://github.com/a40418a/learndoshare/issues/20)
 - 상태: 대화에서 설계 1/4~4/4 승인(2026-10-08). 검토자 4명의 지적 48건 반영. 문서 전체는 사용자 검토 대기. 2026-10-09 org 프로브(Task 9) 결과와 결정 D1~D4 반영([기록](../research/2026-10-09-org-probe.md))
 - 이 문서에서 **LEX**는 Lightning Experience, **VF**는 Visualforce를 뜻한다
-- 용어: **발행**은 패키지를 GitHub Packages에 올리는 것, **배포**는 메타데이터를 Salesforce org에 올리는 것(`pnpm milvus deploy`)이다. **브랜드 명세 페이지**는 Storybook 화면, **브랜드 요청**은 그 페이지가 저장하는 사용자 입력(`milvus-brand-request.md`), **브랜드 명세 표**는 Claude가 채팅으로 제안하는 적용 값 표다
+- 용어: **발행**은 패키지를 GitHub Packages에 올리는 것, **배포**는 메타데이터를 Salesforce org에 올리는 것(`pnpm milvus deploy`)이다. **브랜드 명세 페이지**는 Storybook 화면, **브랜드 요청**은 그 페이지가 저장하는 사용자 입력(`docs/milvus/brand-request.md`), **브랜드 명세 표**는 Claude가 채팅으로 제안하는 적용 값 표다
 
 ### 이 문서가 대체하는 것
 
@@ -14,7 +14,7 @@
 | `pnpm sync:theme` (org → 저장소) | `pnpm milvus init --from-org` (sf 조회). 디자인 시스템 저장소의 데모 브랜드에는 계속 쓴다 |
 | hook H7 (관리 파일 직접 수정 차단) | `permissions.deny` |
 | hook H2 (sf 데이터 변경·`apex run` 차단) | `permissions.ask` |
-| hook H8 (세션 시작 안내) | 두지 않는다. `CLAUDE.md`가 불러오는 `milvus-design.md`가 같은 안내를 한다 |
+| hook H8 (세션 시작 안내) | 두지 않는다. `CLAUDE.md`가 불러오는 `.claude/rules/milvus/design.md`가 같은 안내를 한다 |
 | hook H4 (스타일 린트, 편집마다) | hook 1개: 패키지 CLI의 `check --style`을 node로 직접 실행(pnpm 거치지 않음). 검사 자체는 0.2초 안 |
 
 CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 첫 PR에서 이 표에 맞게 고친다.
@@ -77,6 +77,7 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 | 10/9 | **D4 TS 배포 단계 없음.** `deploy`에 TS → JS 변환 단계를 넣지 않는다 | LWC가 JS이므로 필요 없다 |
 | 10/14 | **앱 빌더 노출은 로더 하나.** 밀버스 부품(`milvusBadge`, `milvusButton`, `milvusMultiSelect`)과 `milvusScript`는 `isExposed`를 `false`로 두어 앱 빌더에 노출하지 않는다. 노출하는 밀버스 LWC는 `milvusBrandLoader`(대상 `lightning__UtilityBar` 하나)뿐이다 | 사용자 지적. 10/14 리허설에서 부품이 앱 빌더 목록에 나왔다. 부품은 다른 LWC 안에서 쓰는 것이다 |
 | 10/20 | **UI 패턴 명세(최소: 모달, #57).** 고객 프로젝트 루트에 [소유] `milvus-patterns.md`를 놓는다. 패턴마다 규칙·이유·예시 코드·출처를 적고, 첫 패턴은 모달(`LightningModal` 상속, `lightning-modal-*`, footer 오른쪽 끝 정렬, 취소 → 주 동작, `size`, `close(result)`, `open()`)이다. `milvus-design.md` 5절이 Claude에게 LWC 화면을 만들기 전에 읽게 한다. 새 컴포넌트는 만들지 않는다 | 2026-10-20 사용자 요청. 씨팝코리아 프로젝트에서 같은 SLDS를 써도 모달마다 버튼 위치와 여는 방식이 달랐다. 근거는 LightningModal Component Reference와 SLDS 2 Modals 블루프린트(2026-10-20 확인)이고, 공식 근거가 없는 규칙(버튼 순서 등)은 "밀버스 규칙(팀 합의)"로 표시한다. 10/16 내용 동결 뒤의 변경이며 사용자 요청에 따른 예외다 |
+| 10/21 | **명세 파일을 루트에서 옮긴다(#63).** Claude 규칙은 `.claude/rules/milvus/design.md`([관리]), 팀 문서는 `docs/milvus/`(UI 패턴 `patterns/<패턴>.md`[소유], 브랜드 요청 `brand-request.md`)에 둔다. `init`은 `CLAUDE.md`에 줄을 덧붙이지 않는다. `milvus.config.json`은 루트에 둔다. `update`가 0.2.x 배치를 옮긴다(4.5). 0.3.0 | 2026-10-21 사용자 요청. 패턴 문서가 늘면 루트가 계속 늘어난다. Claude Code 공식 문서("How Claude remembers your project", 2026-10-21 확인): `.claude/rules/`의 `.md`는 하위 폴더까지 찾아 세션마다 로드되고, `paths` 머리말이 있으면 맞는 파일을 다룰 때만 로드된다. 패턴은 새 LWC를 처음 쓸 때도 읽혀야 해서 `paths` 규칙 대신 항상 로드되는 `design.md`가 패턴 폴더를 가리킨다. 사람이 고치는 문서는 숨김 폴더 대신 `docs/`에 둔다 |
 
 ---
 
@@ -106,11 +107,10 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 표시: **[관리]** 밀버스 관리 파일(직접 고치지 않음, sha256 기록, `update`가 갱신) · **[소유]** 프로젝트 소유(skill과 사람이 고침) · **[생성]** CLI가 만드는 파일(직접 고치지 않음)
 
 ```
-milvus-design.md                                   [관리] 세팅 안내서이자 Claude 규칙
-CLAUDE.md                                          [소유] @milvus-design.md 한 줄 추가 (없으면 이 한 줄로 생성)
+.claude/rules/milvus/design.md                     [관리] 세팅 안내서이자 Claude 규칙. Claude Code가 .claude/rules/를 세션마다 읽는다(CLAUDE.md는 건드리지 않는다, 1장 10/21)
 milvus.config.json                                 [생성] 패키지 버전, 브랜드, 대상 org, 밀버스 관리 파일 목록과 sha256
-milvus-brand-request.md                            [소유] 브랜드 명세 페이지가 저장 (처음에는 없음)
-milvus-patterns.md                                 [소유] UI 패턴 명세(모달 등). 없을 때만 놓고 팀이 고친다. update는 없을 때만 놓고 있는 파일은 건드리지 않는다 (1장 10/20)
+docs/milvus/brand-request.md                       [소유] 브랜드 명세 페이지가 저장 (처음에는 없음)
+docs/milvus/patterns/modal.md                      [소유] UI 패턴 명세. 패턴마다 파일 하나. 없을 때만 놓고 팀이 고친다. update는 없을 때만 놓고 있는 파일은 건드리지 않는다 (1장 10/20·10/21)
 package.json                                       [소유] "storybook": "milvus storybook" 스크립트 추가 (없을 때만)
 .claude/settings.json                              [소유] permissions와 hook 병합 (7.2)
 .claude/skills/milvus-brand/SKILL.md               [관리] 브랜드 입력 skill
@@ -134,7 +134,7 @@ force-app/main/default/
 ```
 
 - Storybook 설정은 패키지 안에 있어서 프로젝트에 Storybook 파일이 생기지 않는다. `init` 직후 `pnpm milvus storybook`(또는 `pnpm storybook`)으로 바로 확인한다
-- 이미 있는 파일은 덮어쓰지 않고 건너뛴 뒤 목록으로 알려 준다. 예외로 다음 파일은 기존 내용에 더한다: `.claude/settings.json`(설정 병합), `.gitignore`·`.forceignore`·`.npmrc`(줄 추가), `CLAUDE.md`(`@milvus-design.md` 한 줄 추가, 따옴표와 백틱 없이), `package.json`(키가 없을 때만 추가). 다시 실행해도 결과가 같다
+- 이미 있는 파일은 덮어쓰지 않고 건너뛴 뒤 목록으로 알려 준다. 예외로 다음 파일은 기존 내용에 더한다: `.claude/settings.json`(설정 병합), `.gitignore`·`.forceignore`·`.npmrc`(줄 추가), `package.json`(키가 없을 때만 추가). 다시 실행해도 결과가 같다
 - `sfdx-project.json`은 읽기만 하고 바꾸지 않는다. `defaultLwcLanguage`는 고객 설정 그대로다(10/9 D1)
 - `LightningExperience.settings`(활성 테마)는 만들지 않는다. `deploy`가 그때그때 `.milvus/deploy/`에 `activeThemeName` 한 필드만 담아 만든다. 프로젝트에 같은 이름의 파일이 있어도 쓰지 않는다
 - `milvusVf.css`는 생성 파일이지만 커밋한다. `milvusHead`가 이 리소스를 참조하므로, 팀원이 프로젝트 전체를 배포할 때 리소스가 없어 실패하는 일을 막는다. 전체 `check`가 지금 브랜드 색으로 다시 만든다
@@ -195,7 +195,7 @@ force-app/main/default/
 - 성공하면 `milvus.config.json`의 버전과 sha256을 함께 바꾼다
 - 구현 판단(2026-10-14, #36)
   - 로컬 수정 판단: 파일의 sha256이 `milvus.config.json`에 기록된 값과 다르면 충돌이다. 기록이 없는 경로(새 버전이 더한 관리 파일)에 다른 내용의 파일이 이미 있어도 사용자 파일이라 충돌이다. 파일이 없으면 잃을 수정이 없으므로 충돌이 아니라 복구한다
-  - [소유]와 [생성]은 바꾸지 않는다. 없는 [소유] 파일만 init처럼 새로 놓는다(새 버전이 더한 `milvus-patterns.md`를 [관리] 파일 `milvus-design.md`가 가리키기 때문, 10/20). `milvusVf.css`는 패키지에 틀만 있고 내용은 `check`·`deploy`가 지금 `BRAND_COLOR`로 다시 만든다. 틀로 덮어쓰면 브랜드 팔레트가 사라진다
+  - [소유]와 [생성]은 바꾸지 않는다. 없는 [소유] 파일만 init처럼 새로 놓는다(새 버전이 더한 패턴 파일을 [관리] 파일 `.claude/rules/milvus/design.md`가 가리키기 때문, 10/20). 0.2.x 배치(루트의 `milvus-design.md`·`milvus-patterns.md`·`milvus-brand-request.md`, `CLAUDE.md`의 `@milvus-design.md`)는 새 위치로 옮긴다: 고치지 않은 옛 `milvus-design.md`와 import 줄은 지우고(고쳤으면 충돌, `--force`면 지움), 패턴·요청 파일은 내용 그대로 옮기며, 새 위치에 이미 있으면 옮기지 않고 알린다(10/21, #63). `milvusVf.css`는 패키지에 틀만 있고 내용은 `check`·`deploy`가 지금 `BRAND_COLOR`로 다시 만든다. 틀로 덮어쓰면 브랜드 팔레트가 사라진다
   - 새 패키지에서 사라진 관리 파일은 `managed`에서만 빼고 파일은 지우지 않는다. 지울지는 org에 배포된 것과 함께 사람이 정하도록 목록으로 안내한다
   - 차이는 처음 달라진 줄과 줄 수만 보인다. `settings.json` 병합을 파일 쓰기보다 먼저 해서, 기존 `settings.json`이 깨졌으면 아무것도 바꾸지 않는다
   - 한계: 쓰기 단계(settings 병합 뒤)에서 권한·디스크 오류가 나면 일부 파일만 바뀐다. 롤백은 하지 않는다. 먼저 바뀐 파일은 기록한 sha256과 같았거나(로컬 수정 없음) `--force`로 덮어쓰기에 동의한 것이라 잃는 수정이 없다. 이때 "일부 파일이 이미 바뀌었다, 원인을 고친 뒤 같은 명령을 다시 실행하라"고 안내하고 1로 끝난다. `milvus.config.json`을 마지막에 쓰므로 다시 실행하면 이미 쓴 파일은 새 원본과 같아 건너뛰고 나머지를 마친다(테스트로 고정)
@@ -324,11 +324,11 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 
 - 요청 안에서 `## `로 시작하는 줄(붙여 넣은 문서의 제목)은 `\## `로 적어 절이 깨지지 않게 한다(읽을 때 `\`를 뗀다). 옛 제목 `## 전체 스타일`은 디자인 명세로 읽고, 입력이 없어진 항목의 옛 절(`## 모서리` 등)은 지우지 않고 저장해도 그대로 남긴다. 페이지는 옛 절의 제목과 내용을 접힌 목록으로 보여 주고, 필요 없으면 요청 파일에서 그 절을 지우라고 안내한다. 같은 항목이면 디자인 명세가 옛 절보다 우선하고 skill이 반영 전에 충돌을 확인받는다
 - 요청의 앞뒤 공백(첫 줄 들여쓰기 포함)은 지운다. 안쪽 줄바꿈·빈 줄·들여쓰기는 그대로 저장된다
-- 페이지를 열면 기존 `milvus-brand-request.md`를 읽어 입력창을 채운다. 저장하면 모든 입력을 담아 파일 전체를 다시 쓰고, 빈 항목은 생략한다(한 항목만 저장해도 다른 요청이 사라지지 않는다)
-- 저장은 Storybook 개발 서버(localhost)에서만 동작한다. Vite 개발 서버 미들웨어가 받아 프로젝트 루트의 `milvus-brand-request.md` 하나에만 쓴다(경로 고정). 정적 빌드에서는 입력창을 비활성화한다
+- 페이지를 열면 기존 `docs/milvus/brand-request.md`를 읽어 입력창을 채운다. 저장하면 모든 입력을 담아 파일 전체를 다시 쓰고, 빈 항목은 생략한다(한 항목만 저장해도 다른 요청이 사라지지 않는다)
+- 저장은 Storybook 개발 서버(localhost)에서만 동작한다. Vite 개발 서버 미들웨어가 받아 프로젝트 루트의 `docs/milvus/brand-request.md` 하나에만 쓴다(경로 고정). 정적 빌드에서는 입력창을 비활성화한다
 - 대체 경로: 저장이 안 되면 채팅에 요청을 직접 쓴다(6.2의 1번)
 
-`milvus-brand-request.md` 형식:
+`docs/milvus/brand-request.md` 형식:
 
 ```markdown
 # 브랜드 요청
@@ -353,7 +353,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 ```
 
 ### 6.2 skill 흐름
-1. 입력: `milvus-brand-request.md`, 또는 채팅의 브랜드 설명
+1. 입력: `docs/milvus/brand-request.md`, 또는 채팅의 브랜드 설명
 2. 브랜드 명세 표를 채팅으로 제안한다. 항목마다 값, 출처, 확정/추정, 반영하지 못하는 요구와 대안을 적는다
 3. 사용자 승인
 4. 작성: `BrandingSet`(색·로고), `milvusBrand.css`. hook·브리지로 안 되는 모양만 `milvusOverride.css`에 쓰고, 그 항목을 "공식 권고 밖"으로 표시해 알린다
@@ -384,14 +384,14 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 
 ## 7. `.claude` 묶음
 
-### 7.1 `milvus-design.md` (프로젝트 루트, 200줄 이하, [관리])
+### 7.1 `.claude/rules/milvus/design.md` (200줄 이하, [관리])
 1. 이 프로젝트의 밀버스 설정: 값은 쓰지 않고 "`milvus.config.json`을 본다"고만 적는다(원본을 하나로)
 2. 준비물: Node 22.18 이상(23.x는 23.6 이상), pnpm, sf CLI, GitHub 토큰 `NODE_AUTH_TOKEN`, 프로젝트 `.npmrc`의 레지스트리 줄과 `~/.npmrc`의 토큰 줄, org 로그인
 3. 세팅 순서 체크리스트: `init` → 브랜드 요청 입력 → 반영 → `storybook` 확인 → `deploy`. 배포 뒤 사람이 org에서 하는 일 두 가지(10/9 D2·D3)
    - VF를 쓰면 Setup → User Interface → Visualforce Settings의 "Use SLDS 2 for pages that include `<apex:slds>` when an SLDS 2 theme is active"를 켠다. 메타데이터로 켤 수 없다
    - 앱 전체에 브랜드를 걸려면 App Manager에서 그 앱의 유틸리티 바에 `milvusBrandLoader`를 추가하고 "앱이 열릴 때 백그라운드로 로드"를 체크한다. 앱마다 한다. 안 하면 밀버스 컴포넌트가 있는 페이지에만 걸린다. 로더는 보이는 유틸리티 항목이라 유틸리티 바에 버튼으로 나온다(라벨·아이콘은 App Manager에서 정한다). 템플릿이 비어 있어 패널을 열어도 아무것도 그리지 않는다
 4. 파일 지도: [관리] / [소유] / [생성] (3장과 같음)
-5. 디자인 규칙: LWC 화면을 만들기 전에 `milvus-patterns.md`를 읽는다(1장 10/20), 판단 순서, util.css 규칙(5.2), 색은 `BrandingSet`에서만, LWC는 JavaScript(`.js`, 10/9 D1), `milvus` 접두사는 밀버스 전용
+5. 디자인 규칙: LWC 화면을 만들기 전에 `docs/milvus/patterns/`를 읽는다(1장 10/20), 판단 순서, util.css 규칙(5.2), 색은 `BrandingSet`에서만, LWC는 JavaScript(`.js`, 10/9 D1), `milvus` 접두사는 밀버스 전용
 6. Claude에게 시키는 법: 예시 문장, skill 이름
 7. 배포 안전장치: 배포는 `pnpm milvus deploy`로만, 계획 확인 후 `--yes`, 활성 테마는 org 전체에 적용, 테마 반영은 새로고침 후
 8. 업데이트와 문제 해결: `milvus update`(`--force`), GitHub 토큰 오류, VF는 `<c:milvusHead/>`(`showHeader="false"` 페이지에서는 `<body>`에 `slds-scope`가 자동으로 붙어 래퍼가 필요 없다, 2026-10-14 측정. `applyBodyTag`·`applyHtmlTag`를 `false`로 두면 직접 넣는다), 프로젝트 전체 배포로 `milvusHead`를 올릴 때는 `milvusVf.css`가 커밋되어 있어야 함, VF가 SLDS 1(버튼 반경 4px)로 보이면 위 VF 설정 확인, 표준 화면에 브랜드가 안 보이면 `milvusBrandLoader` 백그라운드 로드 확인
@@ -418,7 +418,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
       "Edit(/force-app/main/default/components/milvusHead.component*)",
       "Edit(/force-app/main/default/staticresources/milvusVf.*)",
       "Edit(/force-app/main/default/staticresources/milvusBridge.*)",
-      "Edit(/milvus-design.md)", "Edit(/milvus.config.json)",
+      "Edit(/.claude/rules/milvus/**)", "Edit(/milvus.config.json)",
       "Edit(/.claude/skills/milvus-brand/**)", "Edit(/.claude/hooks/milvus-check.mjs)"
     ]
   },
@@ -434,15 +434,15 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 - `ask`는 auto 모드에서도 실행 전에 묻는다. 규칙 순서는 deny → ask → allow다(공식 문서)
 - hook은 바뀐 파일이 `milvusBrand.css`, `milvusOverride.css`, `brandingSets/`일 때만 `check --style`을 실행한다. 프로젝트에서 패키지를 찾아 `dist/cli/index.js`를 node로 직접 실행한다(pnpm 기동 0.3초를 없애고 Windows의 shell 경고를 피한다, 10/9 판정)
 - 결과 전달(공식 문서 code.claude.com/docs/en/hooks, 2026-10-09 확인: PostToolUse가 0으로 끝나면 stderr는 디버그 로그로만 가고 Claude는 보지 못한다): 2로 끝나면 stderr를 그대로 넘겨 Claude가 고칠 값을 본다. 0인데 override 경고가 있으면 stdout에 `{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"…"}}`를 써서 Claude에게 알린다
-- 저장소 hook H2의 2·3층(개인정보 필드·`FIELDS(ALL)` 조회, 토큰을 출력하는 명령)도 프로젝트에 가져간다(10/9 판정). 토큰을 출력하는 `sf org display`와 `sf org open --url-only`는 `deny`로 막는다. `sf org open`은 `--url-only`(짧게 `-r`)와 `--json`일 때 front door URL을 출력하므로 옵션 위치와 상관없이 막는다(공식 소스 [plugin-org `orgOpenCommandBase.ts`](https://github.com/salesforcecli/plugin-org/blob/main/src/shared/orgOpenCommandBase.ts)의 `output = { orgId, url, username }`, 2026-10-14 확인). `deploy`가 출력하는 `sf org open --target-org … --path …`는 브라우저만 열어 막지 않는다. 환경 변수 `SF_CONTAINER_MODE`에서도 URL이 출력되지만 명령 패턴으로는 막을 수 없다. 개인정보 필드와 `FIELDS(ALL)`는 명령 패턴으로 막을 수 없어 `milvus-design.md`의 규칙 문장으로 둔다
+- 저장소 hook H2의 2·3층(개인정보 필드·`FIELDS(ALL)` 조회, 토큰을 출력하는 명령)도 프로젝트에 가져간다(10/9 판정). 토큰을 출력하는 `sf org display`와 `sf org open --url-only`는 `deny`로 막는다. `sf org open`은 `--url-only`(짧게 `-r`)와 `--json`일 때 front door URL을 출력하므로 옵션 위치와 상관없이 막는다(공식 소스 [plugin-org `orgOpenCommandBase.ts`](https://github.com/salesforcecli/plugin-org/blob/main/src/shared/orgOpenCommandBase.ts)의 `output = { orgId, url, username }`, 2026-10-14 확인). `deploy`가 출력하는 `sf org open --target-org … --path …`는 브라우저만 열어 막지 않는다. 환경 변수 `SF_CONTAINER_MODE`에서도 URL이 출력되지만 명령 패턴으로는 막을 수 없다. 개인정보 필드와 `FIELDS(ALL)`는 명령 패턴으로 막을 수 없어 `.claude/rules/milvus/design.md`의 규칙 문장으로 둔다
 - `sf org list --json`과 `sf auth list --json`(= `sf org list auth --json`)은 모든 org의 액세스 토큰을 출력하므로 `deny`로 막는다(#36)
   - 근거: 2026-10-13 로컬 실측(sf 2.108.6, 출력의 org마다 `accessToken`), 공식 소스 [plugin-org 5.9.30 `orgListUtil.ts`](https://github.com/salesforcecli/plugin-org/blob/5.9.30/src/shared/orgListUtil.ts)(복호화한 필드에서 `refreshToken`·`clientSecret`만 뺀다), [plugin-auth 3.9.8 `org/list/auth.ts`](https://github.com/salesforcecli/plugin-auth/blob/3.9.8/src/commands/org/list/auth.ts)(`AuthInfo.listAllAuthorizations()` 결과를 그대로 돌려준다. 별칭 `auth:list`), [sfdx-core 8.23.2 `authInfo.ts`](https://github.com/forcedotcom/sfdx-core/blob/8.23.2/src/org/authInfo.ts)(`accessToken`을 넣는다). 모두 2026-10-14 확인
   - 두 플러그인의 `main`(2026-10-14)은 `SF_TEMP_SHOW_SECRETS`가 없으면 `accessToken`을 가린다. 어느 sf 버전부터인지는 미확인이고, 고객 프로젝트의 sf 버전을 알 수 없어 규칙을 유지한다
   - `--json` 없는 `sf org list`·`sf auth list`는 막지 않는다. 표 출력에는 토큰이 없고, 4.4가 별칭 확인에 `sf org list`를 안내한다
   - 규칙은 명령마다 세 개다(`--json *`, `* --json`, `* --json *`). 근거는 공식 문서(code.claude.com/docs/en/permissions "Wildcard patterns", 2026-10-14 확인)의 표다: `*`는 공백을 포함한 아무 글자나 맞고 가운데에도 둘 수 있다(`Bash(git log * main)`), 끝의 ` *`가 유일한 와일드카드이면 인자 없는 명령도 맞는다(그래서 `--json *`가 `sf org list --json`도 막는다), 와일드카드가 둘이면 끝의 ` *`는 빈 인자를 맞추지 않는다(`Bash(* --help *)`는 `npm --help`에 안 맞음). `tests/templates.test.ts`가 이 표를 옮긴 근사로 확인한다. 실제 Claude Code에서 막히는지는 14장
   - 부수 효과: `sf org list * --json`은 토큰을 출력하지 않는 `sf org list limits|metadata|users … --json`도 막는다. `--json` 없이 쓰면 된다. `init`이 내부에서 부르는 `sf org list limits --json`은 Claude의 Bash 도구를 거치지 않아 영향이 없다
-  - **deny는 완전한 차단이 아니다.** 같은 문서가 인자를 제한하는 Bash 규칙은 깨지기 쉽다고 경고하고, deny는 앞의 환경변수 대입을 건너뛰고 맞춘다고 적는다. 그래서 다음은 걸리지 않는다: `SF_CONTENT_TYPE=JSON sf org list`([sf-plugins-core 12.2.4 `sfCommand.ts`](https://github.com/salesforcecli/sf-plugins-core/blob/12.2.4/src/sfCommand.ts)의 `jsonEnabled()`가 이 환경변수로 JSON을 낸다. 셸에 이 값이 설정되어 있으면 `--json` 없는 `sf org list`도 토큰을 낸다), 콜론 형식(`sf org:list --json`, `sf auth:list --json`, `sf force:auth:list --json`), `sfdx force:org:list --json`, `sh -c` 안의 명령. 이 부분은 `milvus-design.md`의 규칙 문장(강제력 없음)으로 둔다
-- 커밋된 설정의 hook은 팀원에게 별도 동의 없이 실행되므로 hook은 하나만 두고 `milvus-design.md`에 적는다
+  - **deny는 완전한 차단이 아니다.** 같은 문서가 인자를 제한하는 Bash 규칙은 깨지기 쉽다고 경고하고, deny는 앞의 환경변수 대입을 건너뛰고 맞춘다고 적는다. 그래서 다음은 걸리지 않는다: `SF_CONTENT_TYPE=JSON sf org list`([sf-plugins-core 12.2.4 `sfCommand.ts`](https://github.com/salesforcecli/sf-plugins-core/blob/12.2.4/src/sfCommand.ts)의 `jsonEnabled()`가 이 환경변수로 JSON을 낸다. 셸에 이 값이 설정되어 있으면 `--json` 없는 `sf org list`도 토큰을 낸다), 콜론 형식(`sf org:list --json`, `sf auth:list --json`, `sf force:auth:list --json`), `sfdx force:org:list --json`, `sh -c` 안의 명령. 이 부분은 `.claude/rules/milvus/design.md`의 규칙 문장(강제력 없음)으로 둔다
+- 커밋된 설정의 hook은 팀원에게 별도 동의 없이 실행되므로 hook은 하나만 두고 `.claude/rules/milvus/design.md`에 적는다
 
 ---
 
@@ -610,7 +610,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 - 단위: `node --test`(TS 그대로)
   - 팔레트: "50·40·30단계 대비 4.5:1 이상" 추가
   - `check`: 통과·실패 예시 파일(5.2, 5.3의 각 규칙)
-  - `init`: 두 번 실행해도 같은 결과, `CLAUDE.md`에 추가된 줄이 정확히 `@milvus-design.md`인지
+  - `init`: 두 번 실행해도 같은 결과, `CLAUDE.md`를 만들거나 고치지 않는지(10/21)
   - `update`: 로컬 수정 감지, 전부 반영 또는 아무것도 바꾸지 않음
 - LWC: 이미 있는 Jest 테스트는 유지한다(Task 30에서 `.test.ts`를 `.test.js`로 되돌림). 새 LWC(`milvusBrandLoader` 등)에는 Jest 테스트를 굳이 만들지 않는다(10/9 사용자 결정). 화면 확인은 Storybook 스토리로 한다
 - 타입 검사: `tsc --noEmit` (CLI·`lib`·스크립트·테스트. LWC는 JS라 대상이 아니다)

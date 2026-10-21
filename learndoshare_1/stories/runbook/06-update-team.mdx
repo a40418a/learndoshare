@@ -7,7 +7,7 @@ import { Meta } from "@storybook/addon-docs/blocks";
 ## 패키지 업데이트
 
 ```bash
-pnpm add -D @a40418a/milvus-design-system@0.2.4
+pnpm add -D @a40418a/milvus-design-system@0.3.0
 pnpm milvus update
 pnpm milvus check
 ```
@@ -17,7 +17,8 @@ pnpm milvus check
     <tr><th>`update`가 하는 일</th><th>하지 않는 일</th></tr>
   </thead>
   <tbody>
-    <tr><td>관리 파일(밀버스 LWC, `milvusBridge.css`, `milvus-design.md`, skill, hook)을 새 버전으로 바꾼다</td><td>소유 파일(`milvusBrand.css`, `milvusOverride.css`, `milvus-patterns.md`, BrandingSet 등)은 건드리지 않는다. 없는 소유 파일만 새로 놓는다(0.2.4 전에 만든 프로젝트의 `milvus-patterns.md`)</td></tr>
+    <tr><td>관리 파일(밀버스 LWC, `milvusBridge.css`, `.claude/rules/milvus/design.md`, skill, hook)을 새 버전으로 바꾼다</td><td>소유 파일(`milvusBrand.css`, `milvusOverride.css`, `docs/milvus/patterns/`, BrandingSet 등)은 건드리지 않는다. 없는 소유 파일만 새로 놓는다(새 버전이 더한 패턴 파일)</td></tr>
+    <tr><td>0.2.x 프로젝트를 0.3.0 배치로 옮긴다: 루트의 `milvus-patterns.md`·`milvus-brand-request.md`를 `docs/milvus/`로 내용 그대로 옮기고, 고치지 않은 `milvus-design.md`와 `CLAUDE.md`의 `@milvus-design.md` 줄을 지운다</td><td>옛 `milvus-design.md`를 고쳤으면 아무것도 바꾸지 않고 멈춘다(`--force`면 지운다). 새 위치에 이미 파일이 있으면 옛 파일을 옮기지 않고 알린다</td></tr>
     <tr><td>`.claude/settings.json`에 새 permissions·hook을 병합한다</td><td>생성 파일(`milvusVf.css`)은 덮지 않는다. `check`·`deploy`가 다시 만든다</td></tr>
     <tr><td>`milvus.config.json`의 버전과 sha256을 갱신한다</td><td>새 버전에 없는 관리 파일을 지우지 않는다. 목록에서만 빼고 알려 준다</td></tr>
   </tbody>

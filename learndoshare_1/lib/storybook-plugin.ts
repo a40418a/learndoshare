@@ -4,9 +4,9 @@
 //   staticresources의 milvusBrand.css(util.css)·milvusBridge.css·milvusOverride.css. 비교용 "SLDS 기본"도 함께 준다
 // 가상 모듈 virtual:milvus-brands가 mode와 brands를 내보내고, /__milvus/brand-request가 명세 페이지의 요청 파일을 읽고 쓴다.
 // 가상 모듈 virtual:milvus-sentinel은 반영 검사(설계 9.6의 2)의 센티널 브랜드를 내보낸다
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { extname, join, sep } from "node:path";
+import { dirname, extname, join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Plugin } from "vite";
 import { readConfig, type MilvusConfig } from "../cli/context.ts";
@@ -34,7 +34,7 @@ export type PluginOptions = { mode: "repo" | "project"; repoDir: string; project
 
 const FA = "force-app/main/default";
 const RES = `${FA}/staticresources`;
-const REQUEST_FILE = "milvus-brand-request.md";
+const REQUEST_FILE = "docs/milvus/brand-request.md";
 const ENDPOINT = "/__milvus/brand-request";
 const VIRTUAL = "virtual:milvus-brands";
 const RESOLVED = `\0${VIRTUAL}`;
@@ -189,7 +189,7 @@ async function readBody(req: IncomingMessage): Promise<string | undefined> {
   return size > MAX_BODY ? undefined : Buffer.concat(chunks).toString("utf8");
 }
 
-// 본문의 경로·파일 이름은 보지 않는다. 쓰는 곳은 프로젝트 루트의 milvus-brand-request.md 하나다(설계 6.1)
+// 본문의 경로·파일 이름은 보지 않는다. 쓰는 곳은 프로젝트의 docs/milvus/brand-request.md 하나다(설계 6.1, #63)
 async function brandRequest(o: PluginOptions, req: IncomingMessage, res: ServerResponse): Promise<void> {
   const send = (status: number, body: unknown) => {
     res.statusCode = status;
@@ -220,6 +220,7 @@ async function handleBrandRequest(o: PluginOptions, req: IncomingMessage, send: 
     // 아래에서 400
   }
   if (typeof text !== "string") return send(400, { error: '본문은 { "text": "<요청 파일 내용>" } 형식의 JSON이어야 합니다' });
+  mkdirSync(dirname(file), { recursive: true });
   writeFileSync(file, text);
   send(200, { ok: true });
 }

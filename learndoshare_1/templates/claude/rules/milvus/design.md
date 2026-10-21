@@ -1,6 +1,6 @@
 # 밀버스 디자인 시스템 안내
 
-이 파일은 세팅 안내서이자 이 프로젝트에서 Claude Code가 지킬 규칙이다. `pnpm milvus init`이 놓은 밀버스 관리 파일이라 직접 고치지 않는다(`pnpm milvus update`가 갱신한다). 프로젝트 `CLAUDE.md`의 `@milvus-design.md` 한 줄이 이 파일을 불러온다.
+이 파일은 세팅 안내서이자 이 프로젝트에서 Claude Code가 지킬 규칙이다. `pnpm milvus init`이 놓은 밀버스 관리 파일이라 직접 고치지 않는다(`pnpm milvus update`가 갱신한다). Claude Code는 `.claude/rules/` 아래 파일을 세션마다 스스로 읽으므로 `CLAUDE.md`에 따로 적지 않는다. 사람이 읽고 고치는 밀버스 문서는 `docs/milvus/`에 있다.
 
 ## 1. 이 프로젝트의 밀버스 설정
 
@@ -37,7 +37,7 @@
 
 - [ ] `pnpm add -D @a40418a/milvus-design-system`
 - [ ] `pnpm milvus init --target-org <별칭> --brand <이름>` (org의 지금 테마를 가져오려면 `--brand` 대신 `--from-org`, VF를 안 쓰면 `--no-vf`)
-- [ ] `pnpm milvus storybook` → "시작하기 / 브랜드 명세" 페이지에 요청을 입력하고 저장한다(`milvus-brand-request.md`). 입력은 브랜드 색, 로고, 피드백 색, 디자인 명세 네 가지이고 모두 선택이다. 디자인 명세에는 다른 디자인 시스템 문서의 표, 피그마 토큰 JSON, 사이트 주소, 자연어를 그대로 붙여 넣는다. 저장이 안 되면 채팅에 직접 쓴다
+- [ ] `pnpm milvus storybook` → "시작하기 / 브랜드 명세" 페이지에 요청을 입력하고 저장한다(`docs/milvus/brand-request.md`). 입력은 브랜드 색, 로고, 피드백 색, 디자인 명세 네 가지이고 모두 선택이다. 디자인 명세에는 다른 디자인 시스템 문서의 표, 피그마 토큰 JSON, 사이트 주소, 자연어를 그대로 붙여 넣는다. 저장이 안 되면 채팅에 직접 쓴다
 - [ ] Claude Code에 "브랜드 요청 반영해줘" → 브랜드 명세 표 확인 → 승인 → 반영 → `pnpm milvus check`
 - [ ] Storybook에서 화면을 확인한다(파일이 바뀌면 저절로 갱신된다)
 - [ ] `pnpm milvus deploy`로 배포 계획 확인 → 채팅에서 승인 → `pnpm milvus deploy --yes`
@@ -55,11 +55,10 @@
 
 | 파일 | 구분 | 내용 |
 | --- | --- | --- |
-| `milvus-design.md` | 관리 | 이 안내서 |
-| `CLAUDE.md` | 소유 | `@milvus-design.md` 한 줄 |
+| `.claude/rules/milvus/design.md` | 관리 | 이 안내서. Claude Code가 세션마다 읽는다 |
 | `milvus.config.json` | 생성 | 패키지 버전, 브랜드, 대상 org, 관리 파일 목록과 sha256 |
-| `milvus-brand-request.md` | 소유 | 브랜드 명세 페이지가 저장한 요청 |
-| `milvus-patterns.md` | 소유 | UI 패턴 명세(모달 등). 팀이 규칙을 고치고 더한다 |
+| `docs/milvus/brand-request.md` | 소유 | 브랜드 명세 페이지가 저장한 요청 |
+| `docs/milvus/patterns/` | 소유 | UI 패턴 명세. 패턴마다 파일 하나(`modal.md` 등). 팀이 규칙을 고치고 파일을 더한다 |
 | `.claude/settings.json` | 소유 | 밀버스 permissions·hook 병합 |
 | `.claude/skills/milvus-brand/SKILL.md` | 관리 | 브랜드 요청 반영 skill |
 | `.claude/hooks/milvus-check.mjs` | 관리 | `milvusBrand.css`·`milvusOverride.css`·`brandingSets/`를 고치면 `check --style` |
@@ -87,7 +86,7 @@
 - **util.css(`milvusBrand.css`):** `:root` 블록 하나. 이름에 color가 없는 g·s hook(읽는 곳이 있는 이름), 중립 색(`light-dark()`, 글자·면 4.5:1 이상), 피드백 색, 색 s hook 6개, 읽는 곳이 있는 `--milvus-*`, `letter-spacing`만 쓴다. 클래스 규칙, `@font-face`, 글꼴 hook, 브랜드 색 계열 hook, `--slds-c-*`는 쓰지 않는다. 고치면 hook이 `check --style`로 검사한다. 자세한 표는 `milvus-brand` skill에 있다
 - **색은 `BrandingSet`에서만.** 브랜드 색을 CSS에 적지 않는다. Salesforce는 입력한 색 대신 접근성 색(50단계)을 버튼에 쓴다
 - **Salesforce 고정 항목**(토스트 표시 시간, z-index, 아이콘 모양 등)은 바꿀 수 없다고 답하고 목록을 보여 준다. 글꼴은 바꾸지 않는다
-- **화면 패턴.** LWC 화면(모달 등)을 만들거나 고치기 전에 `milvus-patterns.md`를 읽고 따른다. 명세와 다르게 해야 하면 이유를 말하고 확인받는다. 패턴은 브랜드가 아니라 화면 구성이라 `milvus-brand` skill 범위 밖이다
+- **화면 패턴.** LWC 화면(모달 등)을 만들거나 고치기 전에 `docs/milvus/patterns/`에서 해당 패턴 파일을 읽고 따른다. 명세와 다르게 해야 하면 이유를 말하고 확인받는다. 패턴은 브랜드가 아니라 화면 구성이라 `milvus-brand` skill 범위 밖이다
 - **LWC는 JavaScript(`.js`)로 쓴다.** `.ts` LWC를 그대로 배포하면 org가 타입 검사로 거부한다
 - **`milvus` 접두사는 밀버스 전용이다.** 프로젝트 컴포넌트·변수에 `milvus`, `--milvus-`를 쓰지 않는다
 - 프로젝트 컴포넌트에서 브랜드 스타일이 필요하면 `c/milvusScript`의 `loadBrand(this)`를 부른다
@@ -97,7 +96,7 @@
 
 브랜드 작업은 `milvus-brand` skill이 맡는다. Claude는 브랜드 명세 표를 먼저 제안하고, 승인을 받은 뒤에 파일을 쓴다.
 
-- "브랜드 요청 반영해줘" (명세 페이지에 저장한 `milvus-brand-request.md`. 디자인 명세에 붙여 넣은 내용은 명세 페이지 "바꿀 수 있는 것"의 항목으로 나눠 반영한다)
+- "브랜드 요청 반영해줘" (명세 페이지에 저장한 `docs/milvus/brand-request.md`. 디자인 명세에 붙여 넣은 내용은 명세 페이지 "바꿀 수 있는 것"의 항목으로 나눠 반영한다)
 - "브랜드 색을 신뢰감 있는 딥그린으로, 각지고 촘촘하게 해줘"
 - "회색을 쿨그레이로 바꾸고 카드 그림자는 없애줘"
 - "성공 색은 글자 #1B5E20, 배경 #E8F5E9로"
@@ -118,6 +117,7 @@
 ## 8. 업데이트와 문제 해결
 
 - **패키지 업데이트:** `pnpm add -D @a40418a/milvus-design-system@<버전>` 뒤 `pnpm milvus update`. 고친 밀버스 관리 파일이 있으면 아무것도 바꾸지 않고 차이를 보여 준다. 패키지 원본으로 되돌리려면 `pnpm milvus update --force`
+- **0.2.x에서 0.3.0으로:** `update`가 루트의 `milvus-patterns.md`·`milvus-brand-request.md`를 `docs/milvus/`로 내용 그대로 옮기고, 고치지 않은 `milvus-design.md`와 `CLAUDE.md`의 `@milvus-design.md` 줄을 지운다
 - **`storybook`이 버전이 다르다고 멈춤:** 패키지만 올리고 `update`를 하지 않아 새 밀버스 컴포넌트(`c/milvus…`)가 프로젝트에 없다. `pnpm milvus update`를 먼저 실행한다
 - **`check`가 sha256 차이를 말함:** 밀버스 관리 파일이 바뀌었다. `pnpm milvus update --force`로 되돌린다
 - **설치가 인증 오류(401·403)로 실패:** `NODE_AUTH_TOKEN`이 비었거나 만료되었거나 `read:packages` 권한이 없다. 프로젝트 `.npmrc`의 레지스트리 줄과 `~/.npmrc`의 토큰 줄(2절)을 확인한다

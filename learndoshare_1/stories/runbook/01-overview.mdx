@@ -13,7 +13,7 @@ export const STEPS = [
 
 # 1. 개요
 
-팀원이 각자 맡은 Salesforce 프로젝트에 밀버스 디자인 시스템을 적용하고 응용해 보는 런북이다. 왼쪽 메뉴의 순서대로 읽는다. 기준 버전은 **0.2.4**이다.
+팀원이 각자 맡은 Salesforce 프로젝트에 밀버스 디자인 시스템을 적용하고 응용해 보는 런북이다. 왼쪽 메뉴의 순서대로 읽는다. 기준 버전은 **0.3.0**이다.
 
 ## 밀버스는 무엇인가
 
@@ -27,7 +27,7 @@ export const STEPS = [
     <tr><td>`pnpm milvus` CLI</td><td>`init`(세팅), `storybook`(확인), `check`(규칙 검사), `deploy`(배포), `update`(업데이트)</td></tr>
     <tr><td>밀버스 LWC</td><td>SLDS에 없는 기능만: Badge, Button, MultiSelect, Notification, Calendar, 그리고 브랜드 로더</td></tr>
     <tr><td>Storybook</td><td>`lightning-*` 기본 컴포넌트 전부를 내 브랜드로 그려 보는 카탈로그와 브랜드 명세 페이지</td></tr>
-    <tr><td>Claude Code 규칙</td><td>`milvus-design.md`, `milvus-brand` skill, permissions, 스타일 검사 hook</td></tr>
+    <tr><td>Claude Code 규칙</td><td>`.claude/rules/milvus/design.md`, `milvus-brand` skill, permissions, 스타일 검사 hook</td></tr>
   </tbody>
 </table>
 
@@ -72,7 +72,7 @@ export const STEPS = [
   <tbody>
     <tr><td>1. 설치</td><td>개발자</td><td>프로젝트에 패키지</td><td>[2. 준비](?path=/docs/런북-2-준비--docs), [3. 새 프로젝트에 적용](?path=/docs/런북-3-새-프로젝트에-적용--docs)</td></tr>
     <tr><td>2. init</td><td>개발자</td><td>밀버스 LWC, 브랜드 파일, Claude Code 규칙, `milvus.config.json`</td><td>3장</td></tr>
-    <tr><td>3. 명세</td><td>개발자</td><td>`milvus-brand-request.md`</td><td>[4. 브랜드 바꾸기](?path=/docs/런북-4-브랜드-바꾸기--docs)</td></tr>
+    <tr><td>3. 명세</td><td>개발자</td><td>`docs/milvus/brand-request.md`</td><td>[4. 브랜드 바꾸기](?path=/docs/런북-4-브랜드-바꾸기--docs)</td></tr>
     <tr><td>4. Claude 반영</td><td>Claude Code (사람이 승인)</td><td>BrandingSet의 색·로고, `milvusBrand.css`</td><td>4장</td></tr>
     <tr><td>5. 확인</td><td>개발자</td><td>Storybook 화면, `milvus check` 통과</td><td>3장</td></tr>
     <tr><td>6. 배포</td><td>사람이 승인, CLI가 실행</td><td>org의 밀버스 메타데이터와 활성 테마</td><td>3장</td></tr>
@@ -118,6 +118,6 @@ Salesforce가 고정한 값은 어떤 단계로도 바꾸지 않는다. Claude�
     <tr><td>[저장소 README](https://github.com/a40418a/learndoshare/blob/main/learndoshare_1/README.md)</td><td>계획, 결정, 확인된 사실</td></tr>
     <tr><td>[패키지 설계](https://github.com/a40418a/learndoshare/blob/main/learndoshare_1/docs/specs/2026-10-08-milvus-package-design.md)</td><td>CLI·파일·규칙의 원본</td></tr>
     <tr><td>[Learn 학습 자료](https://github.com/a40418a/learndoshare/tree/main/learndoshare_1/Learn)</td><td>개념과 공식 출처. HTML 파일이라 저장소를 받아 브라우저로 연다</td></tr>
-    <tr><td>[milvus-design.md](https://github.com/a40418a/learndoshare/blob/main/learndoshare_1/templates/milvus-design.md)</td><td>`init`이 프로젝트에 놓는 안내서. Claude Code가 지키는 규칙</td></tr>
+    <tr><td>[.claude/rules/milvus/design.md](https://github.com/a40418a/learndoshare/blob/main/learndoshare_1/templates/claude/rules/milvus/design.md)</td><td>`init`이 프로젝트에 놓는 안내서. Claude Code가 지키는 규칙</td></tr>
   </tbody>
 </table>

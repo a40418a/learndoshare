@@ -268,7 +268,7 @@ pnpm milvus init --target-org &lt;별칭&gt; --brand &lt;이름&gt;</code></pre>
   <h3>왜 따로 필요한가</h3>
   <ul>
     <li><code>pnpm add -D @a40418a/milvus-design-system@&lt;버전&gt;</code>은 <code>node_modules</code> 안의 패키지와 <code>package.json</code>·lockfile을 바꾼다. pnpm 문서의 <code>pnpm add sax@3.0.0</code>처럼 버전을 지정해 설치한다</li>
-    <li>그런데 <code>init</code>은 밀버스 LWC, <code>milvusBridge.css</code>, <code>milvus-design.md</code>, skill, hook을 프로젝트 폴더에 <b>복사</b>했다. org에 배포되는 것은 <code>node_modules</code>가 아니라 프로젝트의 <code>force-app/</code> 아래 소스이기 때문이다(설계 3장). 복사본은 pnpm이 관리하지 않으므로 새 버전을 설치해도 그대로다. 이 복사본을 설치된 버전에 맞추는 명령이 <code>update</code>다</li>
+    <li>그런데 <code>init</code>은 밀버스 LWC, <code>milvusBridge.css</code>, <code>.claude/rules/milvus/design.md</code>, skill, hook을 프로젝트 폴더에 <b>복사</b>했다. org에 배포되는 것은 <code>node_modules</code>가 아니라 프로젝트의 <code>force-app/</code> 아래 소스이기 때문이다(설계 3장). 복사본은 pnpm이 관리하지 않으므로 새 버전을 설치해도 그대로다. 이 복사본을 설치된 버전에 맞추는 명령이 <code>update</code>다</li>
     <li>무엇을 복사했고 그때 내용이 무엇이었는지는 <code>milvus.config.json</code>의 <code>managed</code>(경로와 패키지 원본의 sha256)가 기억한다. <code>update</code>는 이 기록으로 "패키지가 놓은 그대로인가, 사람이 고쳤는가"를 가른다</li>
   </ul>
   <h3>동작</h3>
