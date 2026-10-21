@@ -18,7 +18,7 @@ pnpm add -D @a40418a/milvus-design-system
 pnpm milvus --version
 ```
 
-`--version`이 `0.2.4`(또는 그 뒤 버전)을 출력하면 된다. `sfdx-project.json`의 기본 패키지 폴더는 `force-app`이어야 한다(`init`이 확인한다).
+`--version`이 `0.3.0`(또는 그 뒤 버전)을 출력하면 된다. `sfdx-project.json`의 기본 패키지 폴더는 `force-app`이어야 한다(`init`이 확인한다).
 
 ## 2. `init`
 
@@ -46,7 +46,7 @@ pnpm milvus init --target-org my-org --brand Demo
 pnpm milvus storybook
 ```
 
-브라우저에서 **시작하기 / 브랜드 명세**를 열고 네 칸(브랜드 색, 로고, 피드백 색, 디자인 명세)에 요청을 쓴 뒤 **저장**한다. 모두 선택이다. 프로젝트 루트에 `milvus-brand-request.md`가 생긴다. 칸마다 쓰는 법은 [4. 브랜드 바꾸기](?path=/docs/런북-4-브랜드-바꾸기--docs)에 있다.
+브라우저에서 **시작하기 / 브랜드 명세**를 열고 네 칸(브랜드 색, 로고, 피드백 색, 디자인 명세)에 요청을 쓴 뒤 **저장**한다. 모두 선택이다. 프로젝트에 `docs/milvus/brand-request.md`가 생긴다. 칸마다 쓰는 법은 [4. 브랜드 바꾸기](?path=/docs/런북-4-브랜드-바꾸기--docs)에 있다.
 
 - 저장은 `pnpm milvus storybook`(localhost 개발 서버)에서만 된다. GitHub Pages 배포본에서는 입력이 꺼져 있다
 - Storybook은 켜 둔다. 파일이 바뀌면 저절로 다시 그린다
@@ -117,10 +117,10 @@ pnpm milvus deploy --yes
     <tr><th>파일</th><th>구분</th><th>내용</th></tr>
   </thead>
   <tbody>
-    <tr><td>`milvus-design.md`</td><td>관리</td><td>안내서이자 Claude Code 규칙. `CLAUDE.md`의 `@milvus-design.md` 한 줄이 불러온다</td></tr>
-    <tr><td>`milvus.config.json`</td><td>생성</td><td>패키지 버전, 브랜드, 대상 org, VF 여부, 관리 파일 sha256</td></tr>
-    <tr><td>`milvus-brand-request.md`</td><td>소유</td><td>명세 페이지가 저장한 요청</td></tr>
-    <tr><td>`milvus-patterns.md`</td><td>소유</td><td>UI 패턴 명세(모달 등). 팀이 고치고, Claude가 LWC를 쓰기 전에 읽는다</td></tr>
+    <tr><td>`milvus.config.json`</td><td>생성</td><td>패키지 버전, 브랜드, 대상 org, VF 여부, 관리 파일 sha256. 루트에 남는 밀버스 파일은 이것 하나다</td></tr>
+    <tr><td>`.claude/rules/milvus/design.md`</td><td>관리</td><td>안내서이자 Claude Code 규칙. Claude Code가 `.claude/rules/`를 세션마다 읽어 `CLAUDE.md`는 건드리지 않는다</td></tr>
+    <tr><td>`docs/milvus/brand-request.md`</td><td>소유</td><td>명세 페이지가 저장한 요청</td></tr>
+    <tr><td>`docs/milvus/patterns/`</td><td>소유</td><td>UI 패턴 명세. 패턴마다 파일 하나(`modal.md`부터). 팀이 고치고 더하며, Claude가 LWC를 쓰기 전에 읽는다</td></tr>
     <tr><td>`.claude/settings.json`</td><td>소유</td><td>밀버스 permissions·hook 병합</td></tr>
     <tr><td>`.claude/skills/milvus-brand/SKILL.md`</td><td>관리</td><td>"브랜드 요청 반영해줘" skill</td></tr>
     <tr><td>`.claude/hooks/milvus-check.mjs`</td><td>관리</td><td>스타일 파일을 고치면 `check --style`</td></tr>

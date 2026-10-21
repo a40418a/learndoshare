@@ -57,7 +57,6 @@ export function planInit(o: {
     return f.dest === VF_CSS ? [{ kind: "create", dest: f.dest, content: buildMilvusVfCss(brandColor) }] : [{ kind: "copy", dest: f.dest, src: f.src }];
   });
   ops.push(
-    { kind: "append-lines", dest: "CLAUDE.md", lines: ["@milvus-design.md"] },
     settingsOp(o.pkgRoot),
     { kind: "add-key", dest: "package.json", key: "scripts.storybook", value: "milvus storybook" },
     { kind: "append-lines", dest: ".gitignore", lines: [".milvus/"] },

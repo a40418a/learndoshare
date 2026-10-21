@@ -149,7 +149,7 @@ test("두 번 실행해도 파일 내용과 milvus.config.json이 같다", async
     const config = readConfig(root)!;
     assert.deepEqual({ ...config, managed: {} }, { version, targetOrg: "dev", brand: "Acme", vf: true, managed: {} });
     const managed = Object.keys(config.managed);
-    for (const dest of ["milvus-design.md", ".claude/hooks/milvus-check.mjs", `${FA}/lwc/milvusScript/milvusScript.js`, `${FA}/components/milvusHead.component`]) {
+    for (const dest of [".claude/rules/milvus/design.md", ".claude/hooks/milvus-check.mjs", `${FA}/lwc/milvusScript/milvusScript.js`, `${FA}/components/milvusHead.component`]) {
       assert.ok(managed.includes(dest), dest);
     }
     // [소유]·[생성] 파일은 sha256을 기록하지 않는다
@@ -172,15 +172,16 @@ test("두 번 실행해도 파일 내용과 milvus.config.json이 같다", async
   });
 });
 
-test("CLAUDE.md에 정확히 '@milvus-design.md' 한 줄을 추가하고 기존 내용은 그대로다 / 없으면 그 한 줄로 만든다", async () => {
+test("Claude 규칙은 .claude/rules/milvus/design.md에 두고 CLAUDE.md는 만들지도 고치지도 않는다. 루트에 milvus-*.md를 두지 않는다 (#63)", async () => {
   await withProject({ "CLAUDE.md": "# 고객 규칙\n\n- 기존 줄" }, (root) => {
     applyOps(root, plan(root));
-    applyOps(root, plan(root));
-    assert.equal(read(root, "CLAUDE.md"), "# 고객 규칙\n\n- 기존 줄\n@milvus-design.md\n");
+    assert.equal(read(root, "CLAUDE.md"), "# 고객 규칙\n\n- 기존 줄");
+    assert.equal(read(root, ".claude/rules/milvus/design.md"), readFileSync(join(pkgRoot, "templates/claude/rules/milvus/design.md"), "utf8"));
   });
   await withProject({}, (root) => {
     applyOps(root, plan(root));
-    assert.equal(read(root, "CLAUDE.md"), "@milvus-design.md\n");
+    assert.ok(!existsSync(join(root, "CLAUDE.md")));
+    assert.deepEqual(readdirSync(root).filter((f) => /^milvus-.*\.md$/.test(f)), []);
   });
 });
 
@@ -213,16 +214,17 @@ test("이미 있는 milvusBrand.css는 건너뛰고 skipped에 넣는다", async
   });
 });
 
-test("milvus-patterns.md(소유)를 없을 때만 놓고 managed sha256에 넣지 않는다", async () => {
+test("UI 패턴(소유) docs/milvus/patterns/modal.md를 없을 때만 놓고 managed sha256에 넣지 않는다", async () => {
+  const patterns = "docs/milvus/patterns/modal.md";
   await withProject({}, async (root) => {
     assert.equal((await init(root, BRAND)).code, 0);
-    assert.equal(read(root, "milvus-patterns.md"), readFileSync(join(pkgRoot, "templates/milvus-patterns.md"), "utf8"));
-    assert.ok(!("milvus-patterns.md" in readConfig(root)!.managed));
+    assert.equal(read(root, patterns), readFileSync(join(pkgRoot, "templates", patterns), "utf8"));
+    assert.ok(!(patterns in readConfig(root)!.managed));
   });
   const mine = "# 우리 패턴\n";
-  await withProject({ "milvus-patterns.md": mine }, (root) => {
-    assert.ok(applyOps(root, plan(root)).skipped.includes("milvus-patterns.md"));
-    assert.equal(read(root, "milvus-patterns.md"), mine);
+  await withProject({ [patterns]: mine }, (root) => {
+    assert.ok(applyOps(root, plan(root)).skipped.includes(patterns));
+    assert.equal(read(root, patterns), mine);
   });
 });
 

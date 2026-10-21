@@ -16,6 +16,9 @@ const RES = `${FA}/staticresources`;
 const BUTTON = `${FA}/lwc/milvusButton/milvusButton.js`;
 const BADGE = `${FA}/lwc/milvusBadge/milvusBadge.js`;
 const SETTINGS = ".claude/settings.json";
+const DESIGN = ".claude/rules/milvus/design.md";
+const PATTERNS = "docs/milvus/patterns/modal.md";
+const REQUEST = "docs/milvus/brand-request.md";
 const NEW = "9.9.9";
 
 // fn이 쓰는 stdout·stderr를 모은다. 바꿔 둔 write는 끝나면 되돌린다
@@ -231,7 +234,7 @@ test("VF 없이 init한 프로젝트에는 update가 milvusHead·milvusVf를 만
 
 test("소유 파일은 바뀌지 않는다", async () => {
   await withProject(async (root, pkg) => {
-    const owned = [`${RES}/milvusBrand.css`, `${RES}/milvusOverride.css`, "milvus-patterns.md", `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`];
+    const owned = [`${RES}/milvusBrand.css`, `${RES}/milvusOverride.css`, PATTERNS, `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`];
     for (const f of owned) appendFileSync(join(root, f), "<!-- 로컬 -->\n");
     for (const f of owned.slice(0, 3)) appendFileSync(join(pkg, tpl(f)), "/* 새 틀 */\n");
     const before = Object.fromEntries(owned.map((f) => [f, read(root, f)]));
@@ -242,17 +245,77 @@ test("소유 파일은 바뀌지 않는다", async () => {
   });
 });
 
-test("없는 소유 파일만 새로 놓는다(새 버전이 더한 milvus-patterns.md). 있는 소유 파일과 managed 기록은 그대로다", async () => {
+test("없는 소유 파일만 새로 놓는다(새 버전이 더한 패턴 파일). 있는 소유 파일과 managed 기록은 그대로다", async () => {
   await withProject(async (root, pkg) => {
-    rmSync(join(root, "milvus-patterns.md"));
+    rmSync(join(root, PATTERNS));
     appendFileSync(join(root, `${RES}/milvusBrand.css`), "/* 로컬 */\n");
     const brand = read(root, `${RES}/milvusBrand.css`);
 
     const r = await update(root, pkg);
     assert.equal(r.result, 0, r.stderr);
-    assert.equal(read(root, "milvus-patterns.md"), read(pkg, tpl("milvus-patterns.md")));
+    assert.equal(read(root, PATTERNS), read(pkg, tpl(PATTERNS)));
     assert.equal(read(root, `${RES}/milvusBrand.css`), brand);
-    assert.ok(!("milvus-patterns.md" in readConfig(root)!.managed));
-    assert.ok(r.stdout.includes("milvus-patterns.md"), r.stdout);
+    assert.ok(!(PATTERNS in readConfig(root)!.managed));
+    assert.ok(r.stdout.includes(PATTERNS), r.stdout);
+  });
+});
+
+/** 0.2.x 배치로 되돌린다: 루트의 milvus-design.md(관리, sha256 기록)·milvus-patterns.md·milvus-brand-request.md, CLAUDE.md의 import 줄 */
+function toOldLayout(root: string, o: { design?: string } = {}) {
+  const design = o.design ?? "# 밀버스 디자인 시스템 (0.2.4)\n";
+  rmSync(join(root, ".claude/rules"), { recursive: true });
+  rmSync(join(root, "docs"), { recursive: true });
+  write(root, "milvus-design.md", design);
+  write(root, "milvus-patterns.md", "# 팀이 고친 패턴\n");
+  write(root, "milvus-brand-request.md", "# 브랜드 요청\n");
+  write(root, "CLAUDE.md", "# 고객 규칙\n@milvus-design.md\n- 기존 줄\n");
+  const config = readConfig(root)!;
+  delete config.managed[DESIGN];
+  config.managed["milvus-design.md"] = sha256("# 밀버스 디자인 시스템 (0.2.4)\n");
+  writeFileSync(join(root, "milvus.config.json"), `${JSON.stringify(config, null, 2)}\n`);
+}
+
+test("0.2.x 배치를 옮긴다: 고치지 않은 루트 milvus-design.md는 지우고, 패턴·요청은 내용 그대로 docs/milvus로, CLAUDE.md의 import 줄은 지운다 (#63)", async () => {
+  await withProject(async (root, pkg) => {
+    toOldLayout(root);
+    const r = await update(root, pkg);
+    assert.equal(r.result, 0, r.stderr);
+    for (const f of ["milvus-design.md", "milvus-patterns.md", "milvus-brand-request.md"]) assert.ok(!existsSync(join(root, f)), f);
+    assert.equal(read(root, DESIGN), read(pkg, tpl("claude/rules/milvus/design.md")));
+    assert.equal(read(root, PATTERNS), "# 팀이 고친 패턴\n");
+    assert.equal(read(root, REQUEST), "# 브랜드 요청\n");
+    assert.equal(read(root, "CLAUDE.md"), "# 고객 규칙\n- 기존 줄\n");
+    const managed = readConfig(root)!.managed;
+    assert.ok(!("milvus-design.md" in managed) && DESIGN in managed);
+    assert.ok(r.stdout.includes(`milvus-patterns.md → ${PATTERNS}`) && r.stdout.includes("milvus-design.md"), r.stdout);
+    assert.ok(!r.stdout.includes("새 패키지에 없는 관리 파일"), r.stdout);
+  });
+});
+
+test("옛 위치의 milvus-design.md를 고쳤으면 아무것도 바꾸지 않고 1, --force면 지운다 (#63)", async () => {
+  await withProject(async (root, pkg) => {
+    toOldLayout(root, { design: "# 밀버스 디자인 시스템 (0.2.4)\n- 로컬에서 더한 줄\n" });
+    const before = snapshot(root);
+    const r = await update(root, pkg);
+    assert.equal(r.result, 1, r.stdout);
+    assert.ok(r.stderr.includes("milvus-design.md") && r.stderr.includes("--force"), r.stderr);
+    assert.deepEqual(snapshot(root), before);
+
+    const f = await update(root, pkg, ["--force"]);
+    assert.equal(f.result, 0, f.stderr);
+    assert.ok(!existsSync(join(root, "milvus-design.md")));
+    assert.ok(existsSync(join(root, DESIGN)));
+  });
+});
+
+test("새 위치에 이미 파일이 있으면 옛 파일을 옮기지 않고 그대로 두고 알린다 (#63)", async () => {
+  await withProject(async (root, pkg) => {
+    write(root, "milvus-patterns.md", "# 옛 패턴\n");
+    write(root, PATTERNS, "# 새 위치 패턴\n");
+    const r = await update(root, pkg);
+    assert.equal(r.result, 0, r.stderr);
+    assert.equal(read(root, "milvus-patterns.md"), "# 옛 패턴\n");
+    assert.equal(read(root, PATTERNS), "# 새 위치 패턴\n");
+    assert.ok(r.stdout.includes("milvus-patterns.md") && r.stdout.includes("둘 다"), r.stdout);
   });
 });

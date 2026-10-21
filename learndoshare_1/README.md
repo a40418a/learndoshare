@@ -14,7 +14,7 @@
 > | `pnpm sync:theme` (org → 저장소) | 고객 프로젝트는 `pnpm milvus init --from-org`. 이 저장소의 데모 브랜드에는 계속 쓴다 |
 > | hook H2 (sf 데이터 변경·`apex run` 차단) | 고객 프로젝트 `permissions.ask` |
 > | hook H7 (관리 파일 직접 수정 차단) | 고객 프로젝트 `permissions.deny` |
-> | hook H8 (세션 시작 안내) | 두지 않는다. `CLAUDE.md`가 불러오는 `milvus-design.md`가 같은 안내를 한다 |
+> | hook H8 (세션 시작 안내) | 두지 않는다. `CLAUDE.md`가 불러오는 `.claude/rules/milvus/design.md`가 같은 안내를 한다 |
 > | hook H4 (스타일 린트, 편집마다) | 고객 프로젝트 hook 1개(`.claude/hooks/milvus-check.mjs`)가 `check --style`을 실행한다 |
 
 ---
@@ -27,7 +27,7 @@
 | --- | --- | --- |
 | **브랜드 전환** | 프로젝트(브랜드)마다 색, 로고, 타이포, 버튼 모양이 다르다 | org 테마 `BrandingSet`(색·로고) + 요청이 있을 때만 util.css(`milvusBrand.css`)의 styling hook과 브리지 변수 + 마지막 수단 `milvusOverride.css` (설계 5장) |
 | **컴포넌트 재사용** | 같은 SLDS를 쓰는데도 페이지마다 동작과 디자인이 미세하게 다르다. SLDS에 없는 컴포넌트는 각자 만든다 | 공용 컴포넌트 + 카탈로그(Storybook) + 린트 |
-| **프로젝트 시작 표준화** | 새 프로젝트마다 디자인 기반을 처음부터 다시 잡는다 | 패키지 하나를 `pnpm add`로 설치하고 `pnpm milvus init`으로 세팅한다. Storybook은 패키지 안의 설정으로 띄우고(`pnpm milvus storybook`), Claude Code 규칙은 `milvus-design.md`·`milvus-brand` skill·permissions로 함께 들어간다 (설계 3·7장) |
+| **프로젝트 시작 표준화** | 새 프로젝트마다 디자인 기반을 처음부터 다시 잡는다 | 패키지 하나를 `pnpm add`로 설치하고 `pnpm milvus init`으로 세팅한다. Storybook은 패키지 안의 설정으로 띄우고(`pnpm milvus storybook`), Claude Code 규칙은 `.claude/rules/milvus/design.md`·`milvus-brand` skill·permissions로 함께 들어간다 (설계 3·7장) |
 
 브랜드 전환과 컴포넌트 재사용은 정당화 논리가 다르다. 브랜드 전환은 컴포넌트를 만들지 않아도 풀린다. 컴포넌트 재사용의 근거는 브랜드가 아니라 **중복 구현과 일관성 결여**다.
 
@@ -41,7 +41,7 @@
    레지스트리 줄은 프로젝트 .npmrc (init이 없으면 더함, Learn 07)
 1. pnpm add -D @a40418a/milvus-design-system
 2. pnpm milvus init --target-org <별칭> --brand <이름>     (또는 --from-org, VF를 안 쓰면 --no-vf)
-3. pnpm milvus storybook        → "시작하기 / 브랜드 명세" 페이지에 요청 입력 → 저장 (milvus-brand-request.md)
+3. pnpm milvus storybook        → "시작하기 / 브랜드 명세" 페이지에 요청 입력 → 저장 (docs/milvus/brand-request.md)
 4. Claude Code: "브랜드 요청 반영해줘" → 브랜드 명세 표 제안 → 승인 → 파일 작성 → check → 화면 갱신
 5. pnpm milvus deploy           → 배포 계획 확인 → 채팅 승인 → pnpm milvus deploy --yes
 6. org에서 사람이 직접 (메타데이터로 할 수 없음)
@@ -51,15 +51,15 @@
 
 | 단계 | 누가 | 결과물 | 수단 |
 | --- | --- | --- | --- |
-| 2 | 개발자 | 밀버스 관리 파일(LWC, `milvusBridge.css`, `milvus-design.md`, skill, hook), 브랜드 파일(`BrandingSet`, 테마, 빈 `milvusBrand.css`, 설명 주석만 있는 `milvusOverride.css`), UI 패턴 명세 `milvus-patterns.md`(소유), `milvus.config.json` | `pnpm milvus init` (설계 3장, 4.1) |
-| 3 | 개발자 | `milvus-brand-request.md` | 브랜드 명세 페이지 (설계 6.1) |
+| 2 | 개발자 | 밀버스 관리 파일(LWC, `milvusBridge.css`, `.claude/rules/milvus/design.md`, skill, hook), 브랜드 파일(`BrandingSet`, 테마, 빈 `milvusBrand.css`, 설명 주석만 있는 `milvusOverride.css`), UI 패턴 명세 `docs/milvus/patterns/`(소유), `milvus.config.json` | `pnpm milvus init` (설계 3장, 4.1) |
+| 3 | 개발자 | `docs/milvus/brand-request.md` | 브랜드 명세 페이지 (설계 6.1) |
 | 4 | Claude Code | `BrandingSet`의 색·로고, `milvusBrand.css`의 hook·브리지 변수 | `milvus-brand` skill + hook의 `check --style` (설계 6.2, 7.2) |
 | 5 | 개발자가 승인, CLI가 실행 | org의 밀버스 메타데이터와 활성 테마 | `pnpm milvus deploy` (설계 4.4) |
 
 - 새 버전이 나오면 `pnpm milvus update`로 밀버스 관리 파일을 갱신한다(설계 4.5)
 - **팀 런북 (2026-10-20, #53):** 팀원이 따라 하는 설치·적용·배포·실습 안내는 Storybook의 "런북" 메뉴다. 배포본 https://a40418a.github.io/learndoshare/ , 소스 `stories/runbook/`. 패키지에 들어가 고객 프로젝트의 `pnpm milvus storybook`에서도 보인다
 - 이전 계획(9/26)의 ② `pnpm sync:theme`, ③ `root.css`, ④ 컴포넌트 선택과 `create-project.mjs`는 위 흐름으로 대체했다. `init`은 컴포넌트를 고르지 않고 밀버스 LWC를 모두 복사한다. `pnpm sync:theme`은 이 저장소의 데모 브랜드(`brands/`)용으로 남았다
-- **배포 형태 (확정, 2026-10-08):** GitHub Packages에 패키지 하나로 발행한다. 프로젝트 `CLAUDE.md`에는 `@milvus-design.md` 한 줄만 더한다. Claude Code 플러그인 마켓플레이스는 범위 밖이다(설계 0장)
+- **배포 형태 (확정, 2026-10-08):** GitHub Packages에 패키지 하나로 발행한다. 프로젝트 `CLAUDE.md`에는 `@milvus-design.md` 한 줄만 더한다(2026-10-21 변경: 줄을 더하지 않고 Claude 규칙은 `.claude/rules/milvus/design.md`, 팀 문서는 `docs/milvus/`에 둔다, #63). Claude Code 플러그인 마켓플레이스는 범위 밖이다(설계 0장)
 
 ### 1.3 원칙
 
@@ -338,7 +338,7 @@ pnpm sync:theme
 
 9/26 계획(런북 skill `milvus-init`, `root.css`, `create-project.mjs`로 컴포넌트 선택)은 아래로 바뀌었다.
 
-- [x] **런북:** 고객 프로젝트 루트에 `milvus-design.md`([관리], 세팅 안내서이자 Claude 규칙)를 두고, 프로젝트 `CLAUDE.md`에 `@milvus-design.md` 한 줄을 더한다(설계 7.1). skill은 `milvus-brand` 하나다(11.2)
+- [x] **런북:** 고객 프로젝트 루트에 `milvus-design.md`([관리], 세팅 안내서이자 Claude 규칙)를 두고, 프로젝트 `CLAUDE.md`에 `@milvus-design.md` 한 줄을 더한다(설계 7.1). skill은 `milvus-brand` 하나다(11.2) (2026-10-21 갱신: 안내서는 `.claude/rules/milvus/design.md`로 옮기고 `CLAUDE.md`에 줄을 더하지 않는다, #63)
 - [x] **브랜드 요청 반영:** 브랜드 명세 페이지나 채팅 → `milvus-brand` skill → `BrandingSet`과 `milvusBrand.css`. 규칙 밖 값은 hook의 `check --style`이 잡아 고칠 값을 Claude에게 돌려준다(설계 6장, 7.2)
 - [x] **세팅:** `pnpm milvus init --target-org <별칭> (--brand <이름> | --from-org) [--no-vf]`. 컴포넌트를 고르지 않고 밀버스 LWC를 모두 복사한다. Storybook 설정은 복사하지 않고 패키지 안의 것으로 띄운다(`pnpm milvus storybook`, 설계 3장, 4.2)
 - [x] **`milvus.config.json`:** `init`이 패키지 버전, 대상 org 별칭, 브랜드, VF 사용 여부, 밀버스 관리 파일 목록과 sha256을 기록한다. `check`가 sha256으로 직접 수정을 잡고, `update`가 새 버전의 관리 파일을 반영한다([11.3](#113-패키지로-프로젝트-세팅-체계화))
@@ -478,7 +478,7 @@ pnpm sync:theme
 - [x] **테마 메타데이터 (사실상 정해짐).** 고객 프로젝트에서는 `init`이 `brandingSets/`·`lightningExperienceThemes/`를 프로젝트 소유 파일로 만들고, `deploy`가 그 파일로 배포한다. 색의 원본이 이 파일이다(설계 3장, 4.4). 커밋한다고 문서에 명시한 곳은 없다 **(미확인)**
 - [ ] **디자인 시스템 오너와 주당 확보 시간.** 최소 주 4시간 제안
 - [x] **브랜드 명세 페이지 입력 (확정, 2026-10-20 사용자 피드백, #48).** 입력은 브랜드 색·로고·피드백 색·디자인 명세 네 가지다. 입력이 있는 항목 34개를 처음 보는 사람이 "다 채워야 하나"로 받아들였고, 다른 디자인 시스템 문서의 표를 통째로 붙여 넣는 쓰임새를 원했다. 나머지 항목은 "바꿀 수 있는 것"·"바꿀 수 없는 것" 참고 목록이고, 디자인 명세가 옛 세부 절보다 우선한다(설계 6.1). 10/16 내용 동결 뒤의 변경이며 사용자 요청에 따른 예외다
-- [x] **UI 패턴 명세 (확정, 2026-10-20 사용자 요청, #57).** 화면 패턴을 고객 프로젝트의 [소유] 파일 `milvus-patterns.md`에 적고, Claude가 LWC를 쓰기 전에 읽는다(`milvus-design.md` 5절). 최소 버전은 모달 패턴만 다룬다: `LightningModal` 상속, `lightning-modal-*`, footer 오른쪽 끝 정렬, 취소 → 주 동작, `size`, `close(result)`, `open()`. 씨팝코리아 프로젝트에서 모달마다 버튼 위치와 여는 방식이 달랐던 것이 계기다. 새 컴포넌트는 만들지 않는다(설계 1장 10/20). 10/16 내용 동결 뒤의 변경이며 사용자 요청에 따른 예외다
+- [x] **UI 패턴 명세 (확정, 2026-10-20 사용자 요청, #57).** 화면 패턴을 고객 프로젝트의 [소유] 파일 `milvus-patterns.md`에 적고, Claude가 LWC를 쓰기 전에 읽는다(`milvus-design.md` 5절). 최소 버전은 모달 패턴만 다룬다: `LightningModal` 상속, `lightning-modal-*`, footer 오른쪽 끝 정렬, 취소 → 주 동작, `size`, `close(result)`, `open()`. 씨팝코리아 프로젝트에서 모달마다 버튼 위치와 여는 방식이 달랐던 것이 계기다. 새 컴포넌트는 만들지 않는다(설계 1장 10/20). 10/16 내용 동결 뒤의 변경이며 사용자 요청에 따른 예외다 (2026-10-21 갱신: 위치를 `docs/milvus/patterns/modal.md`로 옮겼다. 패턴마다 파일 하나, #63)
 
 ---
 
@@ -583,26 +583,26 @@ learndoshare_1/                     # 밀버스 디자인 시스템 (공용)
 | 종류 | 규칙 | 하는 일 | 대체한 계획 |
 | --- | --- | --- | --- |
 | `permissions.deny` | `Bash(sf org display)`, `Bash(sf org display *)`, `sf org open --url-only`(`-r`)·`--json`, `sf org list --json`·`sf auth list --json` 계열(옵션이 어디에 와도 걸리게 규칙을 여러 개 둔다. 정확한 목록은 템플릿 파일) | 액세스 토큰을 출력하는 명령을 막는다 | H2 3층 |
-| `permissions.deny` | `Edit(...)`: `lwc/milvus*/**`, `classes/utils/design/**`, `milvusHead.component*`, `staticresources/milvusVf.*`·`milvusBridge.*`, `milvus-design.md`, `milvus.config.json`, `.claude/skills/milvus-brand/**`, `.claude/hooks/milvus-check.mjs` | 밀버스 [관리]·[생성] 파일을 Claude의 파일 도구로 고치지 못하게 한다. 다른 경로로 바뀐 것은 `check`의 sha256 비교가 잡는다 | H7 |
+| `permissions.deny` | `Edit(...)`: `lwc/milvus*/**`, `classes/utils/design/**`, `milvusHead.component*`, `staticresources/milvusVf.*`·`milvusBridge.*`, `.claude/rules/milvus/design.md`, `milvus.config.json`, `.claude/skills/milvus-brand/**`, `.claude/hooks/milvus-check.mjs` | 밀버스 [관리]·[생성] 파일을 Claude의 파일 도구로 고치지 못하게 한다. 다른 경로로 바뀐 것은 `check`의 sha256 비교가 잡는다 | H7 |
 | `permissions.ask` | `pnpm milvus deploy`(`pnpm exec milvus`, `milvus`, `./node_modules/.bin/milvus`를 포함한 네 형태), `sf project deploy`, `sf data create/delete/update/upsert`, `sf apex run` | 실행 전에 묻는다. auto 모드에서도 묻는다 | H2 1층 |
 | hook `PostToolUse` · `Edit\|Write` | `node "$CLAUDE_PROJECT_DIR"/.claude/hooks/milvus-check.mjs` | `milvusBrand.css`·`milvusOverride.css`·`brandingSets/`를 고쳤을 때만 패키지 CLI의 `check --style`을 node로 직접 실행한다(pnpm을 거치지 않음). 위반이면 2로 끝나 Claude가 stderr의 고칠 값을 본다. override 경고는 stdout JSON의 `additionalContext`로 넘긴다 | H4 |
-| 안내 문서 | `milvus-design.md`([관리]. 프로젝트 `CLAUDE.md`의 `@milvus-design.md` 한 줄이 불러온다) | 세팅 순서, 디자인 규칙, pnpm만 쓰기, 개인정보 필드·`FIELDS(ALL)` 조회 금지, 배포 안전장치 | H8. H1과 H2 2층은 명령 패턴으로 막지 않고 이 문서의 문장으로 둔다 |
+| 안내 문서 | `.claude/rules/milvus/design.md`([관리]. Claude Code가 `.claude/rules/`를 세션마다 읽는다, #63) | 세팅 순서, 디자인 규칙, pnpm만 쓰기, 개인정보 필드·`FIELDS(ALL)` 조회 금지, 배포 안전장치 | H8. H1과 H2 2층은 명령 패턴으로 막지 않고 이 문서의 문장으로 둔다 |
 
 - 실제 Claude Code에서 잰 것(2026-10-17, `learndoshare_2` 세션): 토큰 출력 sf 명령 6개 deny, 인자 없는 `pnpm milvus deploy`의 ask, `milvusBridge.css` Edit deny가 모두 의도대로 걸린다(설계 13장). `--json` 없는 `sf org list`는 막지 않는다
-- 커밋된 설정의 hook은 팀원에게 따로 동의를 받지 않고 실행된다. 그래서 hook은 하나만 두고 `milvus-design.md`에 적는다(설계 7.2)
+- 커밋된 설정의 hook은 팀원에게 따로 동의를 받지 않고 실행된다. 그래서 hook은 하나만 두고 `.claude/rules/milvus/design.md`에 적는다(설계 7.2)
 
 **처음 계획한 hook (2026-09-26, 커밋하지 않음)**
 
 | # | 막으려던 것 | 지금 |
 | --- | --- | --- |
-| H1 | `npm`·`npx`·`yarn` 명령 | 만들지 않았다. CLAUDE.md 5장과 `milvus-design.md`의 문장 |
-| H2 | 되돌릴 수 없는 sf 명령(1층), 개인정보 필드·`FIELDS(ALL)` 조회(2층), 토큰을 출력하는 명령(3층) | 1층 → `permissions.ask`, 3층 → `permissions.deny`, 2층 → `milvus-design.md`의 문장 |
+| H1 | `npm`·`npx`·`yarn` 명령 | 만들지 않았다. CLAUDE.md 5장과 `.claude/rules/milvus/design.md`의 문장 |
+| H2 | 되돌릴 수 없는 sf 명령(1층), 개인정보 필드·`FIELDS(ALL)` 조회(2층), 토큰을 출력하는 명령(3층) | 1층 → `permissions.ask`, 3층 → `permissions.deny`, 2층 → `.claude/rules/milvus/design.md`의 문장 |
 | H3 | 스테이징된 `.sfdx/`·`.sf/`·`.env`, 시크릿 패턴, 커밋 메시지 형식 | 만들지 않았다. 커밋 규칙은 [CONTRIBUTING.md](../CONTRIBUTING.md), 커밋하지 않는 파일은 CLAUDE.md 5장 |
 | H4 | 스타일 린트(편집마다) | 고객 프로젝트 hook `milvus-check.mjs`(`check --style`). 이 저장소에서는 `pnpm test:brands` |
 | H5 | `theme.json`·`logo.*` 직접 편집 | 만들지 않았다. 고객 프로젝트의 [관리]·[생성] 파일은 `Edit(...)` deny |
 | H6 | 세션 시작 컨텍스트(Phase, 날짜, 금지 사항) | 만들지 않았다. CLAUDE.md 7장 |
 | H7 | 밀버스 관리 파일 직접 수정 | `permissions.deny`의 `Edit(...)` |
-| H8 | 세션 시작 안내(`/milvus-init`, `/milvus-update`) | 두지 않았다. `milvus-design.md`가 같은 안내를 한다 |
+| H8 | 세션 시작 안내(`/milvus-init`, `/milvus-update`) | 두지 않았다. `.claude/rules/milvus/design.md`가 같은 안내를 한다 |
 
 **운영 원칙 (발표에서 배운 점, 설계 7.2에 반영):**
 - 편집마다 도는 PostToolUse에는 **0.2초 안에 끝나는 검사**만 건다. `check --style`은 postcss로 파싱하고 패키지에 미리 넣은 hook 색인(`dist/hooks-index.json`)을 읽어 원본 CSS를 다시 읽지 않는다(`lib/rules.ts`, `lib/hooks-index.ts`). 검사 자체는 0.2초 안이고(설계 첫머리 표), hook은 pnpm 기동(약 0.3초)을 피하려고 node로 직접 실행한다
@@ -617,7 +617,7 @@ learndoshare_1/                     # 밀버스 디자인 시스템 (공용)
 
 | skill | 하는 일 | 연결 |
 | --- | --- | --- |
-| `milvus-brand` | 브랜드 요청(`milvus-brand-request.md`나 채팅)을 `BrandingSet`(색·로고), `milvusBrand.css`, 브리지 변수에 반영한다. 입력 형식 5종(자연어, 디자인 토큰 JSON, Figma, PDF·이미지, URL)을 받는다. 브랜드 명세 표를 제안하고 승인받은 뒤 파일을 쓴다 | hook의 `check --style`이 결과를 검사한다(설계 6장) |
+| `milvus-brand` | 브랜드 요청(`docs/milvus/brand-request.md`나 채팅)을 `BrandingSet`(색·로고), `milvusBrand.css`, 브리지 변수에 반영한다. 입력 형식 5종(자연어, 디자인 토큰 JSON, Figma, PDF·이미지, URL)을 받는다. 브랜드 명세 표를 제안하고 승인받은 뒤 파일을 쓴다 | hook의 `check --style`이 결과를 검사한다(설계 6장) |
 | Ponytail (외부) | 구현 전 과잉 설계 억제. PR 전 `/ponytail-review` | [08 Claude Code 런북](<Learn/08-Claude Code 런북.html>) |
 
 9/26에 계획한 `milvus-init`, `milvus-brand-style`, `milvus-new-component`, `milvus-issue`는 만들지 않았다. `milvus-init`은 CLI `pnpm milvus init`으로, `milvus-brand-style`은 `milvus-brand`로 바뀌었다. 저장소 작업용이던 `milvus-new-component`·`milvus-issue` 대신 CLAUDE.md 1·2장과 CONTRIBUTING.md의 절차를 따른다.
@@ -637,7 +637,7 @@ learndoshare_1/                     # 밀버스 디자인 시스템 (공용)
 | CLI | `pnpm milvus update [--force]` | 새 버전의 관리 파일을 전부 반영하거나 아무것도 바꾸지 않는다(설계 4.5) |
 | skill | `milvus-brand` | 11.2 |
 | permissions·hook | deny·ask, `milvus-check.mjs` | 11.1 |
-| 안내 | `milvus-design.md` | 세팅 순서와 Claude 규칙(설계 7.1) |
+| 안내 | `.claude/rules/milvus/design.md` | 세팅 순서와 Claude 규칙(설계 7.1) |
 
 #### 프로젝트 상태 파일 `milvus.config.json`
 

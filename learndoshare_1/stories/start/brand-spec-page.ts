@@ -1,5 +1,5 @@
 // 브랜드 명세 페이지(설계 6.1, 9.3). 입력은 브랜드 색·로고·피드백 색·디자인 명세 네 가지이고(2026-10-20 사용자 피드백),
-// 나머지 SPEC_ITEMS는 "바꿀 수 있는 것" 참고 목록(설명·예시·한계·지금 값)과 "바꿀 수 없는 것"(group 표시만)으로 그린다. 저장하면 프로젝트 루트의 milvus-brand-request.md를 쓴다.
+// 나머지 SPEC_ITEMS는 "바꿀 수 있는 것" 참고 목록(설명·예시·한계·지금 값)과 "바꿀 수 없는 것"(group 표시만)으로 그린다. 저장하면 프로젝트의 docs/milvus/brand-request.md를 쓴다.
 // 요청 파일은 lib/storybook-plugin.ts의 /__milvus/brand-request(GET { text, writable }, POST { text })로 읽고 쓴다. 정적 빌드와 저장소 모드에서는 입력을 끈다
 // 사용자 입력과 파일 내용은 textContent·value로만 넣는다(innerHTML을 쓰지 않는다)
 import { brands, mode } from "../../.storybook/brand.ts";
@@ -30,7 +30,7 @@ const SAVE_ERRORS: Record<number, string> = {
   400: "요청 형식이 잘못되어 저장하지 못했습니다",
   403: "저장이 거부되었습니다. localhost로 연 프로젝트 Storybook(pnpm milvus storybook)에서만 저장합니다",
   413: "요청이 너무 커서 저장하지 못했습니다. 1MB 이하로 줄여 주세요",
-  500: "서버가 milvus-brand-request.md를 쓰지 못했습니다",
+  500: "서버가 docs/milvus/brand-request.md를 쓰지 못했습니다",
 };
 
 type Props<K extends keyof HTMLElementTagNameMap> = Partial<Omit<HTMLElementTagNameMap[K], "style">>;
@@ -261,7 +261,7 @@ export function renderBrandSpec(): HTMLElement {
     "div",
     { className: "sb-stack" },
     el("h2", { className: "slds-text-heading_large" }, "브랜드 명세"),
-    para("입력은 브랜드 색, 로고, 피드백 색, 디자인 명세 네 가지이고 모두 선택이다. 다 채우지 않아도 된다. 저장하면 프로젝트 루트의 milvus-brand-request.md가 된다. Claude에게 \"브랜드 요청 반영해줘\"라고 하면 milvus-brand skill이 이 파일을 읽어 반영한다. 빈 칸은 파일에 적지 않는다"),
+    para("입력은 브랜드 색, 로고, 피드백 색, 디자인 명세 네 가지이고 모두 선택이다. 다 채우지 않아도 된다. 저장하면 프로젝트의 docs/milvus/brand-request.md가 된다. Claude에게 \"브랜드 요청 반영해줘\"라고 하면 milvus-brand skill이 이 파일을 읽어 반영한다. 빈 칸은 파일에 적지 않는다"),
     para(`지금 값은 툴바에서 고른 브랜드(${brand.label}) 기준이다. 저장할 때 항목마다 '지금:' 줄에 이 값을 함께 적는다`, "slds-text-color_weak"),
     reason,
   );
@@ -309,7 +309,7 @@ export function renderBrandSpec(): HTMLElement {
     const legacy = legacySections(r);
     if (legacy.length) parts.push(`이전에 저장한 세부 요청 ${legacy.length}개가 있다(아래 입력 다음)`);
     if (r.unknown.length > legacy.length) parts.push(`명세 항목이 아닌 줄·절 ${r.unknown.length - legacy.length}개는 저장해도 그대로 남는다`);
-    fileStatus.textContent = `milvus-brand-request.md: ${parts.join(". ")}`;
+    fileStatus.textContent = `docs/milvus/brand-request.md: ${parts.join(". ")}`;
     legacyBox.replaceChildren();
     legacyBox.classList.toggle("slds-hide", !legacy.length);
     if (!legacy.length) return;
@@ -322,7 +322,7 @@ export function renderBrandSpec(): HTMLElement {
     });
     legacyBox.append(
       el("h4", { className: "slds-text-heading_small" }, "이전에 저장한 세부 요청"),
-      para("2026-10-20 전에 항목별 입력으로 저장한 요청이다. 저장해도 그대로 남고 Claude가 그 항목에 반영한다. 디자인 명세와 같은 항목을 다루면 디자인 명세가 우선하고, Claude가 반영 전에 어느 쪽인지 확인을 받는다. 필요 없으면 milvus-brand-request.md에서 그 절을 지운다"),
+      para("2026-10-20 전에 항목별 입력으로 저장한 요청이다. 저장해도 그대로 남고 Claude가 그 항목에 반영한다. 디자인 명세와 같은 항목을 다루면 디자인 명세가 우선하고, Claude가 반영 전에 어느 쪽인지 확인을 받는다. 필요 없으면 docs/milvus/brand-request.md에서 그 절을 지운다"),
       el("details", { className: "slds-m-top_x-small" }, summary, ...blocks),
     );
   };
@@ -354,7 +354,7 @@ export function renderBrandSpec(): HTMLElement {
     // 툴바에서 브랜드를 바꿔 다시 그려도 저장하지 않은 입력은 남는다
     fill(r ?? { sections: [], unknown: [] }, (id, fromFile) => drafts.get(id) ?? fromFile);
     if (r) showFile(r);
-    else fileStatus.textContent = "milvus-brand-request.md가 아직 없습니다. 저장하면 만든다";
+    else fileStatus.textContent = "docs/milvus/brand-request.md가 아직 없습니다. 저장하면 만든다";
     enable();
   })();
 

@@ -188,17 +188,18 @@ test("virtual:milvus-sentinel을 Vite가 해석하고, 프로젝트 milvusBridge
   }
 });
 
-test("POST는 milvus-brand-request.md 하나에만 쓰고, 저장소 모드는 403, GET의 writable은 거짓", async () => {
+test("POST는 docs/milvus/brand-request.md 하나에만 쓰고(폴더가 없으면 만든다), 저장소 모드는 403, GET의 writable은 거짓", async () => {
   const dir = project();
   const before = readdirSync(dir).sort();
-  const file = join(dir, "milvus-brand-request.md");
+  const file = join(dir, "docs/milvus/brand-request.md");
   const p = await serve({ mode: "project", repoDir: repo, projectDir: dir });
   try {
     assert.deepEqual((await p.call("GET")).json, { text: null, writable: true });
     const text = "# 브랜드 요청\n\n## 브랜드 색\n요청: 딥그린\n";
     assert.equal((await p.call("POST", { "content-type": "application/json" }, JSON.stringify({ text }))).status, 200);
     assert.equal(readFileSync(file, "utf8"), text);
-    assert.deepEqual(readdirSync(dir).sort(), [...before, "milvus-brand-request.md"].sort());
+    assert.deepEqual(readdirSync(dir).sort(), [...before, "docs"].sort());
+    assert.deepEqual(readdirSync(join(dir, "docs/milvus")), ["brand-request.md"]);
     assert.deepEqual((await p.call("GET")).json, { text, writable: true });
 
     // localhost가 아닌 Host·Origin은 읽기·쓰기 모두 403
@@ -225,7 +226,7 @@ test("POST는 milvus-brand-request.md 하나에만 쓰고, 저장소 모드는 4
   try {
     assert.deepEqual((await r.call("GET")).json, { text: null, writable: false });
     assert.equal((await r.call("POST", {}, JSON.stringify({ text: "x" }))).status, 403);
-    assert.ok(!existsSync(join(repo, "milvus-brand-request.md")));
+    assert.ok(!existsSync(join(repo, "docs/milvus/brand-request.md")));
   } finally {
     await r.close();
   }
@@ -255,8 +256,8 @@ test("본문에 경로를 넣어도 고정 경로에만 쓴다", async () => {
     const body = { text: "요청", path: "../escape.md", file: join(parent, "escape.md"), name: "README.md" };
     assert.equal((await p.call("POST", {}, JSON.stringify(body))).status, 200);
     assert.deepEqual(readdirSync(parent), ["프로젝트 폴더"]);
-    assert.deepEqual(readdirSync(dir).sort(), ["milvus-brand-request.md", "milvus.config.json"]);
-    assert.equal(readFileSync(join(dir, "milvus-brand-request.md"), "utf8"), "요청");
+    assert.deepEqual(readdirSync(dir).sort(), ["docs", "milvus.config.json"]);
+    assert.equal(readFileSync(join(dir, "docs/milvus/brand-request.md"), "utf8"), "요청");
   } finally {
     await p.close();
   }

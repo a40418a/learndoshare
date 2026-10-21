@@ -1,11 +1,12 @@
 // milvus update [--force] (설계 4.5, 10장). 설치된 패키지의 [관리] 파일을 프로젝트에 반영한다. 전부 반영하거나 아무것도 바꾸지 않는다.
 // - [소유](milvusBrand.css, milvusOverride.css, BrandingSet 등)는 건드리지 않는다. 사람과 skill이 고치는 파일이다.
-//   다만 없는 소유 파일은 init처럼 새로 놓는다. 새 버전이 더한 소유 파일(0.2.4의 milvus-patterns.md)을 관리 파일이 가리키기 때문이다
+//   다만 없는 소유 파일은 init처럼 새로 놓는다. 새 버전이 더한 소유 파일(패턴 파일 등)을 관리 파일이 가리키기 때문이다
+// - 0.2.x 배치(루트의 milvus-*.md, CLAUDE.md의 @milvus-design.md)는 planMigration이 .claude/rules·docs/milvus로 옮긴다(#63)
 // - [생성](milvusVf.css 등)도 건드리지 않는다. 패키지에 있는 것은 틀이고, 실제 내용은 check·deploy가 지금 BRAND_COLOR로 다시 만든다.
 //   틀로 덮어쓰면 브랜드 팔레트가 사라진다
 // - 새 패키지에 없는 관리 파일은 milvus.config.json의 managed에서만 빼고 파일은 지우지 않는다. 설계에 삭제 규칙이 없고,
 //   org에 배포된 컴포넌트를 쓰는 화면이 있을 수 있어 지울지는 사람이 정한다
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
 import { managedFiles, sha256 } from "../lib/managed.ts";
@@ -13,6 +14,37 @@ import { findProject, packageInfo, readConfig, writeConfig, type MilvusConfig } 
 import { applyOps, settingsOp } from "./init.ts";
 
 const USAGE = "사용법: pnpm milvus update [--force]";
+
+// 0.3.0(#63): 루트에 있던 밀버스 명세 파일의 새 위치. 옛 관리 파일 milvus-design.md는 .claude/rules/milvus/design.md가 대신하고,
+// Claude Code가 .claude/rules/를 스스로 읽으므로 CLAUDE.md의 import 줄도 지운다
+const OLD_DESIGN = "milvus-design.md";
+const OLD_IMPORT = "@milvus-design.md";
+const MOVES = [
+  { from: "milvus-patterns.md", to: "docs/milvus/patterns/modal.md" },
+  { from: "milvus-brand-request.md", to: "docs/milvus/brand-request.md" },
+];
+
+/** 0.2.x 배치를 옮길 계획(#63). 파일을 쓰지 않는다. 옛 milvus-design.md를 고쳤으면 designConflict다 */
+export function planMigration(root: string, config: MilvusConfig): {
+  moves: { from: string; to: string }[];
+  kept: string[];
+  removeDesign: boolean;
+  designConflict: boolean;
+  claudeMd?: string;
+} {
+  const has = (p: string) => existsSync(join(root, p));
+  const removeDesign = has(OLD_DESIGN);
+  const claude = has("CLAUDE.md") ? readFileSync(join(root, "CLAUDE.md"), "utf8") : undefined;
+  const stripped = claude?.split("\n").filter((line) => line.trim() !== OLD_IMPORT).join("\n");
+  return {
+    // 새 위치에 이미 파일이 있으면 어느 쪽이 맞는지 모르므로 옮기지 않고 알린다
+    moves: MOVES.filter((m) => has(m.from) && !has(m.to)),
+    kept: MOVES.filter((m) => has(m.from) && has(m.to)).map((m) => m.from),
+    removeDesign,
+    designConflict: removeDesign && sha256(readFileSync(join(root, OLD_DESIGN))) !== config.managed[OLD_DESIGN],
+    claudeMd: stripped !== claude ? stripped : undefined,
+  };
+}
 
 // ponytail: 전체 diff 대신 처음 달라진 줄 하나와 줄 수만 보인다. 자세한 차이는 패키지 원본과 diff 도구로 비교한다
 function diffSummary(local: string, next: string): string {
@@ -65,10 +97,13 @@ export async function runUpdate(argv: string[], deps: { pkg?: { root: string; ve
     if (!config) throw new Error("milvus.config.json이 없습니다. pnpm milvus init을 먼저 실행하세요");
     const pkg = deps.pkg ?? packageInfo();
     const { replace, conflicts } = planUpdate({ root, pkgRoot: pkg.root, config });
-    if (conflicts.length && !force) {
-      const list = conflicts.map((c) => `  ${c.path}\n    ${c.diff}\n`).join("");
+    const mig = planMigration(root, config);
+    if ((conflicts.length || mig.designConflict) && !force) {
+      const list =
+        conflicts.map((c) => `  ${c.path}\n    ${c.diff}\n`).join("") +
+        (mig.designConflict ? `  ${OLD_DESIGN}\n    옛 위치의 관리 파일을 고쳤습니다. 새 위치는 .claude/rules/milvus/design.md이고 --force면 옛 파일을 지웁니다\n` : "");
       process.stderr.write(
-        `milvus update: 직접 고친 밀버스 관리 파일 ${conflicts.length}개가 있어 아무 파일도 바꾸지 않았습니다.\n${list}` +
+        `milvus update: 직접 고친 밀버스 관리 파일 ${conflicts.length + (mig.designConflict ? 1 : 0)}개가 있어 아무 파일도 바꾸지 않았습니다.\n${list}` +
           "고친 내용이 필요하면 다른 곳에 옮겨 둔 뒤, pnpm milvus update --force로 패키지 원본으로 덮어쓰세요\n",
       );
       return 1;
@@ -78,11 +113,12 @@ export async function runUpdate(argv: string[], deps: { pkg?: { root: string; ve
     const files = managedFiles(pkg.root, { vf: config.vf }).filter((f) => f.kind === "managed" && f.src);
     const src = new Map(files.map((f) => [f.dest, f.src!]));
     const writes = [...replace, ...conflicts.map((c) => c.path)].map((dest) => ({ dest, data: readFileSync(src.get(dest)!) }));
+    const movedTo = new Set(mig.moves.map((m) => m.to));
     const created = managedFiles(pkg.root, { vf: config.vf })
-      .filter((f) => f.kind === "owned" && f.src && !existsSync(join(root, f.dest)))
+      .filter((f) => f.kind === "owned" && f.src && !existsSync(join(root, f.dest)) && !movedTo.has(f.dest))
       .map((f) => ({ dest: f.dest, data: readFileSync(f.src!) }));
     const managed = Object.fromEntries(files.map((f) => [f.dest, sha256(readFileSync(f.src!))]));
-    const dropped = Object.keys(config.managed).filter((dest) => !Object.hasOwn(managed, dest));
+    const dropped = Object.keys(config.managed).filter((dest) => !Object.hasOwn(managed, dest) && dest !== OLD_DESIGN);
 
     // settings 병합이 먼저다. 기존 settings.json이 깨졌으면 applyOps가 쓰기 전에 던져 아무것도 바뀌지 않는다.
     // ponytail: 그 뒤의 파일 쓰기는 트랜잭션이 아니다. 도중에 권한·디스크 오류가 나면 일부만 바뀌므로 그렇게 알린다.
@@ -93,12 +129,22 @@ export async function runUpdate(argv: string[], deps: { pkg?: { root: string; ve
       mkdirSync(dirname(join(root, w.dest)), { recursive: true });
       writeFileSync(join(root, w.dest), w.data);
     }
+    for (const m of mig.moves) {
+      mkdirSync(dirname(join(root, m.to)), { recursive: true });
+      renameSync(join(root, m.from), join(root, m.to));
+    }
+    if (mig.removeDesign) rmSync(join(root, OLD_DESIGN));
+    if (mig.claudeMd !== undefined) writeFileSync(join(root, "CLAUDE.md"), mig.claudeMd);
     writeConfig(root, { ...config, version: pkg.version, managed });
 
     const list = (paths: string[]) => paths.map((p) => `  - ${p}\n`).join("");
     process.stdout.write(
       `밀버스 update를 마쳤습니다. 버전 ${config.version} → ${pkg.version}\n` +
         (writes.length ? `바꾼 밀버스 관리 파일 ${writes.length}개${conflicts.length ? `(로컬 수정을 덮어쓴 ${conflicts.length}개 포함)` : ""}:\n${list(writes.map((w) => w.dest))}` : "바꾼 밀버스 관리 파일이 없습니다\n") +
+        (mig.moves.length ? `밀버스 명세 파일을 새 위치로 옮겼습니다(내용은 그대로):\n${list(mig.moves.map((m) => `${m.from} → ${m.to}`))}` : "") +
+        (mig.removeDesign ? `옛 관리 파일 ${OLD_DESIGN}를 지웠습니다. 새 위치는 .claude/rules/milvus/design.md이고 Claude Code가 스스로 읽습니다\n` : "") +
+        (mig.claudeMd !== undefined ? `CLAUDE.md에서 ${OLD_IMPORT} 줄을 지웠습니다\n` : "") +
+        (mig.kept.length ? `새 위치에 이미 파일이 있어 옛 파일을 옮기지 않았습니다(둘 다 있음). 내용을 확인한 뒤 옛 파일을 지우세요:\n${list(mig.kept)}` : "") +
         (created.length ? `없던 프로젝트 소유 파일 ${created.length}개를 새로 놓았습니다. 이제 팀이 고치는 파일입니다:\n${list(created.map((w) => w.dest))}` : "") +
         (settings.length ? ".claude/settings.json에 새 permissions·hook을 병합했습니다\n" : "") +
         (dropped.length

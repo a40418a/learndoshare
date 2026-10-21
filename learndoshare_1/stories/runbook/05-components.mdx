@@ -24,7 +24,7 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 ## 패턴 명세: 화면은 이렇게 짠다
 
-같은 `lightning-*`를 써도 모달마다 버튼 위치나 여는 방식이 달라질 수 있다. `init`이 프로젝트 루트에 놓는 `milvus-patterns.md`가 화면 패턴을 정하고, Claude는 LWC 화면을 만들기 전에 이 파일을 읽는다. 명세와 다르게 하려면 Claude가 이유를 말하고 확인받는다.
+같은 `lightning-*`를 써도 모달마다 버튼 위치나 여는 방식이 달라질 수 있다. `init`이 놓는 `docs/milvus/patterns/`(패턴마다 파일 하나, 첫 파일은 `modal.md`)가 화면 패턴을 정하고, Claude는 LWC 화면을 만들기 전에 해당 패턴 파일을 읽는다. 명세와 다르게 하려면 Claude가 이유를 말하고 확인받는다.
 
 - 지금은 **모달**만 있다: `LightningModal`을 상속하고 `lightning-modal-header`·`-body`·`-footer`를 쓴다. footer 버튼은 오른쪽 끝에 "취소 → 주 동작" 순서, 크기는 `size`, 결과는 `this.close(result)`, 열 때는 `MyModal.open({ … })`
 - 팀이 규칙을 바꾸거나 패턴(폼 레이아웃, 목록 툴바, 빈 상태, 오류 표시 등)을 더한다. 프로젝트 소유 파일이라 `update`가 덮어쓰지 않는다

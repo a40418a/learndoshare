@@ -35,7 +35,7 @@
       "Edit(/force-app/main/default/components/milvusHead.component*)",
       "Edit(/force-app/main/default/staticresources/milvusVf.*)",
       "Edit(/force-app/main/default/staticresources/milvusBridge.*)",
-      "Edit(/milvus-design.md)",
+      "Edit(/.claude/rules/milvus/**)",
       "Edit(/milvus.config.json)",
       "Edit(/.claude/skills/milvus-brand/**)",
       "Edit(/.claude/hooks/milvus-check.mjs)"

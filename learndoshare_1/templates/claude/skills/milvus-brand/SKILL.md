@@ -1,6 +1,6 @@
 ---
 name: milvus-brand
-description: 밀버스 디자인 시스템의 브랜드 요청(milvus-brand-request.md나 채팅)을 org 테마(BrandingSet)·milvusBrand.css·브리지 변수에 반영한다. 입력 형식 5종(자연어, 디자인 토큰 JSON, Figma, PDF·이미지, URL)을 받는다. "브랜드 요청 반영해줘", "버튼을 더 둥글게", "회색을 쿨그레이로", "이 Figma 토큰 적용해줘" 같은 요청에 쓴다
+description: 밀버스 디자인 시스템의 브랜드 요청(docs/milvus/brand-request.md나 채팅)을 org 테마(BrandingSet)·milvusBrand.css·브리지 변수에 반영한다. 입력 형식 5종(자연어, 디자인 토큰 JSON, Figma, PDF·이미지, URL)을 받는다. "브랜드 요청 반영해줘", "버튼을 더 둥글게", "회색을 쿨그레이로", "이 Figma 토큰 적용해줘" 같은 요청에 쓴다
 ---
 
 # 브랜드 요청 반영 (milvus-brand)
@@ -11,7 +11,7 @@ description: 밀버스 디자인 시스템의 브랜드 요청(milvus-brand-requ
 
 ## 1. 흐름 (7단계)
 
-1. **입력.** 프로젝트 루트의 `milvus-brand-request.md`를 읽는다. 없으면 채팅의 브랜드 설명을 쓴다. 자연어가 아니면 7장대로 값을 뽑는다
+1. **입력.** 프로젝트 루트의 `docs/milvus/brand-request.md`를 읽는다. 없으면 채팅의 브랜드 설명을 쓴다. 자연어가 아니면 7장대로 값을 뽑는다
    - 파일 형식: `# 브랜드 요청`, `저장: …`, 항목마다 `## <항목>` 아래 `지금: …`(명세 페이지가 적은 당시 값)과 `요청: …`
    - 명세 페이지의 입력은 `## 브랜드 색`, `## 로고`, `## 피드백 색 / 성공`(경고·오류·정보), `## 디자인 명세` 네 가지다. `지금:` 줄은 없을 수 있고(로고, 디자인 명세 등), `요청:`은 여러 줄일 수 있다(다음 `## ` 줄 앞까지). 어느 절이든 요청 안에서 `## `로 시작하는 줄은 `\## `로 적혀 있다(앞의 `\` 하나를 떼고 읽는다)
    - **디자인 명세**(옛 제목 `## 전체 스타일`도 같다)에는 다른 디자인 시스템 문서의 표, 토큰 JSON, Figma, URL, 자연어가 섞여 붙여 넣어져 있다. 내용을 형식별로 7장대로 읽어 4장 표의 항목(모서리, 밀도, 회색 온도, 그림자 깊이 …)으로 나누고, 2단계 표에는 나눈 결과를 항목별 행으로 적는다. 어느 항목에도 맞지 않거나 Salesforce 고정인 요구는 "반영하지 못하는 요구와 대안" 칸에 적는다. 붙여 넣은 토큰 JSON은 `.milvus/tokens.json`(init이 `.gitignore`에 넣는 폴더)에 그 부분만 떼어 저장한 뒤 7장 명령을 그 파일로 돌린다
@@ -30,7 +30,7 @@ description: 밀버스 디자인 시스템의 브랜드 요청(milvus-brand-requ
 7. **배포는 사용자가 따로 요청했을 때만 한다.** 먼저 `pnpm milvus deploy`로 계획(대상 org, 지금 활성 테마 → 새 활성 테마, 배포 목록, 경고)을 보여 준다
    - 채팅에서 사용자가 그 계획을 승인한 뒤에만 `pnpm milvus deploy --yes`를 실행한다. 이 명령은 `permissions.ask`가 한 번 더 묻는다
    - 활성 테마는 org 전체 사용자 화면에 적용되고, 테마 색은 새로고침 뒤에 보인다
-   - 배포가 끝나면 사람이 org에서 할 일 두 가지(`milvus-design.md` 3절)를 알린다: VF 설정 켜기, App Manager에서 `milvusBrandLoader` 붙이기
+   - 배포가 끝나면 사람이 org에서 할 일 두 가지(`.claude/rules/milvus/design.md` 3절)를 알린다: VF 설정 켜기, App Manager에서 `milvusBrandLoader` 붙이기
 
 ## 2. 반영 순서 (설계 5.1)
 
@@ -47,7 +47,7 @@ description: 밀버스 디자인 시스템의 브랜드 요청(milvus-brand-requ
 - **override를 쓸 때** 사용자에게 알린다: "Salesforce 공식 권고 밖이다. 기본 컴포넌트가 native shadow로 바뀌거나 Salesforce가 마크업·클래스를 바꾸면 깨질 수 있다." 이유와 실험은 Learn 09 "override와 공식 권고"(https://github.com/a40418a/learndoshare/blob/main/learndoshare_1/Learn/09-override와%20공식%20권고.html)를 안내한다
   - `.slds-*` 클래스 선택자만 쓴다. hex 색, `!important`, 브랜드 색 hook은 check가 경고한다. `@font-face`, `@import`는 막는다
 - **모양만 바꾸려고 밀버스 컴포넌트(`lwc/milvus*`)를 새로 만들지 않는다.** 밀버스 컴포넌트는 SLDS에 기능이 없을 때만 만든다
-- 밀버스 관리 파일(`lwc/milvus*`, `milvusBridge.css`, `milvusVf.css`, `milvusHead`, `milvus-design.md`, 이 skill)은 고치지 않는다
+- 밀버스 관리 파일(`lwc/milvus*`, `milvusBridge.css`, `milvusVf.css`, `milvusHead`, `.claude/rules/milvus/design.md`, 이 skill)은 고치지 않는다
 - **Salesforce 고정(설계 9.4)** 은 요청이 와도 바꿀 수 없다고 답하고 목록을 보여 준다. override로도 우회하지 않는다. 예: 토스트 표시 시간, z-index, 아이콘 모양, 스피너, LEX 전역 헤더(org 테마가 원본), LEX 컨트롤 높이, Path 양 끝 반경, 컨트롤·정렬 아이콘 크기, 폼 요소 자간, 선택지 라벨 굵기, 비활성 커서·링크 밑줄, 팝오버 꼬리 그림자, 개체 아이콘 배경색. 글꼴도 바꾸지 않는다. 목록 전체:
   ```bash
   node --input-type=module -e 'import { FIXED_ITEMS } from "@a40418a/milvus-design-system/dist/lib/fixed-list.js"; for (const i of FIXED_ITEMS) console.log(i.mode === "both" ? "지금도 native에서도" : "native 전환 뒤", "-", i.label)'
