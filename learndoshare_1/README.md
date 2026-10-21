@@ -57,7 +57,7 @@
 | 5 | 개발자가 승인, CLI가 실행 | org의 밀버스 메타데이터와 활성 테마 | `pnpm milvus deploy` (설계 4.4) |
 
 - 새 버전이 나오면 `pnpm milvus update`로 밀버스 관리 파일을 갱신한다(설계 4.5)
-- **팀 런북 (2026-10-20, #53):** 팀원이 따라 하는 설치·적용·배포·실습 안내는 Storybook의 "런북" 메뉴다. 배포본 https://a40418a.github.io/learndoshare/ , 소스 `stories/runbook/`. 패키지에 들어가 고객 프로젝트의 `pnpm milvus storybook`에서도 보인다
+- **팀 런북 (2026-10-20, #53):** 팀원이 따라 하는 설치·적용·배포·실습 안내는 Storybook의 "런북" 메뉴다. 배포본 https://a40418a.github.io/learndoshare/ , 소스 `stories/runbook/runbook.mdx`. 2026-10-22: 8쪽을 따라 하기 가이드 한 쪽(준비 → 설치 → init → 요청 → 반영 → 확인 → 배포 → org 마무리 → 컴포넌트 → 업데이트 → 합류 → 문제 해결)으로 합쳤다(#65). 패키지에는 넣지 않는다(#55)
 - 이전 계획(9/26)의 ② `pnpm sync:theme`, ③ `root.css`, ④ 컴포넌트 선택과 `create-project.mjs`는 위 흐름으로 대체했다. `init`은 컴포넌트를 고르지 않고 밀버스 LWC를 모두 복사한다. `pnpm sync:theme`은 이 저장소의 데모 브랜드(`brands/`)용으로 남았다
 - **배포 형태 (확정, 2026-10-08):** GitHub Packages에 패키지 하나로 발행한다. 프로젝트 `CLAUDE.md`에는 `@milvus-design.md` 한 줄만 더한다(2026-10-21 변경: 줄을 더하지 않고 Claude 규칙은 `.claude/rules/milvus/design.md`, 팀 문서는 `docs/milvus/`에 둔다, #63). Claude Code 플러그인 마켓플레이스는 범위 밖이다(설계 0장)
 
