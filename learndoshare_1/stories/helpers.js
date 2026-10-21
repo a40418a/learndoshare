@@ -113,7 +113,6 @@ export function sourceStory(name) {
 
 /** 페이지 상단 표시: 이 컴포넌트가 어디서 왔는지 */
 export const ORIGIN = {
-  slds: "> **SLDS 기본** · Salesforce가 제공하는 `lightning-*` 컴포넌트를 그대로 렌더한다. 색은 org 브랜드를 따른다.",
-  milvus:
-    "> **밀버스 추가** · Salesforce가 제공하지 않는 기능을 SLDS 블루프린트와 `lightning-*` 위에 더한 밀버스 컴포넌트다."
+  slds: "> **Salesforce 기본** · Salesforce가 제공하는 `lightning-*` 컴포넌트입니다.",
+  milvus: "> **밀버스 추가** · Salesforce에 없는 기능이라 밀버스가 더한 컴포넌트입니다."
 };

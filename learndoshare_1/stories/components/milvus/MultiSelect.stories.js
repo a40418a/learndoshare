@@ -31,7 +31,7 @@ export default {
   },
   argTypes: {
     options: { control: "object" },
-    value: { control: "object", description: "선택된 value 배열" },
+    value: { control: "object", description: "선택한 값 배열" },
     onChange: { action: "change", table: { disable: true } }
   },
   parameters: {
@@ -40,20 +40,17 @@ export default {
       description: {
         component: `${ORIGIN.milvus}
 
-Salesforce에는 **검색하면서 여러 개를 고르는** 기본 컴포넌트가 없다. \`lightning-combobox\`는 단일 선택만, \`lightning-dual-listbox\`와 \`lightning-select multiple\`은 검색이 없다. 밀버스 MultiSelect는 SLDS combobox(다중 선택) 블루프린트 마크업에 선택 항목을 \`lightning-pill\`로 보여 준다.
-
-**다중 선택의 표준 컴포넌트다.** 같은 기능을 \`lightning-dual-listbox\`나 \`lightning-select multiple\`로 따로 만들지 않는다 (#6).
+검색하면서 여러 개를 고르는 선택 상자입니다. 다중 선택은 이 컴포넌트 하나만 쓰세요.
 
 | 조작 | 동작 |
 | --- | --- |
-| 입력 | 목록을 거른다 |
+| 입력 | 목록을 거릅니다 |
 | ↑ / ↓, Enter | 항목 이동, 선택·해제 |
 | Esc | 목록 닫기 |
 | 빈 입력창에서 Backspace | 마지막 선택 지우기 |
 
-\`change\` 이벤트의 \`event.detail.value\`로 선택된 value 배열을 받는다.
-
-맨 아래 **소스 코드**에서 실제 파일을 볼 수 있다.`
+- 선택한 값은 \`change\` 이벤트의 \`event.detail.value\`(배열)로 받으세요.
+- 아래 예제의 **Show code**를 눌러 코드를 복사하세요.`
       }
     }
   }

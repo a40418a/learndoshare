@@ -15,8 +15,7 @@ export default {
   parameters: {
     docs: {
       description: {
-        component: `폰트는 org Themes and Branding에서 바꿀 수 없다(플랫폼 고정). 텍스트 크기와 굵기는 SLDS 텍스트 유틸리티 클래스를 쓴다.
-브랜드별 타이포는 브랜드 root style(\`brands/<브랜드>/root.css\`의 \`--milvus-*\`)에서 관리한다 (#4).`
+        component: `글꼴은 바꿀 수 없습니다(Salesforce 고정). 글자 크기와 굵기는 아래 SLDS 클래스를 쓰세요.`
       },
       source: {
         code: SAMPLES.map(
