@@ -11,37 +11,24 @@ import logo from "../brands/Milvus_DesignSystem/logo.jpg";
 
 # 밀버스 디자인 시스템
 
-> **처음이면 [런북](https://a40418a.github.io/learndoshare/?path=/docs/런북-1-개요--docs)부터 읽는다.** 설치부터 브랜드 반영, 배포, 팀 실습까지 순서대로 따라 한다.
+Salesforce 화면에 쓰는 LWC 컴포넌트를 모아 두었습니다. 브랜드를 바꾸면 모든 컴포넌트가 함께 바뀝니다.
 
-밀버스 프로젝트가 함께 쓰는 **Salesforce LWC 컴포넌트 카탈로그**다. 최신 **SLDS 2**(`@salesforce-ux/design-system-2` 2.264.2, Cosmos 테마)를 기반으로 한다.
+## 브랜드 바꾸기
 
-**원칙: SLDS가 제공하는 것을 최대한 쓰고, 없는 것만 더한다.**
+1. **시작하기 / 브랜드 명세**에서 바꾸고 싶은 것을 적고 저장하세요.
+2. Claude Code에 "브랜드 요청 반영해줘"라고 하세요.
+3. 위 툴바의 🖌 메뉴에서 브랜드를 골라 화면을 확인하세요.
+4. 괜찮으면 `pnpm milvus deploy`로 org에 배포하세요.
 
-## 구성
+## 컴포넌트 쓰기
 
-- **런북**(저장소 Storybook에만 있음) · 각자 Salesforce 프로젝트에 설치·적용·배포하는 순서와 팀 실습
-- **Foundations** · 컬러(global styling hook, 브랜드 팔레트), 타이포그래피
-- **컴포넌트 / 기본** · Salesforce가 제공하는 컴포넌트(`lightning-*`) **73개 전부**와 공식 예제 249개. npm `lightning-base-components`의 예제를 그대로 렌더한다
-- **컴포넌트 / 밀버스 추가** · Salesforce가 제공하지 않는 기능만 더한다
-  - Badge(의미색 뱃지), MultiSelect(검색 다중 선택), Notification(닫을 수 있는 화면 안 알림), Calendar(월·주 일정표)
-  - Button: 비교 예시. 평소엔 `lightning-button` 그대로이고, 브랜드 util.css가 커스텀 모드를 켤 때만 블루프린트 버튼으로 그린다
-  - BrandLoader: 앱 유틸리티 바에 넣어 앱 전체에 브랜드 CSS를 거는 로더(화면 없음)
-  - 토스트·날짜 선택은 만들지 않는다. `lightning/toast`, `lightning-input type="date"`를 쓴다
+- **컴포넌트 / 기본**에서 먼저 찾으세요. Salesforce 기본 컴포넌트(`lightning-*`)입니다.
+- 없으면 **컴포넌트 / 밀버스 추가**를 보세요.
+- 각 예제 아래 **Show code**를 눌러 코드를 복사하세요.
 
-  기본 섹션에서 빠진 것: 공식 예제가 없는 `LightningAlert`·`LightningConfirm`·`LightningPrompt`, `LightningModal`, toast. npm 패키지에 없는 것(org 데이터 필요): `lightning-record-form`·`record-edit-form`·`input-field`·`record-picker`·`file-upload`·`map`·`input-rich-text`. 이것들은 Live Preview(`sf lightning dev component`)로 확인한다
+## 알아 두세요
 
-**기능 하나에 컴포넌트 하나.** 같은 기능을 여러 컴포넌트로 만들지 않는다. 예를 들어 다중 선택은 MultiSelect 하나만 쓴다.
+- 이 화면은 미리보기입니다. org는 배포해야 바뀝니다.
+- 데이터(`@wire`, Apex)가 붙은 화면은 `sf lightning dev component`로 확인하세요.
 
-## 보는 법
-
-- **브랜드 전환:** 상단 툴바의 🖌 브랜드 메뉴. `org` 표시는 org Themes and Branding에서 `pnpm sync:theme`으로 가져온 브랜드, `샘플`은 전환 확인용이다
-- **코드:** 각 스토리 아래 **Show code**에 LWC 사용 코드가 나온다. controls를 바꾸면 코드도 바뀐다
-- **소스:** 밀버스 추가 컴포넌트는 문서 페이지에 실제 소스(html/js)가 그대로 나온다. 저장소의 `force-app/main/default/lwc/`와 같은 파일이다
-
-## 알아 둘 것
-
-- Storybook에는 org가 없다. 브랜드 전환은 **시뮬레이션**이며, 실제 org에서는 관리자가 Setup에서 바꾼다
-- `lightning-*`는 Salesforce가 npm으로 배포하는 `lightning-base-components`로 렌더한다. 플랫폼과 같은 synthetic shadow 모드를 쓴다
-- 데이터(`@wire`, Apex)가 붙은 확인은 Salesforce Live Preview(`sf lightning dev component`)를 쓴다
-
-저장소: [a40418a/learndoshare](https://github.com/a40418a/learndoshare) · 계획: `learndoshare_1/README.md`
+처음 설치하거나 팀원과 함께 해 보려면 [런북](https://a40418a.github.io/learndoshare/?path=/docs/런북--docs)을 보세요.

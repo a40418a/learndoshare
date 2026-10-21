@@ -6,15 +6,11 @@ export default {
     controls: { disable: true },
     docs: {
       description: {
-        component: `브랜드마다 **\`brands/<브랜드>/util.css\` 파일 하나**로 모든 컴포넌트(\`lightning-*\` 포함)의 모양을 바꾼다. 상단 툴바에서 브랜드를 바꾸면 \`컴포넌트/기본\` 전체가 그 브랜드의 util.css로 그려진다.
+        component: `브랜드 모양(모서리, 간격, 글자, 그림자 등)은 파일 하나(\`milvusBrand.css\`)로 모든 컴포넌트에 함께 적용됩니다.
 
-- **쓸 수 있는 것은 \`:root\`의 global hook(\`--slds-g-*\`), 컴포넌트 hook(\`--slds-s-*\`), 밀버스 컴포넌트가 읽는 \`--milvus-*\` 변수뿐이다.** 클래스 규칙은 쓰지 않는다
-- **global hook**은 같은 hook을 쓰는 컴포넌트 묶음을 함께 바꾼다. 예: \`--slds-g-radius-border-pill\`은 버튼, 토글, 필(pill), 경로(path), 원형 진행 표시줄의 반경을 함께 바꾼다. 뱃지는 \`radius-border-1\`을 쓰므로 바뀌지 않는다
-- **컴포넌트 hook**은 그 컴포넌트만 바꾼다. 예: \`--slds-s-button-radius-border\`는 버튼 반경만 바꾼다. 쓸 수 있는 이름은 아래 **영향 지도**의 오른쪽 열에 있다. 색 hook(\`--slds-s-*color*\`)은 브랜드 색에 이어진 것이 많아 쓰지 않는다
-- 컴포넌트 hook은 지금 org가 \`lightning-*\`를 synthetic shadow로 그려서 닿는다(2026-10-07 org 실측, 10/9 프로브에서 \`data-render-mode\` 0개). npm 패키지는 156개를 native shadow 지원으로 지정해 두었다. **native로 바뀌면 SLDS 전역 CSS(\`.slds-*\`) 안의 읽기 지점이 사라지고, 기본 컴포넌트의 native CSS가 직접 읽는 s 이름에만 닿는다**(추정, 실측 필요. 설계 9.1). hook·브리지로 안 되는 모양은 밀버스 컴포넌트를 새로 만들지 않고 opt-in \`milvusOverride.css\`(마지막 수단, 공식 권고 밖)로 바꾼다(2026-10-09 결정)
-- **브랜드 색은 바꾸지 않는다.** 색은 org Themes and Branding이 원본이고 \`pnpm sync:theme\`이 가져온다. \`pnpm test\`가 util.css 규칙을 검사한다
-- **공식 권고 밖이다.** SLDS는 global hook 재정의를 권하지 않는다. Salesforce 릴리스마다 Storybook과 org 화면을 다시 확인한다
-- org에서는 util.css를 정적 리소스로 올려 \`loadStyle\`로 문서에 넣는다. 이때 **같은 화면의 표준 Salesforce UI에도 적용된다**`
+- 직접 고치지 말고 **시작하기 / 브랜드 명세**에 적은 뒤 Claude Code에 반영을 맡기세요.
+- 브랜드 색은 이 파일이 아니라 org 테마에서 바뀝니다.
+- 아래 **영향 지도**에서 값 하나가 어느 컴포넌트에 닿는지 볼 수 있습니다.`
       }
     }
   }
@@ -77,7 +73,7 @@ export const 영향_지도 = {
     const note = document.createElement("p");
     note.className = "slds-text-body_small slds-m-bottom_small";
     note.textContent =
-      "SLDS 2 CSS에서 자동으로 읽은 표 (색 hook 제외). 왼쪽 global hook을 util.css에서 바꾸면 오른쪽 컴포넌트 속성이 함께 바뀐다. 오른쪽 이름(--slds-s-<이름>)을 util.css에 직접 넣으면 그 컴포넌트 속성만 바뀐다.";
+      "왼쪽 값을 바꾸면 오른쪽 컴포넌트가 함께 바뀝니다.";
     const table = document.createElement("table");
     table.className = "slds-table slds-table_bordered slds-table_cell-buffer";
     table.innerHTML =

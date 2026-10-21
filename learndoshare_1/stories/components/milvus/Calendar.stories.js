@@ -60,14 +60,14 @@ export default {
     events: SAMPLE
   },
   argTypes: {
-    view: { control: "inline-radio", options: ["month", "week"], description: "그 밖의 값은 `month`" },
-    value: { control: "text", description: "기준 날짜 `YYYY-MM-DD`. 비우면 오늘" },
+    view: { control: "inline-radio", options: ["month", "week"], description: "월 또는 주" },
+    value: { control: "text", description: "기준 날짜 `YYYY-MM-DD`. 비우면 오늘입니다" },
     firstDayOfWeek: {
       control: { type: "select", labels: { 0: "0 (일)", 1: "1 (월)", 2: "2 (화)", 3: "3 (수)", 4: "4 (목)", 5: "5 (금)", 6: "6 (토)" } },
       options: [0, 1, 2, 3, 4, 5, 6],
-      description: "주 첫날. 범위 밖이면 0(일)"
+      description: "한 주의 첫날. 0(일)~6(토)"
     },
-    maxEventsPerDay: { control: { type: "number", min: 1 }, description: "월 보기에서 칸마다 보일 일정 수. 넘으면 \"+N개 더\"" },
+    maxEventsPerDay: { control: { type: "number", min: 1 }, description: "월 보기에서 칸마다 보일 일정 수" },
     events: { control: "object", description: "`[{ id, title, start, end?, variant? }]`" },
     onRangechange: { action: "rangechange", table: { disable: true } },
     onDayselect: { action: "dayselect", table: { disable: true } },
@@ -79,42 +79,28 @@ export default {
       description: {
         component: `${ORIGIN.milvus}
 
-**날짜 칸에 일정을 보여 주는** 월·주 일정표다. Component Reference에 월간 달력이 없고, 패키지 안의 \`lightning/calendar\`는 Date Picker 내부 부품(비공개)이라 밀버스가 만든다. SLDS에도 월간 달력 블루프린트가 없어 레이아웃은 밀버스 CSS이고, 색·테두리·간격·반경·글자는 모두 global hook(\`--slds-g-*\`)을 읽어 브랜드가 그대로 닿는다.
+한 달이나 한 주 단위로 일정을 보여 주는 달력입니다. 일정 데이터는 부모 컴포넌트가 넘겨 주세요.
 
-| 언제 쓰나 | 언제 쓰지 않나 |
+| 이럴 때 쓰세요 | 이럴 땐 다른 것을 쓰세요 |
 | --- | --- |
-| 날짜별 일정·마감·행사를 **한 달이나 한 주 단위로** 보여 줄 때 | **날짜 하나를 고르는** 입력 (\`lightning-input type="date"\` 사용) |
-| 날짜·일정을 눌러 상세나 생성 화면으로 넘어갈 때 | 시간대별 세로 일정표(이번 범위 밖) |
+| 날짜별 일정·마감·행사를 보여 줄 때 | 날짜 하나 고르기: \`lightning-input type="date"\` |
 
-**표현 컴포넌트다.** 데이터를 불러오지 않는다. 부모가 \`rangechange\`의 범위로 일정을 불러와 \`events\`로 넘긴다.
+**이렇게 쓰세요**
 
-| API | 설명 |
+1. \`rangechange\` 이벤트로 보이는 기간(\`start\`~\`end\`)을 받으세요.
+2. 그 기간의 일정을 불러와 \`events\`로 넘기세요.
+3. 날짜를 누르면 \`dayselect\`, 일정을 누르면 \`eventselect\`가 옵니다.
+
+| 속성 | 설명 |
 | --- | --- |
-| \`view\` | \`month\`(기본, 6주 42칸) · \`week\`(7일, 일정 전부) |
-| \`value\` | 기준 날짜 \`YYYY-MM-DD\`. 이 날짜가 든 달·주를 보여 준다. 기본은 오늘 |
+| \`view\` | \`month\`(기본) · \`week\` |
+| \`value\` | 기준 날짜 \`YYYY-MM-DD\`. 기본은 오늘 |
 | \`first-day-of-week\` | 0(일, 기본)~6(토) |
-| \`max-events-per-day\` | 월 보기 칸마다 보일 일정 수(기본 3). 넘으면 "+N개 더" 버튼(누르면 \`dayselect\`) |
-| \`events\` | \`[{ id, title, start, end?, variant? }]\`. \`start\`·\`end\`는 \`YYYY-MM-DD\`(종일)나 \`YYYY-MM-DDTHH:mm\`. \`end\`까지 걸친 날마다 보인다. \`variant\`는 \`info\`·\`success\`·\`warning\`·\`error\` |
+| \`max-events-per-day\` | 월 보기 칸마다 보일 일정 수(기본 3) |
+| \`events\` | \`[{ id, title, start, end?, variant? }]\`. 날짜는 \`YYYY-MM-DD\`나 \`YYYY-MM-DDTHH:mm\` |
 
-| 이벤트 | \`event.detail\` | 언제 |
-| --- | --- | --- |
-| \`rangechange\` | \`{ view, start, end }\` | 처음 그릴 때와 보이는 범위(첫 칸~마지막 칸)가 바뀔 때 |
-| \`dayselect\` | \`{ date }\` | 날짜 칸 클릭, Enter·Space, "+N개 더" |
-| \`eventselect\` | \`{ id }\` | 일정 클릭(Enter·Space) |
-
-| 조작 | 동작 |
-| --- | --- |
-| ← → / ↑ ↓ | 하루 / 일주일 이동. 범위를 벗어나면 달·주가 바뀐다 |
-| Home / End | 그 주의 처음 / 끝 |
-| PageUp / PageDown | 이전 / 다음 달 (주 보기는 주) |
-| Enter · Space | 날짜 선택 |
-| Tab | 포커스가 있는 칸의 일정 버튼으로 간다 |
-
-- 형식이 틀린 일정(날짜 파싱 실패, \`end\`가 \`start\`보다 앞, \`id\`·\`title\` 없음)은 빼고 콘솔에 경고한다
-- 시간대 변환은 하지 않는다. 문자열을 로컬 날짜·시각 그대로 읽는다
-- 색만으로 뜻을 전하지 않도록 일정의 의미는 **제목에** 담는다
-
-맨 아래 **소스 코드**에서 실제 파일을 볼 수 있다.`
+- 일정의 뜻은 색이 아니라 제목에 담으세요.
+- 아래 예제의 **Show code**를 눌러 코드를 복사하세요.`
       }
     }
   }
