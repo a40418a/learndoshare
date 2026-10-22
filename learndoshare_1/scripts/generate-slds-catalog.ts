@@ -426,7 +426,7 @@ export function generateCatalog(o: { lbcDir: string; outStories: string }): { co
       `    docs: {`,
       `      description: {`,
       `        component: ${JSON.stringify(
-        `> **Salesforce 공식 예제** · \`${tagName}\`. 예제 아래 **Show code**를 눌러 코드를 복사하세요.\n\n속성은 공식 문서를 보세요: [${tagName}](https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/${tagName}.html)`
+        `> **Salesforce 공식 예제** · \`${tagName}\`. npm \`lightning-base-components\`에 들어 있는 예제를 그대로 렌더한다. Show code는 예제의 HTML 원본이다.\n\n공식 문서: [${tagName}](https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/${tagName}.html)`
       )}`,
       `      }`,
       `    }`,
