@@ -62,10 +62,19 @@ export default {
       description: {
         component: `${ORIGIN.milvus}
 
-비교용 예시입니다. 실제 화면에는 \`lightning-button\`을 쓰세요.
+**브랜드에 따라 자동 전환한다.** 화면 코드는 항상 \`<c-milvus-button>\` 하나만 쓴다.
 
-- 버튼 모서리·굵기·여백은 브랜드 명세에 적으면 \`lightning-button\`에 그대로 반영됩니다.
-- 툴바에서 브랜드를 바꿔 두 모양을 비교해 보세요.`
+| 브랜드 \`brands/<브랜드>/util.css\`에 | 그려지는 것 |
+| --- | --- |
+| \`--milvus-button-custom\`이 없음 | **SLDS 기본**: \`lightning-button\` 그대로 |
+| \`--milvus-button-custom: on\` | **밀버스 커스텀**: SLDS 버튼 블루프린트 + \`--milvus-button-radius\` · \`-font-weight\` · \`-padding-inline\` |
+
+- **언제 쓰나:** "모양을 바꾸려고 새 컴포넌트를 만드는 방식"의 비교 예시다(2026-10-09 결정). 버튼 반경·굵기·여백은 util.css의 hook(\`--slds-g-*\`, \`--slds-s-button-*\`)으로 바꾸고, 그러면 \`lightning-button\`과 이 컴포넌트가 함께 바뀐다. hook·브리지로 안 되는 모양은 밀버스 컴포넌트를 새로 만들지 않고 opt-in \`milvusOverride.css\`(마지막 수단, 공식 권고 밖)로 바꾼다
+- 기본 컴포넌트가 native shadow로 바뀌면 SLDS 전역 CSS(\`.slds-*\`) 안의 읽기 지점이 사라지고, 기본 컴포넌트의 native CSS가 직접 읽는 s 이름(예: \`--slds-s-button-font-weight\`)에만 닿는다(추정, 실측 필요. 설계 9.1)
+- 상단 툴바에서 브랜드를 바꿔 보면 된다. \`Milvus_DesignSystem\`은 SLDS 기본이고, \`Sample_Forest\`는 밀버스 커스텀(굵은 글씨)이다
+- \`--milvus-button-*\`를 정하지 않으면 SLDS 값으로 떨어진다. 그래서 커스텀 모드에서도 util.css의 버튼 컴포넌트 hook과 global hook(반경 등)을 따른다
+- 색은 두 모드 모두 org 브랜드 색(accent hook)을 따른다
+- 버튼을 직접 \`<button>\`이나 \`lightning-button\`으로 만들지 않는다. 브랜드가 바뀌어도 화면 코드를 고치지 않기 위해서다`
       }
     }
   }

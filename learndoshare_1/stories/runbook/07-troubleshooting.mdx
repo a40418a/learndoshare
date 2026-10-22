@@ -1,0 +1,70 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="런북/7. 문제 해결" />
+
+# 7. 문제 해결
+
+다른 노트북(Windows, pnpm 11)과 리허설에서 실제로 겪은 것이다. 먼저 `pnpm milvus --version`으로 버전을 확인한다. Windows 문제 대부분은 0.2.3에서 고쳤다.
+
+## 설치
+
+<table>
+  <thead>
+    <tr><th>증상</th><th>원인</th><th>해결</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>설치가 `404` · `401` · `403`</td><td>`NODE_AUTH_TOKEN`이 비었거나 만료, `read:packages` 권한 없음, 또는 레지스트리 줄이 없음</td><td>프로젝트 `.npmrc`의 레지스트리 줄과 `~/.npmrc`의 토큰 줄 확인. 환경 변수를 새로 넣었으면 터미널을 다시 연다([2. 준비](?path=/docs/런북-2-준비--docs))</td></tr>
+    <tr><td>`Ignored project-level auth setting … _authToken` 경고</td><td>pnpm 10.34.2·11.5.3부터 프로젝트 `.npmrc`의 `${…}` 토큰을 풀지 않는다</td><td>토큰 줄을 `~/.npmrc`로 옮긴다</td></tr>
+    <tr><td>새 버전이 있는데 이전 버전이 설치됨 (pnpm 11)</td><td>`minimumReleaseAge` 기본 1440분</td><td>`pnpm-workspace.yaml`에 `minimumReleaseAgeExclude: ['@a40418a/*']`</td></tr>
+    <tr><td>`ERR_PNPM_IGNORED_BUILDS: esbuild` (pnpm 11)</td><td>`strictDepBuilds` 기본 true</td><td>`pnpm-workspace.yaml`에 `allowBuilds: { esbuild: true }`</td></tr>
+    <tr><td>`duplicated mapping key` (pnpm 11)</td><td>pnpm이 만든 `allowBuilds` 자리 밑에 같은 키를 덧붙임</td><td>파일을 2장 4절 내용으로 덮어쓴다(`>`)</td></tr>
+    <tr><td>`Command "milvus" not found`</td><td>설치 전에 `pnpm milvus add …`처럼 milvus를 부름, 또는 다른 폴더</td><td>설치는 `pnpm add -D @a40418a/milvus-design-system`. 명령은 프로젝트 폴더에서</td></tr>
+  </tbody>
+</table>
+
+## CLI
+
+<table>
+  <thead>
+    <tr><th>증상</th><th>원인</th><th>해결</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>`init`: sf CLI를 찾지 못했습니다 (Windows)</td><td>Windows의 sf는 `sf.cmd`</td><td>0.2.1에서 고침. 패키지를 올린다</td></tr>
+    <tr><td>`storybook`: `EISDIR lstat 'C:'` (Windows)</td><td>Node가 `\\?\C:\…` 경로를 돌려줌</td><td>0.2.2에서 고침</td></tr>
+    <tr><td>`deploy`: 임시 폴더 `EPERM` (Windows)</td><td>작업 폴더로 잡힌 임시 폴더를 지우지 못함</td><td>0.2.3에서 고침</td></tr>
+    <tr><td>`init`·`deploy`가 org에서 멈춤</td><td>`sf`가 없거나 로그인 만료</td><td>`sf org login web --alias my-org`</td></tr>
+    <tr><td>`init`: 버전이 다르다, `update`를 쓰라</td><td>다른 버전으로 이미 `init`한 프로젝트</td><td>`init`을 다시 하지 않고 `pnpm milvus update`</td></tr>
+    <tr><td>`storybook`: 버전이 다릅니다</td><td>패키지만 올리고 `update`를 안 함</td><td>`pnpm milvus update`</td></tr>
+    <tr><td>`check`: 밀버스 관리 파일을 직접 고쳤습니다</td><td>관리 파일이 바뀜(sha256 차이)</td><td>`pnpm milvus update --force`로 되돌린다</td></tr>
+    <tr><td>`update`가 아무것도 안 바꾸고 멈춤</td><td>고친 관리 파일이 있음</td><td>고친 내용을 옮겨 둔 뒤 `pnpm milvus update --force`</td></tr>
+    <tr><td>Storybook 위에 빨간 오류 배너</td><td>BrandingSet이 없거나 `milvusBrand.css`가 규칙을 어김</td><td>`pnpm milvus check`의 안내대로 고친다</td></tr>
+    <tr><td>명세 페이지에서 저장이 꺼져 있음</td><td>GitHub Pages 같은 정적 빌드</td><td>`pnpm milvus storybook`(개발 서버)에서 연다. 안 되면 채팅에 직접 쓴다</td></tr>
+  </tbody>
+</table>
+
+## Claude Code
+
+<table>
+  <thead>
+    <tr><th>증상</th><th>원인</th><th>해결</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>권한 규칙·hook이 안 걸림(관리 파일을 고침, 토큰 명령을 실행하려 함, "브랜드 요청 반영해줘"를 모름)</td><td>다른 폴더로 연 세션이다. 프로젝트의 `CLAUDE.md`·`.claude/`를 읽지 않는다</td><td>프로젝트 폴더로 세션을 새로 열고 폴더 신뢰를 받아들인다</td></tr>
+    <tr><td>hook이 "고칠 것"을 돌려주며 막음</td><td>util.css 규칙(브랜드 색을 CSS에, 대비 4.5:1 미만 등) 위반</td><td>정상이다. Claude가 제안 값으로 고치게 둔다</td></tr>
+  </tbody>
+</table>
+
+## org 화면
+
+<table>
+  <thead>
+    <tr><th>증상</th><th>원인</th><th>해결</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>표준 화면에 브랜드가 안 보임(테마 색만 바뀜)</td><td>앱 유틸리티 바에 `milvusBrandLoader`가 없거나 "앱이 열릴 때 백그라운드로 로드"가 꺼짐</td><td>App Manager에서 앱마다 추가·체크([3장 7절](?path=/docs/런북-3-새-프로젝트에-적용--docs))</td></tr>
+    <tr><td>배포했는데 색이 그대로</td><td>브라우저가 이전 화면</td><td>새로고침한다</td></tr>
+    <tr><td>버튼 색이 입력한 브랜드 색과 다름</td><td>Salesforce가 접근성 색(50단계)을 칠한다</td><td>정상이다. 명세 페이지의 50단계 색을 본다</td></tr>
+    <tr><td>VF가 SLDS 1처럼 보임(버튼 반경 4px)</td><td>Visualforce Settings의 SLDS 2 설정이 꺼짐</td><td>Setup → User Interface → Visualforce Settings에서 켠다</td></tr>
+    <tr><td>VF에 브랜드가 안 걸림</td><td>페이지에 `<c:milvusHead/>`가 없거나 `slds-scope`가 없음</td><td>`<c:milvusHead/>`를 넣는다. `applyBodyTag`·`applyHtmlTag`를 `false`로 두었으면 `slds-scope`를 직접 넣는다</td></tr>
+  </tbody>
+</table>

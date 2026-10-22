@@ -306,7 +306,7 @@ async function measure(entry: Entry, area: HTMLElement, t: Tally, getCtx: (b: Do
       const [fb, fs] = [focusAndRead(base, i, targets), focusAndRead(sent, i, targets)];
       // 브라우저 창에 포커스가 없으면 이 스토리의 나머지 요소도 재지 못한다
       if (fb === "window" || fs === "window") {
-        t.errors.push([`${entry.title} / ${entry.name}`, "이 화면이 뒤에 있어 포커스 상태를 재지 못했습니다. 화면을 앞에 두고 다시 검사하세요"]);
+        t.errors.push([`${entry.title} / ${entry.name}`, "브라우저 창에 포커스가 없어 focus 상태를 재지 못했다. 이 화면을 앞에 두고 다시 돌린다"]);
         break;
       }
       if (fb === "element" || fs === "element") continue;
@@ -378,8 +378,12 @@ function renderResult(t: Tally, out: HTMLElement) {
     el(
       "section",
       { className: "sb-stack" },
-      el("h2", { className: "slds-text-heading_medium" }, "판정 (반영된 컴포넌트 수 / 해당 컴포넌트 수)"),
-      el("p", {}, "빨간 글자 칸에 브랜드가 닿지 않는 곳이 있습니다. 아래 '빈틈' 목록에서 위치를 확인하세요."),
+      el("h2", { className: "slds-text-heading_medium" }, "판정 (설계 9.6의 4: 반영된 컴포넌트 수 / 해당 컴포넌트 수)"),
+      el(
+        "p",
+        {},
+        "두 열 모두 이 동적 검사의 결과다(pnpm audit:brand의 결과가 아니다). '지금(고정은 예외)'은 hook이 닿고 빈틈이 없는 컴포넌트를 센다. 9.4 고정은 합의한 예외라 섞여 있어도 센다. '지금(정적 검사 셈법)'은 정적 검사처럼 가장 나쁜 상태를 따라 고정이 섞인 칸을 세지 않는다. 칸 글자는 '원본과 hook' 보기처럼 개수를 함께 보인다. 빈틈이 있는 칸은 빨간 글자다. native는 Storybook이 synthetic shadow로만 빌드해 잴 수 없다(설계 9.2: native 빌드는 발표 뒤).",
+      ),
       table(
         ["항목", "지금(고정은 예외)", "지금(정적 검사 셈법)", "native"],
         items.map((id) => {
@@ -387,7 +391,12 @@ function renderResult(t: Tally, out: HTMLElement) {
           return [label(id), `${s.reached} / ${s.total}`, `${s.strict} / ${s.total}`, "잴 수 없음"];
         }),
       ),
-      el("p", { className: "slds-text-color_weak" }, `재지 않은 항목: ${unmeasured.join(", ")}, hover·눌림. 브랜드 색과 같은 값 ${t.brand}곳은 판정하지 않았습니다.`),
+      el("p", {}, `이 검사로 재지 않은 항목: ${unmeasured.join(", ")}. hover·눌림은 재지 않는다(마우스를 올린 상태를 만들지 않는다).`),
+      el(
+        "p",
+        {},
+        `브랜드 색과 같아 판정하지 않은 값 ${t.brand}곳: 브랜드 색은 org 테마가 원본이라 util.css의 빈틈으로 세지 않는다. 흰색도 브랜드 흰 글자(on-accent)와 같아 함께 빠지므로, 하드코딩된 흰색은 이 검사의 빈틈에 나오지 않는다.`,
+      ),
     ),
     el(
       "section",
@@ -422,7 +431,7 @@ export function renderReflectCheck(): HTMLElement {
   if (root) return root;
   const start = el("button", { className: "slds-button slds-button_brand", type: "button" }, "반영 검사 시작");
   const progress = el("progress", { max: 1, value: 0 });
-  const status = el("p", { role: "status" }, "아직 검사하지 않았습니다");
+  const status = el("p", { role: "status" }, "아직 돌리지 않았다");
   const area = el("div", { className: "sb-row" });
   const out = el("div", { className: "sb-stack" });
 
@@ -453,7 +462,7 @@ export function renderReflectCheck(): HTMLElement {
       status.textContent = `끝: 스토리 ${entries.length}개 · 빈틈 ${t.gaps.size}곳 · 고정 ${t.fixed.size}곳 · 재지 못함 ${t.errors.length}`;
       renderResult(t, out);
     } catch (e) {
-      status.textContent = `검사를 끝내지 못했습니다: ${(e as Error).message}`;
+      status.textContent = `검사를 끝내지 못했다: ${(e as Error).message}`;
     } finally {
       start.disabled = false;
     }
@@ -466,7 +475,7 @@ export function renderReflectCheck(): HTMLElement {
     el(
       "p",
       {},
-      "브랜드가 모든 컴포넌트에 닿는지 확인합니다. [반영 검사 시작]을 누르고 끝날 때까지 이 화면을 앞에 두세요. 몇 분 걸립니다.",
+      "모든 컴포넌트 스토리를 기본 브랜드와 센티널 브랜드로 그려 요소마다 계산된 스타일을 비교한다. 센티널은 util.css에서 쓸 수 있는 모든 hook과 브리지 변수에 서로 다른 값을 넣은 브랜드다(설계 9.6의 2). 값이 바뀌면 반영, 그대로면 빈틈 후보다. 바뀐 값이 어느 hook의 센티널 값과 같은지로 명세 항목을 고른다. 컴포넌트(lightning-*, c-*) 안의 요소만 판정하고, 공식 예제의 틀(예제 배경, kbd 등)은 세지 않는다. 스토리마다 iframe 두 개를 열어 몇 분 걸린다.",
     ),
     el(
       "details",
