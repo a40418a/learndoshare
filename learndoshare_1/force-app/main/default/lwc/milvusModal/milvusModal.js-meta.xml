@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>67.0</apiVersion>
+    <isExposed>false</isExposed>
+    <masterLabel>Milvus Modal</masterLabel>
+    <description>LightningModal 안에 넣는 틀. 제목·내용(슬롯)·오른쪽 아래 버튼(비강조 → 강조)을 패턴 명세 순서로 그린다. 닫기는 LightningModal을 상속한 부모가 한다. 다른 LWC 안에서 쓰는 부품이라 앱 빌더에 노출하지 않는다</description>
+</LightningComponentBundle>
