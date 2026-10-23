@@ -33,6 +33,6 @@
   --slds-s-pill-color-background-hover: var(--slds-g-color-surface-container-2);
 
   /* 밀버스 변수와 자간 */
-  --milvus-button-font-weight: var(--slds-g-font-weight-7);
+  --milvus-caps-letter-spacing: 0.05rem;
   letter-spacing: -0.01em;
 }

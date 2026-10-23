@@ -68,7 +68,7 @@
 - **SLDS가 제공하는 것을 최대한 쓴다.** 버튼은 `lightning-button`을 그대로 쓴다. SLDS를 대체하는 자체 디자인 시스템을 만들지 않는다. **(확정)**
 - **브랜드 차이는 org 테마와 util.css에서만 흡수한다.** 브랜드마다 버튼 모양이나 타이포가 달라도 컴포넌트 코드는 바꾸지 않는다. 기본은 Salesforce 기본 모양에 브랜드 색·로고(`BrandingSet`)만 바꾼 것이다(기본 우선, 2026-10-09). 모양은 요청이 있을 때만 util.css(`:root` 블록 하나)의 styling hook과 **밀버스 변수(`--milvus-*`)**로 바꾼다. global hook 재정의는 공식 권고 밖임을 알고 택했다 ([2. 스타일 계층](#2-스타일-계층--root-style)). org에는 정적 리소스 + `loadStyle`로 싣는다(설계 5.5). **(확정)**
 - **표현 컴포넌트와 데이터 컴포넌트를 분리한다.** 표현 컴포넌트는 `@api`로 데이터를 받고 이벤트로 결과를 올린다. `@wire`, Apex, LDS는 컨테이너 컴포넌트만 쓴다. Storybook에서 org 없이 렌더되지 않으면 표현 컴포넌트가 아니다. **(확정)**
-- **파일럿은 토큰 레이어 + 컴포넌트 3개(`milvusBadge`, `milvusButton`, `milvusMultiSelect`)로 제한한다.** 검증 대상은 컴포넌트 개수가 아니라 구조다. **(확정)**
+- **파일럿은 토큰 레이어 + 컴포넌트 3개(`milvusBadge`, `milvusButton`, `milvusMultiSelect`)로 제한한다.** 검증 대상은 컴포넌트 개수가 아니라 구조다. **(확정)** (2026-10-23: 발표가 끝나 실제로 쓰일 것만 남긴다. 비교 예시였던 `milvusButton`은 지웠다. 설계 1장)
 
 ---
 
@@ -327,7 +327,7 @@ pnpm sync:theme
 | --- | --- | --- |
 | 1 | **색상/토큰 레이어** | L1~L3 계층, global hook + `var()` fallback 규칙 |
 | 2 | **의미색 뱃지** (`milvusBadge`) | `lightning-badge`에 없는 성공·경고·위험 변형. 의미색은 브랜드색과 별개 계층이다 |
-| 3 | **브랜드 버튼** (`milvusButton`) | Phase 3에서 구현. 여기서는 스토리 3종, 사용 기준 문서(언제 `lightning-button` 대신 쓰는가), Jest를 마무리한다 |
+| 3 | ~~**브랜드 버튼** (`milvusButton`)~~ **2026-10-23 삭제** | Phase 3에서 구현. 여기서는 스토리 3종, 사용 기준 문서(언제 `lightning-button` 대신 쓰는가), Jest를 마무리한다 |
 | 4 | **multi 검색** (`milvusMultiSelect`) | `lightning-combobox`는 다중 선택을 지원하지 않는다. 다중 선택 기본 컴포넌트는 `lightning-dual-listbox`와 `lightning-select`(`multiple`, 네이티브 목록 상자)뿐이고, 검색 가능한 다중 선택 콤보박스는 없다 **(컷 1순위)** |
 | 5 | **영역 알림** (`milvusNotification`, #40, 동결 이후 추가) | 공식 LWC에 없는 SLDS Scoped Notification 블루프린트. SLDS는 닫을 수 없는 것으로 정의하지만 밀버스가 닫기 버튼(`dismissible`, 취소할 수 있는 `close` 이벤트)을 더했다 |
 | 6 | **월·주 일정표** (`milvusCalendar`, #40, 동결 이후 추가) | 공식 LWC에는 날짜 선택(`lightning-input type="date"`)만 있고 일정표는 없다. 패키지의 `lightning/calendar`는 Date Picker 내부 부품(비공개)이다. 데이터는 부모가 `events`로 넘기고 `rangechange`로 범위를 받는다 |

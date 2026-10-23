@@ -153,17 +153,6 @@ const items: Omit<SpecItem, "nativeLoss">[] = [
     input: "none",
   },
   {
-    id: "milvus-component",
-    group: "기본",
-    label: "밀버스 컴포넌트",
-    description: "예: milvusButton 커스텀 모드",
-    examples: ["milvusButton은 커스텀 모드로"],
-    hooks: [],
-    bridgeVars: [],
-    limits: "모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다(설계 5.1)",
-    input: "none",
-  },
-  {
     id: "font",
     // 바꿀 수 없어 "표시만"이다(명세 페이지의 "바꿀 수 없는 것")
     group: "표시만",

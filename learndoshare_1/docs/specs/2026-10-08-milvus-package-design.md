@@ -78,6 +78,7 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 | 10/14 | **앱 빌더 노출은 로더 하나.** 밀버스 부품(`milvusBadge`, `milvusButton`, `milvusMultiSelect`)과 `milvusScript`는 `isExposed`를 `false`로 두어 앱 빌더에 노출하지 않는다. 노출하는 밀버스 LWC는 `milvusBrandLoader`(대상 `lightning__UtilityBar` 하나)뿐이다 | 사용자 지적. 10/14 리허설에서 부품이 앱 빌더 목록에 나왔다. 부품은 다른 LWC 안에서 쓰는 것이다 |
 | 10/20 | **UI 패턴 명세(최소: 모달, #57).** 고객 프로젝트 루트에 [소유] `milvus-patterns.md`를 놓는다. 패턴마다 규칙·이유·예시 코드·출처를 적고, 첫 패턴은 모달(`LightningModal` 상속, `lightning-modal-*`, footer 오른쪽 끝 정렬, 취소 → 주 동작, `size`, `close(result)`, `open()`)이다. `milvus-design.md` 5절이 Claude에게 LWC 화면을 만들기 전에 읽게 한다. 새 컴포넌트는 만들지 않는다 | 2026-10-20 사용자 요청. 씨팝코리아 프로젝트에서 같은 SLDS를 써도 모달마다 버튼 위치와 여는 방식이 달랐다. 근거는 LightningModal Component Reference와 SLDS 2 Modals 블루프린트(2026-10-20 확인)이고, 공식 근거가 없는 규칙(버튼 순서 등)은 "밀버스 규칙(팀 합의)"로 표시한다. 10/16 내용 동결 뒤의 변경이며 사용자 요청에 따른 예외다 |
 | 10/21 | **명세 파일을 루트에서 옮긴다(#63).** Claude 규칙은 `.claude/rules/milvus/design.md`([관리]), 팀 문서는 `docs/milvus/`(UI 패턴 `patterns/<패턴>.md`[소유], 브랜드 요청 `brand-request.md`)에 둔다. `init`은 `CLAUDE.md`에 줄을 덧붙이지 않는다. `milvus.config.json`은 루트에 둔다. `update`가 0.2.x 배치를 옮긴다(4.5). 0.3.0 | 2026-10-21 사용자 요청. 패턴 문서가 늘면 루트가 계속 늘어난다. Claude Code 공식 문서("How Claude remembers your project", 2026-10-21 확인): `.claude/rules/`의 `.md`는 하위 폴더까지 찾아 세션마다 로드되고, `paths` 머리말이 있으면 맞는 파일을 다룰 때만 로드된다. 패턴은 새 LWC를 처음 쓸 때도 읽혀야 해서 `paths` 규칙 대신 항상 로드되는 `design.md`가 패턴 폴더를 가리킨다. 사람이 고치는 문서는 숨김 폴더 대신 `docs/`에 둔다 |
+| 10/23 | **`milvusButton`을 지우고 `milvusModal`을 더한다.** `milvusButton`(블루프린트 버튼, `--milvus-button-*` 변수, 켜기 스위치 `--milvus-button-custom`)과 명세 항목 "밀버스 컴포넌트"를 지운다. 대신 `LightningModal` 안에 넣는 틀 `milvusModal`(제목 가운데, 버튼 오른쪽 아래 비강조 → 강조)을 더하고 패턴 명세 `modal.md`를 그 기준으로 고친다 | 발표가 끝나 실제로 쓰일 것만 남긴다(사용자 결정). `milvusButton`은 "모양만 바꾸려고 새로 만드는 방식"의 비교 예시였고 모양은 hook·브리지·override가 맡는다. 이미 설치한 프로젝트는 `update`가 config의 managed에서만 빼고 파일은 남긴다(삭제 규칙 없음) |
 
 ---
 
@@ -119,7 +120,7 @@ package.json                                       [소유] "storybook": "milvus
 .forceignore                                       [소유] **/__tests__/** 줄 추가 (없을 때만. 밀버스 LWC가 JS라 tsconfig 줄은 넣지 않는다, 10/9 D1)
 .npmrc                                             [소유] 레지스트리 줄이 없으면 추가 (0장 준비를 팀원과 공유. 토큰 줄은 넣지 않는다, #46)
 force-app/main/default/
-  lwc/milvusBadge/, milvusButton/, milvusMultiSelect/ …   [관리] 밀버스 컴포넌트 (.js)
+  lwc/milvusBadge/, milvusModal/, milvusMultiSelect/ …   [관리] 밀버스 컴포넌트 (.js)
   lwc/milvusScript/                                [관리] 공용 함수 (loadBrand 등)
   lwc/milvusBrandLoader/                           [관리] 앱 전체 브랜드 로더. 화면 없음, 유틸리티 바용 (10/9 D3)
   classes/utils/design/                            [관리] Apex (생기면)

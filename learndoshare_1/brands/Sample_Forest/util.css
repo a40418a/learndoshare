@@ -23,7 +23,4 @@
   /* 카드·컨테이너 (기본 1.25rem) → 덜 둥글게 */
   --slds-g-radius-border-4: 0.5rem;
 
-  /* 밀버스 컴포넌트 변수: 버튼만 굵은 글씨 (milvusButton이 lightning-button 대신 블루프린트로 그린다) */
-  --milvus-button-custom: on;
-  --milvus-button-font-weight: var(--slds-g-font-weight-7);
 }

@@ -114,7 +114,7 @@ test("--yes 없이 실행하면 계획만 출력하고 deploy start를 부르지
     assert.equal(r.result, 0, r.stderr);
     assert.match(r.stdout, /대상 org: dev/);
     assert.match(r.stdout, /Old_Theme → Acme/);
-    assert.match(r.stdout, /lwc\/milvusButton/);
+    assert.match(r.stdout, /lwc\/milvusCalendar/);
     assert.match(r.stdout, /pnpm milvus deploy --yes/);
     // fixture가 BRAND_COLOR를 바꿨으므로 check가 milvusVf.css를 다시 만들고 알린다
     assert.match(r.stdout, /지금 브랜드 색으로 다시 만든 파일: .*milvusVf\.css/);
@@ -198,7 +198,7 @@ test("1단계 실패 시 2단계를 부르지 않고 failures를 출력한다", 
       status: 1,
       result: {
         success: false,
-        details: { componentFailures: [{ componentType: "LightningComponentBundle", fullName: "milvusButton", problem: "Invalid reference c/milvusScript" }] },
+        details: { componentFailures: [{ componentType: "LightningComponentBundle", fullName: "milvusCalendar", problem: "Invalid reference c/milvusScript" }] },
       },
     };
     const sf = fakeSf({ active: "Old_Theme", deploy: { code: 1, stdout: JSON.stringify(failed), stderr: "" } });
@@ -206,7 +206,7 @@ test("1단계 실패 시 2단계를 부르지 않고 failures를 출력한다", 
     assert.equal(r.result, 1);
     assert.equal(sf.deploys().length, 1);
     assert.ok(!sf.deploys()[0].args.includes("--metadata-dir"));
-    assert.match(r.stderr, /LightningComponentBundle:milvusButton/);
+    assert.match(r.stderr, /LightningComponentBundle:milvusCalendar/);
     assert.match(r.stderr, /Invalid reference c\/milvusScript/);
     assert.match(r.stderr, /롤백/);
     assert.equal(existsSync(join(root, SETTINGS)), false);
@@ -215,7 +215,7 @@ test("1단계 실패 시 2단계를 부르지 않고 failures를 출력한다", 
     const single = { ...failed, result: { details: { componentFailures: failed.result.details.componentFailures[0] } } };
     const plan = await planDeploy({ root, config: config(root) }, fakeSf({ active: "Old_Theme" }));
     const e = await executeDeploy(plan, fakeSf({ deploy: { code: 1, stdout: JSON.stringify(single), stderr: "" } }));
-    assert.deepEqual(e, { code: 1, stage: "metadata", failures: [{ name: "LightningComponentBundle:milvusButton", problem: "Invalid reference c/milvusScript" }] });
+    assert.deepEqual(e, { code: 1, stage: "metadata", failures: [{ name: "LightningComponentBundle:milvusCalendar", problem: "Invalid reference c/milvusScript" }] });
 
     // 2단계가 실패하면 stage는 activate
     const a = await executeDeploy(plan, fakeSf({ activate: { code: 1, stdout: JSON.stringify({ status: 1, message: "활성화 실패(가짜)" }), stderr: "" } }));
@@ -258,7 +258,7 @@ test("sourceDirs에 milvusBridge·milvusOverride·milvusBrandLoader와 contentas
     assert.equal(plan.settingsDir, SETTINGS);
     for (const want of [
       `${FA}/lwc/milvusBrandLoader`,
-      `${FA}/lwc/milvusButton`,
+      `${FA}/lwc/milvusCalendar`,
       `${FA}/lwc/milvusScript`,
       `${FA}/classes/utils/design`,
       `${FA}/staticresources/milvusBrand.css`,

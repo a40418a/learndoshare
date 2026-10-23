@@ -40,7 +40,6 @@ import { Meta } from "@storybook/addon-docs/blocks";
   </thead>
   <tbody>
     <tr><td>`c-milvus-badge`</td><td>`lightning-badge`에 의미색(variant)이 없다</td><td>`label`, `variant`(default·inverse·lightest·success·warning·error·info), `icon-name`, `icon-position`</td><td>없음</td></tr>
-    <tr><td>`c-milvus-button`</td><td>비교 예시. 평소엔 `lightning-button` 그대로 그린다. util.css에 `--milvus-button-custom: on`이 있을 때만 블루프린트 버튼</td><td>`label`, `variant`, `icon-name`, `icon-position`, `disabled`, `type`, `title`</td><td>`click`</td></tr>
     <tr><td>`c-milvus-multi-select`</td><td>검색해서 여러 개 고르기</td><td>`label`, `options`(`[{ label, value }]`), `value`(value 배열), `placeholder`, `required`, `disabled`</td><td>`change` → `detail.value`</td></tr>
     <tr><td>`c-milvus-notification`</td><td>SLDS Scoped Notification(화면 안 알림)에 공식 LWC가 없다. 닫기는 밀버스 확장</td><td>`variant`(info·success·warning·error), `message`, `dismissible`, 기본 slot</td><td>`close`(취소 가능)</td></tr>
     <tr><td>`c-milvus-modal`</td><td>모달마다 제목·버튼 자리가 달라지지 않게 하는 틀. `LightningModal`을 상속한 프로젝트 모달 안에 두고 기본 slot만 채운다. 닫기는 부모가 `this.close(result)`로 한다</td><td>`label`(제목, 가운데), `primary-label`(강조), `secondary-label`(비강조), `primary-variant`(brand·destructive), `primary-disabled`, `busy`, 기본 slot</td><td>`primary`, `secondary`</td></tr>

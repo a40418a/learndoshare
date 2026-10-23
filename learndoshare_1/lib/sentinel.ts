@@ -35,11 +35,6 @@ export type SentinelPlan = { decls: SentinelDecl[]; missing: Missing[] };
 // 그 밖의 규칙(light-dark, 포커스 색, 단위 등)은 값의 문제라 이 파일의 값이 틀린 것이다. 그때는 빼지 않고 missing에 적는다
 const NAME_RULES = new Set(["c-hook", "brand-color", "font-family", "unknown-name", "unread", "color-g", "milvus-var"]);
 
-// 값이 하나뿐인 켜기 스위치. 켜면 milvusButton이 다른 마크업(블루프린트 버튼)을 그려 기본 브랜드와 요소를 맞춰 비교할 수 없다
-const SWITCHES: Record<string, string> = {
-  "--milvus-button-custom": "켜기 스위치(on)라 값이 하나뿐이다. 켜면 milvusButton이 다른 마크업을 그려 기본 브랜드와 요소를 맞춰 비교할 수 없다",
-};
-
 // 색 s hook은 값이 중립 g hook 하나여야 한다(설계 5.2). 그래서 그 g hook과 값이 같다. 배경막만 native용 g와 한 쌍이다
 const BACKDROP_S = "--slds-s-backdrop-color-background";
 const BACKDROP_G = "--slds-g-color-neutral-10-opacity-50";
@@ -189,10 +184,6 @@ export function sentinelPlan(ctx: RuleContext, items: SpecItem[]): SentinelPlan 
     if (nameRule) {
       // 허용되지 않은 이름. 명세 항목에 있는 이름만 알린다(색인의 나머지는 브랜드 색 등 원래 금지된 이름이다)
       if (fromItems.has(name)) missing.push({ name, reason: probe[1] });
-      continue;
-    }
-    if (SWITCHES[name]) {
-      missing.push({ name, reason: SWITCHES[name] });
       continue;
     }
     const kind = kindOf(name);

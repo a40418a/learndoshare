@@ -5,7 +5,6 @@ export { createElement } from "lwc";
 
 // 밀버스 추가. Salesforce 기본 컴포넌트는 공식 예제 카탈로그(catalog.js)에서 렌더한다
 export { default as MilvusBadge } from "c/milvusBadge";
-export { default as MilvusButton } from "c/milvusButton";
 export { default as MilvusMultiSelect } from "c/milvusMultiSelect";
 export { default as MilvusNotification } from "c/milvusNotification";
 export { default as MilvusCalendar } from "c/milvusCalendar";
