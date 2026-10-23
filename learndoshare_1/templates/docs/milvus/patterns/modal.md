@@ -12,17 +12,19 @@
 ### 규칙
 
 1. 모달은 `lightning/modal`의 `LightningModal`을 상속한 컴포넌트로 만든다. `slds-modal` 마크업을 직접 쓰지 않는다
-2. 템플릿은 `lightning-modal-header`(제목은 `label`) → `lightning-modal-body` → `lightning-modal-footer` 순서로 둔다. 버튼은 footer에 둔다
-3. footer 버튼은 SLDS 기본대로 오른쪽 끝에 붙인다. 정렬을 CSS로 바꾸지 않는다. 여러 단계로 넘어가는 모달만 버튼을 `<div class="slds-modal__footer_directional">`로 감싸 첫 버튼(이전)을 왼쪽에 둔다
-4. 버튼 순서는 "취소(`neutral`) → 주 동작(`brand`)"이고, `brand` 버튼은 맨 오른쪽 하나만 둔다. 두 번째 버튼부터 `slds-m-left_x-small`로 띄운다 — **밀버스 규칙(팀 합의)**. 순서는 공식 예시를 따랐지만 규칙으로 정한 공식 문서는 없다
-5. 삭제처럼 되돌릴 수 없는 동작은 `variant="destructive"` 버튼에 무엇이 사라지는지 적은 확인 문구를 함께 둔다. 모달 없이 확인만 받으면 `lightning/confirm`(`LightningConfirm.open`)을 쓴다 — 확인 문구는 **밀버스 규칙(팀 합의)**
-6. 크기는 `size`의 `small`·`medium`(기본)·`large`·`full` 중에서 고른다. 너비를 CSS로 정하지 않는다
-7. 닫을 때는 `this.close(result)`로 결과를 돌려준다. X·Esc로 닫으면 결과는 `undefined`다. 저장 중에만 잠깐 `disableClose = true`로 두고, 그동안 닫는 버튼도 비활성화한다
-8. 열 때는 `MyModal.open({ size, label, description, … })`를 쓰고 promise 결과를 받는다. 헤더가 없는 모달은 `open()`에 `label`을 꼭 준다
+2. 템플릿에는 `c-milvus-modal` 하나를 두고 **그 안(기본 슬롯)만 채운다.** `c-milvus-modal`이 `lightning-modal-header`(제목) → `lightning-modal-body`(슬롯) → `lightning-modal-footer`(버튼) 순서로 그린다 — **밀버스 규칙(팀 합의)**
+3. 제목은 `label`로 준다. SLDS 기본대로 헤더 가운데에 놓이고 모달의 접근성 이름이 된다. 정렬을 CSS로 바꾸지 않는다
+4. 버튼은 `primary-label`(강조, `brand`)과 `secondary-label`(비강조, `neutral`)로 준다. SLDS 기본대로 오른쪽 아래에 "비강조 → 강조" 순서로 붙고, 강조 버튼은 맨 오른쪽 하나다. 버튼 하나면 그 라벨만 준다 — 순서는 **밀버스 규칙(팀 합의)**. 공식 예시를 따랐지만 규칙으로 정한 공식 문서는 없다
+5. 삭제처럼 되돌릴 수 없는 동작은 `primary-variant="destructive"`로 두고, 본문에 무엇이 사라지는지 적은 확인 문구를 둔다. 모달 없이 확인만 받으면 `lightning/confirm`(`LightningConfirm.open`)을 쓴다 — 확인 문구는 **밀버스 규칙(팀 합의)**
+6. 크기는 `open()`의 `size`에서 `small`·`medium`(기본)·`large`·`full` 중에서 고른다. 너비를 CSS로 정하지 않는다
+7. 닫기는 부모(LightningModal)가 한다. `c-milvus-modal`의 `primary`·`secondary` 이벤트를 받아 `this.close(result)`로 결과를 돌려준다. X·Esc로 닫으면 결과는 `undefined`다. 저장 중에는 `busy`(두 버튼 비활성)와 `this.disableClose = true`(X·Esc 막기)를 함께 켠다
+8. 열 때는 `MyModal.open({ size, description, … })`를 쓰고 promise 결과를 받는다
+9. 여러 단계로 넘어가는 모달(이전 버튼을 왼쪽에 두는 경우)은 `c-milvus-modal`이 맡지 않는다. 이때만 helper 세 개를 직접 쓰고 버튼을 `<div class="slds-modal__footer_directional">`로 감싼다
 
 ### 이유
 
 - `LightningModal`은 SLDS 모달 블루프린트를 구현하고, org 테마에 따라 SLDS 1·2 모양을 고른다. 포커스 이동, Esc 닫기, 접근성 라벨도 맡는다. 직접 쓴 `slds-modal` 마크업은 이것을 모두 다시 만들어야 한다
+- 틀을 `c-milvus-modal` 하나로 모으면 제목·버튼 자리를 모달마다 다시 짜지 않는다. 개발자는 내용만 만든다. helper는 bubbles·composed 이벤트로 가장 가까운 모달에 등록하므로 한 단계 안쪽에 있어도 동작한다(Storybook 확인. org 화면 확인은 **미확인**)
 - SLDS 2 CSS의 `.slds-modal__footer`는 `text-align: end`이고, 블루프린트 구성도 오른쪽 버튼 두 개("Right button 2", "Right button 1")다. 모든 모달이 같은 자리에 버튼을 두면 사용자가 찾지 않는다
 - 모달을 닫으면 인스턴스가 사라진다. 입력 값은 `close(result)`로 넘기지 않으면 잃는다
 
@@ -35,12 +37,17 @@ import LightningModal from "lightning/modal";
 
 export default class AccountEditModal extends LightningModal {
   @api recordName;
+  busy = false;
 
   handleCancel() {
     this.close();
   }
 
-  handleSave() {
+  async handleSave() {
+    this.busy = true;
+    this.disableClose = true;
+    // ... 저장
+    this.disableClose = false;
     this.close({ saved: true });
   }
 }
@@ -49,12 +56,17 @@ export default class AccountEditModal extends LightningModal {
 ```html
 <!-- c/accountEditModal.html -->
 <template>
-  <lightning-modal-header label="거래처 수정"></lightning-modal-header>
-  <lightning-modal-body>{recordName}</lightning-modal-body>
-  <lightning-modal-footer>
-    <lightning-button variant="neutral" label="취소" onclick={handleCancel}></lightning-button>
-    <lightning-button class="slds-m-left_x-small" variant="brand" label="저장" onclick={handleSave}></lightning-button>
-  </lightning-modal-footer>
+  <c-milvus-modal
+    label="거래처 수정"
+    primary-label="저장"
+    secondary-label="취소"
+    busy={busy}
+    onprimary={handleSave}
+    onsecondary={handleCancel}
+  >
+    <!-- 여기만 채운다 -->
+    <lightning-input label="거래처 이름" value={recordName}></lightning-input>
+  </c-milvus-modal>
 </template>
 ```
 
@@ -78,6 +90,8 @@ const ok = await LightningConfirm.open({ label: "거래처 삭제", message: "�
 ```
 
 ### 출처 (2026-10-20 확인)
+
+- 밀버스 Storybook: "컴포넌트 / 밀버스 추가 / Modal" — `c-milvus-modal`의 속성·이벤트와 실제 소스
 
 - Lightning Component Reference: [Modal (`lightning/modal`)](https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-modal) — 상속, helper 순서, `label`·`size`·`description`·`disableClose`, `open()`·`close(result)`, directional
 - Lightning Component Reference: [Modal Footer](https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-modal-footer) — 취소(`neutral`)·저장(`brand`) 예시와 `slds-m-left_x-small`

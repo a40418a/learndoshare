@@ -100,7 +100,6 @@ function currentFor(sectionId: string): string | undefined {
 function valueEntries(item: SpecItem): [string, string][] {
   const entries: [string, string][] = [...item.hooks, ...item.bridgeVars].map((n) => [n, valueOf(n)]);
   if (item.id === "letter-spacing") entries.unshift(["letter-spacing(:root)", getComputedStyle(document.documentElement).letterSpacing]);
-  if (item.id === "milvus-component") entries.push(["--milvus-button-custom", raw("--milvus-button-custom") || "정하지 않음(lightning-button 그대로)"]);
   if (item.id === "font") entries.push(["font-family", getComputedStyle(document.body).fontFamily]);
   return entries;
 }

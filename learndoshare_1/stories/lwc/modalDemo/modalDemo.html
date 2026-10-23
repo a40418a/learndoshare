@@ -1,0 +1,18 @@
+<template>
+  <c-milvus-modal
+    label={label}
+    primary-label={primaryLabel}
+    secondary-label={secondaryLabel}
+    primary-variant={primaryVariant}
+    primary-disabled={primaryDisabled}
+    busy={busy}
+    onprimary={handlePrimary}
+    onsecondary={handleSecondary}
+  >
+    <p lwc:if={message}>{message}</p>
+    <template lwc:else>
+      <lightning-input label="거래처 이름" value={name} onchange={handleNameChange} required></lightning-input>
+      <lightning-textarea class="slds-m-top_small" label="메모"></lightning-textarea>
+    </template>
+  </c-milvus-modal>
+</template>

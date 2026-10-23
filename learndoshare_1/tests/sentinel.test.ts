@@ -60,18 +60,15 @@ test("센티널 값은 모두 서로 다르다", () => {
   assert.ok(values.length > 250, String(values.length));
   assert.deepEqual(values.filter((v, i) => values.indexOf(v) !== i), []);
   // 예시 값(설계 9.6의 2): 반경 7·9·11px…, 시간 0.777s 계열
-  assert.equal(decls.get("--slds-g-radius-border-1"), "9px");
+  assert.equal(decls.get("--slds-g-radius-border-1"), "7px");
   assert.equal(decls.get("--milvus-motion-duration-fast"), "0.777s");
 });
 
 
 test("센티널을 넣지 못한 hook은 목록으로 나온다", () => {
-  // 센티널 없음은 정확히 이 7개다. 이름으로 종류를 못 정하는 hook이 늘면 여기서 드러난다
-  assert.deepEqual(plan.missing.map((m) => m.name).sort(), ["--milvus-button-custom", ...COLOR_S_WHITELIST].sort());
+  // 센티널 없음은 정확히 색 s hook 6개다. 이름으로 종류를 못 정하는 hook이 늘면 여기서 드러난다
+  assert.deepEqual(plan.missing.map((m) => m.name).sort(), [...COLOR_S_WHITELIST].sort());
   const missing = new Map(plan.missing.map((m) => [m.name, m.reason]));
-  // 켜기 스위치는 넣지 않는다
-  assert.match(missing.get("--milvus-button-custom")!, /스위치/);
-  assert.ok(!plan.decls.some((d) => d.name === "--milvus-button-custom"));
   // 색 s hook은 규칙상 중립 g hook 하나를 참조해 그 hook과 값이 같다. 넣되 "센티널 없음"으로 알린다
   for (const name of COLOR_S_WHITELIST) assert.match(missing.get(name)!, /값이 같다/, name);
   // 이름에 color가 없는 색 hook도 색으로 넣는다

@@ -13,7 +13,7 @@ import { buildMilvusVfCss } from "../lib/vf.ts";
 const pkgRoot = fileURLToPath(new URL("..", import.meta.url));
 const FA = "force-app/main/default";
 const RES = `${FA}/staticresources`;
-const BUTTON = `${FA}/lwc/milvusButton/milvusButton.js`;
+const CALENDAR = `${FA}/lwc/milvusCalendar/milvusCalendar.js`;
 const BADGE = `${FA}/lwc/milvusBadge/milvusBadge.js`;
 const SETTINGS = ".claude/settings.json";
 const DESIGN = ".claude/rules/milvus/design.md";
@@ -87,29 +87,29 @@ async function update(root: string, pkg: string, argv: string[] = []) {
 test("로컬 수정이 있으면 어떤 파일도 바뀌지 않고 1", async () => {
   await withProject(async (root, pkg) => {
     // 새 버전: 관리 파일 두 개와 settings 틀이 바뀌었다
-    appendFileSync(join(pkg, BUTTON), "// 새 버전\n");
+    appendFileSync(join(pkg, CALENDAR), "// 새 버전\n");
     appendFileSync(join(pkg, tpl(`${RES}/milvusBridge.css`)), "/* 새 버전 */\n");
     const settings = JSON.parse(read(pkg, tpl("claude/settings.json")));
     settings.permissions.deny.push("Bash(새 규칙)");
     write(pkg, tpl("claude/settings.json"), JSON.stringify(settings));
     // 로컬: 관리 파일 하나를 고치고, 다른 하나는 지웠다. 지운 파일은 지킬 수정이 없어 충돌이 아니다
-    appendFileSync(join(root, BUTTON), "// 로컬 수정\n");
+    appendFileSync(join(root, CALENDAR), "// 로컬 수정\n");
     rmSync(join(root, BADGE));
 
     const config = readConfig(root)!;
     const plan = planUpdate({ root, pkgRoot: pkg, config });
-    assert.deepEqual(plan.conflicts.map((c) => c.path), [BUTTON]);
+    assert.deepEqual(plan.conflicts.map((c) => c.path), [CALENDAR]);
     assert.match(plan.conflicts[0].diff, /로컬: \/\/ 로컬 수정/);
     assert.ok(plan.replace.includes(BADGE) && plan.replace.includes(`${RES}/milvusBridge.css`), plan.replace.join(", "));
 
     const before = snapshot(root);
     const r = await update(root, pkg);
     assert.equal(r.result, 1, r.stdout);
-    assert.ok(r.stderr.includes(BUTTON) && r.stderr.includes("--force"), r.stderr);
+    assert.ok(r.stderr.includes(CALENDAR) && r.stderr.includes("--force"), r.stderr);
     assert.deepEqual(snapshot(root), before);
 
     // 충돌이 없어도 기존 settings.json이 깨졌으면 어떤 파일도 쓰기 전에 멈춘다
-    write(root, BUTTON, read(pkgRoot, BUTTON));
+    write(root, CALENDAR, read(pkgRoot, CALENDAR));
     write(root, SETTINGS, "{ 깨진 JSON");
     const broken = snapshot(root);
     const b = await update(root, pkg);
@@ -135,15 +135,15 @@ test("새 버전이 더한 관리 파일 경로에 사용자 파일이 있으면
 test("쓰는 도중 실패하면 1과 다시 실행 안내, config는 그대로이고 다시 실행하면 마친다", { skip: process.getuid?.() === 0 && "root는 파일 쓰기 권한을 무시한다" }, async () => {
   await withProject(async (root, pkg) => {
     appendFileSync(join(pkg, BADGE), "// 새 버전\n");
-    appendFileSync(join(pkg, BUTTON), "// 새 버전\n");
+    appendFileSync(join(pkg, CALENDAR), "// 새 버전\n");
     const config = read(root, "milvus.config.json");
-    // 관리 파일은 milvusBadge → milvusButton 순서로 쓴다. 뒤의 것을 읽기 전용으로 두어 앞의 것만 바뀐 상태를 만든다
-    chmodSync(join(root, BUTTON), 0o444);
+    // 관리 파일은 milvusBadge → milvusCalendar 순서로 쓴다. 뒤의 것을 읽기 전용으로 두어 앞의 것만 바뀐 상태를 만든다
+    chmodSync(join(root, CALENDAR), 0o444);
     let r;
     try {
       r = await update(root, pkg);
     } finally {
-      chmodSync(join(root, BUTTON), 0o644);
+      chmodSync(join(root, CALENDAR), 0o644);
     }
     assert.equal(r.result, 1, r.stdout);
     assert.match(r.stderr, /일부 파일이 이미 바뀌었습니다.*pnpm milvus update를 다시 실행하면/);
@@ -153,24 +153,24 @@ test("쓰는 도중 실패하면 1과 다시 실행 안내, config는 그대로�
 
     const again = await update(root, pkg);
     assert.equal(again.result, 0, again.stderr);
-    assert.equal(read(root, BUTTON), read(pkg, BUTTON));
+    assert.equal(read(root, CALENDAR), read(pkg, CALENDAR));
     assert.equal(readConfig(root)!.version, NEW);
   });
 });
 
 test("--force면 덮어쓰고 sha256 갱신", async () => {
   await withProject(async (root, pkg) => {
-    appendFileSync(join(pkg, BUTTON), "// 새 버전\n");
-    appendFileSync(join(root, BUTTON), "// 로컬 수정\n");
+    appendFileSync(join(pkg, CALENDAR), "// 새 버전\n");
+    appendFileSync(join(root, CALENDAR), "// 로컬 수정\n");
     rmSync(join(root, BADGE));
 
     const r = await update(root, pkg, ["--force"]);
     assert.equal(r.result, 0, r.stderr);
-    assert.equal(read(root, BUTTON), read(pkg, BUTTON));
+    assert.equal(read(root, CALENDAR), read(pkg, CALENDAR));
     assert.equal(read(root, BADGE), read(pkg, BADGE));
     const config = readConfig(root)!;
     assert.equal(config.version, NEW);
-    assert.equal(config.managed[BUTTON], sha256(read(pkg, BUTTON)));
+    assert.equal(config.managed[CALENDAR], sha256(read(pkg, CALENDAR)));
     // 기록한 sha256이 모두 지금 파일과 같다(check의 관리 파일 검사가 통과한다)
     for (const [file, hash] of Object.entries(config.managed)) assert.equal(sha256(readFileSync(join(root, file))), hash, file);
   });

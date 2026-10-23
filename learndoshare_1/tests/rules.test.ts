@@ -17,7 +17,7 @@ const index = hooksIndexFromSource(root);
 const ctx: RuleContext = {
   readSHooks: new Set(index.readSHooks),
   readGHooks: new Set(index.readGHooks),
-  milvusVars: new Set(["--milvus-button-font-weight"]),
+  milvusVars: new Set(["--milvus-caps-letter-spacing"]),
 };
 const check = (css: string) => checkUtilCss(css, "util.css", ctx);
 const rulesOf = (body: string) => check(`:root {\n${body}\n}`).map((i) => i.rule);
@@ -195,8 +195,8 @@ test("letter-spacing은 허용, color 같은 다른 일반 속성은 거부", ()
 });
 
 test("--milvus-*는 milvusVars에 있을 때만 허용", () => {
-  assert.deepEqual(rulesOf("--milvus-button-font-weight: 700;"), []);
-  assert.deepEqual(rulesOf("--milvus-button-font-wieght: 700;"), ["milvus-var"]);
+  assert.deepEqual(rulesOf("--milvus-caps-letter-spacing: 700;"), []);
+  assert.deepEqual(rulesOf("--milvus-caps-letter-spacng: 700;"), ["milvus-var"]);
 });
 
 test("2026-10-14 브리지에서 뺀 변수는 milvus-var 메시지에 그 이유를 붙인다(개체 아이콘 변수 포함, 오타는 붙이지 않는다)", () => {
@@ -206,7 +206,7 @@ test("2026-10-14 브리지에서 뺀 변수는 milvus-var 메시지에 그 이�
     assert.match(m, /^milvus-var /, name);
     assert.ok(m.includes("2026-10-14 브리지에서 뺐다(Salesforce 고정, 설계 5.6)"), m);
   }
-  assert.doesNotMatch(messages("--milvus-button-font-wieght: 700;")[0], /2026-10-14/);
+  assert.doesNotMatch(messages("--milvus-caps-letter-spacng: 700;")[0], /2026-10-14/);
 });
 
 test("움직임 시간 변수는 단위가 있어야 한다(단위 없는 0은 브리지의 max()를 무효로 만든다, 설계 5.6)", () => {

@@ -5,10 +5,12 @@ export { createElement } from "lwc";
 
 // 밀버스 추가. Salesforce 기본 컴포넌트는 공식 예제 카탈로그(catalog.js)에서 렌더한다
 export { default as MilvusBadge } from "c/milvusBadge";
-export { default as MilvusButton } from "c/milvusButton";
 export { default as MilvusMultiSelect } from "c/milvusMultiSelect";
 export { default as MilvusNotification } from "c/milvusNotification";
 export { default as MilvusCalendar } from "c/milvusCalendar";
+export { default as MilvusModal } from "c/milvusModal";
 export { default as MilvusBrandLoader } from "c/milvusBrandLoader";
 // 스토리 전용 예시 컴포넌트(슬롯에 내용을 넣는 쪽). 패키지 stories 폴더에 함께 들어간다
 export { default as NotificationSlotDemo } from "./lwc/notificationSlotDemo/notificationSlotDemo.js";
+// 스토리 전용 예시 모달(LightningModal 상속 + c-milvus-modal)
+export { default as ModalDemo } from "./lwc/modalDemo/modalDemo.js";

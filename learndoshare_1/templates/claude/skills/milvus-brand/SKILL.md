@@ -87,7 +87,6 @@ node --input-type=module -e 'import { SPEC_ITEMS } from "@a40418a/milvus-design-
 | 글자 (`typography`) | `--slds-g-font-scale-neg-2`~`--slds-g-font-scale-7`(기본 `--slds-g-font-scale-base`), `--slds-s-container-heading-font-weight`, `--slds-s-pageheader-title-font-weight`, `--slds-s-label-font-weight` | 글꼴은 바꾸지 않는다. 라디오·체크박스·토글 라벨 굵기는 Salesforce 고정 |
 | 피드백 색 (`feedback`) | 4장 표 | |
 | 컴포넌트별 조정 (`component`) | `--slds-s-button-radius-border`, `--slds-s-input-radius-border`, `--slds-s-container-radius-border`, `--slds-s-button-shadow`, `--slds-s-input-shadow`, `--slds-s-container-shadow`, 모달 너비 브리지 `--milvus-modal-width-base`·`--milvus-modal-width-small`·`--milvus-modal-width-medium`·`--milvus-modal-width-large`·`--milvus-modal-width-full`, `--milvus-modal-min-width` | 카드 그림자는 native `lightning-card`에 닿지 않는다. 모달 너비는 아래 |
-| 밀버스 컴포넌트 (`milvus-component`) | 그 컴포넌트가 읽는 `--milvus-*` | 새로 만들지 않는다 |
 | 글꼴 (`font`) | 없음 | 바꾸지 않는다. 요청이 오면 시스템 글꼴 고정이라고 답한다 |
 | 디자인 명세 (`overall`) | 붙여 넣은 표·토큰 JSON·URL·자연어를 7장대로 읽어 이 표의 항목들로 나눠 각 항목 행에 반영한다 | 표에는 나눈 결과를 항목별로 적는다. 옛 절 제목 `전체 스타일`도 이 항목이다 |
 | 바탕·면 색 (`surface`) | `--slds-g-color-surface-1`~`-3`(`--slds-g-color-surface-2`가 앱 바탕), `--slds-g-color-surface-container-1`~`-3`, native용 `--slds-g-color-neutral-base-100`·`-95`·`-90` | `--slds-g-color-neutral-base-100`은 색 위 흰 글자로도 쓰여 흰색 가까이에서만 바꾼다 |

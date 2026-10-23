@@ -1,0 +1,23 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <slot></slot>
+  </lightning-modal-body>
+  <lightning-modal-footer lwc:if={hasFooter}>
+    <lightning-button
+      lwc:if={secondaryLabel}
+      variant="neutral"
+      label={secondaryLabel}
+      disabled={busy}
+      onclick={handleSecondary}
+    ></lightning-button>
+    <lightning-button
+      lwc:if={primaryLabel}
+      class={primaryClass}
+      variant={primaryButtonVariant}
+      label={primaryLabel}
+      disabled={primaryButtonDisabled}
+      onclick={handlePrimary}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>
