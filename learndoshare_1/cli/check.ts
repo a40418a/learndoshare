@@ -1,15 +1,16 @@
 // milvus check (설계 4.3, 10장)
 // - --style: hook이 milvusBrand.css·milvusOverride.css·brandingSets/를 고칠 때마다 실행한다. util.css 규칙·대비(5.2, 5.3),
-//   milvusOverride.css(5.1), config 브랜드 BrandingSet의 BRAND_COLOR 형식만 보고, hook 이름은 설치된 패키지의 dist/hooks-index.json에서
-//   읽는다(lib/hooks-index.ts). 실패하면 2(Claude Code가 stderr를 Claude에게 보여 준다)
+//   milvusOverride.css(5.1), config 브랜드 BrandingSet의 BRAND_COLOR 형식, 프로젝트 LWC의 모달 규칙(lib/modal-rules.ts)만 보고,
+//   hook 이름은 설치된 패키지의 dist/hooks-index.json에서 읽는다(lib/hooks-index.ts). 실패하면 2(Claude Code가 stderr를 Claude에게 보여 준다)
 // - 전체: deploy와 CI가 실행한다. --style 항목 + 밀버스 관리 파일 sha256(milvus.config.json). 실패하면 1.
 //   밀버스 LWC는 JS라 타입 검사는 하지 않는다(10/9 D1). config.vf면 milvusVf.css도 지금 BRAND_COLOR 팔레트로 다시 만든다(설계 3장 [생성])
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
 import { readBranding } from "../lib/branding.ts";
 import { loadRuleContext } from "../lib/hooks-index.ts";
 import { sha256 } from "../lib/managed.ts";
+import { checkModalComponent } from "../lib/modal-rules.ts";
 import { checkOverrideCss, checkUtilCss, type Issue } from "../lib/rules.ts";
 import { buildMilvusVfCss } from "../lib/vf.ts";
 import { findProject, packageInfo, readConfig } from "./context.ts";
@@ -19,6 +20,7 @@ const BRAND_CSS = `${RES}/milvusBrand.css`;
 const OVERRIDE_CSS = `${RES}/milvusOverride.css`;
 const VF_CSS = `${RES}/milvusVf.css`;
 const BRANDING_SETS = "force-app/main/default/brandingSets";
+const LWC = "force-app/main/default/lwc";
 const USAGE = "사용법: pnpm milvus check [--style]";
 
 const lines = (issues: Issue[]) => issues.map((i) => `  ${i.file}  ${i.message}${i.fix ? ` → 고칠 값: ${i.fix}` : ""}\n`).join("");
@@ -63,6 +65,22 @@ function brandingIssues(root: string): Issue[] {
   }
 }
 
+// 프로젝트 LWC 폴더마다 바로 아래 .js·.html만 모달 규칙으로 본다(__tests__는 보지 않는다).
+// 밀버스 관리 컴포넌트(milvus*)는 건너뛴다. c-milvus-modal 자신이 lightning-modal-*를 쓴다
+function modalIssues(root: string): Issue[] {
+  const lwc = join(root, LWC);
+  if (!existsSync(lwc)) return [];
+  return readdirSync(lwc, { withFileTypes: true })
+    .filter((d) => d.isDirectory() && !d.name.startsWith("milvus"))
+    .flatMap((d) => {
+      const dir = `${LWC}/${d.name}`;
+      const files = readdirSync(join(root, dir), { withFileTypes: true })
+        .filter((f) => f.isFile() && /\.(js|html)$/.test(f.name))
+        .map((f) => ({ path: `${dir}/${f.name}`, text: readFileSync(join(root, dir, f.name), "utf8") }));
+      return checkModalComponent(dir, files);
+    });
+}
+
 // config.vf면 milvusVf.css를 BrandingSet의 지금 BRAND_COLOR 팔레트로 다시 쓰고, 내용이 바뀌었을 때만 경로를 돌려준다.
 // milvusVf는 [생성]이라 milvus.config.json의 managed(sha256)에 없어 관리 파일 검사와 겹치지 않는다.
 // config나 BRAND_COLOR를 읽지 못하면 건너뛴다(managedIssues·brandingIssues가 이미 실패로 알린다)
@@ -102,7 +120,7 @@ export async function runCheck(o: { root: string; style: boolean; pkgRoot?: stri
   }
   const override = read(OVERRIDE_CSS);
   const { warnings, errors } = override === undefined ? { warnings: [], errors: [] } : checkOverrideCss(override, OVERRIDE_CSS);
-  issues.push(...errors, ...brandingIssues(o.root));
+  issues.push(...errors, ...brandingIssues(o.root), ...modalIssues(o.root));
   if (!o.style) issues.push(...managedIssues(o.root));
 
   if (warnings.length) {

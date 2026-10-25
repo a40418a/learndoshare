@@ -123,7 +123,7 @@ pnpm milvus deploy --yes
     <tr><td>`docs/milvus/patterns/`</td><td>소유</td><td>UI 패턴 명세. 패턴마다 파일 하나(`modal.md`부터). 팀이 고치고 더하며, Claude가 LWC를 쓰기 전에 읽는다</td></tr>
     <tr><td>`.claude/settings.json`</td><td>소유</td><td>밀버스 permissions·hook 병합</td></tr>
     <tr><td>`.claude/skills/milvus-brand/SKILL.md`</td><td>관리</td><td>"브랜드 요청 반영해줘" skill</td></tr>
-    <tr><td>`.claude/hooks/milvus-check.mjs`</td><td>관리</td><td>스타일 파일을 고치면 `check --style`</td></tr>
+    <tr><td>`.claude/hooks/milvus-check.mjs`</td><td>관리</td><td>스타일 파일이나 LWC의 `.js`·`.html`을 고치면 `check --style`(모달 규칙 포함)</td></tr>
     <tr><td>`force-app/main/default/lwc/milvus*/`</td><td>관리</td><td>밀버스 컴포넌트, `milvusScript`, `milvusBrandLoader`</td></tr>
     <tr><td>`…/brandingSets/LEXTHEMING<이름>.brandingSet-meta.xml`</td><td>소유</td><td>브랜드 색(`BRAND_COLOR`)·로고(`BRAND_IMAGE`). 색의 원본</td></tr>
     <tr><td>`…/lightningExperienceThemes/<이름>.lightningExperienceTheme-meta.xml`</td><td>소유</td><td>위 BrandingSet을 가리키는 테마</td></tr>

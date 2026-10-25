@@ -79,6 +79,7 @@ CLAUDE.md 2장(사다리보다 우선하는 결정)과 README 11장은 구현 �
 | 10/20 | **UI 패턴 명세(최소: 모달, #57).** 고객 프로젝트 루트에 [소유] `milvus-patterns.md`를 놓는다. 패턴마다 규칙·이유·예시 코드·출처를 적고, 첫 패턴은 모달(`LightningModal` 상속, `lightning-modal-*`, footer 오른쪽 끝 정렬, 취소 → 주 동작, `size`, `close(result)`, `open()`)이다. `milvus-design.md` 5절이 Claude에게 LWC 화면을 만들기 전에 읽게 한다. 새 컴포넌트는 만들지 않는다 | 2026-10-20 사용자 요청. 씨팝코리아 프로젝트에서 같은 SLDS를 써도 모달마다 버튼 위치와 여는 방식이 달랐다. 근거는 LightningModal Component Reference와 SLDS 2 Modals 블루프린트(2026-10-20 확인)이고, 공식 근거가 없는 규칙(버튼 순서 등)은 "밀버스 규칙(팀 합의)"로 표시한다. 10/16 내용 동결 뒤의 변경이며 사용자 요청에 따른 예외다 |
 | 10/21 | **명세 파일을 루트에서 옮긴다(#63).** Claude 규칙은 `.claude/rules/milvus/design.md`([관리]), 팀 문서는 `docs/milvus/`(UI 패턴 `patterns/<패턴>.md`[소유], 브랜드 요청 `brand-request.md`)에 둔다. `init`은 `CLAUDE.md`에 줄을 덧붙이지 않는다. `milvus.config.json`은 루트에 둔다. `update`가 0.2.x 배치를 옮긴다(4.5). 0.3.0 | 2026-10-21 사용자 요청. 패턴 문서가 늘면 루트가 계속 늘어난다. Claude Code 공식 문서("How Claude remembers your project", 2026-10-21 확인): `.claude/rules/`의 `.md`는 하위 폴더까지 찾아 세션마다 로드되고, `paths` 머리말이 있으면 맞는 파일을 다룰 때만 로드된다. 패턴은 새 LWC를 처음 쓸 때도 읽혀야 해서 `paths` 규칙 대신 항상 로드되는 `design.md`가 패턴 폴더를 가리킨다. 사람이 고치는 문서는 숨김 폴더 대신 `docs/`에 둔다 |
 | 10/23 | **`milvusButton`을 지우고 `milvusModal`을 더한다.** `milvusButton`(블루프린트 버튼, `--milvus-button-*` 변수, 켜기 스위치 `--milvus-button-custom`)과 명세 항목 "밀버스 컴포넌트"를 지운다. 대신 `LightningModal` 안에 넣는 틀 `milvusModal`(제목 가운데, 버튼 오른쪽 아래 비강조 → 강조)을 더하고 패턴 명세 `modal.md`를 그 기준으로 고친다 | 발표가 끝나 실제로 쓰일 것만 남긴다(사용자 결정). `milvusButton`은 "모양만 바꾸려고 새로 만드는 방식"의 비교 예시였고 모양은 hook·브리지·override가 맡는다. 이미 설치한 프로젝트는 `update`가 config의 managed에서만 빼고 파일은 남긴다(삭제 규칙 없음) |
+| 10/23 | **모달 형식을 `check`로 강제한다(#72).** 모달은 일반 LWC와 분리한 `modal_<이름>` 컴포넌트로만 만든다. `LightningModal`을 상속하고 템플릿은 `<c-milvus-modal>` 하나다. 일반 LWC 안에서 `LightningModal`·`lightning-modal-*`·`slds-modal`·`c-milvus-modal`을 쓰면 실패하고, `c/modal_<이름>`을 import해 `open()`으로만 연다. `modal.md`의 여러 단계 모달 예외(helper 직접 사용)를 없앤다. 검사는 `check`·`check --style`이 하고(`lib/modal-rules.ts`), hook은 LWC 컴포넌트 폴더 바로 아래 `.js`·`.html`을 고칠 때도 `check --style`을 실행한다. 밀버스 관리 컴포넌트(`milvus*`)와 `__tests__`는 보지 않는다 | 2026-10-23 사용자 결정. 패턴 명세는 Claude가 읽고 따를 뿐이라 일반 LWC 안에 모달을 직접 짜도 막히지 않았다. 형식이 하나여야 모달마다 버튼 위치와 여는 방식이 달라지지 않는다. 밑줄 이름은 lwc.dev Reference와 `@lwc/template-compiler` 9.4.3 실측으로 확인했다(README 3장). 검사는 정규식 수준이라(주석은 뺀다) 문자열 안의 글자도 걸린다 |
 
 ---
 
@@ -115,7 +116,7 @@ docs/milvus/patterns/modal.md                      [소유] UI 패턴 명세. �
 package.json                                       [소유] "storybook": "milvus storybook" 스크립트 추가 (없을 때만)
 .claude/settings.json                              [소유] permissions와 hook 병합 (7.2)
 .claude/skills/milvus-brand/SKILL.md               [관리] 브랜드 입력 skill
-.claude/hooks/milvus-check.mjs                     [관리] util.css·브랜드 메타데이터 수정 후 check --style
+.claude/hooks/milvus-check.mjs                     [관리] util.css·브랜드 메타데이터·LWC(.js·.html) 수정 후 check --style
 .gitignore                                         [소유] .milvus/ 줄 추가
 .forceignore                                       [소유] **/__tests__/** 줄 추가 (없을 때만. 밀버스 LWC가 JS라 tsconfig 줄은 넣지 않는다, 10/9 D1)
 .npmrc                                             [소유] 레지스트리 줄이 없으면 추가 (0장 준비를 팀원과 공유. 토큰 줄은 넣지 않는다, #46)
@@ -176,7 +177,7 @@ force-app/main/default/
 - 대체 경로: `node_modules` 안의 설정으로 띄우는 것이 안 되면 `init`이 `.storybook/`을 프로젝트에 복사한다. Task 3 스파이크에서는 필요하지 않았다. 14장의 남은 확인 항목이 실패할 때만 쓴다
 
 ### 4.3 `check [--style]`
-- `--style`(hook이 실행): util.css 규칙(5.2)과 피드백 색 대비(5.3), `milvus.config.json` 브랜드의 `LEXTHEMING<브랜드>` BrandingSet의 `BRAND_COLOR` 형식(`#RRGGBB`)만 본다. 다른 BrandingSet(Experience Cloud 사이트 등)은 보지 않는다. 정규식 수준이라 빠르다. 실패하면 종료 코드 2와 함께 고칠 값을 stderr로 낸다. `milvusOverride.css`는 5.1의 경고만 내고(종료 코드 0) `@font-face`·`@import`만 실패시킨다
+- `--style`(hook이 실행): util.css 규칙(5.2)과 피드백 색 대비(5.3), `milvus.config.json` 브랜드의 `LEXTHEMING<브랜드>` BrandingSet의 `BRAND_COLOR` 형식(`#RRGGBB`), 프로젝트 LWC의 모달 규칙(10/23 #72: `modal_<이름>`만 `LightningModal`, 템플릿은 `<c-milvus-modal>` 하나)만 본다. 다른 BrandingSet(Experience Cloud 사이트 등)은 보지 않는다. 정규식 수준이라 빠르다. 실패하면 종료 코드 2와 함께 고칠 값을 stderr로 낸다. `milvusOverride.css`는 5.1의 경고만 내고(종료 코드 0) `@font-face`·`@import`만 실패시킨다
 - 전체(deploy와 CI가 실행): `--style` 항목 + `milvusVf.css`(팔레트)를 지금 `BRAND_COLOR`로 다시 만듦(VF 사용 시) + 밀버스 관리 파일 sha256 비교. 밀버스 LWC가 JS라 타입 검사는 하지 않는다(10/9 D1)
 - sha256이 다르면 `pnpm milvus update --force`로 되돌리라고 안내한다
 
@@ -433,7 +434,7 @@ util.css에는 `:root` 블록 하나만 둔다. 클래스 규칙과 `@font-face`
 
 - `Edit(...)` 규칙 하나가 파일을 고치는 모든 내장 도구를 막는다. 경로 앞의 `/`는 프로젝트 루트 기준이라는 뜻이다(공식 문서)
 - `ask`는 auto 모드에서도 실행 전에 묻는다. 규칙 순서는 deny → ask → allow다(공식 문서)
-- hook은 바뀐 파일이 `milvusBrand.css`, `milvusOverride.css`, `brandingSets/`일 때만 `check --style`을 실행한다. 프로젝트에서 패키지를 찾아 `dist/cli/index.js`를 node로 직접 실행한다(pnpm 기동 0.3초를 없애고 Windows의 shell 경고를 피한다, 10/9 판정)
+- hook은 바뀐 파일이 `milvusBrand.css`, `milvusOverride.css`, `brandingSets/`, LWC 컴포넌트 폴더 바로 아래 `.js`·`.html`(10/23 모달 규칙, #72)일 때만 `check --style`을 실행한다. 프로젝트에서 패키지를 찾아 `dist/cli/index.js`를 node로 직접 실행한다(pnpm 기동 0.3초를 없애고 Windows의 shell 경고를 피한다, 10/9 판정)
 - 결과 전달(공식 문서 code.claude.com/docs/en/hooks, 2026-10-09 확인: PostToolUse가 0으로 끝나면 stderr는 디버그 로그로만 가고 Claude는 보지 못한다): 2로 끝나면 stderr를 그대로 넘겨 Claude가 고칠 값을 본다. 0인데 override 경고가 있으면 stdout에 `{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"…"}}`를 써서 Claude에게 알린다
 - 저장소 hook H2의 2·3층(개인정보 필드·`FIELDS(ALL)` 조회, 토큰을 출력하는 명령)도 프로젝트에 가져간다(10/9 판정). 토큰을 출력하는 `sf org display`와 `sf org open --url-only`는 `deny`로 막는다. `sf org open`은 `--url-only`(짧게 `-r`)와 `--json`일 때 front door URL을 출력하므로 옵션 위치와 상관없이 막는다(공식 소스 [plugin-org `orgOpenCommandBase.ts`](https://github.com/salesforcecli/plugin-org/blob/main/src/shared/orgOpenCommandBase.ts)의 `output = { orgId, url, username }`, 2026-10-14 확인). `deploy`가 출력하는 `sf org open --target-org … --path …`는 브라우저만 열어 막지 않는다. 환경 변수 `SF_CONTAINER_MODE`에서도 URL이 출력되지만 명령 패턴으로는 막을 수 없다. 개인정보 필드와 `FIELDS(ALL)`는 명령 패턴으로 막을 수 없어 `.claude/rules/milvus/design.md`의 규칙 문장으로 둔다
 - `sf org list --json`과 `sf auth list --json`(= `sf org list auth --json`)은 모든 org의 액세스 토큰을 출력하므로 `deny`로 막는다(#36)

@@ -1,5 +1,5 @@
-// 밀버스 PostToolUse hook(설계 7.2). Edit·Write로 milvusBrand.css·milvusOverride.css·brandingSets/를 고쳤을 때만
-// 설치된 패키지의 CLI로 milvus check --style을 실행한다(판정 R24·R25, Claude Code hooks 문서 2026-10-09 확인)
+// 밀버스 PostToolUse hook(설계 7.2). Edit·Write로 milvusBrand.css·milvusOverride.css·brandingSets/, LWC 컴포넌트의 .js·.html(모달 규칙)을
+// 고쳤을 때만 설치된 패키지의 CLI로 milvus check --style을 실행한다(판정 R24·R25, Claude Code hooks 문서 2026-10-09 확인)
 // - 2: stderr(고칠 값)를 그대로 넘기고 2로 끝난다. Claude Code가 stderr를 Claude에게 보여 준다
 // - 0이고 경고(stderr)가 있으면: 0으로 끝난 hook의 stderr는 Claude에게 가지 않으므로 stdout JSON의 additionalContext로 넘긴다
 // - 0이고 경고가 없으면 아무것도 쓰지 않는다(check의 stdout "통과" 줄도 넘기지 않는다). 그 밖은 stderr와 종료 코드를 넘긴다
@@ -19,7 +19,8 @@ try {
 }
 const file = input?.tool_input?.file_path;
 // 경로는 절대 경로이고 Windows에서는 \ 구분이다
-if (typeof file === "string" && /\/staticresources\/milvus(Brand|Override)\.css$|\/brandingSets\//.test(file.replaceAll("\\", "/"))) {
+// LWC는 컴포넌트 폴더 바로 아래 파일만 본다(__tests__ 안은 보지 않는다)
+if (typeof file === "string" && /\/staticresources\/milvus(Brand|Override)\.css$|\/brandingSets\/|\/lwc\/[^/]+\/[^/]+\.(js|html)$/.test(file.replaceAll("\\", "/"))) {
   // pnpm을 거치지 않는다(기동 약 0.3초, Windows의 pnpm.cmd에 셸이 필요한 문제). 프로젝트의 node_modules에서 패키지를 찾아 node로 직접 실행한다
   const start = process.env.CLAUDE_PROJECT_DIR || input.cwd;
   let cli;

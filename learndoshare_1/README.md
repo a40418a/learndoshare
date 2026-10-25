@@ -189,6 +189,7 @@ Storybook에서는 브랜드 root style을 래퍼 요소에 주입하면 된다.
 | `createElement`와 슬롯 | `createElement`로 만든 LWC 호스트에 자식을 `append`하면 synthetic shadow에서는 슬롯에 들어가지 않고 컴포넌트 밖에 그려진다. 슬롯 스토리는 템플릿으로 슬롯을 채우는 스토리 전용 LWC(`stories/lwc/`)로 그린다(#40) | 확인 (2026-10-20 Storybook 실측) |
 | 패키지만 올리고 `update` 전 | 새 밀버스 컴포넌트가 든 패키지를 설치하고 `update`를 하지 않으면 `milvus storybook`의 LWC 빌드가 `c/milvus…`를 찾지 못한다. 그래서 `storybook`은 빌드 전에 `milvus.config.json`의 `version`과 패키지 버전을 비교해 `update`를 안내한다(#40). 버전 번호를 올리지 않은 tgz는 이 비교로 잡히지 않는다 | 확인 (2026-10-20 리뷰 재현) |
 | 모달 규칙 (#57) | `LightningModal`은 `lightning/modal`을 상속해 만들고 `lightning-modal` 태그는 없다. `label`은 필수(헤더가 있으면 `lightning-modal-header`에), `size`는 `small`·`medium`(기본)·`large`·`full`이고 연 뒤에는 못 바꾼다. `this.close(result)`의 값이 `open()` promise 결과이고, X로 닫으면 `undefined`다. SLDS 2 `.slds-modal__footer`는 `text-align: end`, `slds-modal__footer_directional`은 여러 단계 모달용이다. footer 버튼 순서(취소 → 주 동작)를 정한 공식 규칙은 찾지 못했다(공식 예시만 그 순서) | 확인 (2026-10-20 LightningModal·Modal Footer Component Reference, SLDS 2 Modals, `modal.css` 2.264.2) |
+| LWC 이름의 밑줄 (#72) | 폴더 이름은 소문자로 시작하고 영숫자와 밑줄만 쓴다. 밑줄로 끝나거나 두 번 이어지면 안 된다. 밑줄은 마크업에서 kebab case로 바뀌지 않아 `modal_accountEdit`의 태그는 `c-modal_account-edit`다. 이 이름으로 `c-milvus-modal`을 쓰는 모달과 그것을 여는 LWC가 빌드된다 | 확인 (2026-10-23 [lwc.dev Reference — Component Folder](https://lwc.dev/guide/reference), `@lwc/template-compiler` 9.4.3 `kebabcaseToCamelcase`와 `buildLwc` 실측. developer.salesforce.com 같은 쪽은 403으로 열지 못했다) |
 | 브랜드 단위 | org 단위인지 Lightning 앱 단위인지. 앱 브랜딩은 내장 테마는 항상 덮어쓰지만, 커스텀 테마를 덮으려면 App Manager의 override 옵션이 필요하다 | 미정 |
 
 ---
@@ -482,6 +483,7 @@ pnpm sync:theme
 - [ ] **디자인 시스템 오너와 주당 확보 시간.** 최소 주 4시간 제안
 - [x] **브랜드 명세 페이지 입력 (확정, 2026-10-20 사용자 피드백, #48).** 입력은 브랜드 색·로고·피드백 색·디자인 명세 네 가지다. 입력이 있는 항목 34개를 처음 보는 사람이 "다 채워야 하나"로 받아들였고, 다른 디자인 시스템 문서의 표를 통째로 붙여 넣는 쓰임새를 원했다. 나머지 항목은 "바꿀 수 있는 것"·"바꿀 수 없는 것" 참고 목록이고, 디자인 명세가 옛 세부 절보다 우선한다(설계 6.1). 10/16 내용 동결 뒤의 변경이며 사용자 요청에 따른 예외다
 - [x] **UI 패턴 명세 (확정, 2026-10-20 사용자 요청, #57).** 화면 패턴을 고객 프로젝트의 [소유] 파일 `milvus-patterns.md`에 적고, Claude가 LWC를 쓰기 전에 읽는다(`milvus-design.md` 5절). 최소 버전은 모달 패턴만 다룬다: `LightningModal` 상속, `lightning-modal-*`, footer 오른쪽 끝 정렬, 취소 → 주 동작, `size`, `close(result)`, `open()`. 씨팝코리아 프로젝트에서 모달마다 버튼 위치와 여는 방식이 달랐던 것이 계기다. 새 컴포넌트는 만들지 않는다(설계 1장 10/20). 10/16 내용 동결 뒤의 변경이며 사용자 요청에 따른 예외다 (2026-10-21 갱신: 위치를 `docs/milvus/patterns/modal.md`로 옮겼다. 패턴마다 파일 하나, #63)
+- [x] **모달 형식 강제 (확정, 2026-10-23 사용자 결정, #72).** 모달은 일반 LWC와 분리한 `modal_<이름>` 컴포넌트로만 만든다. `LightningModal`을 상속하고 템플릿은 `<c-milvus-modal>` 하나다. 일반 LWC 안의 `LightningModal`·`lightning-modal-*`·`slds-modal`·`c-milvus-modal`은 실패다. 여러 단계 모달 예외도 없앴다. `check`(`--style` 포함)가 검사하고(`lib/modal-rules.ts`), hook은 LWC의 `.js`·`.html`을 고칠 때도 돈다. 패턴 명세만으로는 Claude가 읽고 따를 뿐 막지 못해서다
 
 ---
 
@@ -588,7 +590,7 @@ learndoshare_1/                     # 밀버스 디자인 시스템 (공용)
 | `permissions.deny` | `Bash(sf org display)`, `Bash(sf org display *)`, `sf org open --url-only`(`-r`)·`--json`, `sf org list --json`·`sf auth list --json` 계열(옵션이 어디에 와도 걸리게 규칙을 여러 개 둔다. 정확한 목록은 템플릿 파일) | 액세스 토큰을 출력하는 명령을 막는다 | H2 3층 |
 | `permissions.deny` | `Edit(...)`: `lwc/milvus*/**`, `classes/utils/design/**`, `milvusHead.component*`, `staticresources/milvusVf.*`·`milvusBridge.*`, `.claude/rules/milvus/design.md`, `milvus.config.json`, `.claude/skills/milvus-brand/**`, `.claude/hooks/milvus-check.mjs` | 밀버스 [관리]·[생성] 파일을 Claude의 파일 도구로 고치지 못하게 한다. 다른 경로로 바뀐 것은 `check`의 sha256 비교가 잡는다 | H7 |
 | `permissions.ask` | `pnpm milvus deploy`(`pnpm exec milvus`, `milvus`, `./node_modules/.bin/milvus`를 포함한 네 형태), `sf project deploy`, `sf data create/delete/update/upsert`, `sf apex run` | 실행 전에 묻는다. auto 모드에서도 묻는다 | H2 1층 |
-| hook `PostToolUse` · `Edit\|Write` | `node "$CLAUDE_PROJECT_DIR"/.claude/hooks/milvus-check.mjs` | `milvusBrand.css`·`milvusOverride.css`·`brandingSets/`를 고쳤을 때만 패키지 CLI의 `check --style`을 node로 직접 실행한다(pnpm을 거치지 않음). 위반이면 2로 끝나 Claude가 stderr의 고칠 값을 본다. override 경고는 stdout JSON의 `additionalContext`로 넘긴다 | H4 |
+| hook `PostToolUse` · `Edit\|Write` | `node "$CLAUDE_PROJECT_DIR"/.claude/hooks/milvus-check.mjs` | `milvusBrand.css`·`milvusOverride.css`·`brandingSets/`, LWC 컴포넌트의 `.js`·`.html`(모달 규칙, #72)을 고쳤을 때만 패키지 CLI의 `check --style`을 node로 직접 실행한다(pnpm을 거치지 않음). 위반이면 2로 끝나 Claude가 stderr의 고칠 값을 본다. override 경고는 stdout JSON의 `additionalContext`로 넘긴다 | H4 |
 | 안내 문서 | `.claude/rules/milvus/design.md`([관리]. Claude Code가 `.claude/rules/`를 세션마다 읽는다, #63) | 세팅 순서, 디자인 규칙, pnpm만 쓰기, 개인정보 필드·`FIELDS(ALL)` 조회 금지, 배포 안전장치 | H8. H1과 H2 2층은 명령 패턴으로 막지 않고 이 문서의 문장으로 둔다 |
 
 - 실제 Claude Code에서 잰 것(2026-10-17, `learndoshare_2` 세션): 토큰 출력 sf 명령 6개 deny, 인자 없는 `pnpm milvus deploy`의 ask, `milvusBridge.css` Edit deny가 모두 의도대로 걸린다(설계 13장). `--json` 없는 `sf org list`는 막지 않는다

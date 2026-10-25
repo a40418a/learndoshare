@@ -26,7 +26,8 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 같은 `lightning-*`를 써도 모달마다 버튼 위치나 여는 방식이 달라질 수 있다. `init`이 놓는 `docs/milvus/patterns/`(패턴마다 파일 하나, 첫 파일은 `modal.md`)가 화면 패턴을 정하고, Claude는 LWC 화면을 만들기 전에 해당 패턴 파일을 읽는다. 명세와 다르게 하려면 Claude가 이유를 말하고 확인받는다.
 
-- 지금은 **모달**만 있다: `LightningModal`을 상속하고 템플릿에는 `c-milvus-modal` 하나를 두어 안만 채운다. 제목은 가운데, 버튼은 오른쪽 아래 "비강조 → 강조" 순서, 크기는 `size`, 결과는 `this.close(result)`, 열 때는 `MyModal.open({ … })`
+- 지금은 **모달**만 있다: 모달은 일반 LWC와 분리한 `modal_<이름>` 컴포넌트(예: `modal_accountEdit`)로만 만든다. `LightningModal`을 상속하고 템플릿에는 `c-milvus-modal` 하나만 두어 안만 채운다. 제목은 가운데, 버튼은 오른쪽 아래 "비강조 → 강조" 순서, 크기는 `size`, 결과는 `this.close(result)`, 열 때는 일반 LWC에서 `ModalAccountEdit.open({ … })`
+- 모달 규칙은 `pnpm milvus check`가 막는다. 일반 LWC 안에 `LightningModal`·`lightning-modal-*`·`slds-modal`·`c-milvus-modal`이 있거나 `modal_` 템플릿이 `c-milvus-modal` 하나가 아니면 hook과 `deploy`·CI의 `check`가 실패한다
 - 팀이 규칙을 바꾸거나 패턴(폼 레이아웃, 목록 툴바, 빈 상태, 오류 표시 등)을 더한다. 프로젝트 소유 파일이라 `update`가 덮어쓰지 않는다
 - 공식 근거: [LightningModal](https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-modal), [SLDS 2 Modals](https://www.lightningdesignsystem.com/components/modals/)
 
