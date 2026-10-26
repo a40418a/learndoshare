@@ -81,8 +81,8 @@
 >   - **2026-10-09 정정:** 처음에는 "컴포넌트 hook은 닿지 않고 상속되는 global hook(`--slds-g-*`)만 닿는다"고 적었다. 전 컴포넌트 분석([`synthesis.md`](docs/research/2026-10-08/synthesis.md) 0장 5번 전제 수정)과 맞지 않아 고쳤다. native에서 s hook이 실제로 효과가 있는지는 실측이 필요하다(설계 14장).
 >   - 경과: #11은 빌드 버그 때문에 모든 LWC가 native로 그려진 Storybook에서 측정했다. #14는 패키지 목록대로 혼합 모드로 그렸다. org 실측(#16)으로 둘 다 바로잡았다.
 > - **util.css에는 global hook과 컴포넌트 hook을 쓴다(#18).** global hook(`--slds-g-*`)은 같은 hook을 쓰는 컴포넌트 묶음을 함께 바꾸고(예: 버튼 `radius-border-pill`, 입력창 `radius-border-2`, 카드 `radius-border-4`), 컴포넌트 hook(`--slds-s-*`)은 그 컴포넌트만 바꾼다(예: `--slds-s-button-radius-border`). 컴포넌트 hook은 native 전환 때 효과가 사라질 수 있다는 것을 알고 허용했다(2026-10-07 결정). 색 컴포넌트 hook은 브랜드 색에 이어진 것이 많아 막고, hover·선택 바탕 6개만 중립 g hook을 참조할 때 허용한다(2026-10-09). 영향 지도는 Storybook "Foundations / 브랜드 스타일 (util.css)"에 SLDS CSS에서 자동으로 나온다.
-> - native 전환에도 유지해야 하거나 hook이 없는 모양은 밀버스 컴포넌트로 만들고, 그 컴포넌트가 읽는 `--milvus-*` 변수를 util.css에 넣는다. 예: `milvusButton`(#4)은 util.css에 `--milvus-button-custom: on`이 있으면 SLDS 버튼 블루프린트에 `--milvus-button-*`를 적용하고, 없으면 `lightning-button`을 그대로 그린다. `--slds-s-*`와 `--milvus-*`는 실제로 읽는 곳이 있는 이름만 쓸 수 있다(`pnpm test`가 검사).
->   - **2026-10-09 갱신:** 모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다. hook·브리지로 안 되는 모양은 프로젝트 소유 opt-in `milvusOverride.css`의 클래스 규칙으로 바꾼다(공식 권고 밖, 마지막 수단). 밀버스 컴포넌트는 기능이 없을 때만 만들고, `milvusButton`은 비교 예시로 남는다(설계 1장, [Learn 09](<Learn/09-override와 공식 권고.html>)).
+> - hook이 없는 항목(움직임 등)은 브리지 변수(`--milvus-*`)를 util.css에 넣는다. 이 변수는 `milvusBridge.css`가 읽는다. 지금 `--milvus-*`를 읽는 밀버스 컴포넌트는 없다. `--slds-s-*`와 `--milvus-*`는 실제로 읽는 곳이 있는 이름만 쓸 수 있다(`pnpm test`가 검사). (2026-10-23 갱신, #70)
+>   - **2026-10-09 갱신:** 모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다. hook·브리지로 안 되는 모양은 프로젝트 소유 opt-in `milvusOverride.css`의 클래스 규칙으로 바꾼다(공식 권고 밖, 마지막 수단). 밀버스 컴포넌트는 기능이 없을 때만 만든다(설계 1장, [Learn 09](<Learn/09-override와 공식 권고.html>)). 비교 예시였던 `milvusButton`은 2026-10-23에 지웠다(#70).
 > - 브랜드 색은 util.css에서 바꾸지 않는다(org가 원본). `pnpm test`(`scripts/check-brands.ts`, 규칙은 `lib/rules.ts`)가 규칙을 검사한다.
 > - **util.css 규칙 (2026-10-09, [설계](docs/specs/2026-10-08-milvus-package-design.md) 5.2·5.3으로 통합):** `:root` 블록 하나에 아래만 쓴다. 클래스 규칙과 `@font-face`는 쓰지 않는다.
 >   - 허용: 이름에 color가 없는 `--slds-g-*`(글꼴 `--slds-g-font-family*` 제외. `--slds-g-shadow-4`를 바꾸면 포커스에 쓰이는 `-5`·`-6`을 기본값으로 따로 적는다), 포커스 그림자(값의 색은 `var(--slds-g-color-brand-base-15)`·`var(--slds-g-color-neutral-base-100)`만), 중립 색(`surface*`, `on-surface*`, `border-1/2`, `neutral-base-*`, `disabled*`, `on-disabled*`, `border-disabled*`, `*inverse*`, `palette-neutral-*`, `palette-yellow-80/90`. 값은 `light-dark()`, 글자·면 4.5:1 이상), 기본 컴포넌트 CSS만 읽는 g 이름 5개, 피드백 색(설계 5.3 표의 이름만. 글자색은 배경 위와 흰색 위 4.5:1 이상, 미달이면 같은 색조 40단계를 제안), SLDS 2 CSS나 기본 컴포넌트 CSS가 `var()`로 읽는 `--slds-s-*`, 색 s hook 6개(모달 배경막 `--slds-s-backdrop-color-background`는 값이 `var(--slds-g-color-neutral-10-opacity-50)`만이고 그 g를 `light-dark()`로 함께 쓴다. `backdrop-pair` 규칙), 밀버스 컴포넌트나 `milvusBridge.css`가 읽는 `--milvus-*`(움직임 시간 `--milvus-motion-duration-*`은 단위를 붙인다. `motion-unit` 규칙), 상속 속성 `letter-spacing`
@@ -118,7 +118,7 @@
 
 ### 2.2 (기록) 그래서 브랜드별 버튼은 이렇게 커버한다
 
-**확정 (2026-09-26): 기능 하나에 컴포넌트 하나, root에 따라 자동 전환.** 프로젝트 코드는 항상 `<c-milvus-button>` 하나만 쓴다. 브랜드 root에 버튼 custom 값(신호 변수 `--milvus-button-custom`)이 없으면 내부에서 `lightning-button`을 그대로 렌더하고, 있으면 블루프린트 + `--milvus-button-*`로 렌더한다. Storybook에도 "Button" 항목 하나만 두고 현재 브랜드의 모드(SLDS 기본 / 밀버스 커스텀)를 표시한다. 다른 SLDS 기반 컴포넌트도 같은 방식을 따른다.
+**확정 (2026-09-26): 기능 하나에 컴포넌트 하나, root에 따라 자동 전환.** 프로젝트 코드는 항상 `<c-milvus-button>`(2026-10-23 삭제, #70) 하나만 쓴다. 브랜드 root에 버튼 custom 값(신호 변수 `--milvus-button-custom`)이 없으면 내부에서 `lightning-button`을 그대로 렌더하고, 있으면 블루프린트 + `--milvus-button-*`로 렌더한다. Storybook에도 "Button" 항목 하나만 두고 현재 브랜드의 모드(SLDS 기본 / 밀버스 커스텀)를 표시한다. 다른 SLDS 기반 컴포넌트도 같은 방식을 따른다.
 
 
 root에서 커버한다는 원칙은 유지한다. 다만 root가 바꾸는 대상은 **밀버스 변수(`--milvus-*`)**이고, 그 변수를 읽는 것은 밀버스 컴포넌트다.
@@ -127,10 +127,10 @@ root에서 커버한다는 원칙은 유지한다. 다만 root가 바꾸는 대�
 | --- | --- | --- | --- |
 | 1 | L1 org 테마 색 | `lightning-button` 포함 전체 | 공식 경로. 코드 변경 없음 |
 | 2 | **기본은 `lightning-button` 그대로** | — | 추구미(SLDS 최대 활용). 브랜드 차이가 색뿐이면 여기서 끝 |
-| 3 | L3 root style에 `--milvus-button-*` 정의 + **`milvusButton`**(SLDS 버튼 블루프린트 `slds-button` 마크업 기반) | 브랜드 고유 버튼이 필요한 프로젝트 | 모양(반경, 굵기, 패딩)을 브랜드별로 바꾼다. 변수가 없으면 SLDS 기본값으로 떨어지게 `var()` fallback을 둔다 |
+| 3 | L3 root style에 `--milvus-button-*` 정의 + **`milvusButton`**(SLDS 버튼 블루프린트 `slds-button` 마크업 기반, 2026-10-23 삭제, #70) | 브랜드 고유 버튼이 필요한 프로젝트 | 모양(반경, 굵기, 패딩)을 브랜드별로 바꾼다. 변수가 없으면 SLDS 기본값으로 떨어지게 `var()` fallback을 둔다 |
 | 4 | **opt-in 확장 계층** `brands/<브랜드>/override.css`에서 `--slds-g-*` 재정의 | `lightning-button` 포함 전체 | **공식 권고 밖.** 고객사가 `lightning-button` 자체의 모양까지 요구할 때만 켠다. 아래 2.3 조건을 지킨다 |
 
-**결정 (2026-09-26):** 공식 권고는 아니지만 **고객사별 니즈가 다양하므로 `milvusButton`을 파일럿으로 구현한다.** "SLDS 블루프린트는 있는데 브랜드 대응 LWC가 없다"에 해당하므로 추가 기준에도 맞는다. 변수를 정의하지 않은 브랜드에서는 `lightning-button`과 똑같이 보여야 한다. 그래서 SLDS를 기본으로 쓰는 원칙과 브랜드 고유 버튼이 함께 성립한다.
+**결정 (2026-09-26):** 공식 권고는 아니지만 **고객사별 니즈가 다양하므로 `milvusButton`(2026-10-23 삭제, #70)을 파일럿으로 구현한다.** "SLDS 블루프린트는 있는데 브랜드 대응 LWC가 없다"에 해당하므로 추가 기준에도 맞는다. 변수를 정의하지 않은 브랜드에서는 `lightning-button`과 똑같이 보여야 한다. 그래서 SLDS를 기본으로 쓰는 원칙과 브랜드 고유 버튼이 함께 성립한다.
 
 #### opt-in 확장 계층 (`override.css`) 조건 (기록. 만들지 않았다. 지금은 `milvusOverride.css`)
 
@@ -148,7 +148,7 @@ root에서 커버한다는 원칙은 유지한다. 다만 root가 바꾸는 대�
 - `root.css`와 컴포넌트 CSS에서 `--slds-g-*`는 **읽기만** 한다
 - `--slds-c-*`는 쓰지 않는다. SLDS 2에서 지원되지 않는다
 - L1 색(브랜드 색)은 root style에서 덮어쓰지 않는다. 색은 org가 원본이다
-- "`lightning-button`을 둥글게" 같은 요구는 먼저 `milvusButton`을 제안한다. 사용자가 `lightning-button` 자체를 원하면 `override.css`의 위험(공식 권고 밖, 릴리스마다 재확인)을 설명하고 **확인을 받은 뒤에** 켠다
+- "`lightning-button`을 둥글게" 같은 요구는 먼저 `milvusButton`(2026-10-23 삭제, #70)을 제안한다. 사용자가 `lightning-button` 자체를 원하면 `override.css`의 위험(공식 권고 밖, 릴리스마다 재확인)을 설명하고 **확인을 받은 뒤에** 켠다
 - 결과는 Storybook에서 눈으로 확인하고, 린트를 통과한 뒤 PR로 리뷰한다
 
 ### 2.4 (기록) org에는 root style을 어떻게 반영하나. 결론: 정적 리소스 + `loadStyle`(설계 5.5, 10/8·10/9 org 측정)
@@ -196,7 +196,7 @@ Storybook에서는 브랜드 root style을 래퍼 요소에 주입하면 된다.
 
 ## 4. 진행 계획
 
-> **2026-10-08부터 실행은 [구현 계획](docs/plans/2026-10-08-milvus-package-plan.md)의 마일스톤 M0~M7을 따른다.** 아래 Phase 0~9는 9/26 계획이며 기록으로 남긴다. Phase 1~5의 기반(Storybook, `lightning-*` 렌더, SLDS 카탈로그, util.css, `milvusButton`, `pnpm sync:theme`)은 M0 이전 PR #7, #8, #10, #13, #15, #17, #19(이슈 #3, #4, #9, #11, #14, #16, #18)에서 만들었다. Phase 6(프로젝트 시작 워크플로)은 패키지와 `pnpm milvus` CLI로 대체했다. 대체한 항목은 각 Phase에 "(대체)"로 적었다.
+> **2026-10-08부터 실행은 [구현 계획](docs/plans/2026-10-08-milvus-package-plan.md)의 마일스톤 M0~M7을 따른다.** 아래 Phase 0~9는 9/26 계획이며 기록으로 남긴다. Phase 1~5의 기반(Storybook, `lightning-*` 렌더, SLDS 카탈로그, util.css, `milvusButton`(2026-10-23 삭제, #70), `pnpm sync:theme`)은 M0 이전 PR #7, #8, #10, #13, #15, #17, #19(이슈 #3, #4, #9, #11, #14, #16, #18)에서 만들었다. Phase 6(프로젝트 시작 워크플로)은 패키지와 `pnpm milvus` CLI로 대체했다. 대체한 항목은 각 Phase에 "(대체)"로 적었다.
 >
 > | 마일스톤 | 내용 | PR |
 > | --- | --- | --- |
@@ -217,7 +217,7 @@ Phase 1  기반 셋업 (pnpm, husky, Storybook) ─────── 0.5일
 Phase 2  ★ 분기점: lightning-* 렌더 검증 ────────── 1.5일
            ├─ 성공 → Phase 3
            └─ 실패 → LWC Garden 검증(3일) → org 내 문서 앱
-Phase 3  스타일 계층 + milvusButton 구현 ──────── 2일
+Phase 3  스타일 계층 + milvusButton 구현 ──────── 2일 (milvusButton은 2026-10-23 삭제)
 Phase 4  테마 동기화: 색 + 로고 (pnpm sync:theme) ─── 1.5일
 Phase 5  파일럿 컴포넌트 ─────────────────────────── 2일
 Phase 6  ★ 프로젝트 시작 워크플로 (Claude Code 런북) ─ 3일
@@ -270,11 +270,11 @@ Phase 9  발표 준비 ───────────────────
 - [ ] `brands/<브랜드>/` 폴더 구조 확정 (`theme.json`, `root.css`, `logo.*`). (대체) `root.css`는 `util.css`로 합쳤다(2장)
 - [ ] `.storybook/preview.js`에 `globalTypes`로 브랜드 툴바, decorator로 브랜드 스코프(래퍼 요소)에 L1 색과 L3 root style 적용. (대체) L3은 `util.css`다
 - [ ] **`--milvus-*` 허용 목록** 초안 작성 (타이포, 버튼 반경·굵기·패딩 등)
-- [ ] `milvusButton` 구현: SLDS 버튼 블루프린트(`slds-button`) 마크업 + `--milvus-button-*` 변수 + SLDS 기본값 fallback. `lightning-button`과 같은 `@api`(label, variant, icon-name, disabled, type)를 우선 지원한다. 변수가 없는 브랜드에서 `lightning-button`과 똑같이 보이는지 나란히 비교한다
+- [ ] `milvusButton`(2026-10-23 삭제, #70) 구현: SLDS 버튼 블루프린트(`slds-button`) 마크업 + `--milvus-button-*` 변수 + SLDS 기본값 fallback. `lightning-button`과 같은 `@api`(label, variant, icon-name, disabled, type)를 우선 지원한다. 변수가 없는 브랜드에서 `lightning-button`과 똑같이 보이는지 나란히 비교한다
 - [ ] `override.css` 실험: `--slds-g-*` 반경·폰트 재정의가 `lightning-button`에 반영되는 범위를 실측하고, 별도 허용 목록을 만든다. (대체) `override.css`는 만들지 않았다. hook 재정의는 util.css에서 하고, hook·브리지로 안 되는 모양은 opt-in `milvusOverride.css`로 바꾼다(2장)
 - [ ] org 반영 방식(정적 리소스 `loadStyle` / 컨테이너 `:host` 선언)을 비교한다. (결과) 정적 리소스 + `loadStyle`(설계 5.5)
 
-**완료 기준:** 하드코딩한 브랜드 2개를 툴바에서 바꾸면 색은 `lightning-button`까지 함께 바뀌고, 버튼 모양(둥근 / 각진)은 `milvusButton`에서 바뀐다. `override.css`를 켠 브랜드에서는 `lightning-button`의 모양도 바뀌는지 기록한다. (대체) util.css의 hook으로 `lightning-button` 모양이 바뀌는 것을 확인했다(2장, #11·#19).
+**완료 기준:** 하드코딩한 브랜드 2개를 툴바에서 바꾸면 색은 `lightning-button`까지 함께 바뀌고, 버튼 모양(둥근 / 각진)은 `milvusButton`(2026-10-23 삭제, #70)에서 바뀐다. `override.css`를 켠 브랜드에서는 `lightning-button`의 모양도 바뀌는지 기록한다. (대체) util.css의 hook으로 `lightning-button` 모양이 바뀌는 것을 확인했다(2장, #11·#19).
 **주의:** Storybook의 브랜드 전환은 **시뮬레이션**이다. 실제 org에서 색은 관리자가 Setup에서 바꾼다.
 
 ### Phase 4 — 테마 동기화: 색 + 로고 `pnpm sync:theme`
@@ -385,7 +385,7 @@ pnpm sync:theme
 
 ## 5. 10/23(금) 발표 준비 계획
 
-> 관련 이슈: [a40418a/learndoshare#1](https://github.com/a40418a/learndoshare/issues/1) (계획, 완료) · 구현: [#3](https://github.com/a40418a/learndoshare/issues/3) Storybook 기반·배포 → [#4](https://github.com/a40418a/learndoshare/issues/4) `milvusButton`·root style → [#5](https://github.com/a40418a/learndoshare/issues/5) 브랜드 입력 skill → [#6](https://github.com/a40418a/learndoshare/issues/6) 컴포넌트 활성화 선택
+> 관련 이슈: [a40418a/learndoshare#1](https://github.com/a40418a/learndoshare/issues/1) (계획, 완료) · 구현: [#3](https://github.com/a40418a/learndoshare/issues/3) Storybook 기반·배포 → [#4](https://github.com/a40418a/learndoshare/issues/4) `milvusButton`(2026-10-23 삭제, #70)·root style → [#5](https://github.com/a40418a/learndoshare/issues/5) 브랜드 입력 skill → [#6](https://github.com/a40418a/learndoshare/issues/6) 컴포넌트 활성화 선택
 > 남은 기간: 9/28(월)부터 약 4주, 실제 작업일 18일 (10/9 한글날 제외)
 >
 > **2026-10-14 갱신:** 5.1·5.2는 9/26 계획 기록이다. 실제 진행은 4장 마일스톤 표, 일정과 빼는 순서는 [설계](docs/specs/2026-10-08-milvus-package-design.md) 12장을 따른다. #6(컴포넌트 활성화 선택)은 하지 않았다(`init`이 밀버스 LWC를 모두 복사한다). 5.3~5.5는 지금 패키지 흐름으로 고쳤다.
@@ -398,7 +398,7 @@ pnpm sync:theme
 | | 9/29(화)~9/30(수) | Phase 2 `lightning-badge`, `lightning-button` 렌더 검증 | 02 LWC, 04 통합 | SLDS 스타일로 렌더 |
 | | 10/1(목) | org에 배포해 화면 비교 (배포 전 확인) | — | Storybook/org 비교 캡처 |
 | | **10/2(금)** | **★ go/no-go 판단** | — | 성공이면 W2, 실패면 LWC Garden |
-| **W2** 브랜드 | 10/5(월)~10/6(화) | Phase 3 스타일 계층, **`milvusButton` 구현**, `--milvus-*` 허용 목록, `override.css` 실험 | 03 스토리북 | 브랜드 2개에서 `milvusButton` 모양 전환, `override.css` 반영 범위 기록 |
+| **W2** 브랜드 | 10/5(월)~10/6(화) | Phase 3 스타일 계층, **`milvusButton` 구현**(2026-10-23 삭제, #70), `--milvus-*` 허용 목록, `override.css` 실험 | 03 스토리북 | 브랜드 2개에서 `milvusButton` 모양 전환, `override.css` 반영 범위 기록 |
 | | 10/7(수)~10/8(목) 오전 | Phase 4 `pnpm sync:theme` (색 + 로고), 두 번째 테마 생성 | 05 테마 동기화 | 명령 1번으로 org 테마 2개가 색·로고째 Storybook에 뜸 |
 | | 10/8(목) 오후 | **발표 재료**: 실제 사례 캡처, 발굴 수치 | — | 캡처 2장, 수치 표 |
 | | 10/9(금) | 한글날 휴일 | | |
@@ -451,7 +451,7 @@ pnpm sync:theme
 | 질문 | 답변 방향 |
 | --- | --- |
 | 토큰(테마)만 하면 되는 거 아닌가? | 브랜드 전환은 org 테마(`BrandingSet`)와, 요청이 있을 때만 쓰는 util.css로 풀린다(기본 우선). 컴포넌트를 만드는 이유는 브랜드가 아니라 중복 구현과 일관성이다 |
-| 브랜드마다 버튼 디자인이 다르면? | 색은 org 테마로 `lightning-button`까지 바뀐다. 모양은 SLDS 2에 운영에서 쓸 공식 경로가 없다. 컴포넌트 hook(`--slds-c-*`)은 SLDS 2에서 Developer Preview(Winter '27, 운영 금지)이고 global hook은 읽기 전용이다. 그래서 요청이 있을 때만 util.css의 hook → 브리지 변수 → opt-in `milvusOverride.css`(마지막 수단, 공식 권고 밖) 순으로 바꾸고, 릴리스마다 재확인한다. 모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않는다(기능이 없을 때만 만든다). `milvusButton`은 "새로 만드는 방식"의 비교 예시로 보여 준다(2026-10-09 갱신, [Learn 09](<Learn/09-override와 공식 권고.html>)) |
+| 브랜드마다 버튼 디자인이 다르면? | 색은 org 테마로 `lightning-button`까지 바뀐다. 모양은 SLDS 2에 운영에서 쓸 공식 경로가 없다. 컴포넌트 hook(`--slds-c-*`)은 SLDS 2에서 Developer Preview(Winter '27, 운영 금지)이고 global hook은 읽기 전용이다. 그래서 요청이 있을 때만 util.css의 hook → 브리지 변수 → opt-in `milvusOverride.css`(마지막 수단, 공식 권고 밖) 순으로 바꾸고, 릴리스마다 재확인한다. 모양만 바꾸려고 밀버스 컴포넌트를 새로 만들지 않고, 기능이 없을 때만 만든다(2026-10-23 갱신, [Learn 09](<Learn/09-override와 공식 권고.html>)) |
 | Claude가 만든 스타일을 믿을 수 있나? | Claude가 고치는 것은 프로젝트 소유 파일(`milvusBrand.css`, `BrandingSet`)이다. 고칠 때마다 hook이 `check --style`로 util.css 규칙(설계 5.2)과 대비 4.5:1을 검사한다. 어기면 hook이 2로 끝나 고칠 값을 Claude에게 돌려주고, Claude가 그 값으로 다시 고친다(편집 자체를 되돌리지는 않는다). 밀버스 관리 파일은 `permissions.deny`로 막도록 설정했다(실제 동작 **미확인**, 설계 14장). 그 앞뒤로 브랜드 명세 표 승인, Storybook 확인, `deploy` 계획 승인을 거친다 |
 | Storybook에서 브랜드를 바꾸면 org도 바뀌나? | 아니다. Storybook은 프로젝트의 `BrandingSet`과 `milvusBrand.css`로 그린 미리보기다(팔레트는 실측으로 역산한 규칙, 3장). org에는 `pnpm milvus deploy`가 색·로고(`BrandingSet`)와 util.css를 함께 배포하고 활성 테마를 바꾼다. 활성 테마는 org 전체 사용자에게 적용되고, LEX 색은 새로고침 뒤 반영된다(설계 4.4) |
 | 공식 도구가 있는데 왜 Storybook까지? | 실습 B 결과. 개발 중 확인은 공식 도구, 카탈로그·브랜드·공유·프로젝트 시작은 Storybook |
@@ -494,7 +494,7 @@ pnpm sync:theme
 | 순서 | 자료 | 핵심 내용 | 선행 Phase | 예상 시간 |
 | --- | --- | --- | --- | --- |
 | 0 | [디자인 시스템과 Salesforce](<Learn/00-디자인 시스템과 Salesforce.html>) | 디자인 시스템 개념, SLDS 1과 2, styling hook(r → g → s → c), 브랜드(BrandingSet), shadow DOM과 스타일 범위, LEX와 Visualforce, 전 컴포넌트 분석, 밀버스의 층과 명령, 용어집 | 전체 | 1시간 |
-| 1 | [세일즈포스 디자인 시스템](<Learn/01-세일즈포스 디자인 시스템.html>) | SLDS 1과 2, styling hook(global / component / 레거시 토큰), 블루프린트와 base component, 브랜드 모양과 milvusButton, 브리지(hook이 없는 항목) | 전체 | 1.5시간 |
+| 1 | [세일즈포스 디자인 시스템](<Learn/01-세일즈포스 디자인 시스템.html>) | SLDS 1과 2, styling hook(global / component / 레거시 토큰), 블루프린트와 base component, 브랜드 모양 바꾸기, 브리지(hook이 없는 항목) | 전체 | 1.5시간 |
 | 2 | [LWC 기초](<Learn/02-LWC 기초.html>) | 컴포넌트 구조, `@api`/`@wire`, shadow DOM(synthetic / native / light), CSS 변수 상속, 표현/컨테이너 분리 | 2, 5 | 2시간 |
 | 3 | [스토리북](<Learn/03-스토리북.html>) | CSF3, args·controls, decorator·globals(툴바), 로고·manager 테마, autodocs, 정적 빌드, 두 모드(저장소·프로젝트)와 Vite 플러그인, 브랜드 명세 페이지 | 1, 3 | 1.5시간 |
 | 4 | [LWC와 스토리북 통합](<Learn/04-LWC와 스토리북 통합.html>) | Rollup과 Vite가 왜 충돌하는가, digitalflask 방식 해부, 미해결 과제와 해결 경로 | 2 | 2시간 |
@@ -515,7 +515,7 @@ pnpm sync:theme
 | 리스크 | 영향 | 대응 |
 | --- | --- | --- |
 | `lightning-*`이 Storybook에서 렌더되지 않는다 | Storybook 방식 전체 무산 | Phase 2를 먼저 하고, 실패하면 LWC Garden → org 내 문서 앱 |
-| SLDS 2에서 `lightning-button` 모양을 브랜드별로 바꿀 운영용 공식 경로가 없다 (확인됨. `--slds-c-*`는 Winter '27 Developer Preview, 운영 금지) | 버튼 모양 요청을 공식 수단만으로는 들어줄 수 없다 | 요청이 있을 때만 util.css의 hook → 브리지 변수 → opt-in `milvusOverride.css`(마지막 수단, 공식 권고 밖) 순으로 쓴다. 모양만 바꾸려고 밀버스 컴포넌트를 만들지 않고, `milvusButton`은 비교 예시로 둔다. 컴포넌트 hook이 GA가 되면 재검토한다(2026-10-09 갱신, [Learn 09](<Learn/09-override와 공식 권고.html>)) |
+| SLDS 2에서 `lightning-button` 모양을 브랜드별로 바꿀 운영용 공식 경로가 없다 (확인됨. `--slds-c-*`는 Winter '27 Developer Preview, 운영 금지) | 버튼 모양 요청을 공식 수단만으로는 들어줄 수 없다 | 요청이 있을 때만 util.css의 hook → 브리지 변수 → opt-in `milvusOverride.css`(마지막 수단, 공식 권고 밖) 순으로 쓴다. 모양만 바꾸려고 밀버스 컴포넌트를 만들지 않는다. 컴포넌트 hook이 GA가 되면 재검토한다(2026-10-23 갱신, [Learn 09](<Learn/09-override와 공식 권고.html>)) |
 | `override.css`(global hook 재정의)가 Salesforce 릴리스 후 깨진다 | 해당 고객사 화면의 버튼 레이아웃이 틀어진다 | opt-in 브랜드에만 적용, 별도 허용 목록, 릴리스(연 3회)마다 Storybook·org 재확인, `milvus.config.json`에 사용 여부 기록 |
 | root style을 org에 반영하는 방식이 정해지지 않았다 | Storybook에서만 되는 스타일이 된다 | Phase 3에서 `loadStyle` / `:host` 선언을 비교하고, 결정 요청 항목으로 올린다 |
 | synthetic/native shadow 차이로 Storybook과 org 화면이 다르다 | 문서를 신뢰할 수 없다 | synthetic-shadow를 로드하고 org 화면과 나란히 비교한다 |
