@@ -185,7 +185,7 @@ export const 소스_코드 = sourceStory("milvusFoo");
 ## 9. 정해야 할 것
 
 - ~~milvus-design-system 이슈 #9를 닫을지~~ → **그대로 둔다** (2026-10-26 사용자 결정). #9("프로젝트에서 만든 LWC를 milvus storybook에 자동으로 띄우기")는 이번 기능과 별개이고, 이 문서는 2.1의 이유로 그 방향을 택하지 않는다
-- **고객 쪽 빈틈** → 이번 범위 밖. **별도 이슈 [#74](https://github.com/a40418a/learndoshare/issues/74)로 남겼다** (2026-10-26 사용자 결정). 다음 패키지 발행 전에 고친다. 패키지에 없는 `milvus*` 폴더는 `check` 실패, 패키지에서 빠진 컴포넌트(`milvusButton` 등)는 경고만 한다
+- **고객 쪽 빈틈** → 이번 범위 밖. **별도 이슈 [#74](https://github.com/a40418a/learndoshare/issues/74)로 남겼고 2026-10-26에 고쳤다**(패키지·CLI 설계 1장 10/26 행). 패키지에 없는 `milvus*` 폴더는 `check` 실패, 패키지에서 빠진 컴포넌트(`milvusButton` 등)는 경고만 한다
   - 고객 프로젝트에서 사람이 패키지에 없는 `milvus*` 폴더를 만들어도 막히지 않는다(`check`는 `milvus.config.json`의 관리 목록만 본다)
   - 모달 검사(`lib/modal-rules.ts`)가 `milvus*` 폴더를 건너뛰어, 그 이름이면 모달 규칙을 피한다
   - Claude가 `milvus*`를 고치려 하면 `permissions.deny`가 거부만 하고 "밀버스에 요청하세요" 같은 안내는 없다

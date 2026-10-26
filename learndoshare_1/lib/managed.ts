@@ -8,7 +8,13 @@ import { createHash } from "node:crypto";
 import { existsSync, readdirSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
-export type ManagedFile = { dest: string; kind: "managed" | "owned" | "generated"; src?: string; optional?: "vf" };
+/**
+ * 패키지에서 뺀 밀버스 컴포넌트. update는 뺀 관리 파일을 milvus.config.json의 managed에서만 빼고 파일은 남기므로(cli/update.ts),
+ * 이런 폴더는 check가 실패가 아니라 경고만 한다(#74). 컴포넌트를 뺄 때마다 여기에 더한다
+ */
+export const RETIRED_COMPONENTS = ["milvusButton"];
+
+export type ManagedFile ={ dest: string; kind: "managed" | "owned" | "generated"; src?: string; optional?: "vf" };
 
 const FA = "force-app/main/default";
 const RES = `${FA}/staticresources`;

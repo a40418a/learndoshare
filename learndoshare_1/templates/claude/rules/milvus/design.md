@@ -89,7 +89,8 @@
 - **화면 패턴.** LWC 화면(모달 등)을 만들거나 고치기 전에 `docs/milvus/patterns/`에서 해당 패턴 파일을 읽고 따른다. 명세와 다르게 해야 하면 이유를 말하고 확인받는다. 패턴은 브랜드가 아니라 화면 구성이라 `milvus-brand` skill 범위 밖이다
 - **모달은 `modal_<이름>` 컴포넌트로만 만든다.** `LightningModal`을 상속하고 템플릿에는 `<c-milvus-modal>` 하나만 둔다. 일반 LWC 안에서는 `LightningModal`·`lightning-modal-*`·`slds-modal`·`c-milvus-modal`을 쓰지 않고, `c/modal_<이름>`을 import해 `open()`으로 연다. 어기면 hook과 `check`가 실패한다(`docs/milvus/patterns/modal.md` 1·2번)
 - **LWC는 JavaScript(`.js`)로 쓴다.** `.ts` LWC를 그대로 배포하면 org가 타입 검사로 거부한다
-- **`milvus` 접두사는 밀버스 전용이다.** 프로젝트 컴포넌트·변수에 `milvus`, `--milvus-`를 쓰지 않는다
+- **`milvus` 접두사는 밀버스 전용이다.** 프로젝트 컴포넌트·변수에 `milvus`, `--milvus-`를 쓰지 않는다. 패키지에 없는 `lwc/milvus*/` 폴더를 만들면 `check`가 실패한다
+- **밀버스 관리 파일(`lwc/milvus*/` 등)은 이 프로젝트에서 고치지 않는다.** 고쳐야 할 것 같으면 직접 고치지 말고, 패키지가 주는 파일이라 여기서 고칠 수 없으니 밀버스에 요청하라고 사용자에게 안내한다. 여러 화면에서 쓸 공용 컴포넌트가 필요할 때도 같다. 밀버스가 패키지에 더하면 `pnpm milvus update`로 받아 쓴다
 - 프로젝트 컴포넌트에서 브랜드 스타일이 필요하면 `c/milvusScript`의 `loadBrand(this)`를 부른다
 - 개인정보 필드(`Phone`, `Email`, 주소)와 `FIELDS(ALL)`는 조회하지 않는다. 액세스 토큰을 출력하는 명령(`sf org display`, `sf org open --url-only`·`-r`·`--json`, `sf org list --json`, `sf auth list --json`)과 `SF_CONTENT_TYPE=JSON`(모든 sf 출력을 JSON으로 바꾼다)은 쓰지 않는다. 별칭 확인은 `--json` 없는 `sf org list`로 한다
 
