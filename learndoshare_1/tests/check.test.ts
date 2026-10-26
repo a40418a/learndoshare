@@ -76,6 +76,32 @@ test("--style은 규칙 위반에서 2와 stderr의 고칠 값", async () => {
   });
 });
 
+test("모달 규칙을 어긴 프로젝트 LWC는 --style에서 2, 전체 check에서 1이다(밀버스 관리 컴포넌트는 보지 않는다)", async () => {
+  await withProject(async (root) => {
+    // init이 놓은 lwc/milvusModal은 lightning-modal-*를 쓰지만 건너뛴다
+    assert.equal((await check(root, true)).result.code, 0);
+
+    const lwc = (name: string, files: Record<string, string>) => {
+      mkdirSync(join(root, `${FA}/lwc/${name}/__tests__`), { recursive: true });
+      for (const [file, text] of Object.entries(files)) write(root, `${FA}/lwc/${name}/${file}`, text);
+    };
+    lwc("accountPanel", { "accountPanel.html": `<template><lightning-modal-body>x</lightning-modal-body></template>` });
+    lwc("modal_accountEdit", { "modal_accountEdit.js": `import { LightningElement } from "lwc";\nexport default class M extends LightningElement {}\n` });
+    // __tests__ 안은 보지 않는다
+    write(root, `${FA}/lwc/accountPanel/__tests__/accountPanel.test.js`, `jest.mock("lightning/modal");\n`);
+
+    const r = await check(root, true);
+    assert.equal(r.result.code, 2);
+    assert.deepEqual(r.result.issues.map((i) => [i.file, i.rule]), [
+      [`${FA}/lwc/accountPanel/accountPanel.html`, "modal-separate"],
+      [`${FA}/lwc/modal_accountEdit/modal_accountEdit.js`, "modal-base"],
+      [`${FA}/lwc/modal_accountEdit/modal_accountEdit.html`, "modal-frame"],
+    ]);
+    assert.match(r.stderr, /modal_<이름> 컴포넌트로 분리/);
+    assert.equal((await check(root, false)).result.code, 1);
+  });
+});
+
 test("--style은 override 경고만 있으면 0이고 stderr에 '공식 권고 밖' 경고", async () => {
   await withProject(async (root) => {
     copyFileSync(fixture("override-warn.css"), join(root, `${RES}/milvusOverride.css`));
@@ -257,14 +283,29 @@ function runHook(input: unknown, projectDir?: string) {
   return spawnSync(process.execPath, [hook], { input: typeof input === "string" ? input : JSON.stringify(input), encoding: "utf8", env });
 }
 const edit = (cwd: string, file_path: string) => ({ hook_event_name: "PostToolUse", tool_name: "Edit", cwd, tool_input: { file_path } });
-const TARGETS = [`${RES}/milvusBrand.css`, `${RES}/milvusOverride.css`, `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`];
+const TARGETS = [
+  `${RES}/milvusBrand.css`,
+  `${RES}/milvusOverride.css`,
+  `${FA}/brandingSets/LEXTHEMINGAcme.brandingSet-meta.xml`,
+  `${FA}/lwc/myCard/myCard.js`,
+  `${FA}/lwc/myCard/myCard.html`,
+];
 
 test("hook은 다른 파일 수정에는 check를 실행하지 않는다", posixOnly, async () => {
   await withProject(async (root) => {
     installPackage(root);
     // check --style이 실패할 상태. 다른 파일에서 check를 실행했다면 2가 나온다
     write(root, `${RES}/milvusBrand.css`, ":root {\n  --slds-g-color-success-1: #7FBF7F;\n}\n");
-    const others = [`${FA}/lwc/myCard/myCard.css`, `${RES}/milvusBrand.resource-meta.xml`, `${RES}/milvusBridge.css`, "brands/acme/milvusBrand.css", "README.md"];
+    // hook은 고친 파일의 폴더에서 check를 실행한다. LWC 폴더를 만들어 둔다
+    mkdirSync(join(root, `${FA}/lwc/myCard/__tests__`), { recursive: true });
+    const others = [
+      `${FA}/lwc/myCard/myCard.css`,
+      `${FA}/lwc/myCard/__tests__/myCard.test.js`,
+      `${RES}/milvusBrand.resource-meta.xml`,
+      `${RES}/milvusBridge.css`,
+      "brands/acme/milvusBrand.css",
+      "README.md",
+    ];
     for (const rel of others) {
       const r = runHook(edit(root, join(root, rel)));
       assert.deepEqual([r.status, r.stdout, r.stderr], [0, "", ""], rel);

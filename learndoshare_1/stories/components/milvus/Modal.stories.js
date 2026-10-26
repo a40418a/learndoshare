@@ -14,7 +14,11 @@ function opener(args, buttonLabel = "모달 열기") {
   log.className = "slds-text-body_small slds-m-top_small";
   log.textContent = "결과: (아직 없음) · X나 Esc로 닫으면 undefined";
   button.addEventListener("click", async () => {
-    const result = await ModalDemo.open({ size, description: `${props.label} 창`, ...props });
+    const result = await ModalDemo.open({
+      size,
+      description: `${props.label} 창`,
+      ...props
+    });
     log.textContent = `결과: ${JSON.stringify(result) ?? "undefined"}`;
     onResult?.(result);
   });
@@ -22,11 +26,11 @@ function opener(args, buttonLabel = "모달 열기") {
   return wrap;
 }
 
-const PROJECT_MODAL = `// c/accountEditModal.js — 프로젝트 모달. 틀은 c-milvus-modal에 맡기고 안만 채운다
+const PROJECT_MODAL = `// c/modal_accountEdit.js — 프로젝트 모달. 이름은 modal_<이름>, 틀은 c-milvus-modal에 맡기고 안만 채운다
 import { api } from "lwc";
 import LightningModal from "lightning/modal";
 
-export default class AccountEditModal extends LightningModal {
+export default class ModalAccountEdit extends LightningModal {
     @api recordName;
     busy = false;
 
@@ -43,16 +47,23 @@ export default class AccountEditModal extends LightningModal {
     }
 }`;
 
-const usageCode = ({ label, primaryLabel, secondaryLabel, primaryVariant, primaryDisabled }) => {
+const usageCode = ({
+  label,
+  primaryLabel,
+  secondaryLabel,
+  primaryVariant,
+  primaryDisabled
+}) => {
   const attrs = [`label="${label}"`];
   if (primaryLabel) attrs.push(`primary-label="${primaryLabel}"`);
   if (secondaryLabel) attrs.push(`secondary-label="${secondaryLabel}"`);
-  if (primaryVariant && primaryVariant !== "brand") attrs.push(`primary-variant="${primaryVariant}"`);
+  if (primaryVariant && primaryVariant !== "brand")
+    attrs.push(`primary-variant="${primaryVariant}"`);
   if (primaryDisabled) attrs.push("primary-disabled");
   attrs.push("busy={busy}");
   if (primaryLabel) attrs.push("onprimary={handleSave}");
   if (secondaryLabel) attrs.push("onsecondary={handleCancel}");
-  return `<!-- c/accountEditModal.html -->
+  return `<!-- c/modal_accountEdit.html -->
 <template>
     <c-milvus-modal
         ${attrs.join("\n        ")}
@@ -64,8 +75,9 @@ const usageCode = ({ label, primaryLabel, secondaryLabel, primaryVariant, primar
 
 ${PROJECT_MODAL}
 
-// 여는 쪽
-const result = await AccountEditModal.open({ size: "small", description: "거래처 수정 창", recordName: this.name });`;
+// 여는 쪽(일반 LWC)
+import ModalAccountEdit from "c/modal_accountEdit";
+const result = await ModalAccountEdit.open({ size: "small", description: "거래처 수정 창", recordName: this.name });`;
 };
 
 export default {
@@ -80,12 +92,33 @@ export default {
     size: "small"
   },
   argTypes: {
-    label: { control: "text", description: "제목. 헤더 가운데에 놓이고 모달의 접근성 이름이 된다 (필수)" },
-    primaryLabel: { control: "text", description: "강조 버튼 라벨. 맨 오른쪽. 비우면 버튼을 그리지 않는다" },
-    secondaryLabel: { control: "text", description: "비강조 버튼 라벨. 강조 버튼 왼쪽. 비우면 버튼을 그리지 않는다" },
-    primaryVariant: { control: "select", options: VARIANTS, description: "`brand`(기본) 또는 되돌릴 수 없는 동작의 `destructive`" },
-    primaryDisabled: { control: "boolean", description: "강조 버튼만 막는다 (입력이 모자랄 때)" },
-    size: { control: "select", options: SIZES, description: "`open()`에 넘기는 크기 (LightningModal 속성)" },
+    label: {
+      control: "text",
+      description: "제목. 헤더 가운데에 놓이고 모달의 접근성 이름이 된다 (필수)"
+    },
+    primaryLabel: {
+      control: "text",
+      description: "강조 버튼 라벨. 맨 오른쪽. 비우면 버튼을 그리지 않는다"
+    },
+    secondaryLabel: {
+      control: "text",
+      description:
+        "비강조 버튼 라벨. 강조 버튼 왼쪽. 비우면 버튼을 그리지 않는다"
+    },
+    primaryVariant: {
+      control: "select",
+      options: VARIANTS,
+      description: "`brand`(기본) 또는 되돌릴 수 없는 동작의 `destructive`"
+    },
+    primaryDisabled: {
+      control: "boolean",
+      description: "강조 버튼만 막는다 (입력이 모자랄 때)"
+    },
+    size: {
+      control: "select",
+      options: SIZES,
+      description: "`open()`에 넘기는 크기 (LightningModal 속성)"
+    },
     message: { table: { disable: true } },
     onResult: { action: "result", table: { disable: true } }
   },
@@ -95,7 +128,7 @@ export default {
       description: {
         component: `${ORIGIN.milvus}
 
-**모달 안만 채우면 되는 틀**이다. 프로젝트 모달은 패턴 명세(\`docs/milvus/patterns/modal.md\`)대로 \`LightningModal\`을 상속하고, 템플릿에는 \`c-milvus-modal\` 하나를 두고 그 안(기본 슬롯)에 내용만 넣는다. 제목과 버튼 자리는 이 컴포넌트가 정한다.
+**모달 안만 채우면 되는 틀**이다. 프로젝트 모달은 패턴 명세(\`docs/milvus/patterns/modal.md\`)대로 이름을 \`modal_<이름>\`으로 하고 \`LightningModal\`을 상속하며, 템플릿에는 \`c-milvus-modal\` 하나만 두고 그 안(기본 슬롯)에 내용만 넣는다. 제목과 버튼 자리는 이 컴포넌트가 정한다. 일반 LWC 안에서는 모달을 만들지 않고 \`c/modal_<이름>\`을 import해 \`open()\`으로 연다. 어기면 \`pnpm milvus check\`가 실패한다.
 
 | 자리 | 정해진 것 |
 | --- | --- |
@@ -123,14 +156,31 @@ export default {
   }
 };
 
-export const 기본 = {};
+export const 기본 = {
+  args: {
+    primaryVariant: "brand",
+    size: "full"
+  }
+};
 
 export const 버튼_하나 = {
-  args: { label: "안내", primaryLabel: "확인", secondaryLabel: "", message: "변경 내용을 저장했습니다." }
+  args: {
+    label: "안내",
+    primaryLabel: "확인",
+    secondaryLabel: "",
+    message: "변경 내용을 저장했습니다."
+  }
 };
 
 export const 되돌릴_수_없는_동작 = {
-  args: { label: "거래처 삭제", primaryLabel: "삭제", secondaryLabel: "취소", primaryVariant: "destructive", message: "삭제하면 이 거래처의 연락처 3건도 함께 사라지고 되돌릴 수 없습니다." }
+  args: {
+    label: "거래처 삭제",
+    primaryLabel: "삭제",
+    secondaryLabel: "취소",
+    primaryVariant: "destructive",
+    message:
+      "삭제하면 이 거래처의 연락처 3건도 함께 사라지고 되돌릴 수 없습니다."
+  }
 };
 
 export const 소스_코드 = sourceStory("milvusModal");
