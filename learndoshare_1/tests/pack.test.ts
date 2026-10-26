@@ -32,8 +32,28 @@ test("pack 결과에 dist/cli/index.js가 있고 __tests__가 없으며, 텍스�
   assert.ok(entries.includes("package/stories/Welcome.mdx"), entries.join("\n"));
   // 판정 R1: 개발자 PC 경로 검사는 dist/, prepack이 만든 카탈로그, package.json만 한다
   assert.ok(entries.includes("package/stories/slds-catalog/examples.json"), entries.join("\n"));
-  const checked = entries.filter((e) => e.startsWith("package/dist/") || e.startsWith("package/stories/slds-catalog/") || e === "package/package.json");
+  const checked = entries.filter(
+    (e) => e.startsWith("package/dist/") || e.startsWith("package/stories/slds-catalog/") || e.startsWith("package/stories/milvus-generated/") || e === "package/package.json",
+  );
   assert.deepEqual(checked.filter((e) => read(e).includes("/Users/")), []);
+});
+
+test("pack의 밀버스 entry export가 패키지에 든 milvus 화면 컴포넌트 목록과 같다", () => {
+  const entry = read("package/stories/milvus-generated/entry.js");
+  assert.equal(entry.split("\n")[0], "// 생성 파일: scripts/generate-milvus-stories.ts. 고치지 않는다");
+  const exported = [...entry.matchAll(/from "c\/(\w+)"/g)].map((m) => m[1]).sort();
+  const screens = entries.map((e) => /^package\/force-app\/main\/default\/lwc\/(milvus\w+)\/\1\.html$/.exec(e)?.[1]).filter(Boolean).sort();
+  assert.ok(exported.length > 0);
+  assert.deepEqual(exported, screens);
+});
+
+test("build:lwc와 prepack에 밀버스 스토리 생성이 있다", () => {
+  // CI에서는 pack 테스트의 prepack이 생성 폴더를 남겨, build:lwc에서 생성 단계가 빠져도 뒤이은 build-storybook이 통과해 버린다
+  assert.equal(pkg.scripts["build:lwc"], "node scripts/generate-slds-catalog.ts && node scripts/generate-milvus-stories.ts && node scripts/build-lwc.ts");
+  assert.equal(
+    pkg.scripts.prepack,
+    "pnpm build:cli && node scripts/build-hooks-index.ts && node scripts/generate-slds-catalog.ts && node scripts/generate-milvus-stories.ts",
+  );
 });
 
 test("pack 결과에 tsconfig.lwc.base.json·lwc-platform.d.ts와 force-app 아래 .ts가 없고 milvusBrandLoader.js가 있다", () => {

@@ -61,6 +61,8 @@ yarn.lock
 
 # 자동 생성 (scripts/generate-slds-catalog.ts)
 stories/slds-catalog/
+# 자동 생성 (scripts/generate-milvus-stories.ts)
+stories/milvus-generated/
 
 # 고객 프로젝트 모드 Storybook이 만드는 폴더 (패키지 설계 3장)
 .milvus/
