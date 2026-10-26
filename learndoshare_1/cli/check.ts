@@ -9,7 +9,7 @@ import { dirname, join } from "node:path";
 import { parseArgs } from "node:util";
 import { readBranding } from "../lib/branding.ts";
 import { loadRuleContext } from "../lib/hooks-index.ts";
-import { sha256 } from "../lib/managed.ts";
+import { RETIRED_COMPONENTS, sha256 } from "../lib/managed.ts";
 import { checkModalComponent } from "../lib/modal-rules.ts";
 import { checkOverrideCss, checkUtilCss, type Issue } from "../lib/rules.ts";
 import { buildMilvusVfCss } from "../lib/vf.ts";
@@ -38,7 +38,9 @@ function managedIssues(root: string): Issue[] {
     const path = join(root, file);
     if (existsSync(path) && sha256(readFileSync(path)) === hash) return [];
     const what = existsSync(path) ? "직접 고쳤습니다" : "없습니다";
-    return [{ file, rule: "managed", message: `밀버스 관리 파일을 ${what}. pnpm milvus update --force로 패키지 원본으로 되돌리세요` }];
+    return [
+      { file, rule: "managed", message: `밀버스 관리 파일을 ${what}. pnpm milvus update --force로 패키지 원본으로 되돌리세요. 고칠 것이 있으면 밀버스에 요청하세요` },
+    ];
   });
 }
 
@@ -65,13 +67,47 @@ function brandingIssues(root: string): Issue[] {
   }
 }
 
+// 패키지가 놓은 밀버스 LWC 폴더(milvus.config.json의 managed에 파일이 있는 폴더). config를 읽지 못하면 undefined
+// (전체 check의 managedIssues가 config 문제로 실패시킨다)
+function managedLwcDirs(root: string): Set<string> | undefined {
+  let config;
+  try {
+    config = readConfig(root);
+  } catch {
+    return undefined;
+  }
+  if (!config) return undefined;
+  const prefix = `${LWC}/`;
+  return new Set(Object.keys(config.managed).filter((f) => f.startsWith(prefix)).map((f) => f.slice(prefix.length).split("/")[0]));
+}
+
+// milvus 접두사는 밀버스 패키지 전용이다(#74). 패키지에 없는 lwc/milvus* 폴더는 실패, 패키지에서 뺀 컴포넌트는 경고만 한다
+function milvusNameIssues(root: string, managed: Set<string> | undefined): { errors: Issue[]; warnings: Issue[] } {
+  const lwc = join(root, LWC);
+  if (!managed || !existsSync(lwc)) return { errors: [], warnings: [] };
+  const foreign = readdirSync(lwc, { withFileTypes: true }).filter((d) => d.isDirectory() && d.name.startsWith("milvus") && !managed.has(d.name));
+  return {
+    errors: foreign
+      .filter((d) => !RETIRED_COMPONENTS.includes(d.name))
+      .map((d) => ({
+        file: `${LWC}/${d.name}`,
+        rule: "milvus-name",
+        message: "milvus는 밀버스 패키지 전용 이름입니다. 공용 컴포넌트가 필요하면 밀버스에 요청하고, 이 프로젝트 화면이면 이름을 바꾸세요",
+      })),
+    warnings: foreign
+      .filter((d) => RETIRED_COMPONENTS.includes(d.name))
+      .map((d) => ({ file: `${LWC}/${d.name}`, rule: "milvus-retired", message: "패키지에서 빠졌습니다. 화면에서 쓰지 않으면 이 폴더를 지우세요" })),
+  };
+}
+
 // 프로젝트 LWC 폴더마다 바로 아래 .js·.html만 모달 규칙으로 본다(__tests__는 보지 않는다).
-// 밀버스 관리 컴포넌트(milvus*)는 건너뛴다. c-milvus-modal 자신이 lightning-modal-*를 쓴다
-function modalIssues(root: string): Issue[] {
+// 패키지가 놓은 밀버스 컴포넌트만 건너뛴다(c-milvus-modal 자신이 lightning-modal-*를 쓴다). config를 읽지 못하면 milvus*를 건너뛴다
+function modalIssues(root: string, managed: Set<string> | undefined): Issue[] {
   const lwc = join(root, LWC);
   if (!existsSync(lwc)) return [];
+  const skip = (name: string) => (managed ? managed.has(name) : name.startsWith("milvus"));
   return readdirSync(lwc, { withFileTypes: true })
-    .filter((d) => d.isDirectory() && !d.name.startsWith("milvus"))
+    .filter((d) => d.isDirectory() && !skip(d.name))
     .flatMap((d) => {
       const dir = `${LWC}/${d.name}`;
       const files = readdirSync(join(root, dir), { withFileTypes: true })
@@ -120,7 +156,9 @@ export async function runCheck(o: { root: string; style: boolean; pkgRoot?: stri
   }
   const override = read(OVERRIDE_CSS);
   const { warnings, errors } = override === undefined ? { warnings: [], errors: [] } : checkOverrideCss(override, OVERRIDE_CSS);
-  issues.push(...errors, ...brandingIssues(o.root), ...modalIssues(o.root));
+  const managed = managedLwcDirs(o.root);
+  const names = milvusNameIssues(o.root, managed);
+  issues.push(...errors, ...brandingIssues(o.root), ...names.errors, ...modalIssues(o.root, managed));
   if (!o.style) issues.push(...managedIssues(o.root));
 
   if (warnings.length) {
@@ -128,6 +166,7 @@ export async function runCheck(o: { root: string; style: boolean; pkgRoot?: stri
       `milvusOverride.css 경고 ${warnings.length}개. 공식 권고 밖인 opt-in 파일이라 막지 않지만, native 전환이나 Salesforce 업데이트 때 깨질 수 있습니다:\n${lines(warnings)}`,
     );
   }
+  if (names.warnings.length) process.stderr.write(`밀버스 컴포넌트 경고 ${names.warnings.length}개:\n${lines(names.warnings)}`);
   if (issues.length) process.stderr.write(`milvus check${o.style ? " --style" : ""}: 고칠 것 ${issues.length}개\n${lines(issues)}`);
   return { code: issues.length ? (o.style ? 2 : 1) : 0, issues, regenerated: o.style ? [] : regenerateVfCss(o.root) };
 }

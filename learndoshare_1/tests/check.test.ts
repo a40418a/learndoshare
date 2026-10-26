@@ -76,6 +76,44 @@ test("--style은 규칙 위반에서 2와 stderr의 고칠 값", async () => {
   });
 });
 
+test("패키지에 없는 milvus* 폴더는 --style 2·전체 1이고, 모달 검사도 받는다(#74)", async () => {
+  await withProject(async (root) => {
+    mkdirSync(join(root, `${FA}/lwc/milvusFoo`), { recursive: true });
+    write(root, `${FA}/lwc/milvusFoo/milvusFoo.html`, `<template><lightning-modal-body>x</lightning-modal-body></template>`);
+    const r = await check(root, true);
+    assert.equal(r.result.code, 2);
+    assert.deepEqual(r.result.issues.map((i) => [i.file, i.rule]), [
+      [`${FA}/lwc/milvusFoo`, "milvus-name"],
+      [`${FA}/lwc/milvusFoo/milvusFoo.html`, "modal-separate"],
+    ]);
+    assert.match(r.stderr, /밀버스 패키지 전용 이름입니다/);
+    assert.match(r.stderr, /밀버스에 요청/);
+    assert.equal((await check(root, false)).result.code, 1);
+  });
+});
+
+test("패키지에서 빠진 컴포넌트 폴더(milvusButton)는 실패가 아니라 경고만 한다(#74)", async () => {
+  await withProject(async (root) => {
+    mkdirSync(join(root, `${FA}/lwc/milvusButton`), { recursive: true });
+    write(root, `${FA}/lwc/milvusButton/milvusButton.js`, "export default class X {}\n");
+    const r = await check(root, true);
+    assert.equal(r.result.code, 0, r.stderr);
+    assert.deepEqual(r.result.issues, []);
+    assert.match(r.stderr, /milvusButton/);
+    assert.match(r.stderr, /패키지에서 빠졌습니다/);
+    assert.equal((await check(root, false)).result.code, 0);
+  });
+});
+
+test("관리 파일을 고쳤을 때 안내에 밀버스 요청이 들어 있다(#74)", async () => {
+  await withProject(async (root) => {
+    appendFileSync(join(root, `${FA}/lwc/milvusScript/milvusScript.js`), "\n// 직접 고침\n");
+    const r = await check(root, false);
+    assert.match(r.stderr, /pnpm milvus update --force/);
+    assert.match(r.stderr, /밀버스에 요청하세요/);
+  });
+});
+
 test("모달 규칙을 어긴 프로젝트 LWC는 --style에서 2, 전체 check에서 1이다(밀버스 관리 컴포넌트는 보지 않는다)", async () => {
   await withProject(async (root) => {
     // init이 놓은 lwc/milvusModal은 lightning-modal-*를 쓰지만 건너뛴다

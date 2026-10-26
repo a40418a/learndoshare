@@ -28,6 +28,7 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 - 지금은 **모달**만 있다: 모달은 일반 LWC와 분리한 `modal_<이름>` 컴포넌트(예: `modal_accountEdit`)로만 만든다. `LightningModal`을 상속하고 템플릿에는 `c-milvus-modal` 하나만 두어 안만 채운다. 제목은 가운데, 버튼은 오른쪽 아래 "비강조 → 강조" 순서, 크기는 `size`, 결과는 `this.close(result)`, 열 때는 일반 LWC에서 `ModalAccountEdit.open({ … })`
 - 모달 규칙은 `pnpm milvus check`가 막는다. 일반 LWC 안에 `LightningModal`·`lightning-modal-*`·`slds-modal`·`c-milvus-modal`이 있거나 `modal_` 템플릿이 `c-milvus-modal` 하나가 아니면 hook과 `deploy`·CI의 `check`가 실패한다
+- 이름이 `milvus`로 시작하는 폴더는 패키지가 준 것만 둘 수 있다. 패키지에 없는 `lwc/milvus*/`를 만들면 `check`가 실패한다. 공용 컴포넌트가 필요하면 밀버스에 요청하고, 패키지에 더해지면 `pnpm milvus update`로 받는다
 - 팀이 규칙을 바꾸거나 패턴(폼 레이아웃, 목록 툴바, 빈 상태, 오류 표시 등)을 더한다. 프로젝트 소유 파일이라 `update`가 덮어쓰지 않는다
 - 공식 근거: [LightningModal](https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-modal), [SLDS 2 Modals](https://www.lightningdesignsystem.com/components/modals/)
 
