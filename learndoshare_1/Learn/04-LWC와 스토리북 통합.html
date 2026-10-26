@@ -378,13 +378,15 @@ export { createElement } from "lwc";
 
 <span class="c">// 밀버스 추가. Salesforce 기본 컴포넌트는 공식 예제 카탈로그(catalog.js)에서 렌더한다</span>
 export { default as MilvusBadge } from "c/milvusBadge";
-export { default as MilvusButton } from "c/milvusButton";
 export { default as MilvusMultiSelect } from "c/milvusMultiSelect";
 export { default as MilvusNotification } from "c/milvusNotification";
 export { default as MilvusCalendar } from "c/milvusCalendar";
+export { default as MilvusModal } from "c/milvusModal";
 export { default as MilvusBrandLoader } from "c/milvusBrandLoader";
 <span class="c">// 스토리 전용 예시 컴포넌트(슬롯에 내용을 넣는 쪽). 패키지 stories 폴더에 함께 들어간다</span>
-export { default as NotificationSlotDemo } from "./lwc/notificationSlotDemo/notificationSlotDemo.js";</code></pre>
+export { default as NotificationSlotDemo } from "./lwc/notificationSlotDemo/notificationSlotDemo.js";
+<span class="c">// 스토리 전용 예시 모달(LightningModal 상속 + c-milvus-modal)</span>
+export { default as ModalDemo } from "./lwc/modalDemo/modalDemo.js";</code></pre>
 
 <pre data-file="package.json (scripts 일부)"><code>  "scripts": {
     …
@@ -458,7 +460,7 @@ export default {
 
 export const 기본 = {};</code></pre>
   <p><code>lwc()</code>는 args를 <code>element[key] = value</code>로 넣는다. <code>@api</code> 속성은 camelCase 이름의 JS property로 노출되므로 이 방식이 맞다. 렌더러는 <code>render</code>가 돌려준 DOM 요소를 그대로 캔버스에 붙인다 (<a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html#why">03 Storybook</a>).</p>
-  <p class="sources">출처: <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/rollup-plugin">@lwc/rollup-plugin README (rootDir, modules, enableDynamicComponents)</a> (확인 2026-10-09) · <a href="https://rollupjs.org/configuration-options/">Rollup — Configuration options (input, output.dir, manualChunks, onwarn)</a> (확인 2026-10-09) · <a href="https://rollupjs.org/plugin-development/">Rollup — Plugin development (resolveId, load, \0 가상 모듈)</a> (확인 2026-10-09) · <a href="https://rollupjs.org/javascript-api/">Rollup — JavaScript API (rollup, bundle.write, bundle.close)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@rollup/plugin-replace">@rollup/plugin-replace (npm)</a> (확인 2026-10-09) · <a href="https://nodejs.org/api/module.html">Node.js — Modules: node:module API (module.createRequire)</a> (확인 2026-10-12) · <a href="https://pnpm.io/symlinked-node-modules-structure">pnpm — Symlinked node_modules structure</a> (확인 2026-10-12) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 13장 (pnpm은 패키지 의존성을 프로젝트 node_modules 바로 아래에 두지 않음)</a> (확인 2026-10-12) · <a href="https://nodejs.org/api/typescript.html">Node.js — Modules: TypeScript (.ts 실행, import에 확장자)</a> (확인 2026-10-09) · <a href="https://vite.dev/config/shared-options.html#resolve-alias">Vite — resolve.alias</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/engine-dom">@lwc/engine-dom README (createElement)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/js-props-names.html">LWC Developer Guide — Property and Attribute Names</a> (확인 2026-10-09)</p>
+  <p class="sources">출처: <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/rollup-plugin">@lwc/rollup-plugin README (rootDir, modules, enableDynamicComponents)</a> (확인 2026-10-09) · <a href="https://rollupjs.org/configuration-options/">Rollup — Configuration options (input, output.dir, manualChunks, onwarn)</a> (확인 2026-10-09) · <a href="https://rollupjs.org/plugin-development/">Rollup — Plugin development (resolveId, load, \0 가상 모듈)</a> (확인 2026-10-09) · <a href="https://rollupjs.org/javascript-api/">Rollup — JavaScript API (rollup, bundle.write, bundle.close)</a> (확인 2026-10-09) · <a href="https://www.npmjs.com/package/@rollup/plugin-replace">@rollup/plugin-replace (npm)</a> (확인 2026-10-09) · <a href="https://nodejs.org/api/module.html">Node.js — Modules: node:module API (module.createRequire)</a> (확인 2026-10-12) · <a href="https://pnpm.io/symlinked-node-modules-structure">pnpm — Symlinked node_modules structure</a> (확인 2026-10-12) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 13장 (pnpm은 패키지 의존성을 프로젝트 node_modules 바로 아래에 두지 않음), 1장 10/23 (milvusButton 삭제, milvusModal 추가)</a> (확인 2026-10-26) · <a href="https://nodejs.org/api/typescript.html">Node.js — Modules: TypeScript (.ts 실행, import에 확장자)</a> (확인 2026-10-09) · <a href="https://vite.dev/config/shared-options.html#resolve-alias">Vite — resolve.alias</a> (확인 2026-10-09) · <a href="https://github.com/salesforce/lwc/tree/master/packages/%40lwc/engine-dom">@lwc/engine-dom README (createElement)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/js-props-names.html">LWC Developer Guide — Property and Attribute Names</a> (확인 2026-10-09)</p>
 </section>
 
 <section id="risks">
@@ -502,9 +504,9 @@ export const 기본 = {};</code></pre>
 
 <section id="project">
   <h2>우리 프로젝트 적용</h2>
-  <div class="callout project"><strong>지금 상태 (2026-10-20 갱신)</strong>
+  <div class="callout project"><strong>지금 상태 (2026-10-26 갱신)</strong>
     <ul>
-      <li>표현 컴포넌트 5개(<code>milvusBadge</code>, <code>milvusButton</code>, <code>milvusMultiSelect</code>, <code>milvusNotification</code>·<code>milvusCalendar</code>, 이슈 #40)와 화면 없는 앱 전체 브랜드 로더 <code>milvusBrandLoader</code>(Task 30)가 <code>force-app/main/default/lwc/</code>에 있고, <code>stories/lwc-entry.js</code>가 export한다</li>
+      <li>표현 컴포넌트 5개(<code>milvusBadge</code>, <code>milvusMultiSelect</code>, <code>milvusNotification</code>·<code>milvusCalendar</code>(이슈 #40), <code>milvusModal</code>(이슈 #70))와 화면 없는 앱 전체 브랜드 로더 <code>milvusBrandLoader</code>(Task 30)가 <code>force-app/main/default/lwc/</code>에 있고, <code>stories/lwc-entry.js</code>가 export한다. 비교 예시였던 <code>milvusButton</code>은 2026-10-23에 지웠다(#70)</li>
       <li>Salesforce 기본 컴포넌트는 <code>lightning-base-components</code>의 공식 예제(<code>__examples__</code>)를 그대로 컴파일한 카탈로그로 보여 준다 (<code>scripts/generate-slds-catalog.ts</code>의 <code>generateCatalog</code>, <a href="#code">저장소 코드</a>)</li>
       <li>컨테이너(<code>@wire</code>, Apex, LDS를 쓰는 컴포넌트)는 빌드 입력에 넣지 않는다. <code>lightning/uiRecordApi</code>가 패키지에 없으므로 빌드되지 않는 것이 정상이다. 지금 저장소에는 컨테이너 컴포넌트가 없다</li>
       <li>밀버스 컴포넌트는 JavaScript(<code>.js</code>)다(2026-10-12 갱신: 10/9 결정 D1로 TypeScript에서 되돌렸다, <a href="02-LWC%20%EA%B8%B0%EC%B4%88.html#ts">02 LWC</a>). 빌드는 npm에 없는 플랫폼 모듈(<code>lightning/platformResourceLoader</code>, <code>@salesforce/resourceUrl/*</code>)을 대체 모듈로 바꾼다 (<a href="#plugins">플랫폼 모듈 대체</a>, 2026-10-09 구현)</li>
@@ -521,7 +523,7 @@ export const 기본 = {};</code></pre>
     <li>native 전환 대비용 두 번째 빌드(native)는 발표 뒤로 미룬다</li>
   </ul>
   <p>근거는 <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서</a> 4.2·9.2·13장이다. native 빌드는 아직 구현 전이다. 플랫폼 모듈 대체는 2026-10-09에 구현해 이 목록에서 뺐다. TypeScript 타입 제거는 같은 날 만들었다가 LWC를 JS로 되돌리며 지웠다(Task 30, 2026-10-12 갱신).</p>
-  <p class="sources">출처: <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="../README.md">README 2장 (util.css 규칙, #11·#18, 2026-10-09 설계 5.2로 통합)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (기본 우선), 4.2 (<code>milvus storybook</code>, 2026-10-13 구현)·9.2·13장, 5.2·5.3 (util.css 규칙, 2026-10-09 구현), 1장 10/9 D1·D3 (LWC는 JS, milvusBrandLoader)</a> (확인 2026-10-13) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/ts.html">LWC Developer Guide — TypeScript (Developer Preview)</a> (확인 2026-10-12) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (2.1 규칙 세 곳 불일치)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (loadStyle)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-09-org-probe.md">org 프로브 2차 기록 3.1 (.ts LWC 배포 실패)</a> (확인 2026-10-12)</p>
+  <p class="sources">출처: <a href="https://www.npmjs.com/package/lightning-base-components">lightning-base-components (npm)</a> (확인 2026-10-09) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-dom.html">LWC Developer Guide — Shadow DOM</a> (확인 2026-10-09) · <a href="../README.md">README 2장 (util.css 규칙, #11·#18, 2026-10-09 설계 5.2로 통합)</a> (확인 2026-10-09) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">설계 문서 1장 (기본 우선), 4.2 (<code>milvus storybook</code>, 2026-10-13 구현)·9.2·13장, 5.2·5.3 (util.css 규칙, 2026-10-09 구현), 1장 10/9 D1·D3 (LWC는 JS, milvusBrandLoader), 1장 10/23 (milvusButton 삭제, milvusModal 추가)</a> (확인 2026-10-26) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/ts.html">LWC Developer Guide — TypeScript (Developer Preview)</a> (확인 2026-10-12) · <a href="../docs/research/2026-10-08/synthesis.md">전 컴포넌트 분석 종합 (2.1 규칙 세 곳 불일치)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-08/org-probe.md">org 프로브 기록 (loadStyle)</a> (확인 2026-10-09) · <a href="../docs/research/2026-10-09-org-probe.md">org 프로브 2차 기록 3.1 (.ts LWC 배포 실패)</a> (확인 2026-10-12)</p>
 </section>
 
 <section id="quiz" class="quiz">
