@@ -8,6 +8,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildLwc, lightningBaseComponentsDir } from "../lib/lwc-build.ts";
 import { planStorybook, runStorybook } from "../cli/storybook.ts";
+import { entrySource, findMilvusComponents } from "../lib/milvus-stories.ts";
 
 const repo = fileURLToPath(new URL("..", import.meta.url));
 // 폴더 이름에 공백과 한글을 넣는다(리뷰 중점 5). 결과물은 임시 폴더에만 쓴다
@@ -28,7 +29,13 @@ function makePkg(o: { light?: boolean; broken?: boolean } = {}): string {
   const entry = o.broken ? 'import "./없는 파일.js";\n' : o.light ? "export {};\n" : readFileSync(join(repo, "stories/lwc-entry.js"));
   writeFileSync(join(pkg, "stories/lwc-entry.js"), entry);
   // 진입 파일이 상대 경로로 import하는 스토리 전용 예시 컴포넌트(패키지에는 stories 폴더째 들어간다)
-  if (!o.light && !o.broken) cpSync(join(repo, "stories/lwc"), join(pkg, "stories/lwc"), { recursive: true });
+  if (!o.light && !o.broken) {
+    cpSync(join(repo, "stories/lwc"), join(pkg, "stories/lwc"), { recursive: true });
+    // 진입 파일이 다시 내보내는 밀버스 컴포넌트 목록(패키지에서는 prepack이 만든다). 저장소의 stories/milvus-generated는 복사하지 않는다:
+    // gitignore 대상이라 CI의 pnpm test 시점에 없고, pack 테스트의 prepack이 같은 시간에 다시 쓴다
+    mkdirSync(join(pkg, "stories/milvus-generated"), { recursive: true });
+    writeFileSync(join(pkg, "stories/milvus-generated/entry.js"), entrySource(findMilvusComponents(join(repo, "force-app/main/default/lwc"))));
+  }
   writeFileSync(join(pkg, "stories/slds-catalog/entry.js"), o.light ? "export {};\n" : 'export { default as accordionBasic } from "accordion/basic";\n');
   writeFileSync(join(pkg, "stories/slds-catalog/examples.json"), JSON.stringify([{ name: "accordion/basic", rel: "accordion/__examples__/basic/basic.js" }]));
   // @lwc/module-resolver가 진입 파일에서 위로 package.json을 찾는다
@@ -157,6 +164,10 @@ test("plan 그대로 buildLwc를 하면 프로젝트 LWC와 카탈로그 예제�
   assert.ok(files.includes("index.js") && files.includes("catalog.js"), files.join(", "));
   const index = readFileSync(join(root, ".milvus/lwc/index.js"), "utf8");
   assert.match(index, /export \{[^}]*MilvusBadge/);
+  // 생성 entry를 거쳐도 밀버스 화면 컴포넌트와 스토리 전용 데모가 모두 나온다(고객 흐름 그대로)
+  for (const name of ["MilvusBrandLoader", "MilvusCalendar", "MilvusModal", "MilvusMultiSelect", "MilvusNotification", "NotificationSlotDemo", "ModalDemo"]) {
+    assert.match(index, new RegExp(`export \\{[^}]*\\b${name}\\b`), name);
+  }
 });
 
 const baseline = listeners();

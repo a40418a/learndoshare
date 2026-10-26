@@ -54,7 +54,7 @@
 - 입력 검증(`@api` 값), 에러 처리, 데이터 손실 방지
 - 접근성: SLDS 블루프린트의 `aria-*`, 키보드 조작, 대비. `milvusNotification` 같은 블루프린트 기반 컴포넌트는 `lightning-*`이 해 주던 접근성을 직접 맞춘다
 - 보안: 인증 정보·org ID를 코드와 문서에 넣지 않는다
-- `var()` fallback, 컴포넌트마다 스토리. LWC Jest 테스트(`__tests__`)는 굳이 새로 만들지 않는다(2026-10-09 사용자 결정. 이미 있는 테스트는 유지하고 `pnpm test:unit`으로 계속 돌린다)
+- `var()` fallback, 컴포넌트마다 스토리(손으로 쓴 스토리. 새 밀버스 컴포넌트는 `force-app/main/default/lwc/milvusFoo/`를 만들고 `pnpm storybook`을 실행하면 기본 스토리로 뜬다. 병합 전에 `stories/components/milvus/Foo.stories.js`를 손으로 쓰고 다시 실행한다. 기본 스토리는 `pnpm build:lwc`가 `stories/milvus-generated/`(커밋하지 않음, 고치지 않음)에 만든다. 설계 2026-10-26 4.4). LWC Jest 테스트(`__tests__`)는 굳이 새로 만들지 않는다(2026-10-09 사용자 결정. 이미 있는 테스트는 유지하고 `pnpm test:unit`으로 계속 돌린다)
 
 ### 의도적 단순화는 기록한다
 
@@ -89,7 +89,7 @@
 | `pnpm lint` | ESLint (`force-app/**/lwc/**/*.js`). SLDS Linter는 없다 |
 | `pnpm test` | 아래를 차례로 실행한다: `typecheck`(`tsc --noEmit`) → `test:unit` → `test:node`(`node --test tests/**/*.test.ts`) → `test:brands`(`brands/*/util.css` 규칙) → `test:learn`(`Learn/` 출처·legacy 검사) → `audit:brand` |
 | `pnpm test:unit` | LWC Jest (`sfdx-lwc-jest`) |
-| `pnpm build-storybook` | `build:lwc`(카탈로그 생성 + Rollup LWC 빌드) 뒤 Storybook 정적 빌드(`storybook-static/`) |
+| `pnpm build-storybook` | `build:lwc`(카탈로그 생성 + 밀버스 스토리 생성 + Rollup LWC 빌드) 뒤 Storybook 정적 빌드(`storybook-static/`) |
 | `pnpm audit:brand` | 정적 반영 검사(설계 9.6). 기준 파일과 달라지거나 고정 목록에 없는 빈틈이 있으면 실패한다 |
 | `pnpm bridge:generate` | SLDS 2 CSS에서 `templates/.../staticresources/milvusBridge.css`를 다시 만든다(검사가 아니라 생성) |
 | `pnpm sync:theme` | org 테마 → `brands/<테마>/`(데모 브랜드용, sf 조회) |

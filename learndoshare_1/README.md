@@ -565,6 +565,7 @@ learndoshare_1/                     # 밀버스 디자인 시스템 (공용)
 
 - **이슈 · 브랜치 · 커밋 규칙은 [CONTRIBUTING.md](../CONTRIBUTING.md)를 따른다.** 형식: `[태그] 요약 (#이슈번호)`, 브랜치 `<태그>/<이슈번호>-<설명>`
 - **pnpm만 사용한다.** `npm`, `yarn`, `npx`는 쓰지 않는다
+- **새 밀버스 컴포넌트**는 `force-app/main/default/lwc/milvusFoo/`를 만들고 `pnpm storybook`을 실행하면 '컴포넌트 / 밀버스 추가 / Foo'에 기본 스토리로 뜬다. 병합 전에 `stories/components/milvus/Foo.stories.js`를 손으로 쓰고 다시 실행한다. `stories/milvus-generated/`는 `pnpm build:lwc`·`prepack`이 지우고 다시 만드는 폴더라 커밋하지 않고(`.gitignore`) 손으로 고치지 않는다(설계 2026-10-26, #76)
 - **코드 작성 시 Ponytail 스킬을 켠다.** 구현 전에 "필요한가 → 이미 있나 → 플랫폼(SLDS·LWC·브라우저)이 제공하나 → 설치된 의존성으로 되나" 순서로 따진다. "SLDS를 최대한 쓴다"는 원칙과 같은 방향이다. 단, 검증·에러 처리·보안·접근성은 줄이지 않는다
 - **`.sfdx`와 `.sf`는 절대 커밋하지 않는다** (org 인증 정보가 들어 있다)
 - `sf` 배포·삭제 명령은 실행 전에 확인한다. 조회는 자유롭게 한다
