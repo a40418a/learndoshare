@@ -1,4 +1,6 @@
-# Figma to LWC 실측 기록 — messageComposer
+# Figma to LWC 실측 기록 — messageComposer (현 slackMessageBox)
+
+> #79 당시 기록. #90 에서 이름을 slackMessageBox 로, 확인 탭을 Slack Message Box Test 로 바꿨다.
 
 런북 06장 "테스트 기록" 표와 스킬 완료 기준(Definition of Done) 11항목을 채운 기록이다.
 
@@ -61,3 +63,16 @@
 - 코드·코드 블록 서식이 필요하면 툴바 대안 정하기 (발견 5)
 - 새 세션에서 스킬이 자동으로 뜨는지, `experience-accessibility-validate`·`experience-lwc-security-validate`·`experience-lwc-rtl-validate` 실행
 - 발견 2 처럼 Linter 가 놓치는 직접 값을 어떻게 확인할지 정하기
+
+## #90 — slackMessageBox 로 이름 변경과 공용 자원 전환 (2026-10-30)
+
+| 항목 | 결과 |
+|---|---|
+| 이름 | lwc·Custom Label 15개·확인 탭/페이지를 slackMessageBox 로. 권한 세트는 탭이 늘어 `Figma_To_LWC_Test` 로 |
+| 색 | SLDS 의미 hook → slackTokens. 바깥 테두리 `1D1C1D-13%`, 모서리 8, 첨부 바탕 `1D1C1D-6%` 등 Figma 값 |
+| 아이콘 | messageComposerIcons(9개) 삭제, slackIcons 의 `<svg><use>`. 크기 Figma 그대로(15·16·18px) |
+| 보내기 버튼 | SLDS brand 버튼 대신 직접 그림. Disabled 는 Figma 대로 바탕 없음 |
+| 테스트 | Jest 32개 통과, ESLint 통과, slackTokens 밖 직접 색 없음 |
+| org 정리 | 예전 컴포넌트·스프라이트·라벨 15개·탭·페이지·권한 세트를 destructive 배포로 삭제(권한 세트는 할당 해제 후) |
+| org 렌더 | Empty·Filled·이모지 삽입 확인 |
+| 추정한 값 | Message Buttons 아이콘 색(70% 본문색), Disabled 보내기 아이콘 색(30%) — Figma 컴포넌트에 없음 |

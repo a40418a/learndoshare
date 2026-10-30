@@ -1,4 +1,6 @@
-# PRD — messageComposer (`<c-message-composer>`)
+# PRD — slackMessageBox (`<c-slack-message-box>`)
+
+> #90 에서 `messageComposer` 에서 이름을 바꿨다(#83 이름 규칙). 색은 slackTokens, 아이콘은 slackIcons 로 옮김. 아래 9장 표의 SLDS hook 대응은 #79 당시 기록이며 지금은 `prd/COLORS.md` 의 토큰을 쓴다.
 
 - 입력: Figma `Slack Design System and UI Kit` › Message Box
   - State=Empty `68:7367`, State=Filled `68:7462` (+ 사용자 제공 Filled 스크린샷)

@@ -1,111 +1,111 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>MessageComposer_Input</fullName>
+        <fullName>SlackMessageBox_Input</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>messageComposer: input label</shortDescription>
+        <shortDescription>slackMessageBox: input label</shortDescription>
         <value>Message</value>
     </labels>
     <labels>
-        <fullName>MessageComposer_Placeholder</fullName>
+        <fullName>SlackMessageBox_Placeholder</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>messageComposer: input placeholder</shortDescription>
+        <shortDescription>slackMessageBox: input placeholder</shortDescription>
         <value>Jot something down</value>
     </labels>
     <labels>
-        <fullName>MessageComposer_Actions</fullName>
+        <fullName>SlackMessageBox_Actions</fullName>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription
-    >messageComposer: footer toolbar label</shortDescription>
+    >slackMessageBox: footer toolbar label</shortDescription>
         <value>Message actions</value>
     </labels>
     <labels>
-        <fullName>MessageComposer_Attach</fullName>
+        <fullName>SlackMessageBox_Attach</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>messageComposer: attach button</shortDescription>
+        <shortDescription>slackMessageBox: attach button</shortDescription>
         <value>Attach</value>
     </labels>
     <labels>
-        <fullName>MessageComposer_Formatting</fullName>
+        <fullName>SlackMessageBox_Formatting</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>messageComposer: formatting button</shortDescription>
+        <shortDescription>slackMessageBox: formatting button</shortDescription>
         <value>Hide formatting</value>
     </labels>
     <labels>
-        <fullName>MessageComposer_Emoji</fullName>
+        <fullName>SlackMessageBox_Emoji</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>messageComposer: emoji button</shortDescription>
+        <shortDescription>slackMessageBox: emoji button</shortDescription>
         <value>Emoji</value>
     </labels>
     <labels>
-        <fullName>MessageComposer_Mention</fullName>
+        <fullName>SlackMessageBox_Mention</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>messageComposer: mention button</shortDescription>
+        <shortDescription>slackMessageBox: mention button</shortDescription>
         <value>Mention someone</value>
     </labels>
     <labels>
-        <fullName>MessageComposer_MentionSearch</fullName>
+        <fullName>SlackMessageBox_MentionSearch</fullName>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription
-    >messageComposer: mention search input</shortDescription>
+    >slackMessageBox: mention search input</shortDescription>
         <value>Search people</value>
     </labels>
     <labels>
-        <fullName>MessageComposer_MentionEmpty</fullName>
+        <fullName>SlackMessageBox_MentionEmpty</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>messageComposer: mention no results</shortDescription>
+        <shortDescription>slackMessageBox: mention no results</shortDescription>
         <value>No people found</value>
     </labels>
     <labels>
-        <fullName>MessageComposer_MentionError</fullName>
+        <fullName>SlackMessageBox_MentionError</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>messageComposer: mention load error</shortDescription>
+        <shortDescription>slackMessageBox: mention load error</shortDescription>
         <value>Couldn't load people</value>
     </labels>
     <labels>
-        <fullName>MessageComposer_Video</fullName>
+        <fullName>SlackMessageBox_Video</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>messageComposer: video clip button</shortDescription>
+        <shortDescription>slackMessageBox: video clip button</shortDescription>
         <value>Record video clip</value>
     </labels>
     <labels>
-        <fullName>MessageComposer_Audio</fullName>
+        <fullName>SlackMessageBox_Audio</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>messageComposer: audio clip button</shortDescription>
+        <shortDescription>slackMessageBox: audio clip button</shortDescription>
         <value>Record audio clip</value>
     </labels>
     <labels>
-        <fullName>MessageComposer_Shortcut</fullName>
+        <fullName>SlackMessageBox_Shortcut</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>messageComposer: shortcut button</shortDescription>
+        <shortDescription>slackMessageBox: shortcut button</shortDescription>
         <value>Run shortcut</value>
     </labels>
     <labels>
-        <fullName>MessageComposer_Send</fullName>
+        <fullName>SlackMessageBox_Send</fullName>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>messageComposer: send button</shortDescription>
+        <shortDescription>slackMessageBox: send button</shortDescription>
         <value>Send now</value>
     </labels>
     <labels>
-        <fullName>MessageComposer_SendOptions</fullName>
+        <fullName>SlackMessageBox_SendOptions</fullName>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription
-    >messageComposer: send options button</shortDescription>
+    >slackMessageBox: send options button</shortDescription>
         <value>Send options</value>
     </labels>
 </CustomLabels>

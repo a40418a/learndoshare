@@ -5,7 +5,7 @@
     <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
     <label>Figma To LWC</label>
     <navType>Standard</navType>
-    <tabs>Message_Composer_Test</tabs>
+    <tabs>Slack_Message_Box_Test</tabs>
     <tabs>Slack_Gallery_Test</tabs>
     <uiType>Lightning</uiType>
 </CustomApplication>

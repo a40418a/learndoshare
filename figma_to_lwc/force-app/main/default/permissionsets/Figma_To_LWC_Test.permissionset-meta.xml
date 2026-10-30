@@ -4,10 +4,10 @@
         <application>Figma_To_LWC</application>
         <visible>true</visible>
     </applicationVisibilities>
-    <label>Message Composer Test</label>
-    <description>messageComposer 확인용 App 페이지 탭과 Figma To LWC 앱을 보이게 한다 (Figma to LWC 실습)</description>
+    <label>Figma To LWC Test</label>
+    <description>Figma To LWC 앱과 확인용 탭을 보이게 한다 (Figma to LWC 실습)</description>
     <tabSettings>
-        <tab>Message_Composer_Test</tab>
+        <tab>Slack_Message_Box_Test</tab>
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>

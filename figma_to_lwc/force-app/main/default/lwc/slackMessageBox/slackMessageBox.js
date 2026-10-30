@@ -1,23 +1,23 @@
 import { LightningElement, api, wire } from "lwc";
 import { gql, graphql } from "lightning/graphql";
-import ICONS from "@salesforce/resourceUrl/messageComposerIcons";
-import INPUT from "@salesforce/label/c.MessageComposer_Input";
-import PLACEHOLDER from "@salesforce/label/c.MessageComposer_Placeholder";
-import ACTIONS from "@salesforce/label/c.MessageComposer_Actions";
-import ATTACH from "@salesforce/label/c.MessageComposer_Attach";
-import FORMATTING from "@salesforce/label/c.MessageComposer_Formatting";
-import EMOJI from "@salesforce/label/c.MessageComposer_Emoji";
-import MENTION from "@salesforce/label/c.MessageComposer_Mention";
-import MENTION_SEARCH from "@salesforce/label/c.MessageComposer_MentionSearch";
-import MENTION_EMPTY from "@salesforce/label/c.MessageComposer_MentionEmpty";
-import MENTION_ERROR from "@salesforce/label/c.MessageComposer_MentionError";
-import VIDEO from "@salesforce/label/c.MessageComposer_Video";
-import AUDIO from "@salesforce/label/c.MessageComposer_Audio";
-import SHORTCUT from "@salesforce/label/c.MessageComposer_Shortcut";
-import SEND from "@salesforce/label/c.MessageComposer_Send";
-import SEND_OPTIONS from "@salesforce/label/c.MessageComposer_SendOptions";
+import ICONS from "@salesforce/resourceUrl/slackIcons";
+import INPUT from "@salesforce/label/c.SlackMessageBox_Input";
+import PLACEHOLDER from "@salesforce/label/c.SlackMessageBox_Placeholder";
+import ACTIONS from "@salesforce/label/c.SlackMessageBox_Actions";
+import ATTACH from "@salesforce/label/c.SlackMessageBox_Attach";
+import FORMATTING from "@salesforce/label/c.SlackMessageBox_Formatting";
+import EMOJI from "@salesforce/label/c.SlackMessageBox_Emoji";
+import MENTION from "@salesforce/label/c.SlackMessageBox_Mention";
+import MENTION_SEARCH from "@salesforce/label/c.SlackMessageBox_MentionSearch";
+import MENTION_EMPTY from "@salesforce/label/c.SlackMessageBox_MentionEmpty";
+import MENTION_ERROR from "@salesforce/label/c.SlackMessageBox_MentionError";
+import VIDEO from "@salesforce/label/c.SlackMessageBox_Video";
+import AUDIO from "@salesforce/label/c.SlackMessageBox_Audio";
+import SHORTCUT from "@salesforce/label/c.SlackMessageBox_Shortcut";
+import SEND from "@salesforce/label/c.SlackMessageBox_Send";
+import SEND_OPTIONS from "@salesforce/label/c.SlackMessageBox_SendOptions";
 
-// PRD: prd/messageComposer/PRD.md — Figma Message Box (68:7367 Empty, 68:7462 Filled)
+// PRD: prd/slackMessageBox/PRD.md — Figma Message Box (68:7367 Empty, 68:7462 Filled)
 
 // 툴바 항목은 Figma 서식 버튼(굵게·기울임·취소선·링크·목록·코드·코드 블록)과 같다 (PRD 2, Q1-A)
 const FORMATS = [
@@ -48,7 +48,7 @@ const EMOJIS = [
 
 // 멘션 검색: 활성 사용자 중 이름이 검색어를 포함하는 10명 (PRD 3)
 const USERS_QUERY = gql`
-  query MessageComposerUsers($term: String) {
+  query SlackMessageBoxUsers($term: String) {
     uiapi {
       query {
         User(
@@ -74,7 +74,7 @@ const USERS_QUERY = gql`
 
 const icon = (name) => `${ICONS}#${name}`;
 
-export default class MessageComposer extends LightningElement {
+export default class SlackMessageBox extends LightningElement {
   /** 입력 영역 안내 문구 */
   @api placeholder = PLACEHOLDER;
   /** true 면 입력과 모든 버튼을 막는다 */
@@ -100,12 +100,12 @@ export default class MessageComposer extends LightningElement {
   icons = {
     plus: icon("plus"),
     formatting: icon("formatting"),
-    emoji: icon("emoji"),
+    emoji: icon("emoji-1"),
     mention: icon("mention"),
     video: icon("video-clip"),
     audio: icon("audio-clip"),
     shortcut: icon("shortcut"),
-    send: icon("send"),
+    send: icon("send-fill"),
     chevron: icon("chevron-down")
   };
   emojis = EMOJIS.map((char) => ({ char }));
