@@ -8,4 +8,10 @@
 |---|---|---|---|---|---|
 | Message Box | `68:7368` | `messageComposer` | State=Empty, Filled | State=Active, Filled Active | 접두사 규칙 이전에 만듦. 부품(Message Buttons, Send Button, Text Format Buttons)을 안에 직접 그림 → 부품 LWC 가 생기면 바꿔 끼움 |
 
-아이콘 스프라이트: `messageComposerIcons` (Slack Icons 섹션 중 9개)
+## 공통 자원
+
+| 자원 | 내용 |
+|---|---|
+| `slackIcons` (static resource) | Slack Icons 섹션 49개 스프라이트. 원본 `figma/icons/`, id 는 Figma 레이어 이름. 새 컴포넌트는 이것을 쓴다 |
+| `messageComposerIcons` (static resource) | messageComposer 전용 9개. 부품 LWC 로 바꿀 때 `slackIcons` 로 옮긴다 |
+| `prd/COLORS.md` | Figma 색 → SLDS hook |

@@ -38,7 +38,7 @@ description: Figma 링크(figma.com/design/...?node-id=...)를 받아 이 프로
 - 위치: `prd/<componentName>/PRD.md`
 - 구성은 스킬의 `references/figma-to-prd-blueprint.md` 를 따른다. `references/prd-analysis-template.md` 는 PRD 양식이 아니라 SARIF 프롬프트이므로 쓰지 않는다.
 - 이름은 스킬의 `scripts/check-component-name.sh <camelCase> <kebab-case>` 로 검사한다.
-- Figma 색·간격·반경은 SLDS 전역 hook 으로 대응표를 만든다(`.claude/skills/design-systems-slds-apply/assets/hooks-index.json` 에 있는 이름만).
+- Figma 색은 `prd/COLORS.md` 에서 먼저 찾고, 없으면 hook 을 정해 그 표에 추가한다. 간격·반경도 SLDS 전역 hook 으로 대응한다(`.claude/skills/design-systems-slds-apply/assets/hooks-index.json` 에 있는 이름만).
 - 아래 질문을 **추천안(A)과 함께** 한 번에 묻고, 답을 PRD 상단에 "확정" 으로 적는다. 사용자가 프롬프트에서 이미 답한 항목은 묻지 않는다.
 
 | # | 질문 | 추천안(A) |
@@ -53,7 +53,7 @@ description: Figma 링크(figma.com/design/...?node-id=...)를 받아 이 프로
 
 ## 3. 생성 — 실측에서 나온 함정
 
-- **아이콘 스프라이트.** Framelink `download_figma_images` 로 아이콘 SVG 를 받고 `scripts/build-sprite.py` 로 한 파일로 합친다. path 의 `fill` 을 지워 색을 상속받게 한다.
+- **아이콘 스프라이트.** 파일 공용 스프라이트가 `prd/COMPONENTS.md` 에 있으면(Slack 은 `slackIcons`) 그것을 쓴다. 없는 아이콘만 Figma 에서 SVG 로 받아 원본 폴더(`figma/icons/`)에 넣고 `scripts/build-sprite.py` 로 다시 만든다. path 의 `fill` 을 지워 색을 상속받게 하고, 선(stroke) 아이콘은 선 색이 같은 hook 을 따르게 바꾼다. Figma API 한도에 걸리면 사용자에게 Figma 에서 직접 SVG 로 내보내 달라고 한다.
   ```bash
   python .claude/skills/figma-to-lwc/scripts/build-sprite.py <svg 폴더> force-app/main/default/staticresources/<name>Icons.svg
   ```
