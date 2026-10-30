@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "Salesforce DX": {
+      "command": "cmd",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@salesforce/mcp@latest",
+        "--orgs",
+        "DEFAULT_TARGET_ORG",
+        "--toolsets",
+        "lwc-experts,aura-experts,experts-validation"
+      ]
+    }
+  }
+}
