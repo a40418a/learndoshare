@@ -26,7 +26,9 @@
           disabled={disabled}
           onclick={handleAction}
         >
-          <lightning-icon src={icons.plus} size="xx-small"></lightning-icon>
+          <svg class="icon icon_15" aria-hidden="true" focusable="false">
+            <use xlink:href={icons.plus}></use>
+          </svg>
           <span class="slds-assistive-text">{labels.ATTACH}</span>
         </button>
 
@@ -37,10 +39,9 @@
           disabled={disabled}
           onclick={handleAction}
         >
-          <lightning-icon
-            src={icons.formatting}
-            size="x-small"
-          ></lightning-icon>
+          <svg class="icon icon_18" aria-hidden="true" focusable="false">
+            <use xlink:href={icons.formatting}></use>
+          </svg>
           <span class="slds-assistive-text">{labels.FORMATTING}</span>
         </button>
 
@@ -54,7 +55,9 @@
             disabled={disabled}
             onclick={togglePopover}
           >
-            <lightning-icon src={icons.emoji} size="x-small"></lightning-icon>
+            <svg class="icon icon_18" aria-hidden="true" focusable="false">
+              <use xlink:href={icons.emoji}></use>
+            </svg>
             <span class="slds-assistive-text">{labels.EMOJI}</span>
           </button>
           <template lwc:if={emojiOpen}>
@@ -90,7 +93,9 @@
             disabled={disabled}
             onclick={togglePopover}
           >
-            <lightning-icon src={icons.mention} size="x-small"></lightning-icon>
+            <svg class="icon icon_18" aria-hidden="true" focusable="false">
+              <use xlink:href={icons.mention}></use>
+            </svg>
             <span class="slds-assistive-text">{labels.MENTION}</span>
           </button>
           <template lwc:if={mentionOpen}>
@@ -147,7 +152,9 @@
           disabled={disabled}
           onclick={handleAction}
         >
-          <lightning-icon src={icons.video} size="x-small"></lightning-icon>
+          <svg class="icon icon_18" aria-hidden="true" focusable="false">
+            <use xlink:href={icons.video}></use>
+          </svg>
           <span class="slds-assistive-text">{labels.VIDEO}</span>
         </button>
         <button
@@ -157,7 +164,9 @@
           disabled={disabled}
           onclick={handleAction}
         >
-          <lightning-icon src={icons.audio} size="x-small"></lightning-icon>
+          <svg class="icon icon_18" aria-hidden="true" focusable="false">
+            <use xlink:href={icons.audio}></use>
+          </svg>
           <span class="slds-assistive-text">{labels.AUDIO}</span>
         </button>
 
@@ -170,30 +179,36 @@
           disabled={disabled}
           onclick={handleAction}
         >
-          <lightning-icon src={icons.shortcut} size="x-small"></lightning-icon>
+          <svg class="icon icon_18" aria-hidden="true" focusable="false">
+            <use xlink:href={icons.shortcut}></use>
+          </svg>
           <span class="slds-assistive-text">{labels.SHORTCUT}</span>
         </button>
       </div>
 
       <!-- 보내기 분할 버튼: Empty 면 비활성, Filled 면 활성 (PRD 6) -->
-      <div class="slds-button-group send" role="group">
+      <div class="send" role="group">
         <button
-          class="slds-button slds-button_brand send-btn"
+          class="send-btn"
           title={labels.SEND}
           disabled={sendDisabled}
           onclick={handleSend}
         >
-          <lightning-icon src={icons.send} size="x-small"></lightning-icon>
+          <svg class="icon icon_16" aria-hidden="true" focusable="false">
+            <use xlink:href={icons.send}></use>
+          </svg>
           <span class="slds-assistive-text">{labels.SEND}</span>
         </button>
         <button
-          class="slds-button slds-button_brand send-btn"
+          class="send-btn"
           title={labels.SEND_OPTIONS}
           data-name="sendoptions"
           disabled={sendDisabled}
           onclick={handleAction}
         >
-          <lightning-icon src={icons.chevron} size="xx-small"></lightning-icon>
+          <svg class="icon icon_15" aria-hidden="true" focusable="false">
+            <use xlink:href={icons.chevron}></use>
+          </svg>
           <span class="slds-assistive-text">{labels.SEND_OPTIONS}</span>
         </button>
       </div>

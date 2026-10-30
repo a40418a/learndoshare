@@ -1,0 +1,115 @@
+@import "c/slackTokens";
+
+/* 값은 Figma Message Box(68:7368) 그대로. 직접 값은 slackTokens 에만 있다 */
+
+.composer {
+  background: var(--slack-brand-ffffff);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--slack-ui-1d1c1d-13);
+  border-radius: var(--slack-radius-8);
+}
+
+/* 하단 줄: padding 0 4 2 6 */
+.footer {
+  padding: 0 var(--slds-g-spacing-1, 0.25rem) var(--slack-space-2)
+    var(--slack-space-5);
+  gap: var(--slds-g-spacing-2, 0.5rem);
+}
+
+.actions {
+  gap: var(--slack-space-2);
+}
+
+/* Message Buttons: padding 5, 모서리 4. 아이콘 색은 Figma 컴포넌트에 없어 70% 본문색(추정) */
+.icon-btn {
+  padding: var(--slack-space-5);
+  border-radius: var(--slack-radius-4);
+  color: var(--slack-ui-1d1c1d-70);
+}
+
+/* 첨부 버튼만 24×24 원형 바탕 */
+.attach {
+  width: var(--slack-size-24);
+  height: var(--slack-size-24);
+  justify-content: center;
+  background: var(--slack-ui-1d1c1d-6);
+  border-radius: var(--slds-g-radius-border-circle, 100%);
+}
+
+.icon {
+  fill: currentColor;
+}
+.icon_15 {
+  width: var(--slack-icon-15);
+  height: var(--slack-icon-15);
+}
+.icon_16 {
+  width: var(--slack-icon-16);
+  height: var(--slack-icon-16);
+}
+.icon_18 {
+  width: var(--slack-icon-18);
+  height: var(--slack-icon-18);
+}
+
+/* Footer Divider: 1×20 선, 좌우 4 */
+.divider {
+  align-self: stretch;
+  border-inline-start: var(--slds-g-sizing-border-1, 1px) solid
+    var(--slack-ui-1d1c1d-13);
+  margin: var(--slack-space-2) var(--slds-g-spacing-1, 0.25rem);
+}
+
+.popover {
+  position: absolute;
+  bottom: 100%;
+  inset-inline-start: 0;
+  margin-bottom: var(--slds-g-spacing-3, 0.75rem);
+}
+
+.emoji {
+  padding: var(--slds-g-spacing-1, 0.25rem);
+  font-size: var(--slds-g-font-scale-3, 1.125rem);
+}
+
+/* Send Button: 보내기(padding 2 8) + 옵션(padding 2 4), 높이 28, 모서리 4 */
+.send {
+  display: inline-flex;
+  margin: var(--slds-g-spacing-1, 0.25rem) var(--slack-space-2)
+    var(--slds-g-spacing-1, 0.25rem) var(--slds-g-spacing-1, 0.25rem);
+}
+
+.send-btn {
+  display: inline-flex;
+  align-items: center;
+  height: var(--slack-size-28);
+  padding: var(--slack-space-2) var(--slds-g-spacing-2, 0.5rem);
+  border: none;
+  border-start-start-radius: var(--slack-radius-4);
+  border-end-start-radius: var(--slack-radius-4);
+  background: var(--slack-brand-007a5a);
+  color: var(--slack-brand-ffffff);
+  cursor: pointer;
+}
+
+.send-btn + .send-btn {
+  padding: var(--slack-space-2) var(--slds-g-spacing-1, 0.25rem);
+  border-radius: 0;
+  border-start-end-radius: var(--slack-radius-4);
+  border-end-end-radius: var(--slack-radius-4);
+  border-inline-start: var(--slds-g-sizing-border-1, 1px) solid
+    var(--slack-ui-ffffff-25);
+}
+
+/* State=Disabled: Figma 에 바탕 없음. 아이콘 색은 Figma 에 없어 30% 본문색(추정) */
+.send-btn:disabled {
+  background: transparent;
+  color: var(--slack-ui-1d1c1d-30);
+  border-inline-start-color: var(--slack-ui-1d1c1d-13);
+  cursor: default;
+}
+
+.icon-btn:focus-visible,
+.send-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--slds-g-shadow-outline-focus-1);
+}

@@ -35,5 +35,12 @@
   --slack-size-28: 1.75rem;
   --slack-space-3: 3px;
   --slack-radius-4: 4px;
+  --slack-radius-8: 8px;
+  --slack-space-2: 2px;
+  --slack-space-5: 5px;
+  --slack-size-24: 1.5rem;
+  --slack-icon-15: 0.9375rem;
+  --slack-icon-16: 1rem;
+  --slack-icon-18: 1.125rem;
   --slack-opacity-80: 0.8;
 }

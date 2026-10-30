@@ -1,5 +1,5 @@
 import { createElement } from "lwc";
-import MessageComposer from "c/messageComposer";
+import SlackMessageBox from "c/slackMessageBox";
 import { graphql } from "lightning/graphql";
 import { registerSa11yMatcher } from "@sa11y/jest";
 
@@ -25,7 +25,7 @@ const USERS = {
 const flush = () => Promise.resolve();
 
 function mount(props = {}) {
-  const el = createElement("c-message-composer", { is: MessageComposer });
+  const el = createElement("c-slack-message-box", { is: SlackMessageBox });
   Object.assign(el, props);
   document.body.appendChild(el);
   return el;
@@ -59,7 +59,7 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-describe("c-message-composer", () => {
+describe("c-slack-message-box", () => {
   it("passes Figma toolbar formats and placeholder to the rich text editor", () => {
     const el = mount({ placeholder: "Say hi" });
     expect(editor(el).formats).toEqual([
@@ -198,7 +198,7 @@ describe("c-message-composer", () => {
     graphql.emit({ uiapi: { query: { User: { edges: [] } } } });
     await flush();
     expect($(el, ".slds-text-color_weak").textContent.trim()).toBe(
-      "c.MessageComposer_MentionEmpty"
+      "c.SlackMessageBox_MentionEmpty"
     );
   });
 
@@ -209,7 +209,7 @@ describe("c-message-composer", () => {
     graphql.emitErrors([{ message: "boom" }]);
     await flush();
     expect($(el, ".slds-text-color_error").textContent.trim()).toBe(
-      "c.MessageComposer_MentionError"
+      "c.SlackMessageBox_MentionError"
     );
   });
 
