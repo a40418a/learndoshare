@@ -84,13 +84,13 @@ npx -y @salesforce-ux/slds-linter@latest lint force-app/main/default/lwc/<name>
 - **SLDS Linter 는 hook 변수에 넣은 직접 색을 잡지 못한다.** `grep -nE "#[0-9a-fA-F]{3,8}\b" <name>.css` 로 따로 보고, 남은 것은 PRD 결정(Q3)과 맞는지 확인한다. `--fix` 는 fallback 에 hex·rem 을 넣으므로 적용 여부를 사용자에게 알린다.
 - **org 확인 (Jest 가 못 잡는 버그가 여기서 나온다):**
   1. `sf project deploy start -o learndoshare_1 -d <경로들>`
-  2. 확인 화면: `flexipages/<Name>_Test` (AppPage) + `tabs/<Name>_Test` + 권한 세트 `Message_Composer_Test` 의 `tabSettings` 에 탭 추가 + 앱 `Figma_To_LWC` 의 `<tabs>` 에 탭 추가. 탭만 배포하면 숨김이라 "페이지 없음" 이 뜬다.
+  2. 확인 화면: `flexipages/<Name>_Test` (AppPage) + `tabs/<Name>_Test` + 권한 세트 `Figma_To_LWC_Test` 의 `tabSettings` 에 탭 추가 + 앱 `Figma_To_LWC` 의 `<tabs>` 에 탭 추가. 탭만 배포하면 숨김이라 "페이지 없음" 이 뜬다.
   3. `/lightning/n/<Name>_Test` 에서 Figma 스크린샷과 상태별로 비교. 로그인은 사용자가 한다.
   4. 배포 직후 예전 화면이 보이면 Lightning 캐시다. 브라우저 IndexedDB `actions` 를 지우거나 다른 브라우저로 본다.
 
 ## 5. 기록
 
-`prd/<componentName>/TEST-RECORD.md` 에 남긴다. `prd/messageComposer/TEST-RECORD.md` 와 같은 구성:
+`prd/<componentName>/TEST-RECORD.md` 에 남긴다. `prd/slackMessageBox/TEST-RECORD.md` 와 같은 구성:
 
 1. 테스트 기록 표 (일자, Figma 노드, 실행 경로, org, 확인 화면, 결과 요약)
 2. 런북 06장 확인 항목 (MCP 연결 · Figma 읽기 · PRD · 코드 생성 · 스타일 · 접근성·보안·RTL · 테스트 · org 렌더)
