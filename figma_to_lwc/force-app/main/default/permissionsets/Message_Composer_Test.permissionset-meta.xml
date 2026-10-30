@@ -10,4 +10,8 @@
         <tab>Message_Composer_Test</tab>
         <visibility>Visible</visibility>
     </tabSettings>
+    <tabSettings>
+        <tab>Slack_Gallery_Test</tab>
+        <visibility>Visible</visibility>
+    </tabSettings>
 </PermissionSet>

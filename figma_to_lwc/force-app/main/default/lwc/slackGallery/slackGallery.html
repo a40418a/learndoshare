@@ -1,0 +1,57 @@
+<template>
+  <!-- org 확인용: prd/COMPONENTS.md 의 부품을 Figma 컴포넌트 세트 배치대로 늘어놓는다 -->
+  <div class="gallery">
+    <section>
+      <h2 class="title">Button</h2>
+      <div class="row">
+        <c-slack-button label="Button" variant="primary"></c-slack-button>
+        <c-slack-button label="Button" variant="secondary"></c-slack-button>
+        <c-slack-button label="Button" variant="tertiary"></c-slack-button>
+      </div>
+      <div class="row">
+        <c-slack-button
+          label="Button"
+          variant="primary"
+          disabled
+        ></c-slack-button>
+        <c-slack-button
+          label="Button"
+          variant="secondary"
+          disabled
+        ></c-slack-button>
+        <c-slack-button
+          label="Button"
+          variant="tertiary"
+          disabled
+        ></c-slack-button>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="title">Icon Button</h2>
+      <div class="row dark">
+        <c-slack-icon-button
+          icon-name="clock"
+          label="History"
+        ></c-slack-icon-button>
+        <c-slack-icon-button
+          icon-name="clock"
+          label="History"
+          active
+        ></c-slack-icon-button>
+        <c-slack-icon-button
+          icon-name="search"
+          label="Search"
+        ></c-slack-icon-button>
+        <c-slack-icon-button
+          icon-name="help"
+          label="Help"
+        ></c-slack-icon-button>
+        <c-slack-icon-button
+          icon-name="double-arrow"
+          label="Switch"
+        ></c-slack-icon-button>
+      </div>
+    </section>
+  </div>
+</template>

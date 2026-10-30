@@ -1,0 +1,25 @@
+@import "c/slackTokens";
+
+.gallery {
+  display: grid;
+  gap: var(--slds-g-spacing-6, 2rem);
+  padding: var(--slds-g-spacing-4, 1rem);
+  background: var(--slack-brand-ffffff);
+}
+.title {
+  margin-block-end: var(--slds-g-spacing-2, 0.5rem);
+  font-weight: var(--slds-g-font-weight-7, 700);
+}
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--slds-g-spacing-4, 1rem);
+  margin-block-end: var(--slds-g-spacing-3, 0.75rem);
+}
+/* Icon Button 은 어두운 바탕용 — 바탕색은 Figma 컴포넌트에 없어 본문색을 쓴다 */
+.dark {
+  padding: var(--slds-g-spacing-2, 0.5rem);
+  background: var(--slack-brand-1d1c1d);
+  color: var(--slack-brand-ffffff);
+}
