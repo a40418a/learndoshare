@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Figma to LWC</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<nav class="topnav"><div class="topnav-inner">
+  <a href="../README.md">README</a>
+  <a href="00-%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C%EA%B3%BC%20Salesforce.html">00 개념</a>
+  <a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html">01 SLDS</a>
+  <a href="02-LWC%20%EA%B8%B0%EC%B4%88.html">02 LWC</a>
+  <a href="03-%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81.html">03 Storybook</a>
+  <a href="04-LWC%EC%99%80%20%EC%8A%A4%ED%86%A0%EB%A6%AC%EB%B6%81%20%ED%86%B5%ED%95%A9.html">04 통합</a>
+  <a href="05-%ED%85%8C%EB%A7%88%EC%99%80%20%EB%B8%8C%EB%9E%9C%EB%94%A9%20%EB%8F%99%EA%B8%B0%ED%99%94.html">05 테마 동기화</a>
+  <a href="06-%EB%A1%9C%EC%BB%AC%20%EA%B0%9C%EB%B0%9C%20%EB%8F%84%EA%B5%AC%20%EB%B9%84%EA%B5%90.html">06 도구 비교</a>
+  <a href="07-pnpm.html">07 pnpm</a>
+  <a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html">08 Claude Code</a>
+  <a href="09-override%EC%99%80%20%EA%B3%B5%EC%8B%9D%20%EA%B6%8C%EA%B3%A0.html">09 override</a>
+  <a class="active" href="10-Figma%20to%20LWC.html">10 Figma to LWC</a>
+</div></nav>
+
+<div class="layout">
+<aside class="toc">
+  <strong>목차</strong>
+  <ol>
+    <li><a href="#why">왜 알아야 하나</a></li>
+    <li><a href="#overview">Figma to LWC란</a></li>
+    <li><a href="#skill">design-generate 스킬</a></li>
+    <li><a href="#slds-apply">slds-apply 스킬</a></li>
+    <li><a href="#figma-read">Figma 읽기 도구</a></li>
+    <li><a href="#linter">SLDS Linter</a></li>
+    <li><a href="#setup">설치와 Figma 준비</a></li>
+    <li><a href="#practice">실습에서 확인한 것</a></li>
+    <li><a href="#milvus">밀버스와의 관계</a></li>
+    <li><a href="#quiz">스스로 점검</a></li>
+  </ol>
+</aside>
+
+<main>
+<header class="hero">
+  <div class="eyebrow">LEARN 10 · Figma 입력 구간</div>
+  <h1>Figma to LWC</h1>
+  <p class="lead">Figma 디자인을 LWC로 바꾸는 Salesforce 공식 경로(MCP 도구 → <code>experience-lwc-design-generate</code> 스킬)와, 그 안에서 SLDS 참고서 역할을 하는 <code>design-systems-slds-apply</code> 스킬을 공식 문서와 스킬 원문으로 정리한다. 2026-10-30 실습(figma_to_lwc)에서 확인한 것과 밀버스 디자인 시스템과의 관계를 끝에 적는다.</p>
+  <div class="meta"><span>예상 1.5시간</span><span>선행: 01 SLDS, 08 Claude Code, 09 override</span><span>2026-10-30 확인 (공식 문서, sf-skills 저장소, Figma 도움말, 실습 기록)</span></div>
+</header>
+
+<section id="why">
+  <h2>왜 알아야 하나</h2>
+  <p>밀버스 디자인 시스템은 디자이너가 만드는 Figma 구간을 범위 밖으로 두었다. org 테마와 SLDS 기본 컴포넌트 위에 브랜드 색을 입히는 일이 중심이라, Figma 파일을 받아 LWC를 만드는 입구가 없다. 고객이 Figma 디자인 시스템을 갖고 와서 "화면을 그대로 만들어 달라"고 하면 그 입구가 필요하다.</p>
+  <p>Salesforce는 이 입구를 두 가지 형태로 제공한다. 처음에는 DX MCP 서버의 도구(<code>guide_figma_to_lwc_conversion</code>)였고, 지금은 sf-skills 저장소의 스킬(<code>experience-lwc-design-generate</code>)이 그 자리를 이어받았다. 스킬은 혼자 일하지 않고 형제 스킬 여럿을 순서대로 부르는데, 그중 SLDS 규칙을 맡는 것이 <code>design-systems-slds-apply</code>다. 이 두 가지가 각각 무엇이고, 무엇을 하고 무엇을 하지 않는지 알아야 밀버스를 어디까지 넓힐지 정할 수 있다.</p>
+  <div class="cards">
+    <div class="card"><h4>이 문서가 답하는 것</h4><p>두 스킬의 정체와 범위, Figma를 읽는 두 서버(공식 Figma MCP, Framelink)의 차이와 요금제 한도, SLDS Linter가 잡는 것과 못 잡는 것, 실습 결과, 밀버스와 함께 쓰는 구조</p></div>
+    <div class="card"><h4>이 문서가 다루지 않는 것</h4><p>LWC 작성법 자체(<a href="02-LWC%20%EA%B8%B0%EC%B4%88.html">02 LWC</a>), hook·블루프린트의 세부(<a href="01-%EC%84%B8%EC%9D%BC%EC%A6%88%ED%8F%AC%EC%8A%A4%20%EB%94%94%EC%9E%90%EC%9D%B8%20%EC%8B%9C%EC%8A%A4%ED%85%9C.html">01 SLDS</a>), 플러그인·스킬 구조(<a href="08-Claude%20Code%20%EB%9F%B0%EB%B6%81.html">08 Claude Code</a>)</p></div>
+  </div>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/mcp-design.html">LWC 개발자 가이드: Use the Figma to LWC Conversion Tool (Beta)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/afv-lwc-skills.html">LWC 개발자 가이드: Use Skills for LWC Development</a> (확인 2026-10-30) · <a href="../README.md">README 1.3 원칙 (밀버스 범위, 모양만 바꾸는 컴포넌트는 만들지 않음)</a> (확인 2026-10-30)</p>
+</section>
+
+<section id="overview">
+  <h2>Figma to LWC란</h2>
+  <p>공식 문서의 정의는 이렇다. <code>guide_figma_to_lwc_conversion</code> 도구는 SLDS 가이드라인을 제공하고 Figma 디자인을 LWC 명세로 바꾸는 일을 돕는다. 문서는 같은 줄에서 이 MCP 도구가 <code>experience-lwc-design-generate</code> 스킬로 대체되었다(superseded)고 적는다. 즉 "Figma to LWC"라는 이름은 기능 하나가 아니라 <b>MCP 도구 경로</b>와 <b>스킬 경로</b> 두 가지를 가리키고, 지금 권장은 스킬 경로다. 이 문서에서 "MCP 도구"는 Salesforce DX MCP 서버(<code>@salesforce/mcp</code>)의 도구를, "스킬"은 sf-skills 저장소의 SKILL.md 묶음을 뜻한다.</p>
+  <h3>변환 흐름 (MCP 도구 경로)</h3>
+  <div class="flow">
+    <div class="step"><b>① 가이드 제공</b><code>guide_figma_to_lwc_conversion</code>이 SLDS 가이드를 대화에 올린다</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>② Figma 읽기</b>Framelink MCP 서버가 디자인 데이터를 읽어 대화에 싣는다</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>③ 코드 생성</b><code>create_lwc_component_from_prd</code>가 데이터로 LWC를 만든다</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>④ 검토·테스트</b>사람이 검토하고 sandbox·scratch org에서 확인한다</div>
+  </div>
+  <p>문서는 ②의 도구를 <code>figma_data_tool</code>이라고 부른다. 지금 npm에 있는 Framelink(<code>figma-developer-mcp</code>)가 실제로 내놓는 도구 이름은 <code>get_figma_data</code>와 <code>download_figma_images</code>다(2026-10-30, 이 저장소에 연결한 서버의 도구 목록으로 확인). 이름이 다르지만 역할은 같다. 프롬프트는 세 가지를 예로 든다. "Convert this Figma design to LWC", "Extract design tokens such as for spacing, color, radius, and typography from Figma and map them to SLDS variables", "Generate an LWC component breakdown and file scaffold plan from this Figma frame". 셋 다 Figma 파일 링크를 뒤에 붙인다.</p>
+  <h3>두 경로 비교</h3>
+  <div class="table-wrap"><table>
+    <tr><th>항목</th><th>MCP 도구 경로</th><th>스킬 경로</th></tr>
+    <tr><td>이름</td><td><code>guide_figma_to_lwc_conversion</code> (DX MCP 서버 <code>lwc-experts</code> 툴셋)</td><td><code>experience-lwc-design-generate</code> (sf-skills, <code>experience-lwc</code> 플러그인)</td></tr>
+    <tr><td>상태</td><td>Beta. Beta 서비스 약관이 적용되고, 문서가 "스킬로 대체됨"이라고 적음</td><td>현재 권장. Agentforce Vibes에는 기본으로 켜져 있고, 다른 도구에는 sf-skills로 설치</td></tr>
+    <tr><td>Figma 읽기</td><td>Framelink MCP 서버. 문서가 직접 안내하는 서버는 이것 하나</td><td>Figma URL, 프레임 스크린샷, Dev Mode 메타데이터를 "사용자에게 받는다". 실제로는 MCP 서버가 대신 읽는다</td></tr>
+    <tr><td>진행</td><td>가이드 → Figma 데이터 → PRD 기반 생성 (3단계)</td><td>PRD → 생성 → 최적화 → 린트·컴파일 → 테스트 (5단계, 형제 스킬 호출)</td></tr>
+    <tr><td>검사</td><td>문서가 "cross-browser, SLDS, WCAG, 성능" 검사를 포함한다고 적음</td><td>접근성·보안·RTL 검증 스킬과 Jest. 완료 기준 11항목</td></tr>
+    <tr><td>실행 환경</td><td>Agentforce Vibes(DX MCP 서버 내장), Cursor, VS Code Copilot 등 MCP 클라이언트</td><td>Agentforce Vibes, Claude Code, Cursor, OpenCode, Codex 등 Agent Skills 규격을 따르는 도구</td></tr>
+  </table></div>
+  <div class="callout key"><strong>이름에 속지 않기</strong>"Figma to LWC"는 Figma를 직접 읽는 기능이 아니다. Figma를 읽는 일은 MCP 서버(Framelink 또는 공식 Figma MCP)가 하고, Salesforce 쪽은 받은 데이터를 PRD와 코드로 바꾸는 절차와 SLDS 규칙을 제공한다. 그래서 Figma 요금제 한도는 Salesforce 도구가 아니라 Figma 쪽에서 걸린다(<a href="#figma-read">Figma 읽기 도구</a>).</div>
+  <h3>적용 범위 (공식 문서 기준)</h3>
+  <div class="table-wrap"><table>
+    <tr><th>해 주는 것</th><th>범위 밖</th></tr>
+    <tr><td>Figma 프레임 하나 → <code>.html</code> <code>.js</code> <code>.css</code> <code>.js-meta.xml</code> 네 파일</td><td>기존 LWC 리팩터링 (<code>experience-lwc-generate</code>가 맡음)</td></tr>
+    <tr><td>Figma 색·간격·반경·글꼴 → SLDS styling hook 매핑</td><td>Aura → LWC 제자리 이관 (<code>experience-aura-lwc-migrate</code>)</td></tr>
+    <tr><td>컴포넌트 분해와 파일 스캐폴드 계획</td><td>비즈니스 로직, 데이터 연결 (생성 뒤 "Customize and Deploy" 단계에서 사람이)</td></tr>
+    <tr><td>기본 컴포넌트 → 블루프린트 → hook CSS 순 결정</td><td>org 테마·브랜드 적용, 화면 간 패턴 통일 (컴포넌트 하나 단위라 할 수 없음)</td></tr>
+    <tr><td>SLDS·접근성·보안·RTL 검사, Jest 테스트</td><td>sandbox 확인과 배포 판단 (사람의 일)</td></tr>
+  </table></div>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/mcp-design.html">LWC 개발자 가이드: Use the Figma to LWC Conversion Tool (Beta) (도구 이름, 대체 관계, 프롬프트 예, 호출 순서, 범위)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/mcp-intro.html">LWC 개발자 가이드: Use DX MCP Tools for LWC (Beta) (툴셋, 설정 JSON, Beta 약관)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/afv-lwc-skills.html">LWC 개발자 가이드: Use Skills for LWC Development (스킬 목록, 프롬프트 예)</a> (확인 2026-10-30) · <a href="https://github.com/forcedotcom/sf-skills/blob/main/skills/experience-lwc-design-generate/SKILL.md">GitHub: forcedotcom/sf-skills experience-lwc-design-generate/SKILL.md (5단계, 범위 밖)</a> (확인 2026-10-30) · <a href="https://github.com/forcedotcom/sf-skills">GitHub: forcedotcom/sf-skills README (지원 도구, 설치 방법)</a> (확인 2026-10-30) · <a href="https://www.npmjs.com/package/figma-developer-mcp">npm: figma-developer-mcp (Framelink 패키지)</a> (확인 2026-10-30)</p>
+</section>
+
+<section id="skill">
+  <h2><code>experience-lwc-design-generate</code> 스킬 자세히</h2>
+  <p>sf-skills 저장소(Apache-2.0)의 스킬이다. 저장소는 같은 스킬을 두 곳에 둔다. <code>skills/</code> 아래 단독 스킬과 <code>plugins/builder/experience-lwc/skills/</code> 아래 플러그인 묶음이다. 실습에서 쓴 것은 플러그인 <code>experience-lwc</code> 0.3.0(2026-10-16)이고, 스킬 자체의 version은 1.0이다. 스킬 정의는 자신을 "top-level workflow skill"이라고 부른다. 각 단계를 맡는 형제 스킬을 순서대로 부르는 지휘자이지, 코드를 직접 쓰는 스킬이 아니다.</p>
+  <h3>다섯 단계와 담당</h3>
+  <div class="table-wrap"><table>
+    <tr><th>단계</th><th>스킬이 직접 하는 것</th><th>넘기는 형제 스킬</th><th>산출물</th></tr>
+    <tr><td>1 요구사항(PRD)</td><td>Figma URL·스크린샷·Dev Mode 메타데이터를 <code>figma-to-prd-blueprint.md</code>에 따라 PRD로 옮김. 이름은 <code>check-component-name.sh &lt;camelCase&gt; &lt;kebab-case&gt;</code>로 검사</td><td>데이터가 있으면 <code>experience-lds-data-requirements-generate</code>, 어댑터 선택은 <code>experience-lds-best-practices-apply</code></td><td>PRD.md (목적, 콘텐츠, 데이터, 상호작용, 상태, 접근성, 반응형, 스타일, 지역화, 보안)</td></tr>
+    <tr><td>2 코드 생성</td><td>PRD에 없는 기능은 넣지 않고, 모호한 곳은 PRD 문장을 인용한 <code>// TODO:</code></td><td>PRD → 코드 번역은 <code>experience-lwc-generate</code>. SLDS 결정 계층은 <code>design-systems-slds-apply</code>와 <code>experience-lwc-base-components-integrate</code></td><td>네 파일 초안</td></tr>
+    <tr><td>3 최적화</td><td>단일 책임, DOM 조작 최소화, <code>renderedCallback</code> 가드 등 체크리스트</td><td><code>experience-accessibility-validate</code>, <code>experience-lwc-security-validate</code>, <code>experience-lwc-rtl-validate</code></td><td>지적 사항 반영본</td></tr>
+    <tr><td>4 린트·포맷·컴파일</td><td><code>detect-project-tools.sh</code>로 eslint·prettier·cursor-rules·lwc-compiler 유무를 읽고, 있는 것만 실행</td><td>없음 (프로젝트에 설정된 도구)</td><td>검증 통과 코드</td></tr>
+    <tr><td>5 테스트</td><td>일반 Jest는 <code>experience-lwc-generate</code>의 테스트 지침을 따름</td><td>접근성 Jest는 <code>experience-lwc-accessibility-jest-run</code></td><td>커버리지 기준을 넘는 테스트</td></tr>
+  </table></div>
+  <h3>완료 기준 11항목 (Definition of Done)</h3>
+  <p>스킬은 이 목록을 PR 설명에 그대로 복사하라고 한다. 실습 기록(<a href="../../figma_to_lwc/prd/slackMessageBox/TEST-RECORD.md">slackMessageBox TEST-RECORD</a>)도 이 11항목으로 채웠다.</p>
+  <ol>
+    <li>PRD 요구사항은 모두 구현되거나, 추적 항목이 연결된 <code>TODO:</code>로 남는다</li>
+    <li>운영 경로에 <code>TODO</code>·<code>FIXME</code>·<code>console.log</code>·<code>alert()</code>가 없다</li>
+    <li>주석 처리된 코드, 빈 함수, 자리표시 값, 더미 데이터, 안 쓰는 import가 없다</li>
+    <li><code>lwc:dom="manual"</code>이나 서드파티 우회는 이유 주석 없이는 없다</li>
+    <li><code>.js-meta.xml</code>의 AI 메타데이터(<code>&lt;ai&gt;&lt;description&gt;</code>와 <code>@api</code>마다 <code>aiDescription</code>)가 감사를 통과한다</li>
+    <li>SLDS 스타일이 <code>design-systems-slds-apply</code> 검증을 통과한다. 직접 hex·px 값이 없다</li>
+    <li>접근성: 소스 리뷰와 자동 Jest 둘 다 통과</li>
+    <li>보안(LWS)과 RTL 리뷰 통과</li>
+    <li>모든 wire·명령형 호출이 PRD 데이터 절에 적혀 있고 승인된 LDS 어댑터와 맞는다</li>
+    <li>Jest가 프로젝트 커버리지 기준을 넘고, 모든 <code>@api</code>·이벤트·오류 경로를 덮는다</li>
+    <li>브라우저 수준 교차 컴포넌트 흐름이 있으면 UTAM 페이지 객체 (없으면 생략)</li>
+  </ol>
+  <div class="callout warn"><strong>실측에서 찾은 정의 문서의 빈틈</strong>참고 파일 <code>references/prd-analysis-template.md</code>는 PRD 양식이 아니라 SARIF 검사 보고서 프롬프트다(실습 발견 1). PRD 구성은 <code>figma-to-prd-blueprint.md</code>로 대신했다. 또 5항의 <code>&lt;ai&gt;</code> 요소 스키마는 스킬 문서에서 찾지 못해 실습에서 넣지 못했다. 정의가 "하라"고 적은 것과 실제로 가능한 것 사이에 틈이 있으니, 완료 기준은 그대로 믿지 말고 항목마다 근거를 남긴다.</div>
+  <h3>하지 않는 것</h3>
+  <ul>
+    <li>기존 LWC 리팩터링(<code>experience-lwc-generate</code>), Aura 제자리 이관, SLDS 토큰만 다루는 일(<code>design-systems-slds-apply</code>), 데이터 계층만 다루는 일(<code>experience-lds-*</code>)에는 쓰지 말라고 정의에 적혀 있다</li>
+    <li>Figma를 직접 읽지 않는다. Phase 1.2의 입력은 "사용자가 주는" URL·스크린샷·메타데이터다. MCP 서버가 없으면 사람이 붙여 넣어야 한다</li>
+    <li>org 테마나 브랜드를 적용하지 않는다. 컴포넌트 하나가 단위다</li>
+  </ul>
+  <p class="sources">출처: <a href="https://github.com/forcedotcom/sf-skills/blob/main/skills/experience-lwc-design-generate/SKILL.md">GitHub: forcedotcom/sf-skills experience-lwc-design-generate/SKILL.md (frontmatter, 5단계, 완료 기준 11항목, Cross-References)</a> (확인 2026-10-30) · <a href="https://github.com/forcedotcom/sf-skills/blob/main/plugins/builder/experience-lwc/CHANGELOG.md">GitHub: forcedotcom/sf-skills experience-lwc 플러그인 CHANGELOG (0.3.0 2026-10-16, 0.2.0 스킬 묶음)</a> (확인 2026-10-30) · <a href="https://github.com/forcedotcom/sf-skills/blob/main/.claude-plugin/marketplace.json">GitHub: forcedotcom/sf-skills marketplace.json (experience-lwc 항목)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/afv-lwc-skills.html">LWC 개발자 가이드: Use Skills for LWC Development (형제 스킬 설명)</a> (확인 2026-10-30)</p>
+</section>
+
+<section id="slds-apply">
+  <h2><code>design-systems-slds-apply</code> 스킬 자세히</h2>
+  <p>같은 sf-skills 저장소의 단독 스킬이다(version 1.1, SLDS 2 대상). <code>experience-lwc</code> 플러그인에는 들어 있지 않고 저장소 <code>skills/</code> 아래에만 있다. 실습에서 "플러그인에 빠져 있어 따로 복사해 넣었다"고 기록한 이유가 이것이다. 공식 설치 경로는 <code>npx skills add forcedotcom/sf-skills</code>(단독 스킬 설치)이고, SLDS 2 AI Starter Kit에는 미리 들어 있다. 정체는 <b>SLDS 참고서</b>다. 스킬 정의의 첫 문장이 "SLDS는 수천 개의 산출물을 가진 CSS 프레임워크이고, 이 스킬은 에이전트가 그것을 찾아 올바르게 쓰는 법을 가르친다"이다.</p>
+  <h3>들어 있는 것</h3>
+  <div class="table-wrap"><table>
+    <tr><th>산출물</th><th>개수</th><th>검색 스크립트</th><th>원본 메타데이터</th></tr>
+    <tr><td>Lightning 기본 컴포넌트 (LWC 전용)</td><td>약 70</td><td>없음 (Component Library 링크)</td><td>—</td></tr>
+    <tr><td>SLDS 블루프린트</td><td>85</td><td><code>search-blueprints.cjs --search "dialog"</code></td><td><code>assets/blueprints/components/*.yaml</code></td></tr>
+    <tr><td>styling hook (<code>--slds-g-*</code>)</td><td>523</td><td><code>search-hooks.cjs --prefix "--slds-g-color-accent-"</code></td><td><code>assets/hooks-index.json</code></td></tr>
+    <tr><td>유틸리티 클래스</td><td>1,147</td><td><code>search-utilities.cjs --category "grid"</code></td><td><code>assets/utilities-index.json</code></td></tr>
+    <tr><td>아이콘</td><td>1,732</td><td><code>search-icons.cjs --query "save button"</code></td><td><code>assets/icon-metadata.json</code></td></tr>
+  </table></div>
+  <p>메타데이터 JSON은 직접 읽지 말라고 적혀 있다(hooks-index.json 6,000줄 이상, icon-metadata.json 38,000줄 이상). 스크립트로만 찾는다. 이 저장소의 밀버스 패키지도 같은 발상으로 hook 이름을 <code>dist/hooks-index.json</code>에서 읽는다(<code>lib/hooks-index.ts</code>).</p>
+  <h3>결정 계층과 규칙</h3>
+  <div class="flow">
+    <div class="step"><b>① Lightning 기본 컴포넌트</b>LWC면 먼저 Component Library에서 찾는다</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>② SLDS 블루프린트</b>정확한 SLDS 클래스로 마크업</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>③ hook으로 직접 CSS</b><code>var(--slds-g-*, fallback)</code></div>
+    <div class="arrow">→</div>
+    <div class="step"><b>④ 커스텀 CSS</b>마지막 수단. 값은 여전히 hook</div>
+  </div>
+  <div class="cards">
+    <div class="card"><h4>하라</h4><p>계층을 따른다. 테마에 걸리는 값은 모두 <code>var(--slds-g-*, fallback)</code>. <code>.slds-*</code>를 덮지 말고 <code>my-*</code>·<code>c-*</code> 클래스를 만든다. hook·클래스·아이콘은 <b>쓰기 전에 스크립트로 존재를 확인</b>한다. surface 색과 on-surface 색을 짝지운다. <code>lightning-icon</code>마다 <code>alternative-text</code></p></div>
+    <div class="card"><h4>하지 마라</h4><p>색·간격·글꼴 직접 값. <code>.slds-*</code> 재정의. <code>--lwc-*</code> 레거시 토큰을 주 값으로. <code>--slds-s-*</code>(공유 hook, 내부용). hook 값 재할당(읽기만). 색만으로 의미 전달. 다른 계열의 이름 패턴을 보고 hook 이름을 지어내기</p></div>
+    <div class="card"><h4>이름 함정 세 가지</h4><p>글꼴 크기는 번호가 없다(<code>--slds-g-font-size-3</code> 없음, <code>--slds-g-font-scale-*</code>). 색 hook은 반드시 번호가 붙는다(<code>--slds-g-color-on-surface</code> 없음, <code>-2</code>). 모든 값에 hook이 있지는 않다(<code>min-width: 7rem</code> 같은 것은 주석과 함께 직접 값)</p></div>
+  </div>
+  <h3>작성 절차와 검증</h3>
+  <p>절차는 다섯 단계다. ① 필요 파악(패턴, 프레임워크, 데이터, 상태) ② 산출물 선택(기본 컴포넌트 → 블루프린트 검색 → YAML 읽기 → 없으면 hook) ③ 스타일(색 역할 분류 → hook, 간격·배치는 유틸리티) ④ 아이콘 ⑤ 검증. 검증은 "필수, 건너뛰지 말 것"으로 표시돼 있고 네 단계다.</p>
+  <ol>
+    <li><code>npx @salesforce-ux/slds-linter@latest lint &lt;component-path&gt;</code>. 위반 0이 목표이고, 위반을 "허용 가능"으로 합리화하지 말라고 적혀 있다</li>
+    <li>생성한 모든 <code>--slds-g-*</code>가 <code>hooks-index.json</code>에 있는지 확인 (지어낸 hook 금지)</li>
+    <li><code>checklists.md</code>로 Linter가 못 잡는 것 확인: fallback 유무(T002), surface·accent·feedback 색 짝(T010~T013), 간격의 px(T020~T021), <code>font-scale</code>(T031), 아이콘 대체 텍스트(A004), 클래스 접두사(Q010)</li>
+    <li>(선택) <code>design-systems-slds-validate</code>로 점수 보고서. B(80점) 이상이 목표</li>
+  </ol>
+  <h3>범위 밖과 관점</h3>
+  <ul>
+    <li>디자인 결정(시각 위계, 구성, 상호작용 패턴), LWC 동작(<code>@wire</code>·<code>@api</code>·수명주기), 전체 접근성(WCAG·ARIA·키보드·대비)은 다른 스킬 몫이라고 정의에 적혀 있다</li>
+    <li>관점은 "SLDS 안에서 가장 가까운 것을 고르라"다. SLDS 의미 hook(surface, on-surface 등)은 Salesforce 색 체계이지 고객 디자인의 색이 아니다. 실습에서 <code>--slds-g-color-on-surface-3</code>이 남색 <code>#03234d</code>인 것을 이 스킬의 <code>search-hooks.cjs</code>로 확인했고, Slack 글자색 <code>#1D1C1D</code>를 거기에 대응시키면 Figma와 다른 색이 나온다는 것을 알았다(실습 발견). Figma를 그대로 따르려는 프로젝트에서는 이 관점이 충돌한다(<a href="#milvus">밀버스와의 관계</a>)</li>
+    <li>Linter 가이드는 이 스킬을 "custom instructions와 섞으면 에이전트가 Linter 단계를 건너뛸 수 있으니 단독으로 쓰라"고 경고한다</li>
+  </ul>
+  <p class="sources">출처: <a href="https://github.com/forcedotcom/sf-skills/blob/main/skills/design-systems-slds-apply/SKILL.md">GitHub: forcedotcom/sf-skills design-systems-slds-apply/SKILL.md (version 1.1, 산출물 표, 계층, 규칙, 이름 함정, 검증 절차, 범위 밖)</a> (확인 2026-10-30) · <a href="https://github.com/forcedotcom/sf-skills">GitHub: forcedotcom/sf-skills README (단독 스킬 설치 <code>npx skills add forcedotcom/sf-skills</code>)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/get-started-linter-AI-skills.html">SLDS Linter 가이드: Run SLDS Linter with SLDS AI Development Skills (세 스킬, Starter Kit, 단독 사용 경고)</a> (확인 2026-10-30) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (hook 이름을 hooks-index에서 읽는 밀버스 check)</a> (확인 2026-10-30)</p>
+</section>
+
+<section id="figma-read">
+  <h2>Figma 읽기 도구: 공식 Figma MCP와 Framelink</h2>
+  <p>Figma를 읽는 서버는 둘이다. Salesforce 문서가 안내하는 것은 Framelink이고, Figma가 직접 제공하는 것은 공식 Figma MCP 서버다. 실습에서는 둘 다 썼다. 어느 쪽이든 한도는 Figma 요금제와 좌석에 걸린다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>항목</th><th>공식 Figma MCP 서버</th><th>Framelink (<code>figma-developer-mcp</code>)</th></tr>
+    <tr><td>제공자</td><td>Figma. remote(<code>https://mcp.figma.com/mcp</code>, 권장)와 desktop(앱 Dev Mode에서 켬, <code>http://127.0.0.1:3845/mcp</code>) 두 가지</td><td>서드파티 오픈소스(GLips/Figma-Context-MCP, MIT). Salesforce 제품이 아니다</td></tr>
+    <tr><td>인증</td><td>OAuth 브라우저 로그인. Claude Code는 <code>claude plugin install figma@claude-plugins-official</code> 또는 <code>claude mcp add --transport http figma https://mcp.figma.com/mcp</code></td><td>Figma personal access token(<code>file_content:read</code> 범위면 충분). 명령줄 인자나 <code>FIGMA_API_KEY</code> 환경 변수로 전달</td></tr>
+    <tr><td>읽기 도구</td><td><code>get_design_context</code>(디자인 컨텍스트와 코드), <code>get_metadata</code>(가벼운 XML 윤곽), <code>get_screenshot</code>, <code>get_variable_defs</code>(변수·스타일), <code>download_assets</code>(remote 전용) 등</td><td><code>get_figma_data</code>(레이아웃·채우기·글꼴·변수 이름을 줄인 JSON), <code>download_figma_images</code></td></tr>
+    <tr><td>쓰기</td><td><code>use_figma</code>, <code>generate_figma_design</code> 등 remote 전용. 초안 밖에 쓰려면 Full 좌석</td><td>없음 (읽기 전용)</td></tr>
+    <tr><td>한도</td><td>읽기 도구에 적용. View·Collab 좌석은 모든 플랜에서 월 20회. Full·Dev 좌석은 Professional 하루 200회·분당 10회, Organization 하루 200회·분당 15회, Enterprise 하루 600회·분당 20회. Starter의 Full·Dev는 표에 값이 없다</td><td>Figma REST API 한도와 같다. 좌석 종류·엔드포인트 등급·파일이 속한 플랜에 따라 달라지고, View·Collab 좌석은 파일·노드·이미지 GET(1등급)이 월 20회. 넘으면 429와 <code>Retry-After</code>(초)</td></tr>
+    <tr><td>토큰 관리</td><td>토큰을 직접 다루지 않는다</td><td>설정 파일에 평문으로 남는다. Salesforce 문서도 "Figma 토큰이 외부 npm 패키지에 전달된다"는 뜻의 보안 검토 필요성을 암시하고, 실습에서 토큰이 대화에 여러 번 올라왔다</td></tr>
+  </table></div>
+  <div class="callout warn"><strong>실습에서 겪은 한도 (2026-10-30)</strong>공식 Figma MCP는 아이콘을 하나씩 받다가 약 12번째 호출에서 Starter 플랜 한도 응답을 받았다. Framelink는 컴포넌트 세트 2개를 읽은 직후 429와 함께 392,229초(약 4.5일) 뒤 재시도하라는 응답을 받았고, "Viewer/Collaborator 좌석은 한도가 낮다"는 설명이 따라왔다. 공식 한도 표와 맞는다. View·Collab 좌석은 실사용이 어렵고, 실무 전제는 Dev 또는 Full 좌석이다. 호출 단위도 중요하다. 페이지 구조는 <code>get_metadata</code> 한 번으로 받되 이름·크기·위치만 있고 색과 글꼴은 없다. 컴포넌트 세트 하나를 읽으면 변형 전체(버튼 9개)가 한 번에 온다. 받은 데이터는 파일로 저장해 다시 쓴다.</div>
+  <p>Framelink에서 Windows는 <code>"command": "cmd"</code>와 <code>["/c", "npx", ...]</code> 래퍼가 필요하다(README가 Windows 설정을 따로 적는다). 실습에서는 npx가 매번 패키지를 받아 30초 연결 시간 초과가 났고 전역 설치로 해결했다. MCP 연결이 끊긴 세션에서는 <code>figma-developer-mcp</code>의 명령줄로 같은 데이터를 읽었다(실습 기록, README에는 없는 기능이라 버전에 따라 다를 수 있다).</p>
+  <p class="sources">출처: <a href="https://help.figma.com/hc/en-us/articles/32132100833559-Guide-to-the-Figma-MCP-server">Figma 도움말: Guide to the Figma MCP server (remote·desktop, 플랜·좌석)</a> (확인 2026-10-30) · <a href="https://help.figma.com/hc/en-us/articles/42495147242903">Figma 도움말: Figma MCP server tools and prompts (도구 목록, remote 전용 표시)</a> (확인 2026-10-30) · <a href="https://help.figma.com/hc/en-us/articles/39252411778583">Figma 도움말: Plans, access, and permissions (한도 표: View·Collab 월 20회, Full·Dev 하루 200·600회)</a> (확인 2026-10-30) · <a href="https://help.figma.com/hc/en-us/articles/39888612464151">Figma 도움말: Claude Code and Figma: Set up the MCP server (설치 명령, desktop 주소)</a> (확인 2026-10-30) · <a href="https://developers.figma.com/docs/rest-api/rate-limits/">Figma Developers: REST API Rate Limits (좌석·등급·플랜, 429와 Retry-After, PAT 집계)</a> (확인 2026-10-30) · <a href="https://github.com/GLips/Figma-Context-MCP">GitHub: GLips/Figma-Context-MCP (Framelink, MIT, 설정 JSON, Windows 래퍼)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/mcp-design.html">LWC 개발자 가이드: Figma to LWC Conversion Tool (Framelink 안내, <code>file_content:read</code>, 한도 주의)</a> (확인 2026-10-30)</p>
+</section>
+
+<section id="linter">
+  <h2>SLDS Linter: 잡는 것과 못 잡는 것</h2>
+  <p>SLDS Linter(<code>@salesforce-ux/slds-linter</code>)는 코드를 SLDS 2 규칙에 견주는 npm 패키지다. HTML·CMP·CSS 파일만 본다. <code>design-systems-slds-apply</code>는 이것을 필수 검증 단계로 돌리고, <code>design-systems-slds-validate</code>는 Linter 결과를 점수의 30%로 쓴다(100 − 10×오류 − 5×경고). <code>lint --fix</code>는 확신이 높은 위반을 자동으로 고친다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>규칙</th><th>심각도</th><th>잡는 것</th></tr>
+    <tr><td><code>no-hardcoded-values-slds2</code></td><td>경고</td><td>색·배경·테두리·여백·크기·그림자·글꼴 속성의 직접 값. hook을 넣고 직접 값은 fallback으로 남기라고 제안</td></tr>
+    <tr><td><code>no-slds-var-without-fallback</code></td><td>오류</td><td>fallback 없는 <code>var(--slds-*)</code>. 메타데이터에서 fallback 값을 제안</td></tr>
+    <tr><td><code>no-slds-class-overrides</code></td><td>경고</td><td>선택자 끝의 <code>.slds-*</code> 재정의</td></tr>
+    <tr><td><code>lwc-token-to-slds-hook</code>, <code>no-sldshook-fallback-for-lwctoken</code></td><td>오류, 경고</td><td>레거시 <code>--lwc-*</code> 토큰</td></tr>
+    <tr><td><code>no-unsupported-hooks-slds2</code>, <code>no-slds-private-var</code>, <code>no-slds-namespace-for-custom-hooks</code></td><td>경고</td><td>SLDS 2에 없는 hook, 내부용 <code>--_slds-*</code>, 커스텀 변수에 <code>--slds</code>·<code>--sds</code> 접두사</td></tr>
+    <tr><td><code>no-deprecated-classes-slds2</code>, <code>enforce-bem-usage</code>, <code>modal-close-button-issue</code></td><td>오류</td><td>SLDS 2에서 빠진 클래스, <code>--</code> BEM, 모달 닫기 버튼 변형</td></tr>
+  </table></div>
+  <div class="callout bad"><strong>실측: Linter만으로는 "직접 값 없음"을 보장하지 못한다</strong>① hook 변수에 넣은 직접 색은 경고 없이 통과한다. <code>--slds-c-button-brand-color-background: #007a5a</code>가 그 예다. <code>no-hardcoded-values-slds2</code>는 <code>color</code>·<code>background</code> 같은 속성만 보고, 커스텀 속성 정의는 보지 않는다. ② <code>--fix</code>가 fallback에 hex·rem을 넣는다. fallback 규칙과 "직접 값 금지"가 서로 당긴다. 그래서 실습 스킬은 <code>grep -nE "#[0-9a-fA-F]{3,8}\b"</code>로 따로 보도록 했고, 밀버스에는 컴포넌트 CSS의 직접 값 검사를 <code>check</code>에 넣는 일을 남겼다(<a href="#milvus">밀버스와의 관계</a>).</div>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide">SLDS Linter 가이드: Get Started (정의, Code Analyzer 통합)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html">SLDS Linter 가이드: Rules (규칙 표, <code>no-hardcoded-values-slds2</code>가 보는 속성 목록)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-commands.html">SLDS Linter 가이드: Commands (lint·report·emit, --fix)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/get-started-linter-AI-skills.html">SLDS Linter 가이드: Run SLDS Linter with SLDS AI Development Skills (점수 공식, HTML·CSS만 파싱)</a> (확인 2026-10-30)</p>
+</section>
+
+<section id="setup">
+  <h2>설치와 Figma 준비 (Claude Code 기준)</h2>
+  <h3>설치</h3>
+  <div class="table-wrap"><table>
+    <tr><th>무엇</th><th>어떻게</th><th>비고</th></tr>
+    <tr><td><code>experience-lwc</code> 플러그인</td><td>sf-skills 마켓플레이스를 더한 뒤 플러그인 설치. 실습 프로젝트의 <code>.claude/settings.json</code>에는 <code>"experience-lwc@salesforce": true</code>로 남는다</td><td>공식 문서가 명령으로 안내하는 것은 <code>claude plugin install salesforce-development@claude-plugins-official</code>(개발 플러그인)이고, sf-skills README는 "저장소가 진실의 원천, 자주 바뀐다"고 적는다</td></tr>
+    <tr><td><code>design-systems-slds-apply</code></td><td><code>npx skills add forcedotcom/sf-skills</code>로 단독 설치하거나, 저장소 <code>skills/design-systems-slds-apply/</code>를 프로젝트 <code>.claude/skills/</code>에 복사</td><td>플러그인에 포함되지 않는다. 실습은 복사했다</td></tr>
+    <tr><td>Salesforce DX MCP 서버</td><td><code>.mcp.json</code>에 <code>@salesforce/mcp@latest --orgs DEFAULT_TARGET_ORG --toolsets lwc-experts,aura-experts,experts-validation</code></td><td>스킬 경로에서는 필수가 아니다. Windows는 <code>cmd /c npx</code> 래퍼</td></tr>
+    <tr><td>Framelink 또는 공식 Figma MCP</td><td><a href="#figma-read">Figma 읽기 도구</a> 참고</td><td>둘 중 하나는 있어야 시작한다</td></tr>
+  </table></div>
+  <h3>Figma 파일 준비 체크리스트</h3>
+  <p>공식 문서의 "Prepare Your Figma Design"과 실습에서 추가로 필요했던 것을 합쳤다. 이 목록은 밀버스 문서에 넣을 Figma 작성 규칙(이슈 #92)의 출발점이다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>항목</th><th>출처</th><th>없으면 생기는 일</th></tr>
+    <tr><td>컴포넌트 이름 규칙 통일, 레이어의 논리적 그룹화</td><td>공식</td><td>컴포넌트 분해 계획이 어긋난다</td></tr>
+    <tr><td>hover·active·disabled 등 상태 전부. 실습은 Focus·Disabled·Loading·Empty·Error까지</td><td>공식 + 실습</td><td>코드가 상태를 추측한다. Slack Button·Icon Button은 Disabled·Focus가 없어 임시 처리했다</td></tr>
+    <tr><td>필요하면 반응형 브레이크포인트</td><td>공식</td><td>좁은 폭 규칙이 PRD에 TODO로만 남는다</td></tr>
+    <tr><td>SLDS 컴포넌트·패턴 사용, 간격·글꼴 스케일, 동작은 디자인 코멘트에, 아이콘·이미지 내보내기</td><td>공식(권장)</td><td>기본 컴포넌트로 되는 것을 직접 그리게 된다</td></tr>
+    <tr><td>값은 전부 변수로, 역할 이름(<code>text/primary</code>, <code>border/subtle</code>)으로</td><td>실습</td><td>값 이름 변수(<code>1D1C1D-30%</code>)는 코드 토큰과 1:1로 맞출 수 없다. 밀버스 토큰 층 설계(이슈 #93)의 입력이 된다</td></tr>
+    <tr><td>모든 프레임에 자동 레이아웃</td><td>실습</td><td>SVG·스크린샷에는 간격 규칙이 남지 않는다</td></tr>
+    <tr><td>컴포넌트는 세트로, 읽기는 세트 단위로</td><td>실습</td><td>아이콘 하나씩 읽으면 한도를 빨리 소모한다</td></tr>
+  </table></div>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/mcp-design.html">LWC 개발자 가이드: Figma to LWC Conversion Tool (Prepare Your Figma Design, 권장 사항)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/mcp-intro.html">LWC 개발자 가이드: Use DX MCP Tools for LWC (툴셋 설정 JSON)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/salesforce-skills-plugins/guide/install-salesforce-development.html">Salesforce Development Plugin 가이드: Install (Claude Code 2.1.222 이상, 설치 명령)</a> (확인 2026-10-30) · <a href="https://github.com/forcedotcom/sf-skills">GitHub: forcedotcom/sf-skills README (<code>npx skills add</code>, 지원 도구)</a> (확인 2026-10-30) · <a href="https://github.com/GLips/Figma-Context-MCP">GitHub: GLips/Figma-Context-MCP (Windows 설정)</a> (확인 2026-10-30)</p>
+</section>
+
+<section id="practice">
+  <h2>실습에서 확인한 것 (figma_to_lwc, 2026-10-30)</h2>
+  <p>이 저장소의 형제 프로젝트 <code>figma_to_lwc</code>에서 Slack Design System and UI Kit(Community)의 컴포넌트를 LWC로 옮겼다. 경로는 스킬 경로다. 플러그인을 세션 도중 설치해 스킬이 자동으로 뜨지 않았고, 스킬 문서의 5단계를 Claude Code에서 그대로 따라갔다. Figma 읽기는 Framelink <code>get_figma_data</code>와 공식 Figma MCP <code>get_screenshot</code>·<code>get_metadata</code>를 함께 썼다. 기록은 <a href="../../figma_to_lwc/prd/slackMessageBox/TEST-RECORD.md">slackMessageBox</a>, <a href="../../figma_to_lwc/prd/slackButton/TEST-RECORD.md">slackButton·slackIconButton</a> 테스트 기록에 있다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>컴포넌트</th><th>Figma</th><th>결과</th><th>남은 것</th></tr>
+    <tr><td><code>slackMessageBox</code> (#79 → #90)</td><td>Message Box, State=Empty·Filled</td><td>네 파일 + Custom Label 15개 + 아이콘 스프라이트. Jest 32개 통과, sa11y 통과, org에서 Empty·Filled·이모지·멘션 동작 확인. org 확인에서 Jest가 못 잡은 버그 3개를 찾아 고침</td><td>State=Active·Filled Active. 좁은 폭 규칙. 서식 툴바는 <code>lightning-input-rich-text</code>라 코드·코드 블록 버튼이 없음</td></tr>
+    <tr><td><code>slackButton</code>, <code>slackIconButton</code> (#88)</td><td>Button 9개 변형, Icon Button 3개 변형</td><td>공용 토큰 <code>slackTokens</code>(CSS 모듈)와 함께 생성. 높이·색·글꼴·아이콘 20px이 Figma 값과 같음. 커버리지 100%</td><td>Figma에 없는 Disabled·Focus는 임시. 2단계 부품 11개 중 2개만 진행(Figma 한도)</td></tr>
+  </table></div>
+  <h3>발견 사항 요약</h3>
+  <div class="table-wrap"><table>
+    <tr><th>구분</th><th>무엇</th><th>어떻게 했나</th></tr>
+    <tr><td>스킬 정의</td><td><code>prd-analysis-template.md</code>가 PRD 양식이 아니라 SARIF 프롬프트. <code>&lt;ai&gt;</code> 메타데이터 스키마를 찾지 못함</td><td>PRD는 <code>figma-to-prd-blueprint.md</code>로. 완료 기준 5항은 ✘로 기록</td></tr>
+    <tr><td>검사 도구</td><td>Linter가 hook 변수 안의 직접 색을 못 잡고, <code>--fix</code>가 직접 값을 넣음. 검증 스킬 세 개(접근성·보안·RTL 리뷰)는 실행하지 못함</td><td>grep으로 따로 검사. RTL은 <code>inset-inline-start</code>·<code>border-inline-start</code>로 직접 수정</td></tr>
+    <tr><td>SLDS와 Figma의 색</td><td>SLDS 의미 hook은 값이 Figma와 다름(<code>on-surface-3</code> = 남색)</td><td>Figma 변수 값을 <code>slackTokens</code> 한 파일에 두고 컴포넌트는 토큰만 읽음. 대응표 <code>prd/COLORS.md</code></td></tr>
+    <tr><td>아이콘</td><td><code>lightning-icon src=</code>는 기본 색이 흰색이고 20px 크기가 없음. <code>lightning-button-icon</code>은 <code>src</code>를 받지 않음</td><td>Figma SVG를 스프라이트 하나(<code>slackIcons</code>, 49개)로 만들고 <code>&lt;svg&gt;&lt;use&gt;</code>로 그림. 색은 부모 <code>color</code> 상속</td></tr>
+    <tr><td>Jest의 한계</td><td>아이콘 색, rich text 커서 위치, 로딩 중 빈 결과 문구는 Jest가 못 잡음. CSS만 있는 모듈은 Jest가 못 찾음</td><td>org 확인을 절차에 넣음. <code>jest.config.js</code>의 <code>moduleNameMapper</code>에 .css 경로</td></tr>
+    <tr><td>규칙 변경 (#83)</td><td>SLDS 결정 계층 1순위(기본 컴포넌트 우선)를 따르면 모양이 Figma와 달라짐(rich text 툴바)</td><td>실습 스킬에 "Figma에 있는 부품은 SLDS 기본 컴포넌트가 있어도 만든다. 동작이 복잡한 것만 기본 컴포넌트를 안에서 쓴다"와 "만든 부품은 <code>prd/COMPONENTS.md</code>에서 찾아 재사용한다"를 넣음</td></tr>
+  </table></div>
+  <div class="callout key"><strong>실습이 말해 주는 것</strong>생성 자체는 됐다. 품질을 가른 것은 도구가 아니라 입력(Figma에 상태·변수·레이아웃이 있는가)과 관문(직접 값·접근성·org 렌더를 누가 어떻게 확인하는가)이었다. 그리고 "Figma대로"와 "SLDS 기본 컴포넌트 우선"은 프로젝트마다 먼저 골라야 하는 선택이지 도구가 정해 주는 것이 아니다.</div>
+  <p class="sources">출처: <a href="https://github.com/forcedotcom/sf-skills/blob/main/skills/experience-lwc-design-generate/SKILL.md">GitHub: forcedotcom/sf-skills experience-lwc-design-generate/SKILL.md (참고 파일 이름, 완료 기준)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html">SLDS Linter 가이드: Rules (<code>no-hardcoded-values-slds2</code>가 보는 속성)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/create-components-css-share.html">LWC 개발자 가이드: Share CSS Style Rules (CSS 모듈 <code>@import "c/모듈"</code>)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/lightning-component-reference/guide/lightning-icon.html">Lightning Component Reference: lightning-icon (<code>src</code>로 SVG 아이콘 지정)</a> (확인 2026-10-30) · <a href="../README.md">README 1.3 원칙 (밀버스의 판단 순서)</a> (확인 2026-10-30)</p>
+</section>
+
+<section id="milvus">
+  <h2>밀버스와의 관계: 함께 쓰되 밀버스를 넓힌다</h2>
+  <p>실습을 하면서 Figma를 따라가다 보니 밀버스에 이미 있는 원칙을 따로 다시 만들게 됐다. 이것이 두 도구의 관계를 정하는 근거다. 밀버스를 Figma to LWC에 맞춰 뒤집을 이유는 없고, 밀버스가 규칙과 관문이 되고 Figma to LWC가 그 앞단의 생성기가 되는 구조가 자연스럽다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>실습에서 새로 만든 것</th><th>밀버스에 이미 있는 것</th></tr>
+    <tr><td><code>slackTokens</code>: 직접 값은 이 파일 한 곳에만</td><td><code>milvusBrand.css</code>(util.css): hook 재정의는 브랜드 파일 한 곳에서만. <code>lib/rules.ts</code>가 검사</td></tr>
+    <tr><td><code>prd/COMPONENTS.md</code>: 만든 부품 목록, 만들기 전에 찾고 만든 뒤 추가</td><td><code>milvus.config.json</code>의 관리 컴포넌트 목록. <code>check</code>가 <code>milvus*</code> 이름을 목록과 견줌</td></tr>
+    <tr><td>"slackTokens 밖 직접 색 없음" grep 검사</td><td><code>pnpm milvus check --style</code> (브랜드 파일·BrandingSet·모달·이름 검사)</td></tr>
+  </table></div>
+  <h3>역할 분담</h3>
+  <div class="table-wrap"><table>
+    <tr><th>관점</th><th>Figma to LWC</th><th>밀버스 디자인 시스템</th><th>결합 시 조치</th></tr>
+    <tr><td>단위</td><td>컴포넌트 1개</td><td>화면 전체(org 테마, 브랜드 hook, 브리지, 유틸리티 바 로더, opt-in override)</td><td>생성 결과가 밀버스 런타임 안에서 동작한다</td></tr>
+    <tr><td>디자인 원본</td><td>Figma 파일. 토큰을 SLDS 변수로 매핑</td><td>org 테마(BrandingSet)와 <code>milvusBrand.css</code></td><td>Figma 색을 CSS에 직접 쓰지 않도록 PRD 스타일 항목에 명시</td></tr>
+    <tr><td>스타일 작성</td><td>컴포넌트 CSS는 hook만 읽음(직접 값 금지)</td><td>hook 재정의는 브랜드 파일 한 곳. 컴포넌트는 읽기만</td><td>규칙이 같다. <code>check --style</code>로 확인</td></tr>
+    <tr><td>패턴 일관성</td><td>디자인에 따름</td><td>패턴 문서(모달 규칙 등)와 <code>check</code>의 모달 검사</td><td>패턴 문서를 PRD·프롬프트에 포함</td></tr>
+    <tr><td>새 컴포넌트 판단</td><td>디자인이 오면 만듦</td><td>모양만 바꾸는 컴포넌트는 만들지 않음. 기능이 없을 때만</td><td>프로젝트 시작 때 충실도 모드를 고름(아래)</td></tr>
+  </table></div>
+  <h3>밀버스의 빈칸 네 가지와 순서</h3>
+  <p>Figma 입력을 받으려면 밀버스 쪽에 네 가지를 더해야 한다. 앞 단계의 결과가 다음 단계의 기준이 되므로 순서가 있다. 2026-10-30에 작업 저장소 이슈로 등록했다(a40418a/learndoshare #92~#95).</p>
+  <div class="table-wrap"><table>
+    <tr><th>순서</th><th>빈칸</th><th>실습에서 드러난 모습</th><th>밀버스를 넓히는 방향</th><th>시제품</th></tr>
+    <tr><td>1 (<a href="https://github.com/a40418a/learndoshare/issues/92">#92</a>)</td><td>Figma 입력 구간이 없음</td><td>밀버스는 디자이너용 Figma 구간을 범위 밖으로 둠</td><td>Figma 작성 규칙 문서화: 상태 전부, 역할 이름 변수, 자동 레이아웃</td><td><a href="#setup">Figma 파일 준비 체크리스트</a></td></tr>
+    <tr><td>2 (<a href="https://github.com/a40418a/learndoshare/issues/93">#93</a>)</td><td>브랜드가 색 하나로만 표현됨</td><td><code>BRAND_COLOR</code> 하나와 SLDS hook 재정의 중심. 색이 16개 이상인 디자인을 담을 수 없고, SLDS 의미 hook은 값이 어긋남</td><td>역할 이름 토큰 층: Figma 변수 → 밀버스 토큰 → SLDS hook. 가장 근본적인 변화라 설계안을 먼저 쓴다</td><td><code>slackTokens</code>, <code>prd/COLORS.md</code></td></tr>
+    <tr><td>3 (<a href="https://github.com/a40418a/learndoshare/issues/94">#94</a>)</td><td>컴포넌트 CSS의 직접 값을 검사하지 않음</td><td><code>check --style</code>은 브랜드 파일·BrandingSet·모달·이름만 봄. Linter도 hook 변수 안의 직접 색은 못 잡음</td><td>컴포넌트 CSS의 직접 색·px 검사를 <code>check</code>에 추가. 2가 "값을 둘 수 있는 곳"을 정해야 판정할 수 있음</td><td>grep 검사</td></tr>
+    <tr><td>4 (<a href="https://github.com/a40418a/learndoshare/issues/95">#95</a>)</td><td>새 컴포넌트 판단 기준이 하나뿐</td><td>"모양만 바꾸는 컴포넌트는 만들지 않음"</td><td>충실도 모드를 프로젝트 시작 때 고름. 1~3이 있어야 Figma 충실 모드도 같은 관문을 통과함</td><td>실습 스킬 #83 규칙, <code>prd/COMPONENTS.md</code></td></tr>
+  </table></div>
+  <h3>충실도 모드: 기본값은 바꾸지 않는다</h3>
+  <div class="table-wrap"><table>
+    <tr><th></th><th>기본 (밀버스 현행)</th><th>Figma 충실 모드</th></tr>
+    <tr><td>언제</td><td>대부분의 Salesforce 프로젝트</td><td>고객이 화면 일치를 요구할 때 (자체 브랜드 앱, Slack 같은 제품 UI)</td></tr>
+    <tr><td>규칙</td><td>SLDS 기본 컴포넌트 먼저, 브랜드는 테마·hook으로</td><td>Figma에 있는 부품은 직접 구현, 값은 토큰으로</td></tr>
+    <tr><td>공통</td><td colspan="2">직접 값은 한 곳에만, 컴포넌트 목록 관리, <code>check</code> 통과</td></tr>
+    <tr><td>예외</td><td>—</td><td>동작이 복잡한 것(rich text, 날짜 선택)은 기본 컴포넌트를 안에서 쓴다</td></tr>
+    <tr><td>얻는 것</td><td>접근성·보안·업데이트를 Salesforce가 맡는다</td><td>화면이 Figma와 같다</td></tr>
+    <tr><td>잃는 것</td><td>모양이 Figma와 다를 수 있다</td><td>접근성·보안·업데이트 대응을 직접 한다</td></tr>
+  </table></div>
+  <div class="flow">
+    <div class="step"><b>① 판단</b>충실도 모드와 밀버스 규칙으로 만들지 말지 정함</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>② 생성</b>Figma to LWC로 PRD와 코드. 값은 토큰 층으로</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>③ 검사</b><code>pnpm milvus check --style</code>, SLDS Linter, 완료 기준 11항목</div>
+    <div class="arrow">→</div>
+    <div class="step"><b>④ 배포</b><code>pnpm milvus deploy</code>(계획 확인 뒤) → org 렌더 확인</div>
+  </div>
+  <div class="callout key"><strong>정리</strong>함께 쓴다: 밀버스가 규칙과 관문, Figma to LWC가 앞단 생성기. 밀버스를 넓힌다: 위 네 가지는 Figma 입력을 받으려면 밀버스 쪽에 더해야 한다. 뒤집지는 않는다: "Figma 충실"을 밀버스의 기본값으로 삼으면 Salesforce가 맡아 주는 접근성·보안·업데이트를 잃으므로 선택하는 모드로 둔다. 이 결론의 현실적 기준은 고객사가 Figma 디자인 시스템을 다 갖춰 두었는가다. 갖춰져 있으면 Figma 충실 모드, 아니면 기본 모드가 효율과 안전 면에서 낫다.</div>
+  <p class="sources">출처: <a href="../README.md">README 1.3 원칙 (모양만 바꾸는 컴포넌트는 만들지 않음, hook은 브랜드 파일 한 곳)</a> (확인 2026-10-30) · <a href="../docs/specs/2026-10-08-milvus-package-design.md">패키지·CLI 설계 (4.3 check, 5.2 util.css 규칙, 5.3 피드백 색, BrandingSet BRAND_COLOR)</a> (확인 2026-10-30) · <a href="https://github.com/forcedotcom/sf-skills/blob/main/skills/design-systems-slds-apply/SKILL.md">GitHub: forcedotcom/sf-skills design-systems-slds-apply/SKILL.md (결정 계층, 직접 값 금지)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/lwc/guide/mcp-design.html">LWC 개발자 가이드: Figma to LWC Conversion Tool (범위 밖: org 테마·브랜드, 화면 간 패턴)</a> (확인 2026-10-30)</p>
+</section>
+
+<section id="quiz" class="quiz">
+  <h2>스스로 점검</h2>
+  <details><summary>Q1. "Figma to LWC MCP 도구를 설치해서 쓰라"는 문서를 받았다. 그대로 따르면 되나?</summary>
+    <p>공식 문서가 그 MCP 도구(<code>guide_figma_to_lwc_conversion</code>)는 <code>experience-lwc-design-generate</code> 스킬로 대체됐다고 적는다. 스킬 경로를 기본으로 하고, MCP 도구 경로는 프롬프트와 호출 순서만 다른 이전 형태로 본다. 둘 다 Figma를 읽는 일은 Framelink나 공식 Figma MCP 서버가 한다.</p></details>
+  <details><summary>Q2. <code>design-systems-slds-apply</code>가 플러그인에 없다. 플러그인이 깨진 건가?</summary>
+    <p>아니다. 이 스킬은 sf-skills의 <code>skills/</code> 아래 단독 스킬이고 <code>experience-lwc</code> 플러그인에 포함되지 않는다. <code>npx skills add forcedotcom/sf-skills</code>로 설치하거나 프로젝트 <code>.claude/skills/</code>에 복사한다.</p></details>
+  <details><summary>Q3. Framelink로 컴포넌트 두 개를 읽자마자 429가 났다. 서버 버그인가?</summary>
+    <p>Figma REST API 한도다. View·Collab 좌석은 파일·노드·이미지 읽기가 월 20회이고, <code>Retry-After</code>가 며칠 단위로 올 수 있다. 공식 Figma MCP도 같은 좌석 기준(월 20회)이다. 실무 전제는 Dev 또는 Full 좌석이고, 읽는 단위를 세트로 키우고 받은 데이터를 저장해 다시 쓴다.</p></details>
+  <details><summary>Q4. SLDS Linter가 0건인데 CSS에 <code>#007a5a</code>가 있다. 왜 못 잡았나?</summary>
+    <p><code>no-hardcoded-values-slds2</code>는 <code>color</code>·<code>background</code> 같은 속성의 값만 보고, <code>--slds-c-*: #007a5a</code>처럼 커스텀 속성 정의에 넣은 값은 보지 않는다. 그래서 "직접 값 없음"은 Linter만으로 보장되지 않고, 밀버스 <code>check</code>에 컴포넌트 CSS 검사를 더하는 일(#94)이 남아 있다.</p></details>
+  <details><summary>Q5. 스킬의 SLDS 결정 계층은 기본 컴포넌트가 1순위인데, 실습 규칙은 Figma 부품을 직접 만든다. 어느 쪽이 맞나?</summary>
+    <p>둘 다 맞고, 프로젝트 시작 때 고르는 문제다. 기본 모드는 접근성·보안·업데이트를 Salesforce가 맡고, Figma 충실 모드는 화면이 Figma와 같다. 밀버스는 기본 모드를 기본값으로 두고 Figma 충실 모드를 선택지로 더한다(#95). 어느 모드든 직접 값은 한 곳에만, 컴포넌트 목록, <code>check</code> 통과는 같다.</p></details>
+  <details><summary>Q6. 밀버스가 Figma 입력을 받으려면 무엇부터 해야 하나?</summary>
+    <p>Figma 작성 규칙 문서(#92) → 역할 이름 토큰 층 설계안(#93) → 컴포넌트 CSS 직접 값 검사(#94) → 충실도 모드(#95) 순서다. 2번이 "값을 둘 수 있는 곳"을 정해야 3번이 위반을 판정할 수 있고, 1~3이 있어야 4번의 Figma 충실 모드도 같은 관문을 통과한다.</p></details>
+  <p class="sources">출처: <a href="https://developer.salesforce.com/docs/platform/lwc/guide/mcp-design.html">LWC 개발자 가이드: Figma to LWC Conversion Tool (Q1 대체 관계)</a> (확인 2026-10-30) · <a href="https://github.com/forcedotcom/sf-skills">GitHub: forcedotcom/sf-skills README (Q2 단독 스킬 설치)</a> (확인 2026-10-30) · <a href="https://developers.figma.com/docs/rest-api/rate-limits/">Figma Developers: REST API Rate Limits (Q3)</a> (확인 2026-10-30) · <a href="https://help.figma.com/hc/en-us/articles/39252411778583">Figma 도움말: Plans, access, and permissions (Q3 월 20회)</a> (확인 2026-10-30) · <a href="https://developer.salesforce.com/docs/platform/slds-linter/guide/reference-rules.html">SLDS Linter 가이드: Rules (Q4)</a> (확인 2026-10-30) · <a href="https://github.com/forcedotcom/sf-skills/blob/main/skills/design-systems-slds-apply/SKILL.md">GitHub: forcedotcom/sf-skills design-systems-slds-apply/SKILL.md (Q5 결정 계층)</a> (확인 2026-10-30) · <a href="../README.md">README 1.3 원칙 (Q5·Q6 밀버스 결정)</a> (확인 2026-10-30)</p>
+</section>
+
+<footer class="doc-foot">
+  <span>밀버스 디자인 시스템 · Learn 10</span>
+  <span>2026-10-30 작성. Salesforce LWC 개발자 가이드, SLDS Linter 가이드, forcedotcom/sf-skills 원문, Figma 도움말·개발자 문서, figma_to_lwc 실습 기록으로 확인함</span>
+</footer>
+</main>
+</div>
+</body>
+</html>
