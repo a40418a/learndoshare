@@ -1,0 +1,202 @@
+<template>
+  <div class="composer">
+    <!-- 서식 툴바 + 입력 영역: 기본 컴포넌트 (PRD 2, Q1-A) -->
+    <lightning-input-rich-text
+      lwc:ref="editor"
+      label={labels.INPUT}
+      placeholder={placeholder}
+      formats={formats}
+      value={value}
+      disabled={disabled}
+      onchange={handleChange}
+    ></lightning-input-rich-text>
+
+    <div
+      class="footer slds-grid slds-grid_align-spread slds-grid_vertical-align-center"
+    >
+      <div
+        class="actions slds-grid slds-grid_vertical-align-center slds-wrap"
+        role="toolbar"
+        aria-label={labels.ACTIONS}
+      >
+        <button
+          class="slds-button slds-button_icon icon-btn attach"
+          title={labels.ATTACH}
+          data-name="attach"
+          disabled={disabled}
+          onclick={handleAction}
+        >
+          <lightning-icon src={icons.plus} size="xx-small"></lightning-icon>
+          <span class="slds-assistive-text">{labels.ATTACH}</span>
+        </button>
+
+        <button
+          class="slds-button slds-button_icon icon-btn"
+          title={labels.FORMATTING}
+          data-name="formatting"
+          disabled={disabled}
+          onclick={handleAction}
+        >
+          <lightning-icon
+            src={icons.formatting}
+            size="x-small"
+          ></lightning-icon>
+          <span class="slds-assistive-text">{labels.FORMATTING}</span>
+        </button>
+
+        <div class="slds-is-relative">
+          <button
+            class="slds-button slds-button_icon icon-btn"
+            title={labels.EMOJI}
+            data-popover="emoji"
+            aria-haspopup="dialog"
+            aria-expanded={emojiOpen}
+            disabled={disabled}
+            onclick={togglePopover}
+          >
+            <lightning-icon src={icons.emoji} size="x-small"></lightning-icon>
+            <span class="slds-assistive-text">{labels.EMOJI}</span>
+          </button>
+          <template lwc:if={emojiOpen}>
+            <section
+              class="slds-popover slds-popover_small slds-nubbin_bottom-left popover"
+              role="dialog"
+              aria-label={labels.EMOJI}
+              onkeydown={handlePopoverKeydown}
+            >
+              <div class="slds-popover__body slds-grid slds-wrap">
+                <template for:each={emojis} for:item="emoji">
+                  <button
+                    key={emoji.char}
+                    class="slds-button emoji"
+                    data-char={emoji.char}
+                    onclick={handleEmojiPick}
+                  >
+                    {emoji.char}
+                  </button>
+                </template>
+              </div>
+            </section>
+          </template>
+        </div>
+
+        <div class="slds-is-relative">
+          <button
+            class="slds-button slds-button_icon icon-btn"
+            title={labels.MENTION}
+            data-popover="mention"
+            aria-haspopup="dialog"
+            aria-expanded={mentionOpen}
+            disabled={disabled}
+            onclick={togglePopover}
+          >
+            <lightning-icon src={icons.mention} size="x-small"></lightning-icon>
+            <span class="slds-assistive-text">{labels.MENTION}</span>
+          </button>
+          <template lwc:if={mentionOpen}>
+            <section
+              class="slds-popover slds-nubbin_bottom-left popover"
+              role="dialog"
+              aria-label={labels.MENTION}
+              onkeydown={handlePopoverKeydown}
+            >
+              <div class="slds-popover__body">
+                <lightning-input
+                  type="search"
+                  label={labels.MENTION_SEARCH}
+                  variant="label-hidden"
+                  placeholder={labels.MENTION_SEARCH}
+                  onchange={handleMentionSearch}
+                ></lightning-input>
+                <template lwc:if={usersError}>
+                  <p class="slds-p-top_x-small slds-text-color_error">
+                    {labels.MENTION_ERROR}
+                  </p>
+                </template>
+                <template lwc:elseif={hasUsers}>
+                  <ul class="slds-p-top_x-small">
+                    <template for:each={users} for:item="user">
+                      <li key={user.id}>
+                        <button
+                          class="slds-button slds-size_full slds-text-align_left"
+                          data-name={user.name}
+                          onclick={handleMentionPick}
+                        >
+                          {user.name}
+                        </button>
+                      </li>
+                    </template>
+                  </ul>
+                </template>
+                <template lwc:elseif={noUsers}>
+                  <p class="slds-p-top_x-small slds-text-color_weak">
+                    {labels.MENTION_EMPTY}
+                  </p>
+                </template>
+              </div>
+            </section>
+          </template>
+        </div>
+
+        <span class="divider" aria-hidden="true"></span>
+
+        <button
+          class="slds-button slds-button_icon icon-btn"
+          title={labels.VIDEO}
+          data-name="video"
+          disabled={disabled}
+          onclick={handleAction}
+        >
+          <lightning-icon src={icons.video} size="x-small"></lightning-icon>
+          <span class="slds-assistive-text">{labels.VIDEO}</span>
+        </button>
+        <button
+          class="slds-button slds-button_icon icon-btn"
+          title={labels.AUDIO}
+          data-name="audio"
+          disabled={disabled}
+          onclick={handleAction}
+        >
+          <lightning-icon src={icons.audio} size="x-small"></lightning-icon>
+          <span class="slds-assistive-text">{labels.AUDIO}</span>
+        </button>
+
+        <span class="divider" aria-hidden="true"></span>
+
+        <button
+          class="slds-button slds-button_icon icon-btn"
+          title={labels.SHORTCUT}
+          data-name="shortcut"
+          disabled={disabled}
+          onclick={handleAction}
+        >
+          <lightning-icon src={icons.shortcut} size="x-small"></lightning-icon>
+          <span class="slds-assistive-text">{labels.SHORTCUT}</span>
+        </button>
+      </div>
+
+      <!-- 보내기 분할 버튼: Empty 면 비활성, Filled 면 활성 (PRD 6) -->
+      <div class="slds-button-group send" role="group">
+        <button
+          class="slds-button slds-button_brand send-btn"
+          title={labels.SEND}
+          disabled={sendDisabled}
+          onclick={handleSend}
+        >
+          <lightning-icon src={icons.send} size="x-small"></lightning-icon>
+          <span class="slds-assistive-text">{labels.SEND}</span>
+        </button>
+        <button
+          class="slds-button slds-button_brand send-btn"
+          title={labels.SEND_OPTIONS}
+          data-name="sendoptions"
+          disabled={sendDisabled}
+          onclick={handleAction}
+        >
+          <lightning-icon src={icons.chevron} size="xx-small"></lightning-icon>
+          <span class="slds-assistive-text">{labels.SEND_OPTIONS}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</template>
