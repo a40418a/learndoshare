@@ -10,6 +10,8 @@ description: Figma 링크(figma.com/design/...?node-id=...)를 받아 이 프로
 ## 0. 범위
 
 - 판단 기준은 **Figma 충실도, SLDS 결정 계층(기본 컴포넌트 → 블루프린트 → styling hook), 스킬 완료 기준 11항목**이다.
+- **Figma 에 있는 부품은 SLDS 기본 컴포넌트가 있어도 LWC 로 만든다.** 모양은 Figma 를 따르고, 동작이 복잡한 것(rich text, 날짜 선택 등)만 기본 컴포넌트를 안에서 쓴다. 이 규칙이 스킬의 SLDS 결정 계층 1순위(기본 컴포넌트 우선)보다 앞선다.
+- **한 번 만든 부품은 다시 만들지 않고 가져다 쓴다** (1.5장).
 - 밀버스 디자인 시스템 규칙(`milvus check`, milvusBrand, 밀버스 패턴)은 적용하지 않는다.
 - 대상 org 는 `learndoshare_1` (`.sf/config.json` 의 target-org).
 
@@ -21,6 +23,16 @@ description: Figma 링크(figma.com/design/...?node-id=...)를 받아 이 프로
 4. **상태:** 노드가 `COMPONENT` 이고 `componentSetId` 가 있으면 같은 세트의 다른 변형(Empty·Filled·Disabled 등)도 읽는다. 링크가 하나여도 상태는 세트 전체가 기준이다.
 5. 둘 중 하나가 연결돼 있지 않으면(`claude mcp list`) 멈추고 알린다. 추측으로 진행하지 않는다.
 
+## 1.5 부품 재사용 — 만들기 전에 목록부터 본다
+
+목록: `prd/COMPONENTS.md` (Figma 컴포넌트 세트 → LWC).
+
+1. 1장에서 읽은 노드 안의 `INSTANCE` 마다 `componentId` 의 세트(`componentSetId`) 이름을 모은다.
+2. 목록에 있는 세트는 그 LWC 를 쓴다(`<c-slack-button>` 등). 같은 모양을 새로 그리지 않는다.
+3. 목록에 없는 세트는 **그 부품부터** 만든다. 작은 부품 → 큰 묶음 순서. 한 번에 다 못 만들면 PRD 에 "미구현 부품" 으로 적고 사용자에게 알린다.
+4. 새로 만든 부품은 바로 목록에 추가한다(세트 이름, 세트 id, LWC, 구현한 변형, 안 한 변형).
+5. 이름: `<파일 접두사><세트 이름 camelCase>`. 이 파일(Slack UI Kit)의 접두사는 `slack` (예: Button → `slackButton`, Icon Button → `slackIconButton`). 변형 속성(`State=Hover` 등)은 컴포넌트를 나누지 않고 `@api` 나 CSS 상태로 만든다.
+
 ## 2. PRD — 확정 전에는 코드를 쓰지 않는다
 
 - 위치: `prd/<componentName>/PRD.md`
@@ -31,13 +43,13 @@ description: Figma 링크(figma.com/design/...?node-id=...)를 받아 이 프로
 
 | # | 질문 | 추천안(A) |
 |---|---|---|
-| Q1 | 같은 일을 하는 기본 컴포넌트가 있을 때: 기본 컴포넌트 vs Figma 모양 재현 | 기본 컴포넌트. 모양 차이를 PRD 에 적음 |
+| Q1 | 동작이 복잡한 부분을 기본 컴포넌트로 감쌀지 직접 만들지 | 모양은 Figma. 동작만 기본 컴포넌트를 안에서 씀 |
 | Q2 | 아이콘: SLDS utility vs Figma SVG | Figma SVG 스프라이트 + 색 hook (3장) |
 | Q3 | SLDS hook 이 없는 Figma 색 | 가장 가까운 SLDS 변형(brand 등). 그대로 쓰면 직접 값 위치를 PRD 에 적음 |
 | Q4 | 버튼별 기능 범위: 실제 구현 vs 이벤트만 | 이벤트(`action`)만. 구현할 버튼을 고르게 함 |
 | Q5 | 데이터: 연결할 객체·필드 | 없음(@api 로 받음) |
 | Q6 | 놓을 곳: 앱·레코드·홈 페이지, 플로우 | App 페이지 |
-| Q7 | 같은 역할의 기존 컴포넌트가 있으면: 교체 vs 나란히 | 나란히 두고 비교 |
+| Q7 | 목록에 없는 부품이 섞여 있을 때: 먼저 만들기 vs 이번엔 생략 | 먼저 만들기 (1.5장) |
 
 ## 3. 생성 — 실측에서 나온 함정
 
