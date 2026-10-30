@@ -1,0 +1,39 @@
+/*
+ * Slack UI Kit 의 Figma 변수 값. Slack 색·크기의 직접 값은 이 파일 한 곳에만 둔다.
+ * 쓰는 쪽: CSS 첫 줄에 @import 'c/slackTokens';
+ * 이름은 Figma 변수 이름을 그대로 옮긴다 (Slack/UI/1D1C1D-30% → --slack-ui-1d1c1d-30). 대응표: prd/COLORS.md
+ */
+:host {
+  --slack-brand-ffffff: #ffffff;
+  --slack-brand-f8f8f8: #f8f8f8;
+  --slack-brand-1d1c1d: #1d1c1d;
+  --slack-brand-007a5a: #007a5a;
+  --slack-ui-1d1c1d-70: rgba(29, 28, 29, 0.7);
+  --slack-ui-1d1c1d-50: rgba(29, 28, 29, 0.5);
+  --slack-ui-1d1c1d-30: rgba(29, 28, 29, 0.3);
+  --slack-ui-1d1c1d-13: rgba(29, 28, 29, 0.13);
+  --slack-ui-1d1c1d-6: rgba(29, 28, 29, 0.06);
+  --slack-ui-148567: #148567;
+  --slack-ui-006e51: #006e51;
+  --slack-ui-007a5a-30: rgba(0, 122, 90, 0.3);
+  --slack-ui-007a5a-50: rgba(0, 122, 90, 0.5);
+  --slack-ui-fafafa-83: rgba(250, 250, 250, 0.83);
+  --slack-ui-ffffff-20: rgba(255, 255, 255, 0.2);
+  --slack-ui-ffffff-25: rgba(255, 255, 255, 0.25);
+
+  /* Figma 효과 스타일 Slack/button, Slack/button-primary */
+  --slack-shadow-button: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+  --slack-shadow-button-primary: 0 1px 4px 0 rgba(0, 0, 0, 0.3);
+
+  /* 글자: Lato 는 org 에 없어 글꼴은 org 기본을 쓰고 크기·굵기·줄높이만 맞춘다 */
+  --slack-font-size-15: 0.9375rem;
+  --slack-font-size-13: 0.8125rem;
+  --slack-line-height-18: 1.125rem;
+
+  /* SLDS 에 같은 값이 없는 크기 */
+  --slack-size-36: 2.25rem;
+  --slack-size-28: 1.75rem;
+  --slack-space-3: 3px;
+  --slack-radius-4: 4px;
+  --slack-opacity-80: 0.8;
+}
