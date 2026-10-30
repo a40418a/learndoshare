@@ -503,6 +503,7 @@ pnpm sync:theme
 | 7 | [pnpm](<Learn/07-pnpm.html>) | strict node_modules, 버전별 차이(10 / 11+), 빌드 스크립트 승인, hoisting, husky, GitHub Packages 설치, `pnpm milvus` 명령과 `update` | 1 | 1시간 |
 | 8 | [Claude Code 런북](<Learn/08-Claude Code 런북.html>) | `CLAUDE.md`, skill, plugin, hook과 permissions, `init`이 만드는 것, 브랜드 요청 → 반영 흐름 | 6 | 1시간 |
 | 9 | [override와 공식 권고](<Learn/09-override와 공식 권고.html>) | 새 컴포넌트 vs 덮어쓰기, SLDS 1·2 커스터마이즈 범위, Salesforce가 권하지 않는 이유, 실험 A~C(세 방식 비교, synthetic·native 라이브 데모, 업데이트 위험), opt-in `milvusOverride.css` | 9 (발표) | 1시간 |
+| 10 | [Figma to LWC](<Learn/10-Figma to LWC.html>) | Figma to LWC의 두 경로(MCP 도구 → `experience-lwc-design-generate` 스킬), `design-systems-slds-apply`의 정체와 검증 절차, Figma MCP·Framelink 한도, SLDS Linter가 못 잡는 것, 실습 결과, 밀버스와의 관계(넓힐 4가지 #92~#95) | 전체 | 1.5시간 |
 
 **추천 순서:** 0 → 1 → 7 → 2 → 3 → 4 → 5 → 8 → 6 → 9. 0(개념)으로 전체 그림을 잡고, 1(SLDS)과 7(pnpm)을 읽으면 Phase 1을 바로 시작할 수 있다. 9는 발표에서 override를 설명하기 전에 읽는다.
 

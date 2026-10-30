@@ -39,6 +39,9 @@ export const SOURCE_DOMAINS = [
   "github.com/DietrichGebert", // Ponytail
   "github.com/lukethacoder", // LWC Garden
   "lwc.garden",
+  "help.figma.com", // Figma 도움말 (MCP 서버 플랜·도구)
+  "developers.figma.com", // Figma 개발자 문서 (REST API 한도)
+  "github.com/GLips", // Framelink Figma MCP
 ];
 
 // 프로젝트의 결정·실측 기록. 외부 사실의 출처로는 쓰지 않는다 (Learn/ 기준 상대 링크, ../ 뒤의 경로)
