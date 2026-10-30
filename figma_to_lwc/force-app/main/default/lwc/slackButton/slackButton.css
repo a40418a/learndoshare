@@ -1,0 +1,76 @@
+@import "c/slackTokens";
+
+/* 값은 Figma Button(92:11225) 그대로. 직접 값은 slackTokens 에만 있다 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--slds-g-spacing-1, 0.25rem);
+  height: var(--slack-size-36);
+  padding: 0 var(--slds-g-spacing-2, 0.5rem) var(--slds-g-sizing-border-1, 1px);
+  border: var(--slds-g-sizing-border-1, 1px) solid transparent;
+  border-radius: var(--slack-radius-4);
+  font-size: var(--slack-font-size-15);
+  font-weight: var(--slds-g-font-weight-7, 700);
+  line-height: var(--slack-line-height-18);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+/* 키보드 포커스: Figma 에 없음 — 접근성을 위해 SLDS 포커스 링 */
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--slds-g-shadow-outline-focus-1);
+}
+
+/* Figma 에 없음(PRD 6). 정해질 때까지 흐리게만 한다 */
+.btn:disabled {
+  opacity: var(--slack-opacity-80);
+  cursor: default;
+  box-shadow: none;
+}
+
+.btn_secondary {
+  background: var(--slack-brand-ffffff);
+  border-color: var(--slack-ui-1d1c1d-30);
+  color: var(--slack-brand-1d1c1d);
+}
+.btn_secondary:hover:not(:disabled) {
+  background: var(--slack-brand-f8f8f8);
+  box-shadow: var(--slack-shadow-button);
+}
+.btn_secondary:active:not(:disabled) {
+  background: var(--slack-brand-f8f8f8);
+  border-color: var(--slack-ui-1d1c1d-50);
+  box-shadow: none;
+}
+
+.btn_primary {
+  background: var(--slack-brand-007a5a);
+  color: var(--slack-brand-ffffff);
+}
+.btn_primary:hover:not(:disabled) {
+  background: var(--slack-ui-148567);
+  box-shadow: var(--slack-shadow-button-primary);
+}
+.btn_primary:active:not(:disabled) {
+  background: var(--slack-ui-006e51);
+  box-shadow: none;
+}
+
+.btn_tertiary {
+  height: var(--slack-size-28);
+  font-size: var(--slack-font-size-13);
+  background: var(--slack-brand-ffffff);
+  border-color: var(--slack-ui-007a5a-30);
+  color: var(--slack-brand-007a5a);
+}
+.btn_tertiary:hover:not(:disabled) {
+  background: var(--slack-brand-f8f8f8);
+  box-shadow: var(--slack-shadow-button);
+}
+.btn_tertiary:active:not(:disabled) {
+  background: var(--slack-ui-fafafa-83);
+  border-color: var(--slack-ui-007a5a-50);
+  box-shadow: none;
+}

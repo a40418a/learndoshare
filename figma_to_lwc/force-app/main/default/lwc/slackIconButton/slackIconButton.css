@@ -1,0 +1,37 @@
+@import "c/slackTokens";
+
+/*
+ * Figma Icon Button(7:10043) 은 어두운 바탕 위에서 쓰는 버튼이다(반투명 흰색 hover).
+ * 아이콘 색은 Figma 컴포넌트에 없어 부모의 글자색(color)을 따른다.
+ */
+.btn {
+  display: inline-flex;
+  padding: var(--slack-space-3);
+  border: none;
+  border-radius: var(--slack-radius-4);
+  background: transparent;
+  color: inherit;
+  opacity: var(--slack-opacity-80);
+  cursor: pointer;
+}
+.btn:hover:not(:disabled) {
+  background: var(--slack-ui-ffffff-20);
+  opacity: 1;
+}
+.btn_active {
+  background: var(--slack-ui-ffffff-25);
+  opacity: 1;
+}
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--slds-g-shadow-outline-focus-1);
+}
+.btn:disabled {
+  cursor: default;
+}
+
+.icon {
+  width: var(--slds-g-sizing-6, 1.25rem);
+  height: var(--slds-g-sizing-6, 1.25rem);
+  fill: currentColor;
+}
