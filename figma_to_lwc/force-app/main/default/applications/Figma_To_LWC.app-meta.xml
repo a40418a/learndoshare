@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Figma to LWC 실습에서 만든 컴포넌트를 확인하는 앱</description>
+    <formFactors>Large</formFactors>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <label>Figma To LWC</label>
+    <navType>Standard</navType>
+    <tabs>Message_Composer_Test</tabs>
+    <uiType>Lightning</uiType>
+</CustomApplication>
