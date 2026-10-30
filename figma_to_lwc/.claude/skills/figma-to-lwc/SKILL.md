@@ -38,7 +38,7 @@ description: Figma 링크(figma.com/design/...?node-id=...)를 받아 이 프로
 - 위치: `prd/<componentName>/PRD.md`
 - 구성은 스킬의 `references/figma-to-prd-blueprint.md` 를 따른다. `references/prd-analysis-template.md` 는 PRD 양식이 아니라 SARIF 프롬프트이므로 쓰지 않는다.
 - 이름은 스킬의 `scripts/check-component-name.sh <camelCase> <kebab-case>` 로 검사한다.
-- Figma 색은 `prd/COLORS.md` 에서 먼저 찾고, 없으면 hook 을 정해 그 표에 추가한다. 간격·반경도 SLDS 전역 hook 으로 대응한다(`.claude/skills/design-systems-slds-apply/assets/hooks-index.json` 에 있는 이름만).
+- Figma 색·그림자는 `prd/COLORS.md` 에서 토큰을 찾고, 없으면 `lwc/slackTokens/slackTokens.css` 와 그 표에 함께 추가한다. SLDS 의미 hook(`--slds-g-color-on-surface-*` 등)은 값이 Figma 와 달라 색에는 쓰지 않는다. 간격·크기는 SLDS 전역 hook 에 같은 값이 있으면 그것을, 없으면 토큰을 쓴다(`.claude/skills/design-systems-slds-apply/assets/hooks-index.json` 에 있는 이름만).
 - 아래 질문을 **추천안(A)과 함께** 한 번에 묻고, 답을 PRD 상단에 "확정" 으로 적는다. 사용자가 프롬프트에서 이미 답한 항목은 묻지 않는다.
 
 | # | 질문 | 추천안(A) |
@@ -67,6 +67,8 @@ description: Figma 링크(figma.com/design/...?node-id=...)를 받아 이 프로
   - `formats` 에 `code`·`code-block` 을 넣어도 툴바 버튼은 생기지 않는다.
   - 커서 자리에 넣을 때는 `setRangeText(text, undefined, undefined, "end")`. 인자 하나만 주면 커서가 넣은 글자 앞에 남는다. `insertTextAtCursor` 는 내부용이라 쓰지 않는다.
 - **조회가 있는 팝오버**는 결과가 오기 전에 빈 결과 문구를 보이지 않는다(로딩 플래그).
+- **공용 토큰** `slackTokens` 는 CSS 만 있는 모듈이다. CSS 첫 줄에 `@import "c/slackTokens";`. Jest 는 이 모듈을 못 찾으므로 `jest.config.js` 의 `moduleNameMapper` 에 .css 경로가 있어야 한다(새 CSS 모듈을 만들면 같이 추가).
+- **새 부품의 아이콘**은 `<svg><use xlink:href={sprite#id}>` 로 직접 그린다. `lightning-icon` 크기(16·24px)에 없는 20px 같은 Figma 크기와 `color` 상속이 바로 된다.
 - **GraphQL** 은 `lightning/graphql`. 필요할 때만 조회하려면 `query` 를 `undefined` 로 돌려준다.
 
 ## 4. 검증 — 이 순서로, 결과를 그대로 보고한다
