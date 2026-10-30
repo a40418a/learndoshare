@@ -14,8 +14,12 @@ for f in sorted(src.glob("*.svg")):
     body = re.sub(r"<defs>.*?</defs>", "", body, flags=re.S)  # Figma 가 붙이는 뷰박스 크기 clipPath 는 효과가 없다
     body = re.sub(r"</?g[^>]*>", "", body)
     body = re.sub(r'\s*fill="(?!none)[^"]*"', "", body)
-    if re.search(r'(?<![-\w])fill="none"', body) or "stroke=" in body:
-        sys.exit(f"{f.name}: 선(stroke) 아이콘은 fill 상속으로 색이 바뀌지 않는다. 직접 확인할 것")
+    # 선(stroke) 아이콘: 선 색도 같은 hook 을 따르게 하고, fill="none" 은 남겨 열린 선 안쪽이 칠해지지 않게 한다
+    body = re.sub(
+        r"<(\w+)([^>]*?)\sstroke=\"[^\"]*\"",
+        lambda m: f'<{m[1]}{re.sub(r" fill=\"none\"", "", m[2])} fill="none" style="stroke: var(--slds-c-icon-color-foreground, currentColor)"',
+        body,
+    )
     symbols.append(f'<symbol id="{f.stem}" viewBox="{vb}">{body.strip()}</symbol>')
 
 if not symbols:
